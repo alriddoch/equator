@@ -8,6 +8,7 @@
 #include "InheritanceWindow.h"
 #include "ServerWindow.h"
 #include "Model.h"
+#include "Server.h"
 #include "Palette.h"
 
 #include "gui/gtkmm/DockWindow.h"
@@ -211,6 +212,16 @@ void MainWindow::newView(Model * model)
     ViewWindow * view = manage( new ViewWindow(*this, *model) );
     m_views.push_back(view);
     view->setTitle();
+}
+
+Server & MainWindow::newServer()
+{
+    Server * server = new Server(*this);
+
+    m_servers.push_back(server);
+    serverAdded.emit(server);
+
+    return *server;
 }
 
 void MainWindow::menu_quit()

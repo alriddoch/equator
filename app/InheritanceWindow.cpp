@@ -37,19 +37,28 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
 
     m_columns = new Gtk::TreeModelColumnRecord();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
-    m_valueColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    // m_valueColumn = new Gtk::TreeModelColumn<Glib::ustring>();
     m_columns->add(*m_nameColumn);
-    m_columns->add(*m_valueColumn);
+    // m_columns->add(*m_valueColumn);
 
     m_treeModel = Gtk::TreeStore::create(*m_columns);
 
     Gtk::TreeModel::Row row = *(m_treeModel->append());
-    row[*m_nameColumn] = Glib::ustring("test name");
-    row[*m_valueColumn] = Glib::ustring("test value");
+    row[*m_nameColumn] = "test name";
+    // row[*m_valueColumn] = Glib::ustring("test value");
+
+    Gtk::TreeModel::Row childrow = *(m_treeModel->append(row.children()));
+    childrow[*m_nameColumn] = "test child";
+
+    Gtk::TreeModel::Row grandchildrow = *(m_treeModel->append(childrow.children()));
+    grandchildrow[*m_nameColumn] = "test child";
 
     m_treeView = manage( new Gtk::TreeView() );
 
     m_treeView->set_model( m_treeModel );
+
+    m_treeView->append_column("name", *m_nameColumn);
+    // m_treeView->append_column("name", *m_valueColumn);
     
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);

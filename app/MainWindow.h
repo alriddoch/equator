@@ -15,6 +15,7 @@ class InheritanceWindow;
 class ServerWindow;
 class Palette;
 class Model;
+class Server;
 class OptionBox;
 
 namespace Gtk {
@@ -26,6 +27,7 @@ class MainWindow : public Gtk::Window
   private:
     std::list<ViewWindow*> m_views;
     std::list<Model*> m_models;
+    std::list<Server*> m_servers;
 
   public:
     typedef enum {
@@ -60,6 +62,7 @@ class MainWindow : public Gtk::Window
     // references, so that the other windows can connect in their constructors
     SigC::Signal1<void, Model *> modelAdded;
     SigC::Signal1<void, Model *> currentModelChanged;
+    SigC::Signal1<void, Server *> serverAdded;
 
     LayerWindow & m_layerwindow;
     InheritanceWindow & m_inheritancewindow;
@@ -79,6 +82,8 @@ class MainWindow : public Gtk::Window
     gint quit( GdkEventAny *);
     Model & newModel();
     void newView(Model *);
+    Server & newServer();
+
     void menu_quit();
     void inheritance_window();
     void server_window();

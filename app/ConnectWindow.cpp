@@ -4,6 +4,7 @@
 
 #include "ConnectWindow.h"
 
+#include "MainWindow.h"
 #include "Server.h"
 
 #include <Eris/Connection.h>
@@ -116,7 +117,7 @@ void ConnectWindow::createConnection()
 
     m_status->push("Connecting...", m_statusContext);
 
-    m_server = new Server(m_mainWindow);
+    m_server = &m_mainWindow.newServer();
 
     m_hostEntry->set_editable(false);
     m_connectButton->set_sensitive(false);
