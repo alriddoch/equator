@@ -71,7 +71,7 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_redrawRequired(true),
-           m_refreshRequired(true),
+           m_animationRequired(false),
            m_frameStore(0),
            m_viewNo(m.getViewNo()),
            m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
@@ -148,11 +148,13 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
                                            &ViewWindow::cursorMoved));
     signal_realize().connect(SigC::slot(*this, &GlView::realize));
-    signal_configure_event().connect(SigC::slot(*this, &GlView::configureEvent));
+    // signal_configure_event().connect(SigC::slot(*this, &GlView::configureEvent));
     signal_expose_event().connect(SigC::slot(*this, &GlView::exposeEvent));
     signal_button_press_event().connect(SigC::slot(*this, &GlView::buttonPressEvent));
     signal_button_release_event().connect(SigC::slot(*this, &GlView::buttonReleaseEvent));
     signal_motion_notify_event().connect(SigC::slot(*this, &GlView::motionNotifyEvent));
+
+    startAnimation();
 }
 
 void GlView::setOrthographic()
@@ -247,8 +249,6 @@ void GlView::initgl()
         initExtensions();
     }
 
-    setupgl();
-
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -280,36 +280,22 @@ void GlView::initgl()
 
 void GlView::setupgl()
 {
-    if (make_current()) {
-        glViewport(0, 0, (GLint)(get_width()), (GLint)(get_height()));
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
+    glViewport(0, 0, (GLint)(get_width()), (GLint)(get_height()));
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-        if (m_projection == GlView::PERSP) {
-#if 0
-            if (get_width()>get_height()) {
-                GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();
-                glFrustum( -w, w, -1.0f, 1.0f, 1.0f, 60.0f );
-            } else {
-                GLfloat h = (GLfloat) get_height() / (GLfloat) get_width();
-                glFrustum( -1.0f, 1.0f, -h, h, 1.0f, 60.0f );
-            }
-#else
-            GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();
-            gluPerspective(45.f, w, .1f, 60.f);
-#endif
-        } else {
-            float xsize = get_width() / 40.0f / 2.0f;
-            float ysize = get_height() / 40.0f / 2.0f;
-            glOrtho(-xsize, xsize, -ysize, ysize, -100.0f, 100.0f);
-        }
-
+    if (m_projection == GlView::PERSP) {
+        GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();
+        gluPerspective(45.f, w, .1f, 60.f);
+    } else {
+        float xsize = get_width() / 40.0f / 2.0f;
+        float ysize = get_height() / 40.0f / 2.0f;
+        glOrtho(-xsize, xsize, -ysize, ysize, -100.0f, 100.0f);
     }
 }
 
 void GlView::origin()
 {
-    // Not safe to call when make_current() has not been called
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     if (m_projection == GlView::PERSP) {
@@ -342,115 +328,37 @@ void GlView::cursor()
 
 void GlView::drawgl()
 {
-    if (make_current()) {
-        origin();
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        glPushMatrix();
-        float cx, cy, cz;
-        m_model.getCursor(cx, cy, cz);
-        glTranslatef(cx, cy, cz);
-        glEnable(GL_TEXTURE_1D);
-        glBindTexture(GL_TEXTURE_1D, m_antTexture);
-        const GLfloat vertices[] = { 0.f, 0.f, 0.f, 0.f, 0.f, -cz };
-        const GLfloat texcoords[] = { 0.f, cz };
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
-        glDrawArrays(GL_LINES, 0, 2);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisable(GL_TEXTURE_1D);
-        face();
-        cursor();
-        glPopMatrix();
-
-        const std::list<Layer *> & layers = m_model.getLayers();
-        std::list<Layer *>::const_iterator I;
-        for(I = layers.begin(); I != layers.end(); I++) {
-            if ((*I)->isVisible()) {
-                (*I)->draw(*this);
-            }
-        }
-        glFlush();
-
-#ifdef USE_FRAMESTORE
-        if (m_frameStore != 0) {
-            if ((m_frameStoreWidth != get_width()) ||
-                (m_frameStoreHeight != get_height())) {
-                delete [] m_frameStore;
-                delete [] m_depthStore;
-                m_frameStore = 0;
-            }
-        }
-        if (m_frameStore == 0) {
-            m_frameStoreWidth = get_width();
-            m_frameStoreHeight = get_height();
-
-            m_frameStore = new GLubyte[get_width() * get_height() * 4];
-            m_depthStore = new GLfloat[get_width() * get_height()];
-        }
-        std::cout << "Frampt " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
-        std::cout << "Grimple " << get_width() << " " << get_height() << std::endl << std::flush;
-        glReadPixels(0, 0, get_width(), get_height(),
-                     GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
-        glReadPixels(0, 0, get_width(), get_height(),
-                     GL_DEPTH_COMPONENT, GL_FLOAT, m_depthStore);
-#endif
-
-        mouseEffects();
-        swap_buffers();
-    }
-}
-
-bool GlView::animate()
-{
-    if (!m_refreshRequired ||
-        (m_frameStoreWidth != get_width()) ||
-        (m_frameStoreHeight != get_height()) ||
-        !make_current()) {
-        return false;
-    }
-    m_refreshRequired = false;
-
-#if USE_FRAMESTORE
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glRasterPos2i(0,0);
-    glDepthMask(GL_FALSE);
-    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                 GL_DEPTH_COMPONENT, GL_FLOAT, m_depthStore);
-    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                 GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
-    glDepthMask(GL_TRUE);
-    std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
-#endif
-
-    m_animCount += 0.02f;
-    if (m_animCount > 1.0f) {
-        m_animCount = 0.0f;
-    }
-
-    setupgl();
     origin();
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glPushMatrix();
+    float cx, cy, cz;
+    m_model.getCursor(cx, cy, cz);
+    glTranslatef(cx, cy, cz);
+    glEnable(GL_TEXTURE_1D);
+    glBindTexture(GL_TEXTURE_1D, m_antTexture);
+    const GLfloat vertices[] = { 0.f, 0.f, 0.f, 0.f, 0.f, -cz };
+    const GLfloat texcoords[] = { 0.f, cz };
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
+    glDrawArrays(GL_LINES, 0, 2);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisable(GL_TEXTURE_1D);
+    face();
+    cursor();
+    glPopMatrix();
 
     const std::list<Layer *> & layers = m_model.getLayers();
     std::list<Layer *>::const_iterator I;
     for(I = layers.begin(); I != layers.end(); I++) {
         if ((*I)->isVisible()) {
-            if ((*I)->animate(*this)) {
-                m_refreshRequired = true;
-            }
+            (*I)->draw(*this);
         }
     }
+    glFlush();
 
     mouseEffects();
-
-    swap_buffers();
-    return false;
 }
 
 void GlView::clickOn(int x, int y)
@@ -604,51 +512,52 @@ void GlView::midClickOff(int x, int y)
 void GlView::worldPoint(int x, int y, double &z,
                         double * wx, double * wy, double * wz)
 {
-    if (make_current()) {
-        GLint viewport[4];
-        GLdouble mvmatrix[16], projmatrix[16];
-        // float z = 0.5;
-        if (z < -1) {
-            z = getZ(x, get_height() - y);
-        }
-
-        setupgl();
-        origin();
-
-        glGetIntegerv (GL_VIEWPORT, viewport);
-        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
-        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
-
-        gluUnProject(x, get_height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
-        // std::cout << "[" << x << ":" << y << ":" << z << "]";
-        // std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
+    if (!make_current()) {
+        return;
     }
+    GLint viewport[4];
+    GLdouble mvmatrix[16], projmatrix[16];
+    // float z = 0.5;
+    if (z < -1) {
+        z = getZ(x, get_height() - y);
+    }
+
+    setupgl();
+    origin();
+
+    glGetIntegerv (GL_VIEWPORT, viewport);
+    glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+    glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+    gluUnProject(x, get_height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
 }
 
 void GlView::screenPoint(float x, float y, float z,
                          int & sx, int & sy, double & sz)
 {
-    if (make_current()) {
-        GLint viewport[4];
-        GLdouble mvmatrix[16], projmatrix[16];
-        // float z = 0.5;
-        if (z < -1) {
-            z = getZ(::lrintf(x), ::lrintf(get_height() - y));
-        }
-
-        setupgl();
-        origin();
-
-        glGetIntegerv (GL_VIEWPORT, viewport);
-        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
-        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
-
-        double tx, ty, tz;
-        gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
-        sx = ::lrint(tx);
-        sy = ::lrint(get_height() - ty);
-        sz = tz;
+    if (!make_current()) {
+        return;
     }
+
+    GLint viewport[4];
+    GLdouble mvmatrix[16], projmatrix[16];
+    // float z = 0.5;
+    if (z < -1) {
+        z = getZ(::lrintf(x), ::lrintf(get_height() - y));
+    }
+
+    setupgl();
+    origin();
+
+    glGetIntegerv (GL_VIEWPORT, viewport);
+    glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+    glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+    double tx, ty, tz;
+    gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
+    sx = ::lrint(tx);
+    sy = ::lrint(get_height() - ty);
+    sz = tz;
 }
 
 void GlView::realize()
@@ -735,43 +644,44 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
 void GlView::mouseEffects()
 {
     // We may want to be a little smarter about this
-    if (clickx != 0) {
-        switch (m_mainWindow.getTool()) {
-          case MainWindow::AREA:
-            {
-                glMatrixMode(GL_PROJECTION);
-                glLoadIdentity();
-                glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
-                glMatrixMode(GL_MODELVIEW);
-                glLoadIdentity();
-                // glClear( GL_COLOR_BUFFER_BIT);
-                glTranslatef(clickx, get_height() - clicky, 100.0f);
-                float x = mousex - clickx;
-                float y = clicky - mousey;
-                std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
-                const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
-                                              x, 0.f, 0.f,
-                                              x, y, 0.f,
-                                              0.f, y, 0.f,
-                                              0.f, 0.f, 0.f };
+    if (clickx == 0) {
+        return;
+    }
+    switch (m_mainWindow.getTool()) {
+      case MainWindow::AREA:
+        {
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            // glClear( GL_COLOR_BUFFER_BIT);
+            glTranslatef(clickx, get_height() - clicky, 100.0f);
+            float x = mousex - clickx;
+            float y = clicky - mousey;
+            std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
+            const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
+                                          x, 0.f, 0.f,
+                                          x, y, 0.f,
+                                          0.f, y, 0.f,
+                                          0.f, 0.f, 0.f };
 
-                glVertexPointer(3, GL_FLOAT, 0, dvertices);
-                // Set The Blending Function For Translucency
-                glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-                glEnable(GL_BLEND);
-                glDisable(GL_DEPTH_TEST);
-                glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-                glDrawArrays(GL_LINE_STRIP, 0, 5);
-                glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-                glDrawArrays(GL_QUADS, 0, 4);
-                glDisable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glEnable(GL_DEPTH_TEST);
-            }
-            break;
-          default:
-            break;
+            glVertexPointer(3, GL_FLOAT, 0, dvertices);
+            // Set The Blending Function For Translucency
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+            glDrawArrays(GL_LINE_STRIP, 0, 5);
+            glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
+            glDrawArrays(GL_QUADS, 0, 4);
+            glDisable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_DEPTH_TEST);
         }
+        break;
+      default:
+        break;
     }
 }
 
@@ -860,6 +770,9 @@ bool GlView::exposeEvent(GdkEventExpose * event)
 
 bool GlView::configureEvent(GdkEventConfigure*)
 {
+    if (!make_current()) {
+        return TRUE;
+    }
     setupgl();
     return TRUE;
 }
@@ -872,6 +785,49 @@ const std::string GlView::details() const
     return dets.str();
 }
 
+void GlView::startAnimation()
+{
+    if (!m_animationRequired) {
+        m_animationRequired = true;
+        Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 100);
+    }
+}
+
+bool GlView::animate()
+{
+    if (!m_animationRequired) {
+        return false;
+    }
+    if (!make_current()) {
+        return true;
+    }
+    m_animationRequired = false;
+
+    m_animCount += 0.02f;
+    if (m_animCount > 1.0f) {
+        m_animCount = 0.0f;
+    }
+
+    setupgl();
+    origin();
+
+    const std::list<Layer *> & layers = m_model.getLayers();
+    std::list<Layer *>::const_iterator I = layers.begin();
+    std::list<Layer *>::const_iterator Iend = layers.end();
+    for(;I != Iend; I++) {
+        if ((*I)->isVisible()) {
+            if ((*I)->animate(*this)) {
+                m_animationRequired = true;
+            }
+        }
+    }
+
+    drawgl();
+
+    swap_buffers();
+    return true;
+}
+
 void GlView::scheduleRedraw()
 {
     if (!m_redrawRequired) {
@@ -882,11 +838,18 @@ void GlView::scheduleRedraw()
 
 bool GlView::redraw()
 {
-    if (m_redrawRequired) {
-        m_redrawRequired = false;
-        setupgl();
-        drawgl();
+    if (!m_redrawRequired) {
+        return false;
     }
+    if (!make_current()) {
+        return true;
+    }
+    m_redrawRequired = false;
+
+    setupgl();
+    drawgl();
+
+    swap_buffers();
     return false;
 }
 

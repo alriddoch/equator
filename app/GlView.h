@@ -28,7 +28,7 @@ class GlView : public Gtk::DrawingArea {
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     bool m_redrawRequired;
-    bool m_refreshRequired;
+    bool m_animationRequired;
     GLubyte * m_frameStore;
     GLfloat * m_depthStore;
     int m_frameStoreWidth;
@@ -209,13 +209,10 @@ class GlView : public Gtk::DrawingArea {
         m_hiddenLayers.erase(l);
     }
 
-    void startAnimation() {
-        m_refreshRequired = true;
-    }
-
     const std::string details() const;
 
     void scheduleRedraw();
+    void startAnimation();
     void setPickProjection(int nx, int ny, int fx, int fy);
     void getViewOffset(float & h, float & v, float & d);
     void setViewOffset(float h, float v, float d);

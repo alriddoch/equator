@@ -145,7 +145,9 @@ void Cal3dStore::draw(GlView & view)
 
 bool Cal3dStore::animate(GlView & view)
 {
-    return false;
+    std::cout << "Cal3dStore::animate" << std::endl << std::flush;
+    m_cal3dModel.onUpdate(0.1);
+    return true;
 }
 
 void Cal3dStore::select(GlView & view, int x, int y)
