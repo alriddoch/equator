@@ -256,7 +256,8 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
                     draw3DCube(e->getPosition(), e->getBBox(),
                                openEntity);
             }
-            if (e == m_selection) {
+            if ((e == m_selection) ||
+                (m_selectionList.find(e) != m_selectionList.end())) {
                 draw3DSelectedBox(e->getPosition(), e->getBBox());
             }
         } // else draw it without using its bbox FIXME how ?
@@ -301,8 +302,8 @@ void ServerEntities::selectEntity(Eris::Entity* ent,entstack_t::const_iterator I
     }
 }
 
-bool ServerEntities::selectSingleEntity(GlView & view,
-                                        int nx, int ny, bool check)
+bool ServerEntities::selectEntities(GlView & view,
+                                    int nx, int ny, int fx, int fy, bool check)
 {
     GLuint selectBuf[32768];
 
@@ -315,7 +316,13 @@ bool ServerEntities::selectSingleEntity(GlView & view,
 
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
-    gluPickMatrix(nx, ny, 1, 1, viewport);
+    int sWidth = abs(fx - nx);
+    int sHeight = abs(fy - ny);
+    int sXCentre = (fx > nx) ? (nx + sWidth / 2) : (fx + sWidth / 2);
+    int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
+    std::cout << "PICK: " << sXCentre << ":" << sYCentre << ":"
+              << sWidth << ":" << sHeight << std::endl << std::flush;
+    gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
 
     view.setPickProjection(); // Sets the projection, sets up names
                               // and sets up the modelview
@@ -498,11 +505,12 @@ void ServerEntities::draw(GlView & view)
 
 void ServerEntities::select(GlView & view, int x, int y)
 {
-    selectSingleEntity(view, x, y);
+    selectEntities(view, x, y, x + 1, y + 1);
 }
 
-void ServerEntities::select(GlView & view, int x, int y, int w, int h)
+void ServerEntities::select(GlView & view, int x, int y, int fx, int fy)
 {
+    selectEntities(view, x, y, fx, fy);
 }
 
 void ServerEntities::pushSelection()
@@ -525,7 +533,7 @@ void ServerEntities::popSelection()
 
 void ServerEntities::dragStart(GlView & view, int x, int y)
 {
-    if (selectSingleEntity(view, x, y, true)) {
+    if (selectEntities(view, x, y, x + 1, y + 1, true)) {
         m_validDrag = true;
     }
 }

@@ -57,7 +57,8 @@ class ServerEntities : public Layer {
     void drawWorld(Eris::Entity * wrld);
     void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
     void selectEntity(Eris::Entity * ent, entstack_t::const_iterator);
-    bool selectSingleEntity(GlView & view, int nx, int ny, bool check = false);
+    bool selectEntities(GlView & view, int nx, int ny, int fx, int fy,
+                        bool check = false);
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
     void alignEntityHeight(Eris::Entity * ent, const WFMath::Point<3> & o);
