@@ -1,3 +1,7 @@
+Interface thoughts - left button should be proactive, so middle button
+should probably pan or rotate like either gimp or blender. I putting a menu
+on the right button too much of a loss?
+
 Abstract the stuff that is currently top level windows to be vbox widgets,
 and allow them to be reparented around in generic toolbar windows, or
 the main window, or something else. To make this work, we then really need
