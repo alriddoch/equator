@@ -15,7 +15,12 @@
 
 void HeightManager::load(Gtk::FileSelection * fsel)
 {
-    m_model.m_heightData.load(fsel->get_filename(),0,0);
+    float x, y, z;
+    m_model.getCursor(x, y, z);
+    int posx = x / HeightData::m_gridSize, posy = y / HeightData::m_gridSize;
+    if (x < 0) { posx -= 1; }
+    if (y < 0) { posy -= 1; }
+    m_model.m_heightData.load(fsel->get_filename(),posx,posy);
     // FIXME Handle error conditions from height loader
 
     delete fsel;
@@ -87,12 +92,12 @@ void HeightManager::heightMapRegion(HeightMap * map)
 {
     glBegin(GL_LINE_STRIP);
     glColor3f(0.5f, 0.0f, 0.0f);
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
+    for (int i = 0; i < HeightData::m_gridSize - 1; ++i) {
         for (int j = 0; j < HeightData::m_gridSize; ++j) {
             glVertex3f(i, j, map->get(i, j) / 32.0f);
             glVertex3f(i + 1, j, map->get(i + 1, j) / 32.0f);
         }
-        if (++i >= HeightData::m_gridSize) { break; }
+        if (++i >= HeightData::m_gridSize - 1) { break; }
         for (int j = HeightData::m_gridSize - 1; j >= 0; --j) {
             glVertex3f(i, j, map->get(i, j) / 32.0f);
             glVertex3f(i + 1, j, map->get(i + 1, j) / 32.0f);

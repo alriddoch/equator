@@ -25,6 +25,7 @@ class Model : public SigC::Object {
     Layer * m_currentLayer;
     Server * m_server;
     std::string m_name;
+    float m_cursX, m_cursY, m_cursZ;
 
   public:
     MainWindow & m_mainWindow;
@@ -64,6 +65,17 @@ class Model : public SigC::Object {
         return m_name;
     }
 
+    void getCursor(float & x, float & y, float & z) const {
+        x = m_cursX; y = m_cursY; z = m_cursZ;
+        return;
+    }
+
+    void setCursor(float x, float y, float z) {
+        m_cursX = x; m_cursY = y; m_cursZ = z;
+        cursorMoved.emit();
+        return;
+    }
+
     void importFile();
     void exportFile();
 
@@ -81,6 +93,7 @@ class Model : public SigC::Object {
     SigC::Signal0<void> updated;
     SigC::Signal0<void> layersChanged;
     SigC::Signal0<void> typesAdded;
+    SigC::Signal0<void> cursorMoved;
 };
 
 #endif // EQUATOR_APP_MODEL_H

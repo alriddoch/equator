@@ -47,6 +47,8 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
 
     add(*vbox);
 
+    cursorMoved();
+
     show_all();
 }
 
@@ -59,9 +61,11 @@ void ViewWindow::setTitle()
     }
 }
 
-void ViewWindow::cursorMoved(double x, double y, double z)
+void ViewWindow::cursorMoved()
 {
     std::stringstream text;
+    float x, y, z;
+    m_glarea->m_model.getCursor(x, y, z);
     text << " " << x << "," << y << "," << z << " ";
     m_cursorCoords->pop(m_cursorContext);
     m_cursorCoords->push(m_cursorContext, text.str());

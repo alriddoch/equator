@@ -1,3 +1,16 @@
+2002-04-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/GlView.h, app/Model.cpp, app/Model.h,
+	  app/ViewWindow.cpp, app/ViewWindow.h:
+	  Move cursor position into model, so there it is no longer one
+	  cursor per view. Implement necessary signals etc. Add z coord
+	  indicator to cursor.
+
+	* app/HeightMap.h, app/HeightMap.cpp, app/HeightManager.cpp:
+	  Implement libpng based heightmap loader, implement loading
+	  of heightmap sections based on cursor position, and tidy
+	  up boundary conditions.
+
 2002-04-10  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp: Ensure bbox is only drawn if the entity

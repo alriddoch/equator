@@ -5,17 +5,14 @@
 #ifndef EQUATOR_HEIGHTMAP_H
 #define EQUATOR_HEIGHTMAP_H
 
-struct SDL_Surface;
-
 #include <string>
 #include <stdint.h>
 
 class HeightMap {
   private:
-    struct SDL_Surface * m_heightImage;
-    uint16_t * m_buffer;
-    int m_pitch;
-    
+    uint8_t ** m_rowPointers;
+    uint32_t m_width;
+    uint32_t m_height;
 
   public:
     HeightMap();

@@ -38,7 +38,6 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
                                // m_currentLayer(NULL),
                                m_xoff(0), m_yoff(0), m_zoff(0),
                                m_declination(60), m_rotation(45),
-                               m_cursX(0), m_cursY(0), m_cursZ(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
                                m_animCount(0.0),
@@ -201,7 +200,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
 
     m_popup->accelerate(m_viewWindow);
 
-    m_viewWindow.cursorMoved(m_cursX, m_cursY, m_cursZ);
+    m_model.cursorMoved.connect(SigC::slot(&m_viewWindow,
+                                           &ViewWindow::cursorMoved));
 }
 
 void GlView::setOrthographic()
@@ -363,7 +363,16 @@ void GlView::drawgl()
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         glPushMatrix();
-        glTranslatef(m_cursX, m_cursY, m_cursZ);
+        float cx, cy, cz;
+        m_model.getCursor(cx, cy, cz);
+        glTranslatef(cx, cy, cz);
+        glEnable(GL_TEXTURE_1D);
+        glBindTexture(GL_TEXTURE_1D, m_antTexture);
+        glBegin(GL_LINES);
+        glTexCoord1f(0.0f); glVertex3f(0.0f,0.0f,0.0f);
+        glTexCoord1f(cz); glVertex3f(0.0f,0.0f,-cz);
+        glEnd();
+        glDisable(GL_TEXTURE_1D);
         face();
         cursor();
         glPopMatrix();
@@ -471,15 +480,14 @@ void GlView::clickOn(int x, int y)
             double cursDepth;
             int tx, ty;
             // Get the depth in the current view of the cursor
-            screenPoint(m_cursX, m_cursY, m_cursZ, tx, ty, cursDepth);
+            float cx, cy, cz;
+            m_model.getCursor(cx, cy, cz);
+            screenPoint(cx, cy, cz, tx, ty, cursDepth);
             double nx, ny, nz;
             // Calculate the world coords with the same depth, at the current
             // position of the mouse.
             worldPoint(x, y, cursDepth, &nx, &ny, &nz);
-            m_cursX = nx;
-            m_cursY = ny;
-            m_cursZ = nz;
-            m_viewWindow.cursorMoved(m_cursX, m_cursY, m_cursZ);
+            m_model.setCursor(nx, ny, nz);
             break;
         case MainWindow::ROTATE:
         case MainWindow::SCALE:
@@ -528,7 +536,9 @@ void GlView::midClickOn(int x, int y)
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
     m_dragType = GlView::MOVE;
     if (m_mainWindow.getTool() == MainWindow::DRAW) {
-        m_model.getCurrentLayer()->insert(WFMath::Point<3>(m_cursX, m_cursY, m_cursZ));
+        float cx, cy, cz;
+        m_model.getCursor(cx, cy, cz);
+        m_model.getCurrentLayer()->insert(WFMath::Point<3>(cx, cy, cz));
     }
 }
 

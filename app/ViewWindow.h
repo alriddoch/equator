@@ -34,7 +34,7 @@ class ViewWindow : public Gtk::Window
     }
 
     void setTitle();
-    void cursorMoved(double, double, double);
+    void cursorMoved();
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H

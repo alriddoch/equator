@@ -27,7 +27,6 @@ class GlView : public Gtk::GLArea {
     float m_xoff, m_yoff, m_zoff;
     float m_declination;           // From vertically down
     float m_rotation;              // From due north
-    float m_cursX, m_cursY, m_cursZ;
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
