@@ -7,6 +7,7 @@
 #include "visual/Cal3dRenderer.h"
 #include "visual/3dsRenderer.h"
 #include "visual/TerrainRenderer.h"
+#include "visual/ForestRenderer.h"
 
 #include "common/configuration.h"
 
@@ -112,6 +113,11 @@ WEFactory::WEFactory(Eris::TypeService & ts, Renderer & r) :
 
     RenderFactory * rf = new RendererFactory<TerrainRenderer>("");
     Eris::TypeInfo * ti = ts.getTypeByName("world");
+    assert(ti != 0);
+    m_renderFactories.insert(std::make_pair(ti, rf));
+
+    rf = new RendererFactory<ForestRenderer>("");
+    ti = ts.getTypeByName("forest");
     assert(ti != 0);
     m_renderFactories.insert(std::make_pair(ti, rf));
 }

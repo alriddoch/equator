@@ -28,6 +28,9 @@ Cal3dRenderer.cpp Cal3dRenderer.h:
 TerrainRenderer.cpp TerrainRenderer.h:
 	$(LN_S) $(apogee_srcdir)/visual/TerrainRenderer.cpp $(apogee_srcdir)/visual/TerrainRenderer.h .
 
+ForestRenderer.cpp ForestRenderer.h:
+	$(LN_S) $(apogee_srcdir)/visual/ForestRenderer.cpp $(apogee_srcdir)/visual/ForestRenderer.h .
+
 libvisual_a_SOURCES = GL.h GLU.h default_texture.h \
                       Texture.cpp Texture.h \
                       Renderer.cpp Renderer.h \
@@ -35,4 +38,5 @@ libvisual_a_SOURCES = GL.h GLU.h default_texture.h \
                       EntityRenderer.cpp EntityRenderer.h \
                       3dsRenderer.cpp 3dsRenderer.h \
                       Cal3dRenderer.cpp Cal3dRenderer.h \
-                      TerrainRenderer.cpp TerrainRenderer.h
+                      TerrainRenderer.cpp TerrainRenderer.h \
+                      ForestRenderer.cpp ForestRenderer.h
