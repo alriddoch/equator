@@ -824,9 +824,9 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
         ymax = std::max(ymax, y);
         Mercator::BasePoint bp(point[2].AsNum());
         if (point.size() > 3) {
-            bp.roughness=point[3].AsNum();
+            bp.roughness()=point[3].AsNum();
             if (point.size() > 4) {
-                bp.falloff=point[4].AsNum();
+                bp.falloff()=point[4].AsNum();
             }
         }
         m_model.m_terrain.setBasePoint(x, y, bp);

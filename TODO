@@ -1,3 +1,5 @@
+Fix up Mercator point modification behavoir.
+
 Implement the world size.
 
 Implement terrain heightmaps as vertex array.

@@ -1,7 +1,13 @@
+2003-06-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.cpp, app/ServerEntities.cpp: Update Mercator API
+	  usage.
+
 2003-06-15  Damien McGinnes
-        * app/HeightManager.cpp: modified to use new Mercator BasePoints
-        * app/ServerEntities.cpp: modified to use new Mercator BasePoints,
-          fixed terrain mod hack (now uses operator new) 
+
+	* app/HeightManager.cpp: modified to use new Mercator BasePoints
+	* app/ServerEntities.cpp: modified to use new Mercator BasePoints,
+	  fixed terrain mod hack (now uses operator new) 
 
 2003-06-06  Damien McGinnes
 
