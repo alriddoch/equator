@@ -297,3 +297,44 @@ LDFLAGS="$WF_SDL_IMAGE_TMP_LDFLAGS"
 AC_LANG_POP([C])
 
 ])dnl end of WF_CHECK_SDL_IMAGE
+
+dnl worldforge check for the GL and GLU libraries,
+dnl the -l flags are added directly to LIBS
+
+AC_DEFUN(WF_CHECK_GL_LIBS,[dnl
+
+AC_LANG_PUSH(C)
+
+AC_CHECK_LIB(GL,glViewport, ,
+    AC_MSG_CHECKING(for glViewport in opengl32)
+    LIBS="$LIBS -lopengl32"
+    AC_TRY_LINK([
+	#include <GL/gl.h>
+    ],[
+	glViewport(0, 0, 0, 0);
+    ],[
+	AC_MSG_RESULT(yes)
+    ],[
+	AC_MSG_RESULT(no)
+	AC_MSG_ERROR(Could not find OpenGL library)
+    ])
+)
+
+AC_CHECK_LIB(GLU,gluPerspective, ,
+    AC_MSG_CHECKING(for glPerspective in opengl32)
+    LIBS="$LIBS -lglu32"
+    AC_TRY_LINK([
+	#include <GL/glu.h>
+    ],[
+	glPerspective(0.0, 0.0, 0.0, 0.0);
+    ],[
+	AC_MSG_RESULT(yes)
+    ],[
+	AC_MSG_RESULT(no)
+	AC_MSG_ERROR(Could not find OpenGL U library)
+    ])
+)
+
+AC_LANG_POP(C)
+
+])dnl end of WF_CHECK_GL_LIBS
