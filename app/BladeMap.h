@@ -29,7 +29,7 @@ class BladeMap : public Layer {
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
   public:
-    explicit BladeMap(const GlView &);
+    explicit BladeMap(GlView &);
     void importFile();
     void draw();
     void select(int x, int y);

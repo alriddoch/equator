@@ -17,7 +17,7 @@ class Holo : public Layer {
     void load(Gtk::FileSelection *) { }
     void cancel(Gtk::FileSelection *) { }
   public:
-    explicit Holo(const GlView &);
+    explicit Holo(GlView &);
     void draw();
     void select(int x, int y) { }
     void select(int x, int y, int w, int h) { }

@@ -180,7 +180,7 @@ void BladeMap::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-BladeMap::BladeMap(const GlView & window) : Layer(window, "map", "BladeMap"),
+BladeMap::BladeMap(GlView & window) : Layer(window, "map", "BladeMap"),
                                         m_database(*new CoalDatabase())
 {
 }

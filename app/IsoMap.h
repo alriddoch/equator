@@ -31,7 +31,7 @@ class IsoMap : public Layer {
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
   public:
-    explicit IsoMap(const GlView &);
+    explicit IsoMap(GlView &);
     void importFile();
     void draw();
     void select(int x, int y);

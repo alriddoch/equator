@@ -1,3 +1,12 @@
+2001-12-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/BladeMap.h, app/Holo.cpp, app/Holo.h,
+	  app/IsoMap.cpp, app/IsoMap.h, app/Layer.h: Make layer's reference
+	  to GlView non-const so that layers can minupulate the view.
+
+	* app/GlView.cpp, app/GlView.h: Implemented dragging, allowing
+	  the user to move around the view.
+
 2001-12-11  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/equator_plugin.cpp: Made plugin functionality optional, so

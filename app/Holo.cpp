@@ -7,7 +7,7 @@
 
 #include <GL/gl.h>
 
-Holo::Holo(const GlView & window) : Layer(window, "background", "HoloWorld")
+Holo::Holo(GlView & window) : Layer(window, "background", "HoloWorld")
 {
 }
 

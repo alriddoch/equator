@@ -10,7 +10,7 @@
 
 #include "sstream.h"
 
-#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include <gtk--/menuitem.h>
 #include <gtk--/menushell.h>
@@ -20,8 +20,11 @@
 
 static const bool pretty = false;
 
-GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL),
-                               clickx(0), clicky(0), dragx(0), dragy(0),
+GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
+                               m_xoff(0), m_yoff(0), m_zoff(0),
+                               m_currentLayer(NULL),
+                               clickx(0), clicky(0),
+                               dragx(0.0), dragy(0.0), dragz(0.0),
                                m_viewwindow(w)
 {
     set_events(GDK_POINTER_MOTION_MASK|
@@ -207,21 +210,28 @@ void GlView::setupgl()
     }
 }
 
-void GlView::drawgl()
+void GlView::origin()
 {
     if (make_current()) {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         if (m_projection == GlView::PLAN) {
             glTranslatef(0.0f, 0.0f, -10.0f);
-            glScalef(m_scale, m_scale, m_scale);
         } else {
             glTranslatef(0.0f, 0.0f, -10.0f);
             glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
             glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-            glScalef(m_scale, m_scale, m_scale);
         }
+        glScalef(m_scale, m_scale, m_scale);
+        glTranslatef(m_xoff, m_yoff, m_zoff);
+    }
+}
+
+void GlView::drawgl()
+{
+    if (make_current()) {
+        origin();
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         std::list<Layer *>::const_iterator I;
         for(I = m_layers.begin(); I != m_layers.end(); I++) {
             (*I)->draw();
@@ -307,11 +317,54 @@ void GlView::clickOff(int x, int y)
 
 void GlView::startDrag(int x, int y)
 {
-    dragx = x; dragy = y;
+    if (make_current()) {
+        GLint viewport[4];
+        GLdouble mvmatrix[16], projmatrix[16];
+        float z = 0.5;
+
+        setupgl();
+        origin();
+
+        glGetIntegerv (GL_VIEWPORT, viewport);
+        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+        gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, &dragx, &dragy, &dragz);
+        cout << "[" << x << ":" << y << ":" << z << "]";
+        cout << "{" << dragx << ":" << dragy << ":" << dragz << "}" << endl << flush;
+    }
+        
+
 }
 
 void GlView::endDrag(int x, int y)
 {
+    if (make_current()) {
+        GLint viewport[4];
+        GLdouble mvmatrix[16], projmatrix[16];
+        float z = 0.5;
+
+        setupgl();
+        origin();
+
+        glGetIntegerv (GL_VIEWPORT, viewport);
+        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+        double dx, dy, dz;
+
+        gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, &dx, &dy, &dz);
+        cout << "[" << x << ":" << y << ":" << z << "]";
+        cout << "{" << dx << ":" << dy << ":" << dz << "}";
+        cout << "{" << dx - dragx << ":" << dy - dragy << ":" << dz - dragz << "}" << endl << flush;
+        m_xoff += (dx - dragx);
+        m_yoff += (dy - dragy);
+        m_zoff += (dz - dragz);
+
+        drawgl();
+    }
+        
+
     // Use the ammount the user has dragged to pan the display
 }
 
@@ -419,7 +472,7 @@ void GlView::lowerCurrentLayer()
     m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
 }
 
-void GlView::setPickProjection() const
+void GlView::setPickProjection()
 {
     if (m_projection == GlView::PERSP) {
         if (width()>height()) {
@@ -437,13 +490,20 @@ void GlView::setPickProjection() const
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glInitNames();
-    if (m_projection == GlView::PLAN) {
-        glTranslatef(0.0f, 0.0f, -10.0f);
+        if (m_projection == GlView::PLAN) {
+            glTranslatef(0.0f, 0.0f, -10.0f);
+        } else {
+            glTranslatef(0.0f, 0.0f, -10.0f);
+            glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+            glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+        }
         glScalef(m_scale, m_scale, m_scale);
-    } else {
-        glTranslatef(0.0f, 0.0f, -10.0f);
-        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        glScalef(m_scale, m_scale, m_scale);
-    }
+        glTranslatef(m_xoff, m_yoff, m_zoff);
+}
+
+const float GlView::getZ(int x, int y) const
+{
+    float z = 0;
+    glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
+    return z;
 }

@@ -19,8 +19,9 @@ class GlView : public Gtk::GLArea {
     std::list<Layer *> m_layers;
     float m_scale;
     Layer * m_currentLayer;
+    float m_xoff, m_yoff, m_zoff;
     int clickx,clicky;
-    int dragx,dragy;
+    double dragx,dragy,dragz;
     int mousex,mousey;
 
     enum view { PLAN, ISO, PERSP } m_projection;
@@ -34,6 +35,7 @@ class GlView : public Gtk::GLArea {
 
     void initgl();
     void setupgl();
+    void origin();
     void drawgl();
 
     void importFile();
@@ -76,7 +78,9 @@ class GlView : public Gtk::GLArea {
     void raiseCurrentLayer();
     void lowerCurrentLayer();
 
-    void setPickProjection() const;
+    void setPickProjection();
+
+    const float getZ(int x, int y) const;
 };
 
 #endif // EQUATOR_APP_GLVIEW_H

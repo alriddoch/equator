@@ -186,7 +186,7 @@ void IsoMap::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-IsoMap::IsoMap(const GlView & window) : Layer(window, "map", "IsoMap"),
+IsoMap::IsoMap(GlView & window) : Layer(window, "map", "IsoMap"),
                                         m_database(*new CoalDatabase())
 {
 }

@@ -16,11 +16,11 @@ namespace Gtk {
 
 class Layer : public SigC::Object {
   protected:
-    Layer(const GlView & w, const std::string & n, const std::string & t) :
+    Layer(GlView & w, const std::string & n, const std::string & t) :
           m_window(w), m_name(n), m_type(t), m_visible(true) { }
     virtual ~Layer() { }
 
-    const GlView & m_window;
+    GlView & m_window;
     std::string m_name;
     std::string m_type;
     bool m_visible;
