@@ -25,15 +25,15 @@
 
 class Palette;
 
-void IsoMap::buildTileMap(CoalContainer & map_base)
+void IsoMap::buildTileMap(Coal::Container & map_base)
 {
     m_tileMap = new TileMap();
-    const std::vector<CoalComponent*> & contents = map_base.GetChildren();
-    std::vector<CoalComponent*>::const_iterator I = contents.begin();
+    const std::vector<Coal::Component*> & contents = map_base.GetChildren();
+    std::vector<Coal::Component*>::const_iterator I = contents.begin();
     for (; I != contents.end(); ++I) {
-        CoalMapTile * tile = dynamic_cast<CoalMapTile*>(*I);
+        Coal::MapTile * tile = dynamic_cast<Coal::MapTile*>(*I);
         if (tile == NULL) { continue; }
-        CoalGraphic * fill = tile->GetGraphic();
+        Coal::Graphic * fill = tile->GetGraphic();
         if ((fill == NULL) || fill->filename.empty()) {
             continue;
         }
@@ -41,7 +41,7 @@ void IsoMap::buildTileMap(CoalContainer & map_base)
         if (tileImage == NULL) {
             continue;
         }
-        CoalCoord coord = tile->GetAnchor();
+        Coal::Coord coord = tile->GetAnchor();
         float bx = coord.x;
         float by = coord.y;
         m_tileMap->add((int)bx, (int)by, tileImage);
@@ -95,7 +95,7 @@ void IsoMap::animateMap(GlView & view, float count)
     }
 }
 
-bool IsoMap::selectMap(GlView & view, CoalContainer & map_base,
+bool IsoMap::selectMap(GlView & view, Coal::Container & map_base,
                        int nx, int ny, int fx, int fy,
                        bool check)
 {
@@ -186,7 +186,7 @@ bool IsoMap::selectMap(GlView & view, CoalContainer & map_base,
 
 void IsoMap::load(Gtk::FileSelection * fsel)
 {
-    CoalIsoLoader loader;
+    Coal::IsoLoader loader;
 
     std::string filename = fsel->get_filename();
     loader.LoadMap(filename.c_str(), &m_database);
@@ -281,7 +281,7 @@ void IsoMap::installTiles()
 }
 
 IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),
-                                        m_database(*new CoalContainer()),
+                                        m_database(*new Coal::Container()),
                                         m_validDrag(false),
                                         m_tileMap(NULL)
 {

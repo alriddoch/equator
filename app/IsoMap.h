@@ -9,8 +9,10 @@
 
 #include <set>
 
-class CoalContainer;
-class CoalComponent;
+namespace Coal {
+  class Container;
+  class Component;
+}
 
 namespace Gtk {
   class FileSelection;
@@ -20,14 +22,14 @@ class TileMap;
 
 class IsoMap : public Layer {
   private:
-    CoalContainer & m_database;
+    Coal::Container & m_database;
     //std::map<CoalRegion *,int> m_selection;
     std::set<std::pair<int, int> > m_selection;
     bool m_validDrag;
     int m_antTexture;
     TileMap * m_tileMap;
 
-    void buildTileMap(CoalContainer & map_base);
+    void buildTileMap(Coal::Container & map_base);
 
     // void animateMapRegion(CoalRegion & map_region, float);
     void animateMap(GlView & , float);
@@ -36,7 +38,7 @@ class IsoMap : public Layer {
     // void drawMapObject(CoalObject & map_object);
     void drawMap(GlView & view);
 
-    bool selectMap(GlView & view, CoalContainer & map_base, int, int, int, int, bool check = false);
+    bool selectMap(GlView & view, Coal::Container & map_base, int, int, int, int, bool check = false);
 
     void load(Gtk::FileSelection *);
     void save(Gtk::FileSelection *);
