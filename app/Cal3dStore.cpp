@@ -47,45 +47,70 @@ void Cal3dStore::loadModel(const std::string & path)
     m_cal3dModel.onUpdate(0.f);
 }
 
-void Cal3dStore::options()
+void Cal3dStore::loadFile(const std::string & path)
 {
+    std::string suffix;
+    unsigned int pos = path.find_last_of(".");
+
+    if (pos != std::string::npos) {
+        suffix = path.substr(pos + 1, std::string::npos);
+    }
+
+    if (suffix == "cfg") {
+        loadModel(path);
+    } else if (suffix == "cal") {
+        std::cout << ".cal files not yet supported" << std::endl << std::flush;
+    } else {
+        // FIXME Message Dialog
+        std::cout << "UNKNOWN" << std::endl << std::flush;
+        // wuh
+    }
 }
 
-void Cal3dStore::importFile()
+void Cal3dStore::import_response(int response, Gtk::FileChooserDialog * fc)
 {
-    Gtk::FileChooserDialog fc("");
-    // fc.set_transient_for(*this);
-
-    fc.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    fc.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-
-
-    Gtk::FileFilter filter_cfg;
-    filter_cfg.set_name("Cal3d Model files");
-    filter_cfg.add_pattern("*.cfg");
-    filter_cfg.add_pattern("*.cal");
-    fc.add_filter(filter_cfg);
-
-    Gtk::FileFilter filter_component;
-    filter_component.set_name("Cal3d Component files");
-    filter_component.add_pattern("*.caf");
-    filter_component.add_pattern("*.cmf");
-    filter_component.add_pattern("*.cmf");
-    fc.add_filter(filter_component);
-
-    int result = fc.run();
-
-    switch (result) {
+    switch (response) {
         case Gtk::RESPONSE_OK:
-            std::cout << "LOAD: " << fc.get_filename()
+            std::cout << "LOAD: " << fc->get_filename()
                       << std::endl << std::flush;
-            loadModel(fc.get_filename());
+            loadFile(fc->get_filename());
             break;
         case Gtk::RESPONSE_CANCEL:
             break;
         default:
             break;
     }
+    delete fc;
+}
+
+void Cal3dStore::options()
+{
+}
+
+void Cal3dStore::importFile()
+{
+    Gtk::FileChooserDialog * fc = new Gtk::FileChooserDialog("Import Cal3d File");
+    // fc->set_transient_for(*this);
+
+    fc->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    fc->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+
+    Gtk::FileFilter filter_cfg;
+    filter_cfg.set_name("Cal3d Model files");
+    filter_cfg.add_pattern("*.cfg");
+    filter_cfg.add_pattern("*.cal");
+    fc->add_filter(filter_cfg);
+
+    Gtk::FileFilter filter_component;
+    filter_component.set_name("Cal3d Component files");
+    filter_component.add_pattern("*.caf");
+    filter_component.add_pattern("*.cmf");
+    filter_component.add_pattern("*.cmf");
+    fc->add_filter(filter_component);
+
+    fc->signal_response().connect(SigC::bind<Gtk::FileChooserDialog*>(SigC::slot(*this, &Cal3dStore::import_response), fc));
+    fc->show_all();
 }
 
 void Cal3dStore::exportFile()

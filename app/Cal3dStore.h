@@ -10,6 +10,10 @@
 
 #include "visual/Model.h"
 
+namespace Gtk {
+  class FileChooserDialog;
+}
+
 class Cal3dStore : public Layer {
   private:
     GlView::rmode_t m_renderMode;
@@ -25,10 +29,13 @@ class Cal3dStore : public Layer {
 
     int m_nameCount;
     int m_nameDict;
+
+    void import_response(int, Gtk::FileChooserDialog *);
   public:
     Cal3dStore(Model &);
 
     void loadModel(const std::string &);
+    void loadFile(const std::string &);
 
     virtual void options();
     virtual void importFile();
