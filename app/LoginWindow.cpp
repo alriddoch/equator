@@ -17,8 +17,10 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
+#include <gtkmm/messagedialog.h>
 
 #include <sigc++/object_slot.h>
+#include <sigc++/hide.h>
 
 #include <iostream>
 #include <cassert>
@@ -109,14 +111,19 @@ void LoginWindow::login()
     m_passwdEntry->set_editable(false);
     m_loginButton->set_sensitive(false);
 
-
     m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
+
+    m_failure = m_server->m_account->LoginFailure.connect(SigC::slot(*this, &LoginWindow::failure));
     m_loggedIn = m_server->m_account->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
 }
 
 void LoginWindow::failure(const std::string & msg)
 {
     assert(m_server != 0);
+
+    Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, "Login Failed", false, Gtk::MESSAGE_ERROR);
+    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->show();
 
     std::cout << "LoginWindow::failure" << std::endl << std::flush;
     std::cout << msg << std::endl << std::flush;

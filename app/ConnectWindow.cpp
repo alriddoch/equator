@@ -21,9 +21,11 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
+#include <gtkmm/messagedialog.h>
 
 #include <sigc++/object_slot.h>
 #include <sigc++/bind.h>
+#include <sigc++/hide.h>
 
 #include <cassert>
 
@@ -142,6 +144,10 @@ void ConnectWindow::createConnection()
 void ConnectWindow::failure(const std::string & msg)
 {
     assert(m_server != 0);
+
+    Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, "Connection Failed", false, Gtk::MESSAGE_ERROR);
+    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->show();
 
     std::cout << "ConnectWindow::failure" << std::endl << std::flush;
     std::cout << msg << std::endl << std::flush;
