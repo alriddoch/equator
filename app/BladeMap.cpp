@@ -78,13 +78,11 @@ void BladeMap::drawMapRegion(Coal::Landscape & map_region)
                             crs->getLeft(), crs->getBottom(), 0.0f,
                             crs->getRight(), crs->getBottom(), 0.0f,
                             crs->getRight(), crs->getTop(), 0.0f };
-        glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glTexCoordPointer(3, GL_FLOAT, 0, texcoords);
         glDrawArrays(GL_QUADS, 0, 4);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
 
         if (tex_id != -1) {
             glDisable(GL_TEXTURE_2D);

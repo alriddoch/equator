@@ -107,10 +107,8 @@ void HeightManager::selectRegion(Mercator::Segment * map)
         vertices[3 * (3 * size + i) + 2] = size - 1 - i;
         vertices[3 * (3 * size + i) + 3] = map->get(0.f, size - 1 -i);
     }
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawArrays(GL_TRIANGLE_FAN, 0, size * 4 + 1);
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void HeightManager::outlineLineStrip(float * varray, unsigned int size,
@@ -120,12 +118,10 @@ void HeightManager::outlineLineStrip(float * varray, unsigned int size,
     for(int i = 0; i < size; ++i) {
         tarray[i] = count + i;
     }
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, varray);
     glTexCoordPointer(1, GL_FLOAT, 0, tarray);
     glDrawArrays(GL_LINE_STRIP, 0, size);
-    glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     delete tarray;
 }
@@ -153,7 +149,6 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
             }
         }
     }
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, harray);
     glColorPointer(3, GL_FLOAT, 0, carray);
@@ -171,7 +166,6 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
         glUnlockArraysEXT();
     }
     glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
     delete harray;
     delete carray;
 }
@@ -211,10 +205,8 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
         // }
     } else {
         glColor3f(1.0f, 0.0f, 0.0f);
-        glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, varray);
         glDrawArrays(GL_LINE_STRIP, 0, (segSize + 1) * 4);
-        glDisableClientState(GL_VERTEX_ARRAY);
     }
     delete varray;
 }
@@ -240,7 +232,6 @@ void HeightManager::draw(GlView & view)
         return;
     }
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 0.f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
 
@@ -268,7 +259,6 @@ void HeightManager::draw(GlView & view)
         glUnlockArraysEXT();
     }
 
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void HeightManager::animate(GlView & view)
@@ -406,7 +396,6 @@ void HeightManager::dragStart(GlView & view, int x, int y)
     BasepointSelection nameDict;
     glPushName(nameCount);
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
 
     if (have_GL_EXT_compiled_vertex_array) {
@@ -435,7 +424,6 @@ void HeightManager::dragStart(GlView & view, int x, int y)
         glUnlockArraysEXT();
     }
 
-    glDisableClientState(GL_VERTEX_ARRAY);
     glPopName();
 
     int hits = glRenderMode(GL_RENDER);

@@ -33,6 +33,7 @@
 static const bool debug_flag = false;
 
 using Atlas::Message::Object;
+typedef Atlas::Message::Object Element;
 
 ImportOptions * ServerEntities::m_importOptions = NULL;
 ExportOptions * ServerEntities::m_exportOptions = NULL;
@@ -261,7 +262,6 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
     static const GLushort west[] = { 0, 3, 7, 4 };
     static const GLushort east[] = { 1, 2, 6, 5 };
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glColor3f(0.0f, 0.0f, 1.0f);
     if (open) {
@@ -305,10 +305,8 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
                                       3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
 
     glColor3f(0.0f, 0.0f, 1.0f);
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
-    glDisableClientState(GL_VERTEX_ARRAY);
     glPopMatrix();
 
 }
@@ -347,12 +345,10 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
                             phase, zlen, phase, zlen, phase, zlen, phase, zlen,
                             phase, ylen, phase, ylen, phase, ylen, phase, ylen };
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
-    glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glPopMatrix();
@@ -788,6 +784,50 @@ void ServerEntities::connectEntity(Eris::Entity * ent)
     }
 }
 
+void ServerEntities::readTerrain(Eris::Entity * ent)
+{
+    if (!ent->hasProperty("terrain")) {
+        std::cerr << "WOrld has no terrain" << std::endl << std::flush;
+        std::cerr << "World " << ent->getID() << std::endl << std::flush;
+        return;
+    }
+    const Element & terrain = ent->getProperty("terrain");
+    if (!terrain.IsMap()) {
+        std::cerr << "Terrain is not a map" << std::endl << std::flush;
+    }
+    const Element::MapType & tmap = terrain.AsMap();
+    Element::MapType::const_iterator I = tmap.find("points");
+    int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    if ((I == tmap.end()) || !I->second.IsList()) {
+        std::cerr << "No terrain points" << std::endl << std::flush;
+    }
+    const Element::ListType & plist = I->second.AsList();
+    Element::ListType::const_iterator J = plist.begin();
+    for(; J != plist.end(); ++J) {
+        if (!J->IsList()) {
+            std::cout << "Non list in points" << std::endl << std::flush;
+            continue;
+        }
+        const Element::ListType & point = J->AsList();
+        if (point.size() != 3) {
+            std::cout << "point without 3 nums" << std::endl << std::flush;
+            continue;
+        }
+        int x = (int)point[0].AsNum();
+        int y = (int)point[1].AsNum();
+        xmin = std::min(xmin, x);
+        xmax = std::max(xmax, x);
+        ymin = std::min(ymin, y);
+        ymax = std::max(ymax, y);
+        m_model.m_terrain.setBasePoint(x, y, point[2].AsNum());
+    }
+    for(int i = xmin; i < xmax; ++i) {
+        for(int j = ymin; j < ymax; ++j) {
+            m_model.m_terrain.refresh(i, j);
+        }
+    }
+}
+
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
@@ -805,7 +845,13 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
         std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
     }
     
-    connectEntity(m_serverConnection.world->getRootEntity());
+    Eris::Entity * worldRoot = m_serverConnection.world->getRootEntity();
+
+    connectEntity(worldRoot);
+
+    // FIXME For now we assume the root entity has the terrain
+    readTerrain(worldRoot);
+
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */
     m_serverConnection.world->EntityCreate.connect(

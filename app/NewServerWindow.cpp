@@ -7,6 +7,7 @@
 #include "Server.h"
 #include "Model.h"
 #include "ServerEntities.h"
+#include "HeightManager.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Lobby.h>
@@ -270,7 +271,9 @@ void NewServerWindow::viewCreated(Model * model)
 {
     model->setName(m_hostEntry->get_text());
     model->setServer(m_server);
-    Layer * layer = new ServerEntities(*model, *m_server);
+    Layer * layer = new HeightManager(*model);
+    model->addLayer(layer);
+    layer = new ServerEntities(*model, *m_server);
     model->addLayer(layer);
     m_viewButton->set_sensitive(false);
 }

@@ -1,5 +1,16 @@
 2003-05-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.h, app/ServerEntities.cpp,
+	  app/NewServerWindow.cpp: Read terrain points
+	  from server, and add a layer to render it.
+
+	* app/BladeMap.cpp, app/GlView.cpp, app/HeightManager.cpp,
+	  app/Holo.cpp, app/ServerEntities.cpp, app/Texture.cpp:
+	  Enable vertex arrays globally, so they no longer
+	  need to be enabled every time they are used.
+
+2003-05-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/ServerEntities.cpp: Clean up some box rendering code, and
 	  improve efficiency of vertex array code.
 

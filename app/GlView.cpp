@@ -464,6 +464,8 @@ void GlView::setupgl()
             float ysize = get_height() / 40.0f / 2.0f;
             glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
         }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
     }
 }
 
@@ -490,14 +492,12 @@ void GlView::face()
 
 void GlView::cursor()
 {
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, cursorLines);
     glColor3f(1.0f, 1.0f, 1.0f);
     glDrawArrays(GL_LINES, 0, 8);
     glVertexPointer(3, GL_FLOAT, 0, cursorCircle);
     glColor3f(1.0f, 0.2f, 0.2f);
     glDrawArrays(GL_LINE_LOOP, 0, 12);
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void GlView::drawgl()
@@ -514,7 +514,6 @@ void GlView::drawgl()
         glBindTexture(GL_TEXTURE_1D, m_antTexture);
         const GLfloat vertices[] = { 0.f, 0.f, 0.f, 0.f, 0.f, -cz };
         const GLfloat texcoords[] = { 0.f, cz };
-        glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
@@ -563,7 +562,6 @@ void GlView::drawgl()
                 glDrawArrays(GL_LINE_STRIP, 0, 5);
             }
         }
-        glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glFlush();
         swap_buffers();
@@ -778,7 +776,6 @@ void GlView::mouseEffects()
                                       0.f, y, 0.f,
                                       0.f, 0.f, 0.f };
 
-        glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, dvertices);
         if (pretty) {
             glEnable(GL_BLEND);
@@ -793,7 +790,6 @@ void GlView::mouseEffects()
             glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
             glDrawArrays(GL_LINE_STRIP, 0, 5);
         }
-        glDisableClientState(GL_VERTEX_ARRAY);
     }
 }
 

@@ -57,14 +57,12 @@ void Holo::draw(GlView & view)
 
     glColor3f(0.0f, 0.3f, 0.0f);
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, varray);
     // Draw the green grid.
     glDrawArrays(GL_LINES, 0, (vCount + 1) / 3);
     glColor3f(0.0f, 1.0f, 0.0f);
     // Draw the origin lines.
     glDrawArrays(GL_LINES, ((numlines - numlines % incr) * 4) / incr, 4);
-    glDisableClientState(GL_VERTEX_ARRAY);
 
     glDepthMask(GL_TRUE);
 
