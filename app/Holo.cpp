@@ -23,6 +23,8 @@ void Holo::draw(GlView & view)
     int incr = 1;
     if (winscale < 0.24f) {
         incr = 10;
+        xc = xc - xc % 10;
+        yc = yc - yc % 10;
     }
 
     glDepthMask(GL_FALSE);
