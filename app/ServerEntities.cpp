@@ -13,13 +13,13 @@
 
 #include <Mercator/Terrain.h>
 #include <Mercator/Segment.h>
-#include <Mercator/Segment_impl.h>
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 #include <Eris/TypeInfo.h>
 
 #include <wfmath/atlasconv.h>
+#include <wfmath/ball.h>
 
 #include <Atlas/Codecs/XML.h>
 

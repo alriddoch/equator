@@ -1,5 +1,11 @@
+2003-06-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.cpp: Clean up header usage.
+
 2003-06-03  Damien McGinnes
-        * app/ServerEntities.cpp added a hack into readTerrain to test a Mercator bug 
+
+	* app/ServerEntities.cpp: added a hack into readTerrain to test a
+	  Mercator bug 
 
 2003-05-12  Al Riddoch  <alriddoch@zepler.org>
 
