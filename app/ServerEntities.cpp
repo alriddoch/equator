@@ -842,6 +842,20 @@ void ServerEntities::createOptionsWindows()
     m_exportOptions = new ExportOptions();
 }
 
+void ServerEntities::connectEntity(Eris::Entity * ent)
+{
+    ent->Changed.connect(SigC::bind(
+        SigC::slot(*this, &ServerEntities::entityChanged),
+        ent));
+    ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
+
+    int numEnts = ent->getNumMembers();
+    for (int i = 0; i < numEnts; i++) {
+        Eris::Entity * e = ent->getMember(i);
+        connectEntity(e);
+    }
+}
+
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
@@ -859,10 +873,11 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
         std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
     }
     
+    connectEntity(m_serverConnection.world->getRootEntity());
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */
     m_serverConnection.world->EntityCreate.connect(
-	SigC::slot(*this, &ServerEntities::gotNewEntity)
+        SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
 
     if (m_importOptions == NULL) {
@@ -997,18 +1012,18 @@ void ServerEntities::align(Alignment a)
 void ServerEntities::gotNewEntity(Eris::Entity *ent)
 {
     ent->Changed.connect(SigC::bind(
-	SigC::slot(*this, &ServerEntities::entityChanged),
-	ent));
+        SigC::slot(*this, &ServerEntities::entityChanged),
+        ent));
     ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
     m_model.update(); // cause a re-draw
 }
 
 void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent)
 {
-    m_model.update();	// a bit excessive I suppose
+    m_model.update();   // a bit excessive I suppose
 }
 
 void ServerEntities::entityMoved(const WFMath::Point<3> &)
 {
-    m_model.update();	// a bit excessive I suppose
+    m_model.update();   // a bit excessive I suppose
 }

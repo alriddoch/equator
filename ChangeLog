@@ -1,5 +1,10 @@
 2003-04-04  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp, app/ServerEntities.h: Add code to hook up to
+	  existing entities when window is opened, so we see when they move.
+
+2003-04-04  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/GlView.cpp: Fix attribute enums for GtkGLextMM.
 
 2003-03-31  Al Riddoch  <alriddoch@zepler.org>
