@@ -12,6 +12,8 @@
 #include "debug.h"
 
 #include <Mercator/Terrain.h>
+#include <Mercator/Segment.h>
+#include <Mercator/Segment_impl.h>
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>
@@ -29,6 +31,8 @@
 #include <gtkmm/label.h>
 
 #include <fstream>
+
+#include <wfmath/ball.h>
 
 static const bool debug_flag = false;
 
@@ -825,6 +829,11 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
             m_model.m_terrain.refresh(i, j);
         }
     }
+
+    //============HACKED TO TEST MERCATOR
+    const WFMath::Ball<2> circ(WFMath::Point<2>(28.0,28.0), 19.0);
+    m_model.m_terrain.getSegmentSafe(-1,0)->modifyShape(circ, 35.0f);
+    //======================================
 }
 
 ServerEntities::ServerEntities(Model & model, Server & server) :
