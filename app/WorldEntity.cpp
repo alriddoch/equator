@@ -16,6 +16,7 @@
 
 #include <varconf/Config.h>
 
+#include <sigc++/bind.h>
 #include <sigc++/object_slot.h>
 
 #include <SDL/SDL.h>
@@ -126,17 +127,27 @@ bool WEFactory::accept(const GameEntity&, Eris::World * w)
 
 Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
 {
+    SigC::Slot0<void> slot;
     RenderableEntity * re = 0;
+
     Eris::TypeInfoPtr type = w->getConnection()->getTypeService()->getTypeForAtlas(ge);
     if (type->safeIsA(autonomousType)) {
-        re = new AutonomousEntity(ge,w);
+        AutonomousEntity * ae = new AutonomousEntity(ge,w);
+        slot = SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(),
+                                              ae);
+        re = ae;
     } else if (type->safeIsA(terrainType)) {
-        re = new TerrainEntity(ge,w);
-        // re->m_drawer = new TerrainRenderer(m_renderer, *re);
+        TerrainEntity * te = new TerrainEntity(ge,w);
+        slot = SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
+        re = te;
     } else if (type->safeIsA(treeType)) {
-        re = new TreeEntity(ge,w);
+        TreeEntity * te = new TreeEntity(ge,w);
+        slot = SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
+        re = te;
     } else {
         re = new RenderableEntity(ge, w);
+        slot = SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(),
+                                              re);
     }
     if (re->m_drawer == 0) {
         RendererMap::const_iterator I = m_renderFactories.find(type);
@@ -147,5 +158,6 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
             re->m_drawer = new BBoxRenderer(m_renderer, *re);
         }
     }
+    slot();
     return re;
 }
