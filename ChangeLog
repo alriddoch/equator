@@ -1,3 +1,8 @@
+2003-05-11  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.cpp: Clean up some box rendering code, and
+	  improve efficiency of vertex array code.
+
 2003-04-06  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/GlView.cpp, app/HeightManager.cpp,

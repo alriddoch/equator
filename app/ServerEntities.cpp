@@ -254,30 +254,33 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
         bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z() 
     };
 
-    GLuint bottom[] = { 0, 1, 2, 3 };
-    GLuint top[] = { 4, 5, 6, 7 };
-    GLuint south[] = { 0, 1, 5, 4 };
-    GLuint north[] = { 3, 2, 6, 7 };
-    GLuint west[] = { 0, 3, 7, 4 };
-    GLuint east[] = { 1, 2, 6, 5 };
+    static const GLushort bottom[] = { 0, 1, 2, 3 };
+    static const GLushort top[] = { 4, 5, 6, 7 };
+    static const GLushort south[] = { 0, 1, 5, 4 };
+    static const GLushort north[] = { 3, 2, 6, 7 };
+    static const GLushort west[] = { 0, 3, 7, 4 };
+    static const GLushort east[] = { 1, 2, 6, 5 };
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glColor3f(0.0f, 0.0f, 1.0f);
-    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, bottom);
-    if (!open) {
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, top);
+    if (open) {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, bottom);
+    } else {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, top);
     }
     if (!shaded) { glColor3f(0.2f, 0.2f, 1.0f); }
-    if (!open) {
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, south);
+    if (open) {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, north);
+    } else {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, south);
     }
-    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, north);
     if (!shaded) { glColor3f(0.0f, 0.0f, 0.7f); }
-    if (!open) {
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, west);
+    if (open) {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, east);
+    } else {
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, west);
     }
-    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, east);
     glPopMatrix();
 }
 
@@ -298,13 +301,13 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
         bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z(),
         bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z() 
     };
-    GLuint indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
-                         3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
+    static const GLushort indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
+                                      3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
 
     glColor3f(0.0f, 0.0f, 1.0f);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
     glDisableClientState(GL_VERTEX_ARRAY);
     glPopMatrix();
 
@@ -337,8 +340,8 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
         bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z(),
         bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z() 
     };
-    GLuint indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
-                         3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
+    static const GLushort indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
+                                        3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
     // FIXME THis is all wrong
     GLfloat texcoords[] = { phase, xlen, phase, xlen, phase, xlen, phase, xlen,
                             phase, zlen, phase, zlen, phase, zlen, phase, zlen,
@@ -348,7 +351,7 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
-    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
