@@ -5,7 +5,11 @@
 #ifndef EQUATOR_APP_MAINWINDOW_H
 #define EQUATOR_APP_MAINWINDOW_H
 
+#include <sage/sage.h>
+
 #include <gtkmm/window.h>
+
+#include <gdkmm/gl/context.h>
 
 #include <list>
 
@@ -86,6 +90,8 @@ class MainWindow : public Gtk::Window
     ServerWindow & m_serverwindow;
     Palette & m_palettewindow;
     EntityTree & m_entitytreewindow;
+
+    Glib::RefPtr<const Gdk::GL::Context> m_glContext;
 
     MainWindow();
 

@@ -285,9 +285,8 @@ void MainWindow::menuNewModel()
 Model & MainWindow::newModel()
 {
     Model * model = new Model(*this);
-    ViewWindow * view = new ViewWindow(*this, *model);
     model->setName("Untitled");
-    m_views.push_back(view);
+    newView(model);
     m_models.push_back(model);
     modelAdded.emit(model);
 
@@ -296,7 +295,7 @@ Model & MainWindow::newModel()
 
 void MainWindow::newView(Model * model)
 {
-    ViewWindow * view = manage( new ViewWindow(*this, *model) );
+    ViewWindow * view = new ViewWindow(*this, *model);
     m_views.push_back(view);
     view->setTitle();
 }

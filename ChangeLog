@@ -1,5 +1,12 @@
 2005-02-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/MainWindow.cpp: Clean up creating new views.
+
+	* app/GlView.cpp, app/MainWindow.h: Store a reference to a GL context
+	  which is then shared by all windows.
+
+2005-02-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* gui/gtkmm/Cal3dStoreOptions.cpp: Remove some excess debug output.
 
 2005-02-08  Al Riddoch  <ajr@ecs.soton.ac.uk>

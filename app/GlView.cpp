@@ -122,7 +122,16 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
         Gtk::GL::Widget::set_gl_capability(*this, glconfig);
     }
 #else
-    Gtk::GL::widget_set_gl_capability(*this, glconfig);
+    // FIXME Be a bit more thorough, like above.
+
+    if (mw.m_glContext) {
+        std::cout << "Context exists" << std::endl << std::flush;
+        Gtk::GL::widget_set_gl_capability(*this, glconfig, mw.m_glContext);
+    } else {
+        std::cout << "No Context" << std::endl << std::flush;
+        Gtk::GL::widget_set_gl_capability(*this, glconfig);
+        // mw.m_glContext = Gtk::GL::widget_create_gl_context(*this);
+    }
 #endif
 
     m.updated.connect(SigC::slot(*this, &GlView::scheduleRedraw));
@@ -645,6 +654,9 @@ void GlView::screenPoint(float x, float y, float z,
 void GlView::realize()
 {
     initgl();
+    if (!m_mainWindow.m_glContext) {
+        m_mainWindow.m_glContext = Gtk::GL::widget_get_gl_context(*this);
+    }
 }
 
 bool GlView::motionNotifyEvent(GdkEventMotion*event)
