@@ -42,7 +42,7 @@ class Terrain : public Layer {
     void cancel(Gtk::FileSelection *);
 
     void selectRegion(Mercator::Segment & map);
-    void outlineLineStrip(float *, unsigned int, float);
+    void outlineLineStrip(float *, unsigned int);
     void heightMapRegion(GlView & view, Mercator::Segment & map);
     void drawRegion(GlView & view, Mercator::Segment & map,
                     const GroundCoord & gc);

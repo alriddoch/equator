@@ -60,7 +60,6 @@ class ServerEntities : public Layer {
 
     int m_nameCount;
     entname_t m_nameDict;
-    unsigned int m_antTexture;
 
     static EntityImportOptions * m_importOptions;
     static EntityExportOptions * m_exportOptions;

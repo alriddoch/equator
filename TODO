@@ -1,3 +1,9 @@
+Move ants setup into GlView.
+
+Avoid drawing whole terrain segments when dragging them, and try and
+work out how to draw the changing segment boundaries as the drag is
+animated.
+
 Use shift or control or something to do logic selection ops, like interseciton,
 union.
 

@@ -139,19 +139,10 @@ void Terrain::selectRegion(Mercator::Segment & map)
     glDrawArrays(GL_TRIANGLE_FAN, 0, size * 4 + 1);
 }
 
-void Terrain::outlineLineStrip(float * varray, unsigned int size,
-                                     float count)
+void Terrain::outlineLineStrip(float * varray, unsigned int size)
 {
-    float * tarray = new float[size];
-    for(unsigned int i = 0; i < size; ++i) {
-        tarray[i] = count + i;
-    }
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, varray);
-    glTexCoordPointer(1, GL_FLOAT, 0, tarray);
     glDrawArrays(GL_LINE_STRIP, 0, size);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    delete tarray;
 }
 
 void Terrain::heightMapRegion(GlView & view, Mercator::Segment & map)
@@ -218,13 +209,37 @@ void Terrain::drawRegion(GlView & view, Mercator::Segment & map,
     }
     bool selected = (m_selection.find(gc) != m_selection.end());
     if (selected) {
+        glDepthFunc(GL_LEQUAL);
+
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        float phase = view.getAnimCount();
+        glTranslatef(phase, phase, phase);
+        glMatrixMode(GL_MODELVIEW);
+
+        GLfloat scale = 0.5f * view.getScale();
+        GLfloat sx[] = { scale, scale, scale, 0 };
+
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        outlineLineStrip(varray, (segSize + 1) * 4, view.getAnimCount());
+        glColor3f(1.f, 1.f, 1.f);
+        glEnable(GL_TEXTURE_GEN_S);
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+        glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
+
+        outlineLineStrip(varray, (segSize + 1) * 4);
         glDisable(GL_TEXTURE_1D);
-        // if (view.getScale() > 0.05f) {
-            heightMapRegion(view, map);
-        // }
+
+        glDisable(GL_TEXTURE_GEN_S);
+        glDisable(GL_TEXTURE_1D);
+
+        glDepthFunc(GL_LESS);
+
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
+        heightMapRegion(view, map);
     } else {
         glColor3f(1.0f, 0.0f, 0.0f);
         glVertexPointer(3, GL_FLOAT, 0, varray);
@@ -358,7 +373,6 @@ bool Terrain::animate(GlView & view)
         glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
-        return true;
     } else {
         const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
         Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
@@ -366,17 +380,21 @@ bool Terrain::animate(GlView & view)
             const Mercator::Terrain::Segmentcolumn & col = I->second;
             Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
             for (; J != col.end(); ++J) {
+                GroundCoord gc(I->first, J->first);
+                if (m_selection.find(gc) == m_selection.end()) {
+                    continue;
+                }
                 glPushMatrix();
                 glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
                 if (m_validDrag) {
                     glTranslatef(0.f, 0.f, m_dragPoint.z());
                 }
-                drawRegion(view, *J->second, GroundCoord(I->first, J->first));
+                drawRegion(view, *J->second, gc);
                 glPopMatrix();
             }
         }
     }
-    return false;
+    return true;
 }
 
 bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool check)
@@ -534,8 +552,6 @@ void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
     }
 }
 
-typedef std::map<int, GroundCoord > BasepointSelection;
-
 void Terrain::dragStart(GlView & view, int x, int y)
 {
     if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
@@ -549,68 +565,6 @@ void Terrain::dragStart(GlView & view, int x, int y)
             m_dragPoint = WFMath::Vector<3>(0.f, 0.f, 0.f);
         }
     }
-
-#if 0
-    m_vertexSelection.clear();
-
-    GLuint selectBuf[32768];
-    glSelectBuffer(32768, selectBuf);
-
-    view.setPickProjection(x, y, x + 1, y + 1);
-
-    int nameCount = 0;
-    BasepointSelection nameDict;
-    glPushName(nameCount);
-
-    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
-
-    float scale = 0.00625 / view.getScale();
-    
-    const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
-    Mercator::Terrain::Pointstore::const_iterator K = points.begin();
-    for(; K != points.end(); ++K) {
-        const Mercator::Terrain::Pointcolumn & col = K->second;
-        Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
-        for (; L != col.end(); ++L) {
-            nameDict[++nameCount] = GroundCoord(K->first, L->first);
-            glLoadName(nameCount);
-            glPushMatrix();
-            glTranslatef(K->first * segSize,
-                         L->first * segSize,
-                         L->second.height());
-            glScalef(scale, scale, scale);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
-            glPopMatrix();
-        }
-    }
-
-    glPopName();
-
-    int hits = glRenderMode(GL_RENDER);
-
-    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
-    if (hits < 1) { return; }
-
-    GLuint * ptr = &selectBuf[0];
-    for (int i = 0; i < hits; i++) {
-        int names = *(ptr);
-        ptr += 3;
-        for (int j = 0; j < names; j++) {
-            int hitName = *(ptr++);
-            std::cout << "{" << hitName << "}";
-            std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName
-);
-            if (K != nameDict.end()) {
-                const GroundCoord & c = K->second;
-                std::cout << "DRAGGING " << c.first << "," << c.second
-                          << std::endl << std::flush;
-                m_vertexSelection.insert(c);
-            } else {
-                std::cout << "UNKNOWN NAME" << std::endl << std::flush;
-            }
-        }
-    }
-#endif
 }
 
 void Terrain::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
@@ -624,10 +578,8 @@ void Terrain::alterBasepoint(const GroundCoord & pt, float diff)
     if (!m_terrain.getBasePoint(pt.first, pt.second, ref)) {
         return;
     }
-    std::cout << "DRAGGED " << pt.first
-              << "," << pt.second
-              << " FROM " << ref.height()
-              << " TO " << ref.height() + diff
+    std::cout << "DRAGGED " << pt.first << "," << pt.second
+              << " FROM " << ref.height() << " TO " << ref.height() + diff
               << std::endl << std::flush;
     ref.height() += diff; 
     m_terrain.setBasePoint(pt.first, pt.second, ref);
@@ -644,20 +596,6 @@ void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
     GroundCoordSet::const_iterator I = selection.begin();
     for(; I != selection.end(); ++I) {
         const GroundCoord & coord = *I;
-#if 0
-        Mercator::BasePoint ref;
-        if (!m_terrain.getBasePoint(coord.first,
-                                            coord.second, ref)) {
-            continue;
-        }
-        std::cout << "DRAGGED " << coord.first
-                  << "," << coord.second
-                  << " FROM " << ref.height()
-                  << " TO " << ref.height() + v.z()
-                  << std::endl << std::flush;
-        ref.height() += v.z(); 
-        m_terrain.setBasePoint(coord.first, coord.second, ref);
-#endif
         alterBasepoint(coord, v.z());
         if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
             continue;

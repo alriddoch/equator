@@ -1,3 +1,10 @@
+2004-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Clean up ant
+	  code.
+
+	* app/Terrain.cpp, app/Terrain.h: Use ants to animate terrain segments.
+
 2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/Terrain.cpp, app/Terrain.h: Lots of changes to texture

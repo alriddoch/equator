@@ -179,19 +179,16 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
 {
     glDepthFunc(GL_LEQUAL);
 
-    // if (phase != 0.f) {
-    std::cout << "phase " << phase << std::endl << std::flush;
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        glTranslatef(phase, phase, phase);
-        glMatrixMode(GL_MODELVIEW);
-    // }
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glTranslatef(phase, phase, phase);
+    glMatrixMode(GL_MODELVIEW);
 
     GLfloat scale = 0.5f * view.getScale();
     GLfloat sx[] = { scale, scale, scale, 0 };
 
     glEnable(GL_TEXTURE_1D);
-    glBindTexture(GL_TEXTURE_1D, m_antTexture);
+    glBindTexture(GL_TEXTURE_1D, view.getAnts());
     glColor3f(1.f, 1.f, 1.f);
     glEnable(GL_TEXTURE_GEN_S);
     glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
@@ -217,12 +214,9 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
 
     glDepthFunc(GL_LESS);
 
-    // if (phase != 0.f) {
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-    // }
-
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 void ServerEntities::orient(const WFMath::Quaternion & orientation)
@@ -816,8 +810,6 @@ bool ServerEntities::animate(GlView & view)
 
 void ServerEntities::draw(GlView & view)
 {
-    m_antTexture = view.getAnts();
-
     m_renderMode = view.getRenderMode(m_name);
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     drawWorld(view, root);
