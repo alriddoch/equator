@@ -1,7 +1,7 @@
 dnl Initialise autoconf
 
-AC_INIT()
-AM_CONFIG_HEADER(config.h)
+AC_INIT(equator, 0.1.0)
+AC_CONFIG_SRCDIR([app/equator_plugin.cpp])
 
 dnl Detect the canonical host and target environment
 
@@ -10,9 +10,8 @@ AC_CANONICAL_TARGET
 
 dnl Initialise automake
 
-VERSION=0.0.2
-
-AM_INIT_AUTOMAKE(equator, $VERSION)
+AM_INIT_AUTOMAKE([dist-bzip2])
+AM_CONFIG_HEADER(config.h)
 
 dnl Need libtool
 
@@ -39,21 +38,132 @@ AC_ARG_ENABLE(debug,
     ]
 )
 
+SEAR_LIBS=
+STATIC_LIBSTDCPP=
+STATIC_LIBGCC=
+
+AC_ARG_ENABLE(static_link,
+  [  --enable-static-link    enable static link of some libs [default=no]],
+  [
+    if test "$enableval" = "yes"; then
+      link_static="true"
+      STATIC_LIBSTDCPP=`$CXX -print-file-name=libstdc++.a`
+      STATIC_LIBGCC=`$CXX -print-file-name=libgcc.a`
+    else
+      link_static="false"
+    fi
+  ],[
+    link_static="false"
+  ]
+)
+AM_CONDITIONAL(BUILD_STATIC, test x"$link_static" = xtrue)
+
+
 AC_CHECK_FUNC(rint,,[AC_CHECK_LIB(m,rint)])
 AC_CHECK_FUNCS([rintf lrintf lrint])
 
 AC_LANG_CPLUSPLUS
 AC_REQUIRE_CPP
 
-SDL_VERSION=1.2.0
-WF_CHECK_SDL_IMAGE($SDL_VERSION)
+dnl Check SDL
+SDL_VERSION=1.2.2
+AM_PATH_SDL($SDL_VERSION, [
+  CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+  EQUATOR_LIBS="$EQUATOR_LIBS $SDL_LIBS"
+],
+[
+  AC_MSG_ERROR(Couldn't find SDL or insufficent version found. Please goto http://www.libsdl.org/ and get at least version $SDL_VERSION)
+])
+AC_SUBST(SDL_VERSION)
 
-WF_CHECK_GL_LIBS
+if test $cross_compiling == no; then
+  AC_CHECK_LIB(SDL_image,IMG_ReadXPMFromArray, [
+    EQUATOR_LIBS="$EQUATOR_LIBS -lSDL_image"
+  ], [
+    AC_MSG_ERROR(Couldn't find SDL_image or wrong version found. Please goto http://www.libsdl.org/projects/SDL_image and get at least version 1.2.1)
+])
+  AC_CHECK_LIB(SDL_mixer,Mix_OpenAudio, [
+    EQUATOR_LIBS="$EQUATOR_LIBS -lSDL_mixer"
+  ], [
+    AC_MSG_ERROR(Couldn't find SDL_sound. Please goto http://www.libsdl.org/projects/SDL_mixer/)
+])
+else
+   AC_CHECK_HEADER(SDL/SDL_image.h,
+       [found_sdl_image=yes break],
+       [found_sdl_image=no])
+
+   if test $found_sdl_image == yes; then
+       EQUATOR_LIBS="$EQUATOR_LIBS -lSDL_image"
+   else
+       AC_MSG_ERROR(Error could not find SDL_image)
+   fi
+
+   AC_CHECK_HEADER(SDL/SDL_mixer.h,
+       [found_sdl_mixer=yes break],
+       [found_sdl_mixer=no])
+
+   if test $found_sdl_mixer == yes; then
+       EQUATOR_LIBS="$EQUATOR_LIBS -lSDL_mixer"
+   else
+       AC_MSG_ERROR(Error could not find SDL_mixer)
+   fi
+fi
+
+if test $cross_compiling == no; then
+  AC_CHECK_LIB(GL,glViewport, [
+    EQUATOR_LIBS="$EQUATOR_LIBS -lGL"
+  ],[
+    AC_MSG_ERROR(Couldn't find OpenGL)
+])
+
+  AC_CHECK_LIB(GLU,gluPerspective, [
+    EQUATOR_LIBS="$EQUATOR_LIBS -lGLU"
+  ],[
+    AC_MSG_ERROR(Couldn't find GLU)
+])
+
+  AC_CHECK_LIB(cal3d,main, [
+    EQUATOR_LIBS="$EQUATOR_LIBS -lcal3d"
+  ], [
+    AC_MSG_ERROR(Couldn't find Cal3D. Please goto http://sourceforge.net/projects/cal3d/)
+])
+
+ else
+   AC_CHECK_HEADER(cal3d/cal3d.h,
+       [found_cal3d=yes break],
+       [found_cal3d=no])
+
+   if test $found_cal3d == yes; then
+       EQUATOR_LIBS="$EQUATOR_LIBS -lcal3d"
+   else
+       AC_MSG_ERROR(Error could not find Cal3D)
+   fi
+   AC_CHECK_HEADER(GL/gl.h,
+       [found_gl=yes break],
+       [found_gl=no])
+
+ if test $found_gl == yes; then
+       EQUATOR_LIBS="$EQUATOR_LIBS -lopengl32"
+   else
+       AC_MSG_ERROR(Error could not find OpenGL)
+   fi
+
+   AC_CHECK_HEADER(GL/glu.h,
+       [found_glu=yes break],
+       [found_glu=no])
+
+   if test $found_glu == yes; then
+       EQUATOR_LIBS="$EQUATOR_LIBS -lglu32"
+   else
+       AC_MSG_ERROR(Error could not find GLU)
+   fi
+fi
+LIBS="$LIBS $EQUATOR_LIBS"
 
 PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.3 >= 1.3.2 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
-        LIBS="$LIBS $WF_LIBS"
+        EQUATOR_LIBS="$EQUATOR_LIBS $WF_LIBS"
     ],
     [
         AC_MSG_ERROR(Couldn't find WF libs.)
@@ -61,29 +171,17 @@ PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.3 >= 1.3.2 varconf-1.0 sage ,
 
 AM_PATH_LIB3DS(1.2.0, , AC_MSG_ERROR(Couldn't find lib3ds))
 CPPFLAGS="$CPPFLAGS $LIB3DS_CFLAGS"
-LIBS="$LIBS $LIB3DS_LIBS"
-
-AC_CHECK_LIB(cal3d, main,
-[
-    LIBS="$LIBS -lcal3d"
-], AC_MSG_ERROR(Could not find cal3d library))
+EQUATOR_LIBS="$EQUATOR_LIBS $LIB3DS_LIBS"
 
 dnl Versions required
 
 PKG_CHECK_MODULES(GTK, gtkglextmm-1.2 ,
     [
         CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
-        LIBS="$LIBS $GTK_LIBS"
+        EQUATOR_LIBS="$EQUATOR_LIBS $GTK_LIBS"
     ],
     [
-        PKG_CHECK_MODULES(GTK, gtkglextmm-1.0 ,
-            [
-                CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
-                LIBS="$LIBS $GTK_LIBS"
-            ],
-            [
-                AC_MSG_ERROR(Couldn't find GTK libs.)
-            ])
+        AC_MSG_ERROR(Couldn't find GTK libs.)
     ])
 
 AC_MSG_CHECKING([for round in libm])
@@ -111,9 +209,16 @@ AC_TRY_COMPILE([
 
 ])
 
+dnl SDL adds itself to LIBS
+LIBS=
+
+AC_SUBST(EQUATOR_LIBS)
+AC_SUBST(STATIC_LIBSTDCPP)
+AC_SUBST(STATIC_LIBGCC)
+
 dnl add SDL flags at the end to avoid SDL_main problems
-CXXFLAGS="$CXXFLAGS $WF_SDL_IMAGE_CFLAGS"
-LIBS="$LIBS $WF_SDL_IMAGE_LIBS"
+dnl CXXFLAGS="$CXXFLAGS $WF_SDL_IMAGE_CFLAGS"
+dnl LIBS="$LIBS $WF_SDL_IMAGE_LIBS"
 
 dnl Generate files
 AC_OUTPUT([

@@ -1,3 +1,10 @@
+2005-02-11  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* configure,ac: Add a configure option for linking lots of the libs
+	  statically.
+
+	* app/Makefile.am: Implement the partial static linking option.
+
 2005-02-10  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* gui/gtkmm/Cal3dStoreOptions.h: Re-order component type enumeration
