@@ -7,6 +7,8 @@
 
 #include "OptionBox.h"
 
+#include <gtkmm/treeview.h>
+
 class Server;
 
 namespace Eris {
@@ -27,7 +29,6 @@ class TypeTree : public OptionBox
   private:
     Glib::RefPtr<Gtk::TreeStore> m_treeModel;
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
-    Gtk::TreeModelColumn<Glib::ustring> * m_objTypeColumn;
     Gtk::TreeModelColumn<Eris::TypeInfo *> * m_ptrColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
@@ -41,7 +42,7 @@ class TypeTree : public OptionBox
         return 1;
     }
 
-    void insertType(Eris::TypeInfo * const ti);
+    void insertType(Eris::TypeInfo * const, Gtk::TreeModel::Row);
 
   public:
     explicit TypeTree(Server &);
