@@ -26,7 +26,7 @@ class Layer : public SigC::Object {
     Layer(Model & m, const std::string & n, const std::string & t) :
           m_model(m), m_name(n), m_type(t), m_visible(true),
           m_xoff(0.0f), m_yoff(0.0f), m_zoff(0.0f) { }
-    virtual ~Layer() { }
+    virtual ~Layer();
 
     Model & m_model;
     std::string m_name;

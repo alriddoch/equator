@@ -17,11 +17,12 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  HeightData.cpp HeightData.h \
 		  Model.cpp Model.h \
 		  Server.cpp Server.h \
-		  Layer.h \
+		  Layer.cpp Layer.h \
 		  Holo.cpp Holo.h \
 		  BladeMap.cpp BladeMap.h \
 		  IsoMap.cpp IsoMap.h \
 		  TileMap.cpp TileMap.h \
+		  Terrain.cpp Terrain.h \
 		  HeightManager.cpp HeightManager.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \

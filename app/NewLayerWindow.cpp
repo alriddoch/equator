@@ -8,6 +8,7 @@
 #include "IsoMap.h"
 #include "Model.h"
 #include "HeightManager.h"
+#include "Terrain.h"
 
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/box.h>
@@ -65,6 +66,13 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
     m_factories["HeightManager"] = factory;
     row = *(m_treeModel->append());
     row[*m_nameColumn]     = "HeightManager";
+    //m_list->add(*(manage( new FactoryItem(factory, "HeightManager") )));
+
+    factory = new LayerPlant<Terrain>();
+    LayerFactory::factories["Terrain"] = factory;
+    m_factories["Terrain"] = factory;
+    row = *(m_treeModel->append());
+    row[*m_nameColumn]     = "Terrain";
     //m_list->add(*(manage( new FactoryItem(factory, "HeightManager") )));
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
