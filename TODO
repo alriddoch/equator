@@ -1,4 +1,5 @@
-Add controls to affect behavoir of middle button. pan, rotate etc.
+Why is selectMod_t in ServerEntities? It seems like it should be general
+purpose. m_renderMode in ServerEntities could probably be in Layer.
 
 Have a media database, and a media mapper, which maps database onto entities.
 This might involve apogee

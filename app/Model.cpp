@@ -18,7 +18,7 @@ Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
                                 m_sizeX(500.0f), m_sizeY(500.0f),
                                 m_sizeZ(500.0f), m_mainWindow(mw)
 {
-    m_currentLayer = new Holo(*this);
+    m_currentLayer = m_backDropLayer = new Holo(*this);
     m_layers.push_front( m_currentLayer );
 }
 

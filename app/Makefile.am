@@ -23,6 +23,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \
 		  GameView.cpp GameView.h \
+		  Cal3dStore.cpp Cal3dStore.h \
 		  types.h GL.h operations.h \
 		  arrow_mesh.h \
 		  equator_plugin.cpp

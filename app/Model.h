@@ -13,6 +13,7 @@
 #include <sigc++/signal.h>
 
 class Layer;
+class Holo;
 class MainWindow;
 
 class Model : public SigC::Object {
@@ -22,6 +23,7 @@ class Model : public SigC::Object {
     const int m_modelNo;
     int m_viewCount;
     std::list<Layer *> m_layers;
+    Holo * m_backDropLayer;
     Layer * m_currentLayer;
     std::string m_name;
     float m_cursX, m_cursY, m_cursZ;
@@ -42,6 +44,10 @@ class Model : public SigC::Object {
 
     const std::list<Layer *> & getLayers() const {
         return m_layers;
+    }
+
+    Holo * getBackDropLayer() const {
+        return m_backDropLayer;
     }
 
     Layer * getCurrentLayer() const {

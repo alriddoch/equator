@@ -9,7 +9,7 @@
 #include "visual/Texture.h"
 
 Holo::Holo(Model & model) : Layer(model, "background", "HoloWorld"),
-                            m_box_radius(0)
+                            m_box_radius(8)
 {
 }
 
@@ -26,9 +26,10 @@ void Holo::draw(GlView & view)
     int numlines = (int)(winsize / (40.0f * winscale) + 1);
     int xc = -(int)view.getXoff();
     int yc = -(int)view.getYoff();
-    int zc = -(int)view.getYoff();
 
     if (m_box_radius > 0) {
+        xc = 0;
+        yc = 0;
         numlines = m_box_radius;
     }
 
@@ -41,25 +42,25 @@ void Holo::draw(GlView & view)
                            xc + numlines, yc + numlines, 0,
                            xc - numlines, yc + numlines, 0,
 
-                           xc - numlines, yc + numlines, zc - 0,
-                           xc + numlines, yc + numlines, zc - 0,
-                           xc + numlines, yc + numlines, zc + numlines,
-                           xc - numlines, yc + numlines, zc + numlines,
+                           xc - numlines, yc + numlines, 0,
+                           xc + numlines, yc + numlines, 0,
+                           xc + numlines, yc + numlines, numlines,
+                           xc - numlines, yc + numlines, numlines,
 
-                           xc - numlines, yc - numlines, zc - 0,
-                           xc - numlines, yc - numlines, zc + numlines,
-                           xc + numlines, yc - numlines, zc + numlines,
-                           xc + numlines, yc - numlines, zc - 0,
+                           xc - numlines, yc - numlines, 0,
+                           xc - numlines, yc - numlines, numlines,
+                           xc + numlines, yc - numlines, numlines,
+                           xc + numlines, yc - numlines, 0,
 
-                           xc + numlines, yc - numlines, zc - 0,
-                           xc + numlines, yc - numlines, zc + numlines,
-                           xc + numlines, yc + numlines, zc + numlines,
-                           xc + numlines, yc + numlines, zc - 0,
+                           xc + numlines, yc - numlines, 0,
+                           xc + numlines, yc - numlines, numlines,
+                           xc + numlines, yc + numlines, numlines,
+                           xc + numlines, yc + numlines, 0,
 
-                           xc - numlines, yc - numlines, zc - 0,
-                           xc - numlines, yc + numlines, zc - 0,
-                           xc - numlines, yc + numlines, zc + numlines,
-                           xc - numlines, yc - numlines, zc + numlines
+                           xc - numlines, yc - numlines, 0,
+                           xc - numlines, yc + numlines, 0,
+                           xc - numlines, yc + numlines, numlines,
+                           xc - numlines, yc - numlines, numlines
                          };
 
     static GLfloat x0[] = {1.f, 0.f, 0.f, 0.f};

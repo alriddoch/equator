@@ -1,3 +1,14 @@
+2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/Server.cpp, app/Model.h, app/Model.cpp, app/Holo.cpp: Default
+	  to a box Holo backdrop. Store a pointer to the backdrop layer
+	  in the Model, and then change the backdrop type depending on
+	  the scene. Fix Holo rendering so its not offset by the z view
+	  offset.
+
+	* app/NewLayerWindow.cpp, app/Cal3dStore.cpp, app/Cal3dStore.h:
+	  Add new layer for previewing cal3d animations.
+
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.cpp: Clean up use of m_dragType rather than anything

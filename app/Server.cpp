@@ -4,6 +4,7 @@
 
 #include "Server.h"
 
+#include "Holo.h"
 #include "Model.h"
 #include "WorldEntity.h"
 #include "ServerEntities.h"
@@ -255,6 +256,7 @@ void Server::gotAvatar(Eris::Avatar * av)
 
     Model & model = m_mainWindow.newModel();
     model.setName(getName());
+    model.getBackDropLayer()->setBoxSize(0);
     takeModel(model);
 }
 
