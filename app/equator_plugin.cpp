@@ -2,17 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "MainWindow.h"
+
+#include <gtkmm.h>
+
+#include <gtkglmm.h>
 
 #include <iostream>
 
-#include "MainWindow.h"
-
-#include <gtkmm/main.h>
-
 Gtk::Main * kit;
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #ifdef BUILD_AS_GIMP_PLUGIN
 
@@ -72,6 +74,8 @@ int main(int argc, char ** argv)
 {
     kit = new Gtk::Main(argc, argv);
 
+    Gdk::GL::init();
+
     int type = gimp_main (argc, argv);
 
     if (type == 1) { // We are not being invoked as a plugin
@@ -89,6 +93,8 @@ int main(int argc, char ** argv)
 int main(int argc, char ** argv)
 {
     kit = new Gtk::Main(argc, argv);
+
+    Gdk::GL::init();
 
     MainWindow * window = new MainWindow();
 
