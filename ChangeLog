@@ -1,5 +1,11 @@
 2003-02-06  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/GlView.cpp: Disable use of accumulation buffer as its too slow
+	  on most hardware. Improve depth of view in orthographic mode to
+	  avoid clipping too early.
+
+2003-02-06  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/LayerWindow.cpp, app/Model.cpp: Fix some ui glitches.
 
 2003-02-05  Al Riddoch  <alriddoch@zepler.org>

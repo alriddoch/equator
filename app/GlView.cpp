@@ -35,9 +35,9 @@ int attrlist[] = {
     GDK_GL_RGBA,
     GDK_GL_DOUBLEBUFFER,
     GDK_GL_DEPTH_SIZE, 1,
-    GDK_GL_ACCUM_RED_SIZE, 1,
-    GDK_GL_ACCUM_GREEN_SIZE, 1,
-    GDK_GL_ACCUM_BLUE_SIZE, 1,
+    // GDK_GL_ACCUM_RED_SIZE, 1,
+    // GDK_GL_ACCUM_GREEN_SIZE, 1,
+    // GDK_GL_ACCUM_BLUE_SIZE, 1,
     GDK_GL_NONE
 };
 
@@ -90,7 +90,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     Glib::RefPtr<Gdk::GL::Config> glconfig = Gdk::GL::Config::create(
                                              Gdk::GL::MODE_RGB |
                                              Gdk::GL::MODE_DEPTH |
-                                             Gdk::GL::MODE_ACCUM |
+                                             // Gdk::GL::MODE_ACCUM |
                                              Gdk::GL::MODE_DOUBLE);
     if (glconfig.is_null()) {
         std::cerr << "*** Cannot find the double-buffered visual.\n"
@@ -381,7 +381,7 @@ void GlView::initgl()
     glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glEnable(GL_ACCUM);
+    // glEnable(GL_ACCUM);
 
 }
 
@@ -405,7 +405,7 @@ void GlView::setupgl()
         } else {
             float xsize = get_width() / 40.0f / 2.0f;
             float ysize = get_height() / 40.0f / 2.0f;
-            glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
+            glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
         }
     }
 }
@@ -415,7 +415,9 @@ void GlView::origin()
     // Not safe to call when make_current() has not been called
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0.0f, 0.0f, -10.0f);
+    if (m_projection == GlView::PERSP) {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+    }
     glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
     glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
@@ -519,7 +521,7 @@ void GlView::drawgl()
         }
         glFlush();
         swap_buffers();
-        glAccum(GL_LOAD, 1.0f);
+        // glAccum(GL_LOAD, 1.0f);
     }
 }
 
@@ -533,7 +535,7 @@ gint GlView::animate()
         setupgl();
         origin();
         // glClear( GL_COLOR_BUFFER_BIT );
-        glAccum(GL_RETURN, 1.0f);
+        // glAccum(GL_RETURN, 1.0f);
         // cursor();
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
@@ -703,7 +705,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
     mousex = event->x; mousey = event->y;
     if (clickx != 0) {
         if (make_current()) {
-            glAccum(GL_RETURN, 1.0f);
+            // glAccum(GL_RETURN, 1.0f);
             mouseEffects();
             swap_buffers();
         }
@@ -867,12 +869,14 @@ void GlView::setPickProjection()
     } else {
         float xsize = get_width() / 40.0f / 2.0f;
         float ysize = get_height() / 40.0f / 2.0f;
-        glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
+        glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
     }
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glInitNames();
-    glTranslatef(0.0f, 0.0f, -10.0f);
+    if (m_projection == GlView::PERSP) {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+    }
     glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
     glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
