@@ -3,11 +3,14 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "ServerEntities.h"
+
 #include "GlView.h"
 #include "Server.h"
 #include "Model.h"
 #include "MainWindow.h"
 #include "Palette.h"
+#include "WorldEntity.h"
+#include "Terrain.h"
 
 #include "debug.h"
 
@@ -541,28 +544,44 @@ static const WFMath::Point<3> operator+(const WFMath::Point<3> & lhs,
     return WFMath::Point<3>(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]);
 }
 
-void ServerEntities::alignEntityHeight(Eris::Entity * ent,
-                                       const WFMath::Point<3> & o)
+void ServerEntities::alignEntityParent(Eris::Entity * ent)
 {
     assert(ent != NULL);
+    std::cout << "Aligning ... " << std::endl << std::flush;
 
-    WFMath::Point<3> pos = ent->getPosition();
-    WFMath::Point<3> offset = pos + o;
-    if (m_selectionList.find(ent) != m_selectionList.end()) {
+    Eris::Entity * parent = ent->getContainer();
+    if ((parent != 0) && (m_selectionList.find(ent) != m_selectionList.end())) {
+        TerrainEntity * tparent = dynamic_cast<TerrainEntity *>(parent);
+        if (tparent != 0) {
+            std::cout << "Terrain ... " << std::endl << std::flush;
+            if (tparent->m_terrain != 0) {
+                WFMath::Point<3> pos = ent->getPosition();
+                float height = tparent->m_terrain->m_terrain.get(pos.x(),
+                                                                 pos.y());
+                std::cout << ent->getID() << " had height of " << pos.z()
+                          << " and we change it to terrain level " << height << std::endl << std::flush;
+                pos.z() = height;
+                m_serverConnection.avatarMoveEntity(ent->getID(),
+                                            ent->getContainer()->getID(),
+                                            pos, WFMath::Vector<3>(0,0,0));
+                
+            } else {
+                std::cout << "No terrain ... " << std::endl << std::flush;
+            }
+        } else {
+            std::cout << "Not terrain ... " << std::endl << std::flush;
+            WFMath::Point<3> pos = ent->getPosition();
+            float height = 0.f;
+            std::cout << ent->getID() << " had height of " << pos.z()
+                      << " and we change it to zero " << height << std::endl << std::flush;
+            pos.z() = height;
+            m_serverConnection.avatarMoveEntity(ent->getID(),
+                                        ent->getContainer()->getID(),
+                                        pos, WFMath::Vector<3>(0,0,0));
+        }
 #warning FIXME - get the server object to handle the adjustment.
         // The server object knows about what data we have available.
         // We should probably support alignments like "other layer", "parent"
-        float x = offset.x();
-        float y = offset.y();
-        float z = o.z();
-        float height = z; // = m_model.m_terrain.get(x, y); // / 32.0f;
-        std::cout << ent->getID() << " had height of " << offset.z()
-                  << " and we change it to " << height << std::endl << std::flush;
-        WFMath::Point<3> newPos = pos;
-        newPos.z() = height - z;
-        m_serverConnection.avatarMoveEntity(ent->getID(),
-                                            ent->getContainer()->getID(),
-                                            newPos, WFMath::Vector<3>(0,0,0));
     }
     int numEnts = ent->getNumMembers();
     debug(std::cout << ent->getID() << " " << numEnts << " emts"
@@ -570,7 +589,7 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
     for (int i = 0; i < numEnts; i++) {
         Eris::Entity * e = ent->getMember(i);
         assert(e != NULL);
-        alignEntityHeight(e, offset);
+        alignEntityParent(e);
     }
 }
 
@@ -938,10 +957,10 @@ void ServerEntities::insert(const WFMath::Point<3> & pos)
 
 void ServerEntities::align(Alignment a)
 {
-    if (a != ALIGN_HEIGHT) { return; }
+    if (a != ALIGN_PARENT) { return; }
 
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
-    alignEntityHeight(root, WFMath::Point<3>(0,0,0));
+    alignEntityParent(root);
 
 }
 

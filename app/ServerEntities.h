@@ -80,7 +80,7 @@ class ServerEntities : public Layer {
                         bool check = false);
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
-    void alignEntityHeight(Eris::Entity * ent, const WFMath::Point<3> & o);
+    void alignEntityParent(Eris::Entity * ent);
     void connectEntity(Eris::Entity * );
 
     void loadOptions(Gtk::FileSelection *);

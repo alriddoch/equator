@@ -13,12 +13,14 @@ namespace Eris {
 }
 
 class Server;
+class Terrain;
 
 class TerrainEntity : public Eris::Entity
 {
   public:
     TerrainEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
 
+    Terrain * m_terrain;
 };
 
 class WEFactory : public Eris::Factory

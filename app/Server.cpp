@@ -162,11 +162,13 @@ void Server::readTerrain(Terrain & t, Eris::Entity & ent)
 void Server::checkEntityForNewLayers(Eris::Entity & ent)
 {
     if (typeid(ent) == typeid(TerrainEntity)) {
+        TerrainEntity & tent = dynamic_cast<TerrainEntity &>(ent);
         std::cout << "Found a terrain entity"
                   << std::endl << std::flush;
         Terrain * layer = new Terrain(*m_model);
         readTerrain(*layer, ent);
         m_model->addLayer(layer);
+        tent.m_terrain = layer;
     }
     
     int numEnts = ent.getNumMembers();

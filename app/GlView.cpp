@@ -198,7 +198,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& align_popup = menu_sub_sub->items();
     align_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to heightfield", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_HEIGHT)));
+    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to parent", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_PARENT)));
     align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to grid", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_GRID)));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Align", *menu_sub_sub));
 

@@ -1,3 +1,15 @@
+2003-08-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/types.h: Get rid of hardcoded heighfield alignment
+	  from enumeration, and add parent alignment.
+
+	* app/WorldEntity.h, app/Server.cpp: Add a pointer to the associated
+	  terrain layer to TerrainEntity.
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Replace heightfield
+	  alignment code with parent alignment, which has the same effect
+	  in the useful case.
+
 2003-08-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Terrain.h, app/Terrain.cpp:
