@@ -143,6 +143,8 @@ void GameView::draw(GlView & view)
 
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     drawWorld(view, root);
+
+    glDepthFunc(GL_LESS);
 }
 
 void GameView::animate(GlView & view)

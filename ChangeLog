@@ -1,5 +1,15 @@
 2004-01-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ServerEntities.cpp, app/ServerEntities.h,
+	  gui/gtkmm/EntityExportOptions.cpp gui/gtkmm/EntityExportOptions.h
+	  gui/gtkmm/EntityImportOptions.cpp gui/gtkmm/EntityImportOptions.h:
+	  Move gui classes into separate files in gui directory.
+
+	* app/GameView.cpp: Change depth test back after IG rendering code is
+	  done.
+
+2004-01-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/CharacterWindow.cpp, app/CharacterWindow.h,
 	  app/ConnectWindow.cpp, app/ConnectWindow.h,
 	  app/Server.cpp, app/Server.h, app/ServerWindow.cpp,

@@ -12,6 +12,9 @@
 #include "WorldEntity.h"
 #include "Terrain.h"
 
+#include "gui/gtkmm/EntityExportOptions.h"
+#include "gui/gtkmm/EntityImportOptions.h"
+
 #include "common/debug.h"
 
 #include "visual/TerrainRenderer.h"
@@ -32,10 +35,6 @@
 #include <GL/glu.h>
 
 #include <gtkmm/fileselection.h>
-#include <gtkmm/radiobutton.h>
-#include <gtkmm/label.h>
-#include <gtkmm/alignment.h>
-#include <gtkmm/stock.h>
 
 #include <fstream>
 
@@ -45,8 +44,8 @@ static const bool debug_flag = false;
 
 using Atlas::Message::Element;
 
-ImportOptions * ServerEntities::m_importOptions = NULL;
-ExportOptions * ServerEntities::m_exportOptions = NULL;
+EntityImportOptions * ServerEntities::m_importOptions = NULL;
+EntityExportOptions * ServerEntities::m_exportOptions = NULL;
 
 
 class DummyDecoder : public Atlas::Message::DecoderBase {
@@ -114,155 +113,6 @@ class FileDecoder : public Atlas::Message::DecoderBase {
 
     const std::string & getTopLevel() const {
         return m_topLevelId;
-    }
-};
-
-class ImportOptions : public Gtk::Dialog
-{
-  private:
-    
-  public:
-    typedef enum import_target { IMPORT_TOPLEVEL, IMPORT_SELECTION } ImportTarget;
-
-    Gtk::Button * m_ok;
-    ImportTarget m_target;
-
-    ImportOptions() : m_target(IMPORT_TOPLEVEL) {
-        Gtk::VBox * vbox = get_vbox();
-
-        Gtk::HBox * hbox = manage( new Gtk::HBox() );
-        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        vbox = manage( new Gtk::VBox() );
-        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 12);
-
-        Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-        a->add(*manage( new Gtk::Label("Import entities into..") ) );
-        vbox->pack_start(*a);
-
-        hbox = manage( new Gtk::HBox() );
-        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        vbox = manage( new Gtk::VBox() );
-        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("top level") );
-        rb1->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_TOPLEVEL));
-        vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
-        Gtk::RadioButton::Group rgp = rb1->get_group();
-        Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
-        rb->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
-        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
-
-        add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
-        m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
-
-        signal_response().connect(slot(*this, &ImportOptions::response));
-    }
-
-    void setImportTarget(ImportTarget it) {
-        m_target = it;
-    }
-
-    void response(int) {
-        hide();
-    }
-};
-
-class ExportOptions : public Gtk::Dialog
-{
-  private:
-    
-  public:
-    typedef enum export_target { EXPORT_ALL, EXPORT_VISIBLE, EXPORT_SELECTION, EXPORT_ALL_SELECTED } ExportTarget;
-
-    Gtk::Button * m_ok;
-    Gtk::CheckButton * m_charCheck; 
-    Gtk::CheckButton * m_appendCheck; 
-    Gtk::Entry * m_idSuffix;
-    Gtk::CheckButton * m_setRootCheck; 
-    Gtk::Entry * m_rootId;
-    ExportTarget m_target;
-    Eris::TypeInfoPtr m_charType;
-
-    ExportOptions() : m_target(EXPORT_ALL), m_charType(NULL) {
-        Gtk::VBox * vbox = get_vbox();
-
-        Gtk::HBox * hbox = manage( new Gtk::HBox() );
-        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        Gtk::VBox * mainvbox = manage( new Gtk::VBox() );
-        hbox->pack_start(*mainvbox, Gtk::PACK_EXPAND_WIDGET, 12);
-
-        Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-        a->add(*manage( new Gtk::Label("Export..") ) );
-        mainvbox->pack_start(*a);
-
-        hbox = manage( new Gtk::HBox() );
-        mainvbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        vbox = manage( new Gtk::VBox() );
-        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("all entities") );
-        rb1->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL));
-        vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
-        Gtk::RadioButton::Group rgp = rb1->get_group();
-        Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "visible entities") );
-        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_VISIBLE));
-        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
-        rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
-        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_SELECTION));
-        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
-        rb = manage( new Gtk::RadioButton(rgp, "all selected entities") );
-        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
-        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
-        m_charCheck = manage( new Gtk::CheckButton("Remove characters") );
-        vbox->pack_start(*m_charCheck, Gtk::PACK_SHRINK, 6);
-        
-        a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-        a->add(*manage( new Gtk::Label("ID handling") ) );
-        mainvbox->pack_start(*a);
-
-        hbox = manage( new Gtk::HBox() );
-        mainvbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        vbox = manage( new Gtk::VBox() );
-        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
-
-        m_appendCheck = manage( new Gtk::CheckButton("Append") );
-        vbox->pack_start(*m_appendCheck, Gtk::PACK_SHRINK, 6);
-
-        hbox = manage( new Gtk::HBox() );
-        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-        m_idSuffix = manage( new Gtk::Entry() );
-        m_idSuffix->set_text("_map");
-        hbox->pack_start(*m_idSuffix, Gtk::PACK_SHRINK, 6);
-
-        Gtk::Label * t = manage( new Gtk::Label("to IDs in file.") );
-        hbox->pack_start(*t, Gtk::PACK_SHRINK, 6);
-
-        m_setRootCheck = manage( new Gtk::CheckButton("Set root id to ") );
-        vbox->pack_start(*m_setRootCheck, Gtk::PACK_SHRINK, 6);
-
-        hbox = manage( new Gtk::HBox() );
-        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
-        m_rootId = manage( new Gtk::Entry() );
-        m_rootId->set_text("world_0");
-        hbox->pack_start(*m_rootId, Gtk::PACK_SHRINK, 6);
-
-        add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
-        m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
-
-        signal_response().connect(slot(*this, &ExportOptions::response));
-    }
-
-    void setExportTarget(ExportTarget et) {
-        m_target = et;
-    }
-
-    void response(int) {
-        hide();
     }
 };
 
@@ -700,7 +550,7 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
         std::cerr << "Top level entity " << topId << " found in file"
                   << std::endl << std::flush;
     }
-    if (m_importOptions->m_target == ImportOptions::IMPORT_TOPLEVEL) {
+    if (m_importOptions->m_target == EntityImportOptions::IMPORT_TOPLEVEL) {
         insertEntityContents(m_serverConnection.m_world->getRootEntity()->getID(),
                              I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
@@ -763,16 +613,16 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
 
     Eris::Entity * export_root = NULL;
     switch (m_exportOptions->m_target) {
-        case ExportOptions::EXPORT_SELECTION:
+        case EntityExportOptions::EXPORT_SELECTION:
             export_root = m_selection;
             break;
-        case ExportOptions::EXPORT_ALL_SELECTED:
+        case EntityExportOptions::EXPORT_ALL_SELECTED:
             if (m_selection != 0) {
                 export_root = m_selection->getContainer();
             }
             break;
-        case ExportOptions::EXPORT_ALL:
-        case ExportOptions::EXPORT_VISIBLE:
+        case EntityExportOptions::EXPORT_ALL:
+        case EntityExportOptions::EXPORT_VISIBLE:
         default:
             export_root = m_serverConnection.m_world->getRootEntity();
             break;
@@ -804,7 +654,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
         m_exportOptions->m_charType = m_serverConnection.m_connection.getTypeService()->getTypeByName("character");
     }
 
-    if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
+    if (m_exportOptions->m_target == EntityExportOptions::EXPORT_ALL_SELECTED) {
         Atlas::Message::Element::MapType ent;
         Atlas::Message::Element::ListType contents;
         ent["id"] = exportedRootId;
@@ -840,8 +690,8 @@ void ServerEntities::cancel(Gtk::FileSelection * fsel)
 
 void ServerEntities::createOptionsWindows()
 {
-    m_importOptions = new ImportOptions();
-    m_exportOptions = new ExportOptions();
+    m_importOptions = new EntityImportOptions();
+    m_exportOptions = new EntityExportOptions();
 }
 
 void ServerEntities::connectEntity(Eris::Entity * ent)

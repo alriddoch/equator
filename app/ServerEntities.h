@@ -13,8 +13,8 @@
 #include <set>
 
 class Server;
-class ImportOptions;
-class ExportOptions;
+class EntityImportOptions;
+class EntityExportOptions;
 
 namespace WFMath {
   template<const int dim> class AxisBox;
@@ -58,8 +58,8 @@ class ServerEntities : public Layer {
     entname_t m_nameDict;
     unsigned int m_antTexture;
 
-    static ImportOptions * m_importOptions;
-    static ExportOptions * m_exportOptions;
+    static EntityImportOptions * m_importOptions;
+    static EntityExportOptions * m_exportOptions;
 
     SigC::Connection m_loadOptionsDone;
     SigC::Connection m_saveOptionsDone;
