@@ -9,7 +9,6 @@
 #include "MainWindow.h"
 #include "Palette.h"
 
-#include "Vector3D.h"
 #include "debug.h"
 
 #include <Eris/Entity.h>
@@ -22,108 +21,117 @@ static const bool debug_flag = false;
 
 using Atlas::Message::Object;
 
-void ServerEntities::draw3DCube(const Vector3D & coords,
-                                const Eris::BBox & bbox, bool open)
+inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
+{
+    Atlas::Message::Object::ListType ret(3);
+    ret[0] = m_elem[0];
+    ret[1] = m_elem[1];
+    ret[2] = m_elem[2];
+    return Atlas::Message::Object(ret);
+}
+
+void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
+                                const WFMath::AxisBox<3> & bbox, bool open)
 {
     bool shaded = (m_renderMode == GlView::SHADED);
     glPushMatrix();
 
-    glTranslatef(coords.X(), coords.Y(), coords.Z());
+    glTranslatef(coords.x(), coords.y(), coords.z());
 
     glBegin(GL_QUADS);
     glColor3f(0.0f, 0.0f, 1.0f);
     // Bottom face
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
     // Top face
     if (!open) {
-        glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
-        glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
-        glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
-        glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
+        glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+        glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+        glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+        glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
     }
 
     if (!shaded) { glColor3f(0.2f, 0.2f, 1.0f); }
     // South face
     if (!open) {
-        glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-        glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
-        glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
-        glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
+        glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+        glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+        glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+        glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
     }
 
     // North face
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
     if (!shaded) { glColor3f(0.0f, 0.0f, 0.7f); }
     // West face
     if (!open) {
-        glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-        glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
-        glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
-        glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
+        glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+        glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+        glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+        glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
     }
 
     // East face
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
     glEnd();
 
     glPopMatrix();
 }
 
-void ServerEntities::draw3DBox(const Vector3D & coords,
-                               const Eris::BBox & bbox)
+void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
+                               const WFMath::AxisBox<3> & bbox)
 {
     glPushMatrix();
     // origin();
-    glTranslatef(coords.X(), coords.Y(), coords.Z());
+    glTranslatef(coords.x(), coords.y(), coords.z());
 
     glBegin(GL_LINES);
     glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.u.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.u.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.u.z);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glVertex3f(bbox.u.x,bbox.u.y,bbox.v.z);
-    glVertex3f(bbox.u.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glVertex3f(bbox.v.x,bbox.u.y,bbox.v.z);
-    glVertex3f(bbox.v.x,bbox.v.y,bbox.v.z);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
     glEnd();
 
     glPopMatrix();
@@ -135,17 +143,17 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
     assert(ent != NULL);
 
     glPushMatrix();
-    const Eris::Coord & pos = ent->getPosition();
-    glTranslatef(pos.x, pos.y, pos.z);
+    const WFMath::Point<3> & pos = ent->getPosition();
+    glTranslatef(pos.x(), pos.y(), pos.z());
     int numEnts = ent->getNumMembers();
     debug(std::cout << ent->getID() << " " << numEnts << " emts"
                     << std::endl << std::flush;);
     for (int i = 0; i < numEnts; i++) {
         Eris::Entity * e = ent->getMember(i);
         assert(e != NULL);
-        debug(std::cout << ":" << e->getID() << e->getPosition() << ":"
-                        << e->getBBox().u << e->getBBox().v
-                        << std::endl << std::flush;);
+        // debug(std::cout << ":" << e->getID() << e->getPosition() << ":"
+                        // << e->getBBox().u << e->getBBox().v
+                        // << std::endl << std::flush;);
         // if (!e->isVisible()) { continue; }
         bool openEntity = ((I != m_selectionStack.end()) && (*I == e));
         switch (m_renderMode) {
@@ -181,8 +189,8 @@ void ServerEntities::selectEntity(Eris::Entity* ent,entstack_t::const_iterator I
     assert(ent != NULL);
 
     glPushMatrix();
-    const Eris::Coord & pos = ent->getPosition();
-    glTranslatef(pos.x, pos.y, pos.z);
+    const WFMath::Point<3> & pos = ent->getPosition();
+    glTranslatef(pos.x(), pos.y(), pos.z());
     int numEnts = ent->getNumMembers();
     for (int i = 0; i < numEnts; i++) {
         Eris::Entity * e = ent->getMember(i);
@@ -378,12 +386,12 @@ void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
                   << ":" << y << ":" << z << std::endl << std::flush;
         m_serverConnection.avatarMoveEntity(m_selection->getID(),
                    m_selection->getContainer()->getID(),
-                   Vector3D(m_selection->getPosition()) + Vector3D(x, y, z));
+                   m_selection->getPosition() + WFMath::Vector<3>(x, y, z));
     }
-    m_validDrag = true;
+    m_validDrag = false;
 }
 
-void ServerEntities::insert(const Vector3D & pos)
+void ServerEntities::insert(const WFMath::Point<3> & pos)
 {
     const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
     std::cout << "INSERTING " << type << std::endl << std::flush;
@@ -392,7 +400,7 @@ void ServerEntities::insert(const Vector3D & pos)
     ent["objtype"] = "object";
     ent["parents"] = Atlas::Message::Object::ListType(1, type);
     ent["loc"] = m_serverConnection.world->getRootEntity()->getID();
-    ent["pos"] = pos.asObject();
+    ent["pos"] = pos.toAtlas();
     
     m_serverConnection.avatarCreateEntity(ent);
 }
@@ -402,10 +410,16 @@ void ServerEntities::gotNewEntity(Eris::Entity *ent)
     ent->Changed.connect(SigC::bind(
 	SigC::slot(this, &ServerEntities::entityChanged),
 	ent));
+    ent->Moved.connect(SigC::slot(this, &ServerEntities::entityMoved));
     m_model.update(); // cause a re-draw
 }
 
 void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent)
+{
+    m_model.update();	// a bit excessive I suppose
+}
+
+void ServerEntities::entityMoved(const WFMath::Point<3> &)
 {
     m_model.update();	// a bit excessive I suppose
 }

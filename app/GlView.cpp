@@ -229,10 +229,10 @@ void GlView::setupgl()
         if (m_projection == GlView::PERSP) {
             if (width()>height()) {
                 GLfloat w = (GLfloat) width() / (GLfloat) height();
-                glFrustum( -w, w, -1.0f, 1.0f, 0.65f, 60.0f );
+                glFrustum( -w, w, -1.0f, 1.0f, 1.0f, 60.0f );
             } else {
                 GLfloat h = (GLfloat) height() / (GLfloat) width();
-                glFrustum( -1.0f, 1.0f, -h, h, 0.65f, 60.0f );
+                glFrustum( -1.0f, 1.0f, -h, h, 1.0f, 60.0f );
             }
         } else {
             float xsize = width() / 40.0f / 2.0f;
@@ -454,7 +454,7 @@ void GlView::midClickOn(int x, int y)
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
     m_dragType = GlView::MOVE;
     if (m_mainWindow.getTool() == MainWindow::DRAW) {
-        m_model.getCurrentLayer()->insert(Vector3D(m_cursX, m_cursY, m_cursZ));
+        m_model.getCurrentLayer()->insert(WFMath::Point<3>(m_cursX, m_cursY, m_cursZ));
     }
 }
 

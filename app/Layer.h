@@ -10,7 +10,10 @@
 
 class GlView;
 class Model;
-class Vector3D;
+
+namespace WFMath {
+  template<const int dim> class Point;
+}
 
 namespace Gtk {
   class FileSelection;
@@ -38,7 +41,7 @@ class Layer : public SigC::Object {
     virtual void dragStart(GlView & view, int x, int y) = 0;
     virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
     virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
-    virtual void insert(const Vector3D &) = 0;
+    virtual void insert(const WFMath::Point<3> &) = 0;
 
     const std::string & getType() const {
         return m_type;

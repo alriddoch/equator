@@ -13,10 +13,12 @@
 #include <set>
 
 class Server;
-class Vector3D;
+
+namespace WFMath {
+  template<const int dim> class AxisBox;
+}
 
 namespace Eris {
-  class BBox;
   class Entity;
   class TypeInfo;
   
@@ -42,9 +44,11 @@ class ServerEntities : public Layer {
 
     Eris::TypeInfo * m_gameEntityType;
 
-    void draw3DCube(const Vector3D & coords, const Eris::BBox & bbox,
+    void draw3DCube(const WFMath::Point<3> & coords,
+                    const WFMath::AxisBox<3> & bbox,
                     bool open = false);
-    void draw3DBox(const Vector3D & coords, const Eris::BBox & bbox);
+    void draw3DBox(const WFMath::Point<3> & coords,
+                   const WFMath::AxisBox<3> & bbox);
     void drawEntity(Eris::Entity * ent, entstack_t::const_iterator);
     void drawWorld(Eris::Entity * wrld);
     void selectEntity(Eris::Entity * ent, entstack_t::const_iterator);
@@ -62,10 +66,11 @@ class ServerEntities : public Layer {
     void dragStart(GlView & view, int x, int y);
     void dragUpdate(GlView & view, float x, float y, float z);
     void dragEnd(GlView & view, float x, float y, float z);
-    void insert(const Vector3D &);
+    void insert(const WFMath::Point<3> &);
     
     void gotNewEntity(Eris::Entity *ent);
     void entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent);
+    void entityMoved(const WFMath::Point<3> &);
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H

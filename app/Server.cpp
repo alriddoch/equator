@@ -3,7 +3,6 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "Server.h"
-#include "Vector3D.h"
 
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
@@ -21,6 +20,24 @@ using Atlas::Message::Object;
 using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
+
+inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
+{
+    Atlas::Message::Object::ListType ret(3);
+    ret[0] = m_elem[0];
+    ret[1] = m_elem[1];
+    ret[2] = m_elem[2];
+    return Atlas::Message::Object(ret);
+}
+
+inline Atlas::Message::Object WFMath::Vector<3>::toAtlas() const
+{
+    Atlas::Message::Object::ListType ret(3);
+    ret[0] = m_elem[0];
+    ret[1] = m_elem[1];
+    ret[2] = m_elem[2];
+    return Atlas::Message::Object(ret);
+}
 
 Server::Server() : inGame(false),
                    connection(* new Eris::Connection("equator", true)),
@@ -137,12 +154,12 @@ void Server::worldEnter(Eris::Entity * chr)
 
 }
 
-void Server::charMoved(const Eris::Coord &)
+void Server::charMoved(const WFMath::Point<3> &)
 {
     std::cout << "Char moved" << std::endl << std::flush;
 }
 
-void Server::moveCharacter(const Vector3D & pos)
+void Server::moveCharacter(const WFMath::Point<3> & pos)
 {
     if (character == NULL) {
         return;
@@ -153,8 +170,8 @@ void Server::moveCharacter(const Vector3D & pos)
     Atlas::Message::Object::MapType marg;
     marg["id"] = character->getID();
     marg["loc"] = character->getContainer()->getID();
-    marg["pos"] = pos.asObject();
-    marg["velocity"] = Vector3D(1,0,0).asObject();
+    marg["pos"] = pos.toAtlas();
+    marg["velocity"] = WFMath::Point<3>(1,0,0).toAtlas();
     m.SetArgs(Atlas::Message::Object::ListType(1, marg));
     m.SetFrom(character->getID());
 
@@ -162,17 +179,23 @@ void Server::moveCharacter(const Vector3D & pos)
     
 }
 
-const Vector3D Server::getAbsCharPos()
+const WFMath::Point<3> operator+(const WFMath::Point<3> & lhs,
+                                 const WFMath::Point<3> & rhs)
+{
+    return WFMath::Point<3>(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]);
+}
+
+const WFMath::Point<3> Server::getAbsCharPos()
 {
     if (!inGame) {
-        return Vector3D();
+        return WFMath::Point<3>();
     }
-    Vector3D pos = character->getPosition();
+    WFMath::Point<3> pos = character->getPosition();
     Eris::Entity * root = world->getRootEntity();
     for(Eris::Entity * ref = character->getContainer();
         ref != NULL && ref != root;
         ref = ref->getContainer()) {
-        pos = pos + Vector3D(ref->getPosition());
+        pos = pos + ref->getPosition();
     }
     return pos;
 }
@@ -188,17 +211,16 @@ void Server::avatarCreateEntity(const Atlas::Message::Object::MapType & ent)
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
-                              const Vector3D & pos, const Vector3D & vel)
+                              const WFMath::Point<3> & pos,
+                              const WFMath::Vector<3> & vel)
 {
     Move m = Move::Instantiate();
 
     Atlas::Message::Object::MapType ent;
     ent["id"] = id;
-    ent["pos"] = pos.asObject();
+    ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
-    if (vel) {
-        ent["velocity"] = vel.asObject();
-    }
+    ent["velocity"] = vel.toAtlas();
     m.SetArgs(Atlas::Message::Object::ListType(1, ent));
     m.SetFrom(character->getID());
     m.SetTo(id);

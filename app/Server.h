@@ -17,7 +17,10 @@ namespace Eris {
   class World;
   class Room;
   class Entity;
-  class Coord;
+}
+
+namespace WFMath {
+  template<const int dim> class Point;
 }
 
 namespace Atlas {
@@ -40,7 +43,7 @@ class Server : public SigC::Object {
     void worldEntityCreate(Eris::Entity *r);
     void worldEnter(Eris::Entity *r);
 
-    void charMoved(const Eris::Coord &);
+    void charMoved(const WFMath::Point<3> &);
   protected:
     bool inGame;
   public:
@@ -66,14 +69,14 @@ class Server : public SigC::Object {
     void createAccount(const std::string &, const std::string &);
     void createCharacter(const std::string &, const std::string &);
 
-    void moveCharacter(const Vector3D & pos);
+    void moveCharacter(const WFMath::Point<3> & pos);
 
     void avatarCreateEntity(const Atlas::Message::Object::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,
-                          const Vector3D & pos,
-                          const Vector3D & vel = Vector3D());
+                          const WFMath::Point<3> & pos,
+                          const WFMath::Vector<3> & vel = WFMath::Vector<3>());
 
-    const Vector3D getAbsCharPos();
+    const WFMath::Point<3> getAbsCharPos();
 };
 
 #endif // EQUATOR_SERVER_H

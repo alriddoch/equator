@@ -1,3 +1,15 @@
+2002-03-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Added hook
+	  so that screen is refreshed everytime something is updated or
+	  moved.
+
+	* app/ServerEntities.h, app/ServerEntities.cpp, app/Server.h,
+	  app/Server.cpp, app/Layer.h, app/IsoMap.h, app/Holo.h,
+	  app/GlView.cpp, app/EntityLayer.h, app/BladeMap.h:
+	  Migrate to new wfmath based Eris API, and use wfmath types
+	  internally.
+
 2002-02-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp, app/Server.h, app/Server.cpp:
