@@ -35,7 +35,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
                                m_dragType(NONE),
                                m_mainWindow(mw),
                                m_viewWindow(vw),
-                               m_model(m)
+                               m_model(m), m_animCount(0.0)
 {
     m.updated.connect(slot(this, &GlView::redraw));
 
@@ -155,7 +155,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
 
     // list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Float 3"));
 
-    // Gtk::Main::timeout.connect(slot(this, &GlView::animate), 1000);
+    Gtk::Main::timeout.connect(slot(this, &GlView::animate), 100);
 
     m_popup->accelerate(m_viewWindow);
 
@@ -381,18 +381,25 @@ void GlView::drawgl()
         }
     }
     glFlush();
+    glAccum(GL_LOAD, 1.0f);
     swap_buffers();
 }
 
 gint GlView::animate()
 {
-    std::cout << "ANIMATE" << std::endl << std::flush;
+    m_animCount += 0.1f;
+    if (m_animCount > 1.0f) { m_animCount = 0.0f; }
     if (make_current()) {
         setupgl();
         origin();
+        glAccum(GL_RETURN, 1.0f);
         cursor();
-        //swap_buffers();
-        std::cout << "ANIMATED" << std::endl << std::flush;
+        const std::list<Layer *> & layers = m_model.getLayers();
+        std::list<Layer *>::const_iterator I;
+        for(I = layers.begin(); I != layers.end(); I++) {
+            if ((*I)->isVisible()) { (*I)->animate(*this); }
+        }
+        swap_buffers();
     }
     return 1;
 }

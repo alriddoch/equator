@@ -36,6 +36,7 @@ class IsoMap : public Layer {
     explicit IsoMap(Model &);
     void importFile();
     void draw(GlView & view);
+    void animate(GlView & view) { } 
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection() { }

@@ -49,11 +49,12 @@ class ServerEntities : public Layer {
                     const WFMath::AxisBox<3> & bbox,
                     bool open = false);
     void draw3DSelectedBox(const WFMath::Point<3> & coords,
-                   const WFMath::AxisBox<3> & bbox);
+                   const WFMath::AxisBox<3> & bbox, float phase = 0);
     void draw3DBox(const WFMath::Point<3> & coords,
                    const WFMath::AxisBox<3> & bbox);
     void drawEntity(Eris::Entity * ent, entstack_t::const_iterator);
     void drawWorld(Eris::Entity * wrld);
+    void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
     void selectEntity(Eris::Entity * ent, entstack_t::const_iterator);
     bool selectSingleEntity(GlView & view, int nx, int ny, bool check = false);
     void newType(Eris::TypeInfo*);
@@ -62,6 +63,7 @@ class ServerEntities : public Layer {
     ServerEntities(Model &, Server &);
     void importFile() { }
     void draw(GlView & view);
+    void animate(GlView & view);
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection();

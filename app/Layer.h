@@ -34,6 +34,7 @@ class Layer : public SigC::Object {
   public:
     virtual void importFile() = 0;
     virtual void draw(GlView & view) = 0;
+    virtual void animate(GlView & view) = 0;
     virtual void select(GlView & view, int x, int y) = 0;
     virtual void select(GlView & view, int x, int y, int fx, int fy) = 0;
     virtual void pushSelection() = 0;

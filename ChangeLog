@@ -1,3 +1,17 @@
+2002-03-14  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.h, app/GlView.cpp, app/GlView.h, app/Holo.h,
+	  app/IsoMap.h, app/Layer.h:
+	  Added animate method to all layers. Call it regularly to
+	  animate the view, and provide a cycling value between 0
+	  and 1 to control cycling animations. Use the accumulation
+	  buffer to store rendered frame once complete, and then overlay
+	  animations onto stored frame to avoid having to re-render
+	  when animating.
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Use animation
+	  mechanism to animate marching ants on selected entities.
+
 2002-03-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp, app/GlView.h,

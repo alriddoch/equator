@@ -139,7 +139,8 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
 }
 
 void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
-                                       const WFMath::AxisBox<3> & bbox)
+                                       const WFMath::AxisBox<3> & bbox,
+                                       float phase)
 {
     glPushMatrix();
     // origin();
@@ -150,67 +151,70 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
 
     glEnable(GL_TEXTURE_1D);
     glBindTexture(GL_TEXTURE_1D, m_antTexture);
+    float xlen = phase + bbox.highCorner().x() - bbox.lowCorner().x();
+    float ylen = phase + bbox.highCorner().y() - bbox.lowCorner().y();
+    float zlen = phase + bbox.highCorner().z() - bbox.lowCorner().z();
 
     glBegin(GL_LINES);
     // glColor3f(0.0f, 0.0f, 1.0f);
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glTexCoord1f(xlen);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glTexCoord1f(xlen);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glTexCoord1f(xlen);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glTexCoord1f(xlen);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glTexCoord1f(zlen);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glTexCoord1f(zlen);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glTexCoord1f(zlen);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glTexCoord1f(zlen);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().y());
+    glTexCoord1f(ylen);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
-    glTexCoord1f(bbox.highCorner().y() - bbox.lowCorner().y());
+    glTexCoord1f(ylen);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
-    glTexCoord1f(bbox.highCorner().y() - bbox.lowCorner().y());
+    glTexCoord1f(ylen);
     glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
 
-    glTexCoord1f(0);
+    glTexCoord1f(phase);
     glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
-    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().y());
+    glTexCoord1f(ylen);
     glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
     glEnd();
 
@@ -415,6 +419,30 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     Eris::World::Instance()->EntityCreate.connect(
 	SigC::slot(this, &ServerEntities::gotNewEntity)
     );
+}
+
+void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
+{
+    if ((ent == world) || (ent == NULL)) {
+        return;
+    }
+    Eris::Entity * cont = ent->getContainer();
+    moveTo(cont, world);
+    const WFMath::Point<3> & pos = ent->getPosition();
+    glTranslatef(pos.x(), pos.y(), pos.z());
+}
+
+void ServerEntities::animate(GlView & view)
+{
+    if (m_selection == NULL) {
+        return;
+    }
+    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    glPushMatrix();
+    moveTo(m_selection->getContainer(), root);
+    draw3DSelectedBox(m_selection->getPosition(), m_selection->getBBox(),
+                      view.getAnimCount());
+    glPopMatrix();
 }
 
 void ServerEntities::draw(GlView & view)
