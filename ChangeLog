@@ -1,3 +1,8 @@
+2002-05-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.cpp: Added more options to the import/export
+	  options gui in preparation for implementation in the exporters.
+
 2002-05-05  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Server.cpp, app/Server.h: Enable Eris connection logging.

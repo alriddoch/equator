@@ -23,6 +23,7 @@
 #include <gtk--/fileselection.h>
 #include <gtk--/frame.h>
 #include <gtk--/radiobutton.h>
+#include <gtk--/label.h>
 
 #include <fstream>
 
@@ -124,18 +125,16 @@ class ImportOptions : public Gtk::Window
         rb->set_group(rb1->group());
         rb->clicked.connect(SigC::bind<ImportTarget>(slot(this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
         hbox->pack_start(*rb, false, false, 2);
-        
         frame->add(*hbox);
         vbox->pack_start(*frame, false, false, 2);
 
         hbox = manage( new Gtk::HBox() );
         m_ok = manage( new Gtk::Button("OK") );
-        hbox->pack_start(*m_ok, false, false, 2);
+        hbox->pack_start(*m_ok, true, true, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
         b->clicked.connect(slot(this, &ImportOptions::cancel));
-        hbox->pack_start(*b, false, false, 2);
-
-        vbox->pack_start(*hbox, false, false, 2);
+        hbox->pack_start(*b, true, true, 2);
+        vbox->pack_end(*hbox, false, false, 2);
         add(*vbox);
     }
 
@@ -156,6 +155,8 @@ class ExportOptions : public Gtk::Window
     typedef enum export_target { EXPORT_ALL, EXPORT_VISIBLE, EXPORT_SELECTION, EXPORT_ALL_SELECTED } ExportTarget;
 
     Gtk::Button * m_ok;
+    Gtk::CheckButton * m_appendCheck; 
+    Gtk::Entry * m_idSuffix;
     ExportTarget m_target;
 
     ExportOptions() : m_target(EXPORT_ALL) {
@@ -182,12 +183,24 @@ class ExportOptions : public Gtk::Window
         frame->add(*rbox);
         vbox->pack_start(*frame, false, false, 2);
 
+        frame = manage( new Gtk::Frame("ID handling") );
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
+        m_appendCheck = manage( new Gtk::CheckButton("Append") );
+        hbox->pack_start(*m_appendCheck, false, false, 0);
+        m_idSuffix = manage( new Gtk::Entry() );
+        m_idSuffix->set_max_length(8);
+        hbox->pack_start(*m_idSuffix, false, false, 0);
+        Gtk::Label * t = manage( new Gtk::Label("to IDs in file") );
+        hbox->pack_end(*t, false, false, 0);
+        frame->add(*hbox);
+        vbox->pack_start(*frame, false, false, 2);
+
+        hbox = manage( new Gtk::HBox() );
         m_ok = manage( new Gtk::Button("OK") );
-        hbox->pack_start(*m_ok, false, false, 2);
+        hbox->pack_start(*m_ok, true, true, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
         b->clicked.connect(slot(this, &ExportOptions::cancel));
-        hbox->pack_start(*b, false, false, 2);
+        hbox->pack_start(*b, true, true, 2);
 
         vbox->pack_start(*hbox, false, false, 2);
         add(*vbox);
