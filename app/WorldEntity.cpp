@@ -4,6 +4,10 @@
 
 #include "WorldEntity.h"
 
+#include "Model.h"
+#include "Server.h"
+#include "Terrain.h"
+
 #include <Eris/World.h>
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
@@ -37,7 +41,15 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
     Eris::TypeInfoPtr type = w->getConnection()->getTypeService()->getTypeForAtlas(ge);
     if (type->safeIsA(terrainType)) {
         std::cout << "got Terrain Entity" << std::endl << std::flush;
-        e = new TerrainEntity(ge,w);
+        TerrainEntity * t = new TerrainEntity(ge,w);
+        Model * m = m_svr.getModel();
+        if (m != 0) {
+            Terrain * layer = new Terrain(*m);
+            m_svr.readTerrain(*layer, *t);
+            m->addLayer(layer);
+            t->m_terrain = layer;
+        }
+        e = t;
     } else {
         std::cout << "default" << std::endl << std::flush;
         e = new Eris::Entity(ge, w);

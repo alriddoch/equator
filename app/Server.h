@@ -44,7 +44,6 @@ class Server : public SigC::Object {
     void charMoved(const PosType &);
 
     void checkEntityForNewLayers(Eris::Entity & ent);
-    void readTerrain(Terrain & t, Eris::Entity & ent);
   protected:
     bool inGame;
     std::string m_name;
@@ -64,6 +63,10 @@ class Server : public SigC::Object {
 
     const std::string & getName() const {
         return m_name;
+    }
+
+    Model * getModel() const {
+        return m_model;
     }
 
     void connect(const std::string &, int);
@@ -90,6 +93,7 @@ class Server : public SigC::Object {
                           const VelType & vel);
 
     const PosType getAbsCharPos();
+    void readTerrain(Terrain & t, Eris::Entity & ent);
 };
 
 #endif // EQUATOR_SERVER_H

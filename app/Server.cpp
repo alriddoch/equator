@@ -34,7 +34,7 @@ using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
-Server::Server() : inGame(false),
+Server::Server() : inGame(false), m_model(0),
                    m_connection(* new Eris::Connection("equator", true)),
                    m_player(NULL), m_lobby(NULL), m_world(NULL),
                    m_character(NULL)
