@@ -199,12 +199,11 @@ gint MainWindow::idle()
 void MainWindow::newModel()
 {
     Model * model = new Model(*this);
-    ViewWindow * view = manage( new ViewWindow(*this, *model) );
+    ViewWindow * view = new ViewWindow(*this, *model);
     model->setName("Untitled");
     m_views.push_back(view);
     m_models.push_back(model);
     modelAdded.emit(model);
-    
 }
 
 void MainWindow::newView(Model * model)
