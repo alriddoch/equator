@@ -81,7 +81,6 @@ class NewServerWindow : public Gtk::Window
     void connected();
     void loginComplete(const Atlas::Objects::Entity::Player &);
     void worldEnter(Eris::Entity*);
-    void viewCreated(Model*);
 
     void dismiss();
 };

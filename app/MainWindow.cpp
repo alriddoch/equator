@@ -50,7 +50,7 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
     file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey('n', Gdk::CONTROL_MASK), SigC::slot(*this, &MainWindow::newModel)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey('n', Gdk::CONTROL_MASK), SigC::slot(*this, &MainWindow::menuNewModel)));
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::AccelKey('o',Gdk::CONTROL_MASK)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(*this, &MainWindow::new_server_dialog)));
@@ -196,7 +196,12 @@ gint MainWindow::idle()
     return 1;
 }
 
-void MainWindow::newModel()
+void MainWindow::menuNewModel()
+{
+    newModel();
+}
+
+Model & MainWindow::newModel()
 {
     Model * model = new Model(*this);
     ViewWindow * view = new ViewWindow(*this, *model);
@@ -204,6 +209,8 @@ void MainWindow::newModel()
     m_views.push_back(view);
     m_models.push_back(model);
     modelAdded.emit(model);
+
+    return *model;
 }
 
 void MainWindow::newView(Model * model)

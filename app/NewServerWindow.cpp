@@ -208,10 +208,14 @@ void NewServerWindow::createAvatar()
 
 void NewServerWindow::createView()
 {
-    SigC::Connection created = m_mainWindow.modelAdded.connect(slot(*this, &NewServerWindow::viewCreated));
-    m_mainWindow.newModel();
-    created.disconnect();
-    // FIXME Create us a view
+    Model & model = m_mainWindow.newModel();
+    model.setName(m_hostEntry->get_text());
+    // model->setServer(m_server);
+    // Layer * layer = new HeightManager(*model);
+    // model->addLayer(layer);
+    Layer * layer = new ServerEntities(model, *m_server);
+    model.addLayer(layer);
+    m_viewButton->set_sensitive(false);
 }
 
 void NewServerWindow::failure(const std::string & msg)
@@ -265,17 +269,6 @@ void NewServerWindow::worldEnter(Eris::Entity*)
     m_avatarTypeEntry->set_editable(false);
     m_avatarButton->set_sensitive(false);
     m_viewButton->set_sensitive(true);
-}
-
-void NewServerWindow::viewCreated(Model * model)
-{
-    model->setName(m_hostEntry->get_text());
-    // model->setServer(m_server);
-    // Layer * layer = new HeightManager(*model);
-    // model->addLayer(layer);
-    Layer * layer = new ServerEntities(*model, *m_server);
-    model->addLayer(layer);
-    m_viewButton->set_sensitive(false);
 }
 
 void NewServerWindow::dismiss()

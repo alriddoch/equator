@@ -56,6 +56,8 @@ class MainWindow : public Gtk::Window
 
     bool destroy_handler(GdkEventAny*);
     gint idle();
+
+    void menuNewModel();
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors
@@ -80,7 +82,7 @@ class MainWindow : public Gtk::Window
     }
 
     gint quit( GdkEventAny *);
-    void newModel();
+    Model & newModel();
     void newView(Model *);
     void menu_quit();
     void inheritance_dialog();

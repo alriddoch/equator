@@ -1,3 +1,15 @@
+2003-08-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Holo.cpp: Try out anti-aliased lines in Holo view.
+
+	* app/MainWindow.cpp, app/MainWindow.h: Make newModel function
+	  return a reference to the new model.
+
+	* app/NewServerWindow.cpp, app/NewServerWindow.h: Simplify
+	  the way creating a new Model is handled, as we now get a
+	  reference when its created, and don't have to rely on a
+	  callback.
+
 2003-08-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp, app/GlView.h: Cut down on excessive use of doubles.
