@@ -128,7 +128,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 100);
+    Glib::signal_idle().connect(SigC::slot(*this, &GlView::animate));
 
     mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
@@ -394,13 +394,13 @@ bool GlView::animate()
     if (m_redrawRequired) {
         redraw();
         m_redrawRequired = false;
-        return true;
+        return false;
     }
     if (!m_refreshRequired ||
         (m_frameStoreWidth != get_width()) ||
         (m_frameStoreHeight != get_height()) ||
         !make_current()) {
-        return true;
+        return false;
     }
     m_refreshRequired = false;
 
@@ -442,7 +442,7 @@ bool GlView::animate()
     mouseEffects();
 
     swap_buffers();
-    return true;
+    return false;
 }
 
 void GlView::clickOn(int x, int y)
@@ -843,6 +843,13 @@ const std::string GlView::details() const
     const char * view = (m_projection == ORTHO) ? "Orthographic" : "Perspective";
     dets << "-" << m_model.getModelNo() << "." << m_viewNo << " (" << view << ") " << (int)(getScale() * 100) << "%";
     return dets.str();
+}
+
+void GlView::scheduleRedraw() {
+    if (!m_redrawRequired) {
+        m_redrawRequired = true;
+        Glib::signal_idle().connect(SigC::slot(*this, &GlView::animate));
+    }
 }
 
 void GlView::redraw()

@@ -1,5 +1,10 @@
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.h, app/GlView.cpp: Get rid of timeout function, and
+	  use one-shot idle function to do screen refresh instead.
+
+2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Holo.cpp: Correctly restore blend function.
 
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>

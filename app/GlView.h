@@ -209,16 +209,13 @@ class GlView : public Gtk::DrawingArea {
         m_hiddenLayers.erase(l);
     }
 
-    void scheduleRedraw() {
-        m_redrawRequired = true;
-    }
-
     void startAnimation() {
         m_refreshRequired = true;
     }
 
     const std::string details() const;
 
+    void scheduleRedraw();
     void setPickProjection(int nx, int ny, int fx, int fy);
     void getViewOffset(float & h, float & v, float & d);
     void setViewOffset(float h, float v, float d);
