@@ -341,9 +341,8 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
     static const GLushort indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
                                         3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
     // FIXME THis is all wrong
-    GLfloat texcoords[] = { phase, xlen, phase, xlen, phase, xlen, phase, xlen,
-                            phase, zlen, phase, zlen, phase, zlen, phase, zlen,
-                            phase, ylen, phase, ylen, phase, ylen, phase, ylen };
+    GLfloat texcoords[] = { phase, xlen, xlen + ylen, ylen, zlen, xlen + zlen,
+                            xlen + ylen + zlen, ylen + zlen };
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);

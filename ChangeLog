@@ -1,3 +1,7 @@
+2003-05-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.cpp: Fix texture coords for marching ants.
+
 2003-05-11  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp,
