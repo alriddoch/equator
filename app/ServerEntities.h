@@ -18,7 +18,6 @@ class ExportOptions;
 
 namespace WFMath {
   template<const int dim> class AxisBox;
-  template<const int dim> class Point;
   class Quaternion;
 }
 
@@ -109,12 +108,12 @@ class ServerEntities : public Layer {
     void dragStart(GlView & view, int x, int y);
     void dragUpdate(GlView & view, float x, float y, float z);
     void dragEnd(GlView & view, float x, float y, float z);
-    void insert(const WFMath::Point<3> &);
+    void insert(const WFMath::Vector<3> &);
     void align(Alignment );
     
     void gotNewEntity(Eris::Entity *ent);
     void entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent);
-    void entityMoved(const WFMath::Point<3> &);
+    void entityMoved(const WFMath::Vector<3> &);
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H

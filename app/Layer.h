@@ -14,7 +14,7 @@ class GlView;
 class Model;
 
 namespace WFMath {
-  template<const int dim> class Point;
+  template<const int dim> class Vector;
 }
 
 namespace Gtk {
@@ -45,7 +45,7 @@ class Layer : public SigC::Object {
     virtual void dragStart(GlView & view, int x, int y) = 0;
     virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
     virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
-    virtual void insert(const WFMath::Point<3> &) = 0;
+    virtual void insert(const WFMath::Vector<3> &) = 0;
     virtual void align(Alignment) = 0;
 
     const std::string & getType() const {

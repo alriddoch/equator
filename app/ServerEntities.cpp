@@ -372,7 +372,7 @@ void ServerEntities::drawEntity(Eris::Entity* world,
 {
     assert(ent != NULL);
 
-    WFMath::Point<3> pos = ent->getPosition();
+    WFMath::Vector<3> pos = ent->getPosition();
 
     // This is where code would go to adjust position for velocity etc.
 
@@ -433,7 +433,7 @@ void ServerEntities::selectEntity(Eris::Entity * wrld,
 {
     assert(ent != NULL);
 
-    WFMath::Point<3> pos = ent->getPosition();
+    WFMath::Vector<3> pos = ent->getPosition();
 
     glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
@@ -560,12 +560,6 @@ void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
     }
 }
 
-static const WFMath::Point<3> operator+(const WFMath::Point<3> & lhs,
-                                 const WFMath::Point<3> & rhs)
-{
-    return WFMath::Point<3>(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]);
-}
-
 void ServerEntities::alignEntityParent(Eris::Entity * ent)
 {
     assert(ent != NULL);
@@ -577,7 +571,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
         if (tparent != 0) {
             std::cout << "Terrain ... " << std::endl << std::flush;
             if (tparent->m_terrain != 0) {
-                WFMath::Point<3> pos = ent->getPosition();
+                WFMath::Vector<3> pos = ent->getPosition();
                 float height = tparent->m_terrain->m_terrain.get(pos.x(),
                                                                  pos.y());
                 std::cout << ent->getID() << " had height of " << pos.z()
@@ -592,7 +586,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
             }
         } else {
             std::cout << "Not terrain ... " << std::endl << std::flush;
-            WFMath::Point<3> pos = ent->getPosition();
+            WFMath::Vector<3> pos = ent->getPosition();
             float height = 0.f;
             std::cout << ent->getID() << " had height of " << pos.z()
                       << " and we change it to zero " << height << std::endl << std::flush;
@@ -886,7 +880,7 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     }
     Eris::Entity * cont = ent->getContainer();
     moveTo(cont, world);
-    WFMath::Point<3> pos = ent->getPosition();
+    WFMath::Vector<3> pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
 }
 
@@ -963,7 +957,7 @@ void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
     m_validDrag = false;
 }
 
-void ServerEntities::insert(const WFMath::Point<3> & pos)
+void ServerEntities::insert(const WFMath::Vector<3> & pos)
 {
     const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
     std::cout << "INSERTING " << type << std::endl << std::flush;
@@ -1000,7 +994,7 @@ void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *e
     m_model.update();   // a bit excessive I suppose
 }
 
-void ServerEntities::entityMoved(const WFMath::Point<3> &)
+void ServerEntities::entityMoved(const WFMath::Vector<3> &)
 {
     m_model.update();   // a bit excessive I suppose
 }

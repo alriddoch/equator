@@ -19,7 +19,7 @@ namespace Eris {
 }
 
 namespace WFMath {
-  template<const int dim> class Point;
+  template<const int dim> class Vector;
 }
 
 namespace Atlas {
@@ -43,7 +43,7 @@ class Server : public SigC::Object {
     void worldEntityCreate(Eris::Entity *r);
     void worldEnter(Eris::Entity *r);
 
-    void charMoved(const WFMath::Point<3> &);
+    void charMoved(const WFMath::Vector<3> &);
 
     void checkEntityForNewLayers(Eris::Entity & ent);
     void readTerrain(Terrain & t, Eris::Entity & ent);
@@ -77,16 +77,16 @@ class Server : public SigC::Object {
     void createCharacter(const std::string &, const std::string &);
     void createLayers(Model & model);
 
-    void moveCharacter(const WFMath::Point<3> & pos);
+    void moveCharacter(const WFMath::Vector<3> & pos);
 
     void avatarCreateEntity(const Atlas::Message::Element::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,
-                          const WFMath::Point<3> & pos);
+                          const WFMath::Vector<3> & pos);
     void avatarMoveEntity(const std::string &, const std::string &loc,
-                          const WFMath::Point<3> & pos,
+                          const WFMath::Vector<3> & pos,
                           const WFMath::Vector<3> & vel);
 
-    const WFMath::Point<3> getAbsCharPos();
+    const WFMath::Vector<3> getAbsCharPos();
 };
 
 #endif // EQUATOR_SERVER_H
