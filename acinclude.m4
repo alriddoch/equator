@@ -321,12 +321,12 @@ AC_CHECK_LIB(GL,glViewport, ,
 )
 
 AC_CHECK_LIB(GLU,gluPerspective, ,
-    AC_MSG_CHECKING(for glPerspective in opengl32)
+    AC_MSG_CHECKING(for gluPerspective in opengl32)
     LIBS="$LIBS -lglu32"
     AC_TRY_LINK([
 	#include <GL/glu.h>
     ],[
-	glPerspective(0.0, 0.0, 0.0, 0.0);
+	gluPerspective(0.0, 0.0, 0.0, 0.0);
     ],[
 	AC_MSG_RESULT(yes)
     ],[
