@@ -741,7 +741,7 @@ void ServerEntities::exportEntity(const std::string & id,
             eid += m_exportOptions->m_idSuffix->get_text();
         }
         exportEntity(eid, e, me);
-        contents.push_back(me->getID());
+        contents.push_back(eid);
     }
     ent["contains"] = contents;
     ent["pos"] = ee->getPosition().toAtlas();
@@ -808,7 +808,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
                 eid += m_exportOptions->m_idSuffix->get_text();
             }
             exportEntity(eid, e, me);
-            contents.push_back(me->getID());
+            contents.push_back(eid);
         }
         ent["contains"] = contents;
         ent["pos"] = export_root->getPosition().toAtlas();
