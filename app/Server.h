@@ -30,6 +30,7 @@ namespace Atlas {
 
 class Model;
 class Terrain;
+class Renderer;
 
 class Server : public SigC::Object {
   private:
@@ -52,6 +53,8 @@ class Server : public SigC::Object {
 
   public:
     Server();
+
+    Renderer & m_renderer;
 
     Eris::Connection & m_connection;
     Eris::Player * m_player;

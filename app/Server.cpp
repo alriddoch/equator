@@ -38,6 +38,7 @@ using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
 Server::Server() : inGame(false), m_model(0),
+                   m_renderer(* new Renderer),
                    m_connection(* new Eris::Connection("equator", true)),
                    m_player(NULL), m_lobby(NULL), m_world(NULL),
                    m_character(NULL)
@@ -68,9 +69,8 @@ void Server::takeCharacter(const std::string & id)
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
 
-    Renderer r;
     m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
-                                           r));
+                                           m_renderer));
 }
 
 void Server::createCharacter(const std::string & name,
@@ -90,9 +90,8 @@ void Server::createCharacter(const std::string & name,
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
 
-    Renderer r;
     m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
-                                           r));
+                                           m_renderer));
 }
 
 void Server::readTerrain(Terrain & t, Eris::Entity & ent)
