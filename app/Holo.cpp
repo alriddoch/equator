@@ -32,7 +32,7 @@ void Holo::draw(GlView & view)
     glColor3f(0.0f, 0.3f, 0.0f);
 
     for (int i = -(numlines - numlines % incr); i <= numlines; i += incr) {
-        if (i == 0) continue;
+        // if (i == xc) continue;
 
         glVertex3f(xc-numlines, yc+i, 0.0f);
         glVertex3f(xc+numlines, yc+i, 0.0f);

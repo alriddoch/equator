@@ -97,7 +97,7 @@ void ViewWindow::northChanged()
 {
     std::cout << "North changed to " << m_north->get_value()
               << std::endl << std::flush;
-    m_glarea->setYoff(-m_north->get_value());
+    m_glarea->setYoff(m_north->get_value());
     m_glarea->redraw();
 }
 
