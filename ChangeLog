@@ -1,3 +1,8 @@
+2004-03-25  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Add code to handle
+	  selection of bbox vertices.
+
 2004-03-24  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.cpp, app/GlView.h: Modify the depth frame store to be

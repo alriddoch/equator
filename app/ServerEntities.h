@@ -52,10 +52,10 @@ class ServerEntities : public Layer {
     Server & m_serverConnection;
   private:
     GlView::rmode_t m_renderMode;
-    Eris::Entity * m_world; 
-    Eris::Entity * m_selection; 
-    entlist_t m_selectionList; 
-    entstack_t m_selectionStack; 
+    Eris::Entity * m_world;
+    Eris::Entity * m_selection;
+    entlist_t m_selectionList;
+    entstack_t m_selectionStack;
     entlist_t m_lowVertexSelection;
     entlist_t m_highVertexSelection;
     bool m_validDrag;
@@ -79,9 +79,18 @@ class ServerEntities : public Layer {
     void drawEntity(GlView &, Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
     void drawWorld(GlView &, Eris::Entity * wrld);
     void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
-    void selectEntity(GlView &, Eris::Entity *, entstack_t::const_iterator);
-    bool selectEntities(GlView & view, int nx, int ny, int fx, int fy,
-                        bool check = false);
+
+    void selectCorners(GlView & view, Eris::Entity *,
+                       entname_t &, entname_t &);
+    void selectEntity(GlView &, Eris::Entity *, entname_t & nameDict,
+                      entstack_t::const_iterator);
+    bool selectEntities(GlView &, int, int, int, int, bool check = false);
+
+    void selectEntityVertices(GlView &, Eris::Entity *,
+                              entname_t & lowDict, entname_t & highDict,
+                              entstack_t::const_iterator);
+    bool selectVertices(GlView &, int, int, int, int, bool check = false);
+
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
     void alignEntityParent(Eris::Entity * ent);

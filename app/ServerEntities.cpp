@@ -268,8 +268,7 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
             default:
                 draw3DCube(ent->getBBox(), openEntity);
         }
-        if ((ent == m_selection) ||
-            (m_selectionList.find(ent) != m_selectionList.end())) {
+        if (m_selectionList.find(ent) != m_selectionList.end()) {
             if (m_model.getCurrentLayer() == this) {
                 if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
                     drawSelectableCorners(view, ent->getBBox());
@@ -308,6 +307,7 @@ void ServerEntities::drawWorld(GlView & view, Eris::Entity * wrld)
 
 void ServerEntities::selectEntity(GlView & view,
                                   Eris::Entity * ent,
+                                  entname_t & nameDict,
                                   entstack_t::const_iterator I)
 {
     assert(ent != 0);
@@ -322,7 +322,7 @@ void ServerEntities::selectEntity(GlView & view,
                        ((I != m_selectionStack.end()) && (*I == ent)));
 
     if (ent->hasBBox()) {
-        m_nameDict[++m_nameCount] = ent;
+        nameDict[++m_nameCount] = ent;
         glPushName(m_nameCount);
         draw3DCube(ent->getBBox());
         glPopName();
@@ -338,7 +338,7 @@ void ServerEntities::selectEntity(GlView & view,
             Eris::Entity * e = ent->getMember(i);
             assert(e != 0);
 
-            selectEntity(view, e, J);
+            selectEntity(view, e, nameDict, J);
         }
     }
     glPopMatrix();
@@ -355,7 +355,7 @@ bool ServerEntities::selectEntities(GlView & view,
     view.setPickProjection(nx, ny, fx, fy);
 
     m_nameCount = 0;
-    m_nameDict.clear();
+    entname_t nameDict;
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
@@ -363,7 +363,7 @@ bool ServerEntities::selectEntities(GlView & view,
 
     assert(m_world != 0);
 
-    selectEntity(view, m_world, I);
+    selectEntity(view, m_world, nameDict, I);
 
     
     int hits = glRenderMode(GL_RENDER);
@@ -386,7 +386,7 @@ bool ServerEntities::selectEntities(GlView & view,
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
             std::cout << "{" << hitName << "}";
-            entname_t::const_iterator I = m_nameDict.find(hitName);
+            entname_t::const_iterator I = nameDict.find(hitName);
             if (check) {
                 if (m_selectionList.find(I->second) != m_selectionList.end()) {
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
@@ -397,7 +397,150 @@ bool ServerEntities::selectEntities(GlView & view,
                     return true;
                 }
             } else {
-                if (I != m_nameDict.end()) {
+                if (I != nameDict.end()) {
+                    m_selection = I->second;
+                    m_selectionList.insert(I->second);
+                    view.startAnimation();
+                    // m_selectionStack[I->second] = 0;
+                } else {
+                    std::cout << "UNKNOWN NAME" << std::endl << std::flush;
+                }
+            }
+        }
+        std::cout << "]";
+    }
+    std::cout << std::endl << std::flush;
+
+    return false;
+}
+
+void ServerEntities::selectCorners(GlView & view, Eris::Entity * ent,
+                                   entname_t & lowDict, entname_t & highDict)
+{
+    const WFMath::AxisBox<3> & box = ent->getBBox();
+    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+
+    float scale = 0.00625 / view.getScale();
+
+    glPushMatrix();
+    lowDict[++m_nameCount] = ent;
+    glPushName(m_nameCount);
+    glTranslatef(box.lowCorner().x(),
+                 box.lowCorner().y(),
+                 box.lowCorner().z());
+    glScalef(scale, scale, scale);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+    glPopName();
+    glPopMatrix();
+
+    glPushMatrix();
+    highDict[++m_nameCount] = ent;
+    glPushName(m_nameCount);
+    glTranslatef(box.highCorner().x(),
+                 box.highCorner().y(),
+                 box.highCorner().z());
+    glScalef(scale, scale, scale);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+    glPopName();
+    glPopMatrix();
+}
+
+void ServerEntities::selectEntityVertices(GlView & view,
+                                          Eris::Entity * ent,
+                                          entname_t & lowDict,
+                                          entname_t & highDict,
+                                          entstack_t::const_iterator I)
+{
+    assert(ent != 0);
+
+    PosType pos = ent->getPosition();
+
+    glPushMatrix();
+    glTranslatef(pos.x(), pos.y(), pos.z());
+    orient(ent->getOrientation());
+
+    bool openEntity = ((ent == m_world) ||
+                       ((I != m_selectionStack.end()) && (*I == ent)));
+
+    if (ent->hasBBox()) {
+        if (m_selectionList.find(ent) != m_selectionList.end()) {
+            selectCorners(view, ent, lowDict, highDict);
+        }
+    }
+
+    if (openEntity) {
+        int numEnts = ent->getNumMembers();
+        entstack_t::const_iterator J = I;
+        if (ent != m_world) {
+            ++J;
+        }
+        for (int i = 0; i < numEnts; i++) {
+            Eris::Entity * e = ent->getMember(i);
+            assert(e != 0);
+
+            selectEntityVertices(view, e, lowDict, highDict, J);
+        }
+    }
+    glPopMatrix();
+}
+
+bool ServerEntities::selectVertices(GlView & view,
+                                    int nx, int ny, int fx, int fy, bool check)
+// FIXME This is just a copy at the moment
+{
+    GLuint selectBuf[32768];
+
+    glSelectBuffer(32768,selectBuf);
+
+    // Sets the projection, sets up names and sets up the modelview
+    view.setPickProjection(nx, ny, fx, fy);
+
+    m_nameCount = 0;
+    entname_t lowDict, highDict;
+
+    entstack_t::const_iterator I = m_selectionStack.begin();
+
+    m_world = m_serverConnection.m_world->getRootEntity();
+
+    assert(m_world != 0);
+
+    selectEntityVertices(view, m_world, lowDict, highDict, I);
+    
+    int hits = glRenderMode(GL_RENDER);
+
+    if (!check) {
+        m_selection = 0;
+        m_selectionList.clear();
+    }
+
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
+    if (hits < 1) { return false; }
+
+    if (check && m_selectionList.empty()) { return false; }
+
+    GLuint * ptr = &selectBuf[0];
+    for (int i = 0; i < hits; i++) {
+        int names = *(ptr);
+        ptr += 3;
+        std::cout << "[";
+        for (int j = 0; j < names; j++) {
+            int hitName = *(ptr++);
+            std::cout << "{" << hitName << "}";
+            // FIXME Use I and J
+            entname_t::const_iterator I = lowDict.find(hitName);
+            entname_t::const_iterator J = highDict.find(hitName);
+            if (check) {
+                if (m_selectionList.find(I->second) != m_selectionList.end()) {
+                    std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
+                    std::cout << "Setting primart selection from "
+                              << m_selection->getID() << " to "
+                              << I->second->getID() << std::endl << std::flush;
+                    m_selection = I->second;
+                    return true;
+                }
+            } else {
+                // FIXME Use I and J
+                if (I != lowDict.end()) {
                     m_selection = I->second;
                     m_selectionList.insert(I->second);
                     view.startAnimation();
@@ -936,12 +1079,16 @@ void ServerEntities::draw(GlView & view)
 
 void ServerEntities::select(GlView & view, int x, int y)
 {
-    selectEntities(view, x, y, x + 1, y + 1);
+    select(view, x, y, x + 1, y + 1);
 }
 
 void ServerEntities::select(GlView & view, int x, int y, int fx, int fy)
 {
-    selectEntities(view, x, y, fx, fy);
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        selectVertices(view, x, y, fx, fy);
+    } else {
+        selectEntities(view, x, y, fx, fy);
+    }
 }
 
 void ServerEntities::pushSelection()
