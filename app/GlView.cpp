@@ -18,6 +18,8 @@
 #include <gtkmm/menuitem.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/fileselection.h>
+#include <gtkmm/adjustment.h>
+#include <gtkmm/scrollbar.h>
 
 #include <iostream>
 #include <sstream>
@@ -71,6 +73,41 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
                                       -0.4f, 0.0f, 0.0f,
                                       -0.3464f, 0.2f, 0.0f,
                                       -0.2f, 0.3464f, 0.0f };
+
+class CameraControl : public Gtk::Window
+{
+  private:
+    Gtk::Adjustment * m_dAdjust;
+    Gtk::Adjustment * m_rAdjust;
+  public:
+    GlView & view;
+
+    CameraControl(GlView & v) : Gtk::Window(Gtk::WINDOW_TOPLEVEL), view(v) {
+        Gtk::VBox * vbox = manage( new Gtk::VBox() );
+
+        m_dAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 359) );
+        m_dAdjust->signal_value_changed().connect(slot(*this, &CameraControl::dChange));
+        m_rAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 359) );
+        m_rAdjust->signal_value_changed().connect(slot(*this, &CameraControl::rChange));
+
+        vbox->pack_start( * manage( new Gtk::HScrollbar(*m_dAdjust) ) );
+        vbox->pack_start( * manage( new Gtk::HScrollbar(*m_rAdjust) ) );
+
+        set_title(view.m_model.getName() + " Camera");
+
+        add(*vbox);
+    }
+
+    void dChange() {
+        view.setDeclination(m_dAdjust->get_value());
+        view.redraw();
+    }
+
+    void rChange() {
+        view.setRotation(m_rAdjust->get_value());
+        view.redraw();
+    }
+};
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                m_popup(NULL),
@@ -214,6 +251,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", Gtk::Menu_Helpers::AccelKey("KP_7"), SigC::bind<float, float>(slot(*this, &GlView::setFace), 0, 0)));
     face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Up", SigC::bind<float, float>(slot(*this, &GlView::setFace), 180, 0)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Face..", *menu_sub_sub));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Camera Control..", slot(*this, &GlView::showCameraControl)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("New View", SigC::bind<Model*>(slot(m_mainWindow, &MainWindow::newView),&m_model)));
 
@@ -343,6 +381,13 @@ void GlView::zoomOut()
     if (m_scale != new_scale) {
         setScale(new_scale);
     }
+}
+
+void GlView::showCameraControl()
+{
+    CameraControl * c = new CameraControl(*this);
+
+    c->show_all();
 }
 
 bool GlView::extensionsInitialised = 0;

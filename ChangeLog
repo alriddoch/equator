@@ -1,3 +1,8 @@
+2003-03-31  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.h, app/GlView.cpp: Add camera control window to allow
+	  more flexible view.
+
 2003-02-24  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Palette.cpp, app/Palette.h, app/ServerEntities.cpp:

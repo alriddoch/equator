@@ -53,6 +53,8 @@ class GlView : public Gtk::DrawingArea {
     void zoomIn();
     void zoomOut();
 
+    void showCameraControl();
+
     void initgl();
     void setupgl();
     void origin();
@@ -115,6 +117,22 @@ class GlView : public Gtk::DrawingArea {
 
     void setZoff(float z) {
         m_zoff = z;
+    }
+
+    float getDeclination() const {
+        return m_declination;
+    }
+
+    void setDeclination(float d) {
+        m_declination = d;
+    }
+
+    float getRotation() const {
+        return m_rotation;
+    }
+
+    void setRotation(float r) {
+        m_rotation = r;
     }
 
     rmode_t getDefaultRenderMode() const {
