@@ -1,5 +1,9 @@
 2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Terrain.h, app/Terrain.cpp: Implement selecting basepoints.
+
+2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Terrain.h, app/Terrain.cpp: Re-work the way terrain editing
 	  is to be handled.
 

@@ -284,7 +284,6 @@ void Terrain::draw(GlView & view)
         return;
     }
 
-    glColor3f(1.0f, 0.f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
 
     float scale = 0.00625 / view.getScale();
@@ -295,11 +294,17 @@ void Terrain::draw(GlView & view)
         const Mercator::Terrain::Pointcolumn & col = K->second;
         Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
         for (; L != col.end(); ++L) {
+            GroundCoord gc(K->first, L->first);
             if ((m_selection.find(GroundCoord(K->first, L->first)) == m_selection.end()) &&
                 (m_selection.find(GroundCoord(K->first - 1, L->first)) == m_selection.end()) &&
                 (m_selection.find(GroundCoord(K->first - 1, L->first - 1)) == m_selection.end()) &&
                 (m_selection.find(GroundCoord(K->first, L->first - 1)) == m_selection.end())) {
                 continue;
+            }
+            if (m_vertexSelection.find(gc) != m_vertexSelection.end()) {
+                glColor3f(1.f, 1.f, 0.f);
+            } else {
+                glColor3f(1.f, 0.f, 1.f);
             }
             glPushMatrix();
             glTranslatef(K->first * segSize,
@@ -354,12 +359,7 @@ bool Terrain::animate(GlView & view)
 }
 #endif
 
-void Terrain::select(GlView & view, int x, int y)
-{
-    select(view, x, y, x + 1, y + 1);
-}
-
-void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
+bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool check)
 {
 
     GLuint selectBuf[32768];
@@ -392,10 +392,12 @@ void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
 
     int hits = glRenderMode(GL_RENDER);
 
-    m_selection.clear();
+    if (!check) {
+        m_selection.clear();
+    }
 
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
-    if (hits < 1) { return; }
+    if (hits < 1) { return false; }
 
     GLuint * ptr = &selectBuf[0];
     for (int i = 0; i < hits; i++) {
@@ -407,6 +409,9 @@ void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
             std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName);
             if (K != nameDict.end()) {
                 const GroundCoord & c = K->second;
+                if (check) {
+                    return true;
+                }
                 m_selection.insert(c);
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
@@ -414,6 +419,97 @@ void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
         }
     }
     std::cout << std::endl << std::flush;
+    return false;
+}
+
+bool Terrain::selectBasepoints(GlView & view, int nx, int ny, int fx, int fy, bool check)
+{
+
+    GLuint selectBuf[32768];
+
+    glSelectBuffer(32768,selectBuf);
+
+    // Sets the projection, sets up names and sets up the modelview
+    view.setPickProjection(nx, ny, fx, fy);
+
+    int nameCount = 0;
+    std::map<int, GroundCoord> nameDict;
+    glPushName(nameCount);
+
+    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+
+    float scale = 0.00625 / view.getScale();
+    
+    const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
+    Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+    for(; K != points.end(); ++K) {
+        const Mercator::Terrain::Pointcolumn & col = K->second;
+        Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+        for (; L != col.end(); ++L) {
+            if ((m_selection.find(GroundCoord(K->first, L->first)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first - 1, L->first)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first - 1, L->first - 1)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first, L->first - 1)) == m_selection.end())) {
+                continue;
+            }
+            nameDict[++nameCount] = GroundCoord(K->first, L->first);
+            glLoadName(nameCount);
+            glPushMatrix();
+            glTranslatef(K->first * segSize,
+                         L->first * segSize,
+                         L->second.height());
+            glScalef(scale, scale, scale);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+            glPopMatrix();
+        }
+    }
+    glPopName();
+
+    int hits = glRenderMode(GL_RENDER);
+
+    if (!check) {
+        m_vertexSelection.clear();
+    }
+
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
+    if (hits < 1) { return false; }
+
+    GLuint * ptr = &selectBuf[0];
+    for (int i = 0; i < hits; i++) {
+        int names = *(ptr);
+        ptr += 3;
+        for (int j = 0; j < names; j++) {
+            int hitName = *(ptr++);
+            std::cout << "{" << hitName << "}";
+            std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName
+);
+            if (K != nameDict.end()) {
+                const GroundCoord & c = K->second;
+                if (check) {
+                    return true;
+                }
+                m_vertexSelection.insert(c);
+            } else {
+                std::cout << "UNKNOWN NAME" << std::endl << std::flush;
+            }
+        }
+    }
+    std::cout << std::endl << std::flush;
+    return false;
+}
+
+void Terrain::select(GlView & view, int x, int y)
+{
+    select(view, x, y, x + 1, y + 1);
+}
+
+void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
+{
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        selectBasepoints(view, nx, ny, fx, fy);
+    } else {
+        selectSegments(view, nx, ny, fx, fy);
+    }
 }
 
 typedef std::map<int, GroundCoord > BasepointSelection;

@@ -47,8 +47,8 @@ class Terrain : public Layer {
     void drawRegion(GlView & view, Mercator::Segment & map,
                     const GroundCoord & gc);
 
-    bool selectRegions(int nx, int ny, int fx, int fy, bool check = false);
-    bool selectBasepoints(int nx, int ny, int fx, int fy, bool check = false);
+    bool selectSegments(GlView &, int, int, int, int, bool check = false);
+    bool selectBasepoints(GlView &, int, int, int, int, bool check = false);
   public:
     static const int segSize = 64;
     explicit Terrain(Model &, Mercator::Terrain &);

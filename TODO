@@ -1,3 +1,6 @@
+Use shift or control or something to do logic selection ops, like interseciton,
+union.
+
 Use return value of dragStart to indicate if drag works.
 
 Add a right click context menu.
