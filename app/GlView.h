@@ -25,6 +25,9 @@ class GlView : public Gtk::GLArea {
     const int m_viewNo;
     float m_scale;
     float m_xoff, m_yoff, m_zoff;
+    float m_declination;           // From vertically down
+    float m_rotation;              // From due north
+    float m_cursX, m_cursY, m_cursZ;
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
@@ -37,6 +40,7 @@ class GlView : public Gtk::GLArea {
     void setPerspective();
 
     void setScale(float s);
+    void setFace(float d, float r);
     void zoomIn();
     void zoomOut();
 
@@ -44,6 +48,7 @@ class GlView : public Gtk::GLArea {
     void setupgl();
     void origin();
     void face();
+    void cursor();
     void drawgl();
 
     void clickOn(int x, int y);
@@ -53,6 +58,8 @@ class GlView : public Gtk::GLArea {
 
     void worldPoint(int x, int y, double & z,
                     double * wx, double * wy, double * wz);
+    void screenPoint(double x, double y, double z,
+                     int & sx, int & sy, double & sz);
 
     virtual void realize_impl();
     virtual gint motion_notify_event_impl(GdkEventMotion*); 

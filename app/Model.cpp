@@ -15,7 +15,7 @@ static const bool pretty = false;
 int Model::modelCount = 0;
 
 Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
-                               m_mainWindow(mw)
+                                m_server(NULL), m_mainWindow(mw)
 {
     m_currentLayer = new Holo(*this);
     m_layers.push_front( m_currentLayer );

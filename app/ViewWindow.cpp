@@ -9,8 +9,11 @@
 #include <gtk--/frame.h>
 #include <gtk--/eventbox.h>
 #include <gtk--/menuitem.h>
+#include <gtk--/box.h>
+#include <gtk--/statusbar.h>
 
 #include <iostream>
+#include <sstream>
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) :
                                          Gtk::Window(GTK_WINDOW_TOPLEVEL),
@@ -19,15 +22,30 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     m.nameChanged.connect(slot(this, &ViewWindow::setTitle));
     // destroy.connect(slot(this, &ViewWindow::destroy_handler));
 
+    Gtk::VBox * vbox = manage( new Gtk::VBox() );
+
+    // This needs to be done before the GlView is created
+    m_cursorCoords = manage( new Gtk::Statusbar() );
+    m_cursorContext = m_cursorCoords->get_context_id("Cursor coordinates");
+    m_cursorCoords->push(m_cursorContext, " xxx,xxx,xxx ");
+
     m_glarea = manage( new GlView(w, *this, m) );
     m_glarea->set_usize(300,300);
 
     Gtk::Frame * frame = manage( new Gtk::Frame() );
     frame->set_shadow_type(GTK_SHADOW_IN);
-    frame->set_border_width(4);
+    frame->set_border_width(2);
     frame->add(*m_glarea);
 
-    add(*frame);
+    vbox->pack_start(*frame, true, true, 0);
+
+    Gtk::HBox * hbox = manage( new Gtk::HBox() );
+
+    hbox->pack_start(*m_cursorCoords, false, false, 2);
+
+    vbox->pack_start(*hbox, false, false, 0);
+
+    add(*vbox);
 
     show_all();
 }
@@ -39,4 +57,12 @@ void ViewWindow::setTitle()
     } else {
         set_title(m_glarea->m_model.getName() + m_glarea->details());
     }
+}
+
+void ViewWindow::cursorMoved(double x, double y, double z)
+{
+    stringstream text;
+    text << " " << x << "," << y << "," << z << " ";
+    m_cursorCoords->pop(m_cursorContext);
+    m_cursorCoords->push(m_cursorContext, text.str());
 }

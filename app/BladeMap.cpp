@@ -227,6 +227,7 @@ void BladeMap::installTextures()
         p.addTextureEntry(&m_model, g->name);
 #warning TODO Add code to coal to add short names for tiles
     }
+    m_model.typesAdded.emit();
     // p.addTileEntry();
 }
 

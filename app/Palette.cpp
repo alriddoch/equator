@@ -17,6 +17,7 @@
 #include <vector>
 
 Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                    m_currentModel(NULL),
                                     m_mainWindow(mw)
 {
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
@@ -75,6 +76,9 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
 void Palette::addModel(Model * model)
 {
+    if (m_tiles.find(model) != m_tiles.end()) {
+        return;
+    }
     Gtk::Menu * menu = m_modelMenu->get_menu();
     std::stringstream ident;
     ident << model->getName() << "-" << model->getModelNo();
@@ -97,12 +101,20 @@ void Palette::addModel(Model * model)
 
 void Palette::setModel(Model * model)
 {
+    m_typeMonitor.disconnect();
+
     if (model == NULL) {
         set_sensitive(false);
         // Clear all the pallettes
         return;
     }
+    syncModel(model);
 
+    m_typeMonitor = model->typesAdded.connect(bind(SigC::slot(this, &Palette::syncModel), model));
+}
+
+void Palette::syncModel(Model * model)
+{
     std::map<Model*,std::list<std::string> >::const_iterator I;
 
     I = m_tiles.find(model);

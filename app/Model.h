@@ -11,6 +11,7 @@
 #include <sigc++/signal_system.h>
 
 class Layer;
+class Server;
 class MainWindow;
 
 class Model : public SigC::Object {
@@ -21,6 +22,7 @@ class Model : public SigC::Object {
     int m_viewCount;
     std::list<Layer *> m_layers;
     Layer * m_currentLayer;
+    Server * m_server;
     std::string m_name;
 
   public:
@@ -48,6 +50,14 @@ class Model : public SigC::Object {
         m_currentLayer = l;
     }
 
+    Server * getServer() const {
+        return m_server;
+    }
+
+    void setServer(Server * s) {
+        m_server = s;
+    }
+
     const std::string & getName() const {
         return m_name;
     }
@@ -55,9 +65,7 @@ class Model : public SigC::Object {
     void importFile();
 
     void setName(const std::string & n);
-    // const std::string details() const;
     void addLayer(Layer *);
-    void makeCurrent();
     void update();
 
     void raiseCurrentLayer();
@@ -69,6 +77,7 @@ class Model : public SigC::Object {
     SigC::Signal0<void> nameChanged;
     SigC::Signal0<void> updated;
     SigC::Signal0<void> layersChanged;
+    SigC::Signal0<void> typesAdded;
 };
 
 #endif // EQUATOR_APP_MODEL_H

@@ -28,6 +28,8 @@ class Palette : public Gtk::Window
     Gtk::CList * m_entity_clist;
     Gtk::CList * m_texture_clist;
     Gtk::OptionMenu * m_modelMenu;
+    Model * m_currentModel;
+    Gtk::Connection m_typeMonitor;
 
     std::map<Model *, std::list<std::string> > m_tiles;
     std::map<Model *, std::list<std::string> > m_entities;
@@ -39,6 +41,7 @@ class Palette : public Gtk::Window
 
     void addModel(Model *);
     void setModel(Model *);
+    void syncModel(Model *);
 
     void addTileEntry(Model *, const std::string &);
     void addEntityEntry(Model *, const std::string &);

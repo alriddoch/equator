@@ -230,6 +230,7 @@ void IsoMap::installTiles()
         p.addTileEntry(&m_model, g->filename);
 #warning TODO Add code to coal to add short names for tiles
     }
+    m_model.typesAdded.emit();
     // p.addTileEntry();
 }
 

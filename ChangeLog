@@ -1,3 +1,28 @@
+2002-01-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/GlView.h: Added new view submenu to control
+	  direction world is viewed from. Now it is possible to view
+	  the world from any angle. Added a cursor, which can be
+	  moved around using the draw tool. Implemented update of
+	  display when clicks have been processed.
+
+	* app/Model.cpp, Model.h, app/NewServerWindow.cpp:
+	  Store pointer the the Server object associated with this model.
+
+	* app/Palette.cpp: Ensure that the palette knows about a model
+	  early enough.
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Register game_entity
+	  types with the palette as the type nodes are bound by Eris.
+
+	* app/ViewWindow.cpp, app/ViewWindow.h: Add a status bar that
+	  displays the cursor world coords.
+
+	* app/Palette.h, app/Palette.cpp, app/IsoMap.cpp, app/BladeMap.cpp,
+	  app/ServerEntities.cpp: Added signal used to indicate to
+	  the palette that 1 or more new types have been installed. Intended
+	  to be more efficient than updating everytime a new one is added.
+
 2002-01-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Palette.h, app/Palette.cpp: Implemented storing lists

@@ -17,6 +17,7 @@ class Vector3D;
 namespace Eris {
   class BBox;
   class Entity;
+  class TypeInfo;
 }
 
 class ServerEntities : public Layer {
@@ -32,6 +33,8 @@ class ServerEntities : public Layer {
     int m_nameCount;
     entname_t m_nameDict;
 
+    Eris::TypeInfo * m_gameEntityType;
+
     void draw3DCube(const Vector3D & coords, const Eris::BBox & bbox,
                     bool open = false);
     void draw3DBox(const Vector3D & coords, const Eris::BBox & bbox);
@@ -39,6 +42,8 @@ class ServerEntities : public Layer {
     void drawWorld(Eris::Entity * wrld);
     void selectEntity(Eris::Entity * ent, entlist_t::const_iterator);
     bool selectSingleEntity(GlView & view, int nx, int ny, int fx, int fy, bool check = false);
+    void newType(Eris::TypeInfo*);
+    void descendTypeTree(Eris::TypeInfo*);
   public:
     ServerEntities(Model &, Server &);
     void importFile() { }

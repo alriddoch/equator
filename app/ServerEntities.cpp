@@ -6,12 +6,15 @@
 #include "GlView.h"
 #include "Server.h"
 #include "Model.h"
+#include "MainWindow.h"
+#include "Palette.h"
 
 #include "Vector3D.h"
 #include "debug.h"
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>
+#include <Eris/TypeInfo.h>
 
 #include <GL/glu.h>
 
@@ -255,10 +258,43 @@ bool ServerEntities::selectSingleEntity(GlView & view,
 
 }
 
+void ServerEntities::newType(Eris::TypeInfo * node)
+{
+    if (!m_gameEntityType->isBound()) {
+        return;
+    }
+    if (!node->isA(m_gameEntityType)) {
+        return;
+    }
+    Palette & p = m_model.m_mainWindow.m_palettewindow;
+    p.addEntityEntry(&m_model, node->getName());
+    m_model.typesAdded.emit();
+}
+
+void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
+{
+    m_model.m_mainWindow.m_palettewindow.addEntityEntry(&m_model, node->getName());
+    const Eris::TypeInfoSet & children = node->getChildren();
+    Eris::TypeInfoSet::const_iterator I = children.begin();
+    for (; I != children.end(); I++) {
+        descendTypeTree(*I);
+    }
+}
+
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
-                               m_serverConnection(server)
+                               m_serverConnection(server),
+                               m_gameEntityType(NULL)
 {
+    Eris::TypeInfo::BoundType.connect(SigC::slot(this, &ServerEntities::newType));
+    m_gameEntityType = Eris::TypeInfo::findSafe("game_entity");
+    m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
+    if (m_gameEntityType->isBound()) {
+        descendTypeTree(m_gameEntityType);
+        m_model.typesAdded.emit();
+    } else {
+        std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
+    }
 }
 
 void ServerEntities::draw(GlView & view)

@@ -13,10 +13,16 @@ class MainWindow;
 class GlView;
 class Model;
 
+namespace Gtk {
+  class Statusbar;
+};
+
 class ViewWindow : public Gtk::Window
 {
   private:
     GlView * m_glarea;
+    Gtk::Statusbar * m_cursorCoords;
+    int m_cursorContext;
 
   public:
     MainWindow & m_mainWindow;
@@ -28,6 +34,7 @@ class ViewWindow : public Gtk::Window
     }
 
     void setTitle();
+    void cursorMoved(double, double, double);
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H

@@ -257,6 +257,7 @@ void NewServerWindow::worldEnter(Eris::Entity*)
 void NewServerWindow::viewCreated(Model * model)
 {
     model->setName(m_hostEntry->get_text());
+    model->setServer(m_server);
     Layer * layer = new ServerEntities(*model, *m_server);
     model->addLayer(layer);
     m_viewButton->set_sensitive(false);

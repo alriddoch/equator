@@ -22,8 +22,10 @@ static const bool pretty = false;
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
                                m_viewNo(m.getViewNo()),
                                m_scale(1.0),
+                               m_declination(60), m_rotation(45),
                                // m_currentLayer(NULL),
                                m_xoff(0), m_yoff(0), m_zoff(0),
+                               m_cursX(0), m_cursY(0), m_cursZ(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
                                m_dragType(NONE),
@@ -114,6 +116,18 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),TEXTURE)));
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SHADETEXT)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& face_popup = menu_sub_sub->items();
+    face_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Isometric", SigC::bind<float, float>(slot(this, &GlView::setFace), 60, 45)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("North", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("South", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 180)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("West", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, -90)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("East", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 90)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", SigC::bind<float, float>(slot(this, &GlView::setFace), 0, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Up", SigC::bind<float, float>(slot(this, &GlView::setFace), 180, 0)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Face..", *menu_sub_sub));
+    view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("New View", SigC::bind<Model*>(slot(&m_mainWindow, &MainWindow::newView),&m_model)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("View",*menu_sub));
@@ -136,6 +150,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     // list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Float 3"));
 
     m_popup->accelerate(m_viewWindow);
+
+    m_viewWindow.cursorMoved(m_cursX, m_cursY, m_cursZ);
 }
 
 void GlView::setOrthographic()
@@ -157,6 +173,13 @@ void GlView::setScale(GLfloat s)
     m_scale = s;
     redraw();
     m_viewWindow.setTitle();
+}
+
+void GlView::setFace(GLfloat d, GLfloat r)
+{
+    m_declination = d;
+    m_rotation = r;
+    redraw();
 }
 
 void GlView::zoomIn()
@@ -219,8 +242,8 @@ void GlView::origin()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -10.0f);
-    glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
+    glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
     glTranslatef(m_xoff, m_yoff, m_zoff);
 }
@@ -228,8 +251,38 @@ void GlView::origin()
 void GlView::face()
 {
     glScalef(1.0f/m_scale, 1.0f/m_scale, 1.0f/m_scale);
-    glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);
-    glRotatef(60.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(-m_rotation, 0.0f, 0.0f, 1.0f);
+    glRotatef(m_declination, 1.0f, 0.0f, 0.0f);
+}
+
+void GlView::cursor()
+{
+    glBegin(GL_LINES);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glVertex3f(0.0f, 0.2f, 0.0f);
+    glVertex3f(0.0f, 0.6f, 0.0f);
+    glVertex3f(0.0f, -0.2f, 0.0f);
+    glVertex3f(0.0f, -0.6f, 0.0f);
+    glVertex3f(0.2f, 0.0f, 0.0f);
+    glVertex3f(0.6f, 0.0f, 0.0f);
+    glVertex3f(-0.2f, 0.0f, 0.0f);
+    glVertex3f(-0.6f, 0.0f, 0.0f);
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+    glColor3f(1.0f, 0.2f, 0.2f);
+    glVertex3f(0.0f, 0.4f, 0.0f);
+    glVertex3f(0.2f, 0.3464f, 0.0f);
+    glVertex3f(0.3464f, 0.2f, 0.0f);
+    glVertex3f(0.4f, 0.0f, 0.0f);
+    glVertex3f(0.3464f, -0.2f, 0.0f);
+    glVertex3f(0.2f, -0.3464f, 0.0f);
+    glVertex3f(0.0f, -0.4f, 0.0f);
+    glVertex3f(-0.2f, -0.3464f, 0.0f);
+    glVertex3f(-0.3464f, -0.2f, 0.0f);
+    glVertex3f(-0.4f, 0.0f, 0.0f);
+    glVertex3f(-0.3464f, 0.2f, 0.0f);
+    glVertex3f(-0.2f, 0.3464f, 0.0f);
+    glEnd();
 }
 
 void GlView::drawgl()
@@ -237,6 +290,13 @@ void GlView::drawgl()
     if (make_current()) {
         origin();
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        glPushMatrix();
+        glTranslatef(m_cursX, m_cursY, m_cursZ);
+        face();
+        cursor();
+        glPopMatrix();
+
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
         for(I = layers.begin(); I != layers.end(); I++) {
@@ -247,8 +307,8 @@ void GlView::drawgl()
         glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Func tion For Translucency
-        if (clickx != 0) {
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
+        if ((clickx != 0) && (m_dragType == GlView::SELECT)) {
             glTranslatef(clickx, height() - clicky, 100.0f);
             float x = mousex - clickx;
             float y = clicky - mousey;
@@ -314,11 +374,25 @@ void GlView::clickOn(int x, int y)
             m_dragType = GlView::MOVE;
             break;
         case MainWindow::DRAW:
+            double cursDepth;
+            int tx, ty;
+            // Get the depth in the current view of the cursor
+            screenPoint(m_cursX, m_cursY, m_cursZ, tx, ty, cursDepth);
+            double nx, ny, nz;
+            // Calculate the world coords with the same depth, at the current
+            // position of the mouse.
+            worldPoint(x, y, cursDepth, &nx, &ny, &nz);
+            m_cursX = nx;
+            m_cursY = ny;
+            m_cursZ = nz;
+            m_viewWindow.cursorMoved(m_cursX, m_cursY, m_cursZ);
+            break;
         case MainWindow::ROTATE:
         case MainWindow::SCALE:
         default:
             break;
     }
+    redraw();
 }
 
 void GlView::clickOff(int x, int y)
@@ -351,6 +425,7 @@ void GlView::clickOff(int x, int y)
             break;
     }
     clickx = 0; clicky = 0;
+    redraw();
 }
 
 void GlView::midClickOn(int x, int y)
@@ -368,6 +443,7 @@ void GlView::midClickOff(int x, int y)
     m_yoff += (ty - dragy);
     m_zoff += (tz - dragz);
     m_dragType = GlView::NONE;
+    redraw();
 }
 
 void GlView::worldPoint(int x, int y, double &z,
@@ -390,8 +466,30 @@ void GlView::worldPoint(int x, int y, double &z,
         std::cout << "[" << x << ":" << y << ":" << z << "]";
         std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
     }
-        
+}
 
+void GlView::screenPoint(double x, double y, double z,
+                         int & sx, int & sy, double & sz)
+{
+    if (make_current()) {
+        GLint viewport[4];
+        GLdouble mvmatrix[16], projmatrix[16];
+        // float z = 0.5;
+        if (z < -1) { z = getZ(x, height() - y); }
+
+        setupgl();
+        origin();
+
+        glGetIntegerv (GL_VIEWPORT, viewport);
+        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+        double tx, ty, tz;
+        gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
+        sx = tx;
+        sy = height() - ty;
+        sz = tz;
+    }
 }
 
 void GlView::realize_impl()
@@ -491,8 +589,8 @@ void GlView::setPickProjection()
     glLoadIdentity();
     glInitNames();
     glTranslatef(0.0f, 0.0f, -10.0f);
-    glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
+    glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
     glTranslatef(m_xoff, m_yoff, m_zoff);
 }
