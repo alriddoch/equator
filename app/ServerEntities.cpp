@@ -16,6 +16,8 @@
 #include <Eris/World.h>
 #include <Eris/TypeInfo.h>
 
+#include <wfmath/atlasconv.h>
+
 #include <Atlas/Codecs/XML.h>
 
 #include <GL/glu.h>
@@ -155,8 +157,11 @@ class ExportOptions : public Gtk::Window
     typedef enum export_target { EXPORT_ALL, EXPORT_VISIBLE, EXPORT_SELECTION, EXPORT_ALL_SELECTED } ExportTarget;
 
     Gtk::Button * m_ok;
+    Gtk::CheckButton * m_charCheck; 
     Gtk::CheckButton * m_appendCheck; 
     Gtk::Entry * m_idSuffix;
+    Gtk::CheckButton * m_setRootCheck; 
+    Gtk::Entry * m_rootId;
     ExportTarget m_target;
 
     ExportOptions() : m_target(EXPORT_ALL) {
@@ -179,20 +184,35 @@ class ExportOptions : public Gtk::Window
         rb->set_group(rb1->group());
         rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
         rbox->pack_start(*rb, false, false, 2);
+        m_charCheck = manage( new Gtk::CheckButton("Remove characters") );
+        rbox->pack_start(*m_charCheck, false, false, 0);
         
         frame->add(*rbox);
         vbox->pack_start(*frame, false, false, 2);
 
         frame = manage( new Gtk::Frame("ID handling") );
+        Gtk::VBox * lvbox = manage( new Gtk::VBox() );
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
         m_appendCheck = manage( new Gtk::CheckButton("Append") );
         hbox->pack_start(*m_appendCheck, false, false, 0);
         m_idSuffix = manage( new Gtk::Entry() );
-        m_idSuffix->set_max_length(8);
+        m_idSuffix->set_text("_map");
         hbox->pack_start(*m_idSuffix, false, false, 0);
-        Gtk::Label * t = manage( new Gtk::Label("to IDs in file") );
+        Gtk::Label * t = manage( new Gtk::Label("to IDs in file.") );
         hbox->pack_end(*t, false, false, 0);
-        frame->add(*hbox);
+        lvbox->pack_start(*hbox, false, false, 2);
+
+        hbox = manage( new Gtk::HBox() );
+        m_setRootCheck = manage( new Gtk::CheckButton("Set root id to ") );
+        hbox->pack_start(*m_setRootCheck, false, false, 0);
+        m_rootId = manage( new Gtk::Entry() );
+        m_rootId->set_text("world_0");
+        hbox->pack_start(*m_rootId, false, false, 0);
+        t = manage( new Gtk::Label(".") );
+        hbox->pack_end(*t, false, false, 0);
+        lvbox->pack_start(*hbox, false, false, 2);
+
+        frame->add(*lvbox);
         vbox->pack_start(*frame, false, false, 2);
 
         hbox = manage( new Gtk::HBox() );
@@ -214,15 +234,6 @@ class ExportOptions : public Gtk::Window
         hide();
     }
 };
-
-inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
-{
-    Atlas::Message::Object::ListType ret(3);
-    ret[0] = m_elem[0];
-    ret[1] = m_elem[1];
-    ret[2] = m_elem[2];
-    return Atlas::Message::Object(ret);
-}
 
 void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
                                 const WFMath::AxisBox<3> & bbox, bool open)
@@ -701,25 +712,116 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
         std::cerr << "Top level entity " << topId << " found in file"
                   << std::endl << std::flush;
     }
-    insertEntityContents(m_serverConnection.world->getRootEntity()->getID(),
-                         I->second.AsMap(), fileEnts);
+    if (m_importOptions->m_target == ImportOptions::IMPORT_TOPLEVEL) {
+        insertEntityContents(m_serverConnection.world->getRootEntity()->getID(),
+                             I->second.AsMap(), fileEnts);
+    } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
+        if (m_selection == NULL) {
+            std::cerr << "ERROR: Can't import into selection, as nothing is selected. Tell the user" << std::endl << std::flush;
+            return;
+        }
+        insertEntityContents(m_selection->getID(),
+                             I->second.AsMap(), fileEnts);
+    }
     // m_model.updated.emit();
+}
+
+void ServerEntities::exportEntity(const std::string & id,
+                                  Atlas::Message::Encoder & e,
+                                  Eris::Entity * ee)
+{
+    Atlas::Message::Object::MapType ent;
+    Atlas::Message::Object::ListType contents;
+    ent["id"] = id;
+    unsigned int numEnts = ee->getNumMembers();
+    for(unsigned int i = 0; i < numEnts; ++i) {
+        Eris::Entity * me = ee->getMember(i);
+        std::string eid = me->getID();
+        if (m_exportOptions->m_appendCheck->get_active()) {
+            eid += m_exportOptions->m_idSuffix->get_text();
+        }
+        exportEntity(eid, e, me);
+        contents.push_back(me->getID());
+    }
+    ent["contains"] = contents;
+    ent["pos"] = ee->getPosition().toAtlas();
+    ent["bbox"] = ee->getBBox().toAtlas();
+    ent["orientation"] = ee->getOrientation().toAtlas();
+    ent["name"] = ee->getName();
+    ent["parents"] = Atlas::Message::Object::ListType(1, *ee->getInherits().begin());
+    e.StreamMessage(ent);
 }
 
 void ServerEntities::save(Gtk::FileSelection * fsel)
 {
-    m_saveOptionsDone.disconnect();
     m_exportOptions->hide();
 
     std::string filename = fsel->get_filename();
     delete fsel;
+
+    Eris::Entity * export_root = NULL;
+    switch (m_exportOptions->m_target) {
+        case ExportOptions::EXPORT_SELECTION:
+            export_root = m_selection;
+        case ExportOptions::EXPORT_ALL_SELECTED:
+            if (m_selection != NULL) {
+                export_root = m_selection->getContainer();
+            }
+        case ExportOptions::EXPORT_ALL:
+        case ExportOptions::EXPORT_VISIBLE:
+        default:
+            export_root = m_serverConnection.world->getRootEntity();
+    }
+
+    if (export_root == NULL) {
+        std::cerr << "ERROR: Nothing to export" << std::endl << std::flush;
+        return;
+    }
 
     DummyDecoder d;
     std::fstream ios(filename.c_str(), std::ios::out);
     Atlas::Codecs::XML codec(ios, &d);
     Atlas::Message::Encoder e(&codec);
 
-    e.StreamMessage(Atlas::Message::Object::MapType());
+    codec.StreamBegin();
+
+    std::string exportedRootId;
+    if (m_exportOptions->m_setRootCheck->get_active()) {
+        exportedRootId = m_exportOptions->m_rootId->get_text();
+    } else {
+        exportedRootId = export_root->getID();
+        if (m_exportOptions->m_appendCheck->get_active()) {
+            exportedRootId += m_exportOptions->m_idSuffix->get_text();
+        }
+    }
+
+    if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
+        Atlas::Message::Object::MapType ent;
+        Atlas::Message::Object::ListType contents;
+        ent["id"] = exportedRootId;
+        unsigned int numEnts = export_root->getNumMembers();
+        for(unsigned int i = 0; i < numEnts; ++i) {
+            Eris::Entity * me = export_root->getMember(i);
+            if (m_selectionList.find(me) == m_selectionList.end()) {continue;}
+            std::string eid = me->getID();
+            if (m_exportOptions->m_appendCheck->get_active()) {
+                eid += m_exportOptions->m_idSuffix->get_text();
+            }
+            exportEntity(eid, e, me);
+            contents.push_back(me->getID());
+        }
+        ent["contains"] = contents;
+        ent["pos"] = export_root->getPosition().toAtlas();
+        ent["bbox"] = export_root->getBBox().toAtlas();
+        ent["orientation"] = export_root->getOrientation().toAtlas();
+        ent["name"] = export_root->getName();
+        ent["parents"] = Atlas::Message::Object::ListType(1, *export_root->getInherits().begin());
+        e.StreamMessage(ent);
+    } else {
+        exportEntity(exportedRootId, e, export_root);
+    }
+
+    codec.StreamEnd();
 }
 
 void ServerEntities::cancel(Gtk::FileSelection * fsel)

@@ -29,9 +29,12 @@ namespace Eris {
   typedef std::set<std::string> StringSet;
 }
 
-namespace Atlas { namespace Message {
-  class Object;
-} }
+namespace Atlas {
+  namespace Message {
+    class Object;
+    class Encoder;
+  }
+}
 
 namespace Gtk {
   class FileSelection;
@@ -85,7 +88,8 @@ class ServerEntities : public Layer {
     void insertEntityContents(const std::string & container,
                               const Atlas::Message::Object::MapType & ent,
                               const Atlas::Message::Object::MapType & entities);
-
+    void exportEntity(const std::string & id,
+                      Atlas::Message::Encoder & e, Eris::Entity *);
 
     void load(Gtk::FileSelection *);
     void save(Gtk::FileSelection *);
