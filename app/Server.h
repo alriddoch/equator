@@ -47,6 +47,7 @@ class Server : public SigC::Object {
     void readTerrain(Terrain & t, Eris::Entity & ent);
   protected:
     bool inGame;
+    std::string m_name;
 
     Model * m_model;
 
@@ -60,6 +61,10 @@ class Server : public SigC::Object {
     Eris::Entity * m_character;
 
     SigC::Connection inputHandler;
+
+    const std::string & getName() const {
+        return m_name;
+    }
 
     void connect(const std::string &, int);
     void netConnected();

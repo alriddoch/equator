@@ -35,7 +35,7 @@ class ServerWindow : public Gtk::Window
 
     ConnectWindow & m_connectWindow;
     LoginWindow & m_loginWindow;
-    CharacterWindow * m_characterWindow;
+    CharacterWindow & m_characterWindow;
 
   public:
     MainWindow & m_mainWindow;
@@ -51,6 +51,8 @@ class ServerWindow : public Gtk::Window
 
     void newServer(Server *);
     void setServer(Server *);
+    void loggedIn(Server *);
+    void createdAvatar(Server *);
 };
 
 #endif // EQUATOR_APP_SERVERWINDOW_H

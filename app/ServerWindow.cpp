@@ -3,11 +3,13 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "ServerWindow.h"
+
+#include "MainWindow.h"
 #include "ConnectWindow.h"
 #include "LoginWindow.h"
-#include "ViewWindow.h"
-#include "GlView.h"
-#include "Layer.h"
+#include "CharacterWindow.h"
+#include "Model.h"
+#include "Server.h"
 
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>
@@ -25,9 +27,10 @@
 #include <vector>
 
 ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
-                                       m_connectWindow(*new ConnectWindow()),
-                                       m_loginWindow(*new LoginWindow()),
-                                       m_mainWindow(mw)
+                                      m_connectWindow(*new ConnectWindow()),
+                                      m_loginWindow(*new LoginWindow()),
+                                      m_characterWindow(*new CharacterWindow()),
+                                      m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
@@ -65,6 +68,8 @@ ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     // show_all();
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
+    m_loginWindow.loginSuccess.connect(slot(*this, &ServerWindow::loggedIn));
+    m_characterWindow.createSuccess.connect(slot(*this, &ServerWindow::createdAvatar));
 }
 
 void ServerWindow::connect()
@@ -77,7 +82,7 @@ void ServerWindow::newServer(Server * server)
     assert(server != 0);
 
     Gtk::TreeModel::Row row = *(m_treeModel->append());
-    row[*m_hostnameColumn] = Glib::ustring("hostname");
+    row[*m_hostnameColumn] = Glib::ustring(server->getName());
 
     m_loginWindow.useServer(server);
     m_loginWindow.show_all();
@@ -90,4 +95,21 @@ void ServerWindow::setServer(Server * server)
     // FIXME Update the contents of the window to reflect the newly selected
     // server
 
+}
+
+void ServerWindow::loggedIn(Server * server)
+{
+    assert(server != 0);
+
+    m_characterWindow.useServer(server);
+    m_characterWindow.show_all();
+}
+
+void ServerWindow::createdAvatar(Server * server)
+{
+    assert(server != 0);
+
+    Model & model = m_mainWindow.newModel();
+    model.setName(server->getName());
+    server->createLayers(model);
 }

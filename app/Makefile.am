@@ -10,6 +10,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  NewLayerWindow.cpp NewLayerWindow.h \
 		  ConnectWindow.cpp ConnectWindow.h \
 		  LoginWindow.cpp LoginWindow.h \
+		  CharacterWindow.cpp CharacterWindow.h \
 		  NewServerWindow.cpp NewServerWindow.h \
 		  Palette.cpp Palette.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \

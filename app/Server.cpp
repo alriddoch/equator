@@ -197,6 +197,7 @@ void Server::connect(const std::string & host, int port)
     Eris::setLogLevel(Eris::LOG_DEBUG);
 
     std::cout << host << ":" << port << std::endl << std::flush;
+    m_name = host;
     m_connection.connect(host, port);
     // m_connection.connect("localhost", 6767);
 

@@ -1,3 +1,15 @@
+2003-12-20  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/CharacterWindow.cpp, app/CharacterWindow.h: Character window
+	  for entering new character details.
+
+	* ServerWindow.h, ServerWindow.cpp: Add code required to use
+	  new Character window, and create view once the character is
+	  confirmed.
+
+	* Server.h, Server.cpp: Give server object a name, based on host name
+	  of server.
+
 2003-12-19  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ConnectWindow.h: Fix header guards.
