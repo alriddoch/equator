@@ -21,7 +21,7 @@ namespace Eris {
 
 class ServerEntities : public Layer {
   public:
-    typedef std::list<Eris::Entity*> entlist_t;
+    typedef std::map<Eris::Entity*,int> entlist_t;
     typedef std::map<int,Eris::Entity*> entname_t;
   private:
     Server & m_serverConnection;
@@ -35,10 +35,10 @@ class ServerEntities : public Layer {
     void draw3DCube(const Vector3D & coords, const Eris::BBox & bbox,
                     bool open = false);
     void draw3DBox(const Vector3D & coords, const Eris::BBox & bbox);
-    void drawEntity(Eris::Entity * ent);
+    void drawEntity(Eris::Entity * ent, entlist_t::const_iterator);
     void drawWorld(Eris::Entity * wrld);
     void selectEntity(Eris::Entity * ent, entlist_t::const_iterator);
-    void selectSingleEntity(GlView & view, int nx, int ny, int fx, int fy, bool check);
+    bool selectSingleEntity(GlView & view, int nx, int ny, int fx, int fy, bool check = false);
   public:
     ServerEntities(Model &, Server &);
     void importFile() { }

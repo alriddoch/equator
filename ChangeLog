@@ -1,3 +1,8 @@
+2002-01-14  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Progress on
+	  entity selection code.
+
 2002-01-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/LayerWindow.cpp, app/Server.cpp, app/ServerWindow.cpp,

@@ -125,7 +125,7 @@ void ServerEntities::draw3DBox(const Vector3D & coords,
 
 }
 
-void ServerEntities::drawEntity(Eris::Entity * ent)
+void ServerEntities::drawEntity(Eris::Entity * ent, entlist_t::const_iterator I)
 {
     glPushMatrix();
     const Eris::Coord & pos = ent->getPosition();
@@ -139,6 +139,7 @@ void ServerEntities::drawEntity(Eris::Entity * ent)
                         << e->getBBox().u << e->getBBox().v
                         << std::endl << std::flush;);
         // if (!e->isVisible()) { continue; }
+        bool finalEntity = (I == m_selectionStack.end());
         switch (m_renderMode) {
             case GlView::LINE:
                 draw3DBox(e->getPosition(), e->getBBox());
@@ -148,17 +149,20 @@ void ServerEntities::drawEntity(Eris::Entity * ent)
             case GlView::TEXTURE:
             case GlView::SHADETEXT:
             default:
-                draw3DCube(e->getPosition(), e->getBBox());
+                draw3DCube(e->getPosition(), e->getBBox(), !finalEntity);
         }
         //draw3DBox(e->getPosition(), e->getBBox());
-        drawEntity(e);
+        if (!finalEntity) {
+            entlist_t::const_iterator J = I;
+            drawEntity(e, ++J);
+        }
     }
     glPopMatrix();
 }
 
 void ServerEntities::drawWorld(Eris::Entity * wrld)
 {
-    drawEntity(wrld);
+    drawEntity(wrld, m_selectionStack.begin());
 }
 
 void ServerEntities::selectEntity(Eris::Entity* ent,entlist_t::const_iterator I)
@@ -181,7 +185,7 @@ void ServerEntities::selectEntity(Eris::Entity* ent,entlist_t::const_iterator I)
     }
 }
 
-void ServerEntities::selectSingleEntity(GlView & view,
+bool ServerEntities::selectSingleEntity(GlView & view,
                                         int nx, int ny, int fx, int fy,
                                         bool check)
 {
@@ -211,6 +215,44 @@ void ServerEntities::selectSingleEntity(GlView & view,
     selectEntity(root, I);
 
     
+    int hits = glRenderMode(GL_RENDER);
+
+    if (!check) {
+        m_selection.clear();
+    }
+
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
+    if (hits < 1) { return false; }
+
+    if (check && m_selection.empty()) { return true; }
+
+    GLuint * ptr = &selectBuf[0];
+    for (int i = 0; i < hits; i++) {
+        int names = *(ptr);
+        ptr += 3;
+        std::cout << "[";
+        for (int j = 0; j < names; j++) {
+            int hitName = *(ptr++);
+            std::cout << "{" << hitName << "}";
+            entname_t::const_iterator I = m_nameDict.find(hitName);
+            if (check) {
+                if (m_selection.find(I->second) != m_selection.end()) {
+                    return true;
+                    std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
+                }
+            } else {
+                if (I != m_nameDict.end()) {
+                    m_selection[I->second] = 0;
+                    m_selectionStack[I->second] = 0;
+                } else {
+                    std::cout << "UNKNOWN NAME" << std::endl << std::flush;
+                }
+            }
+        }
+        std::cout << "]";
+    }
+    std::cout << std::endl << std::flush;
+
 }
 
 ServerEntities::ServerEntities(Model & model, Server & server) :
@@ -230,6 +272,7 @@ void ServerEntities::draw(GlView & view)
 
 void ServerEntities::select(GlView & view, int x, int y)
 {
+    selectSingleEntity(view, x, y, x + 1, y + 1);
 }
 
 void ServerEntities::select(GlView & view, int x, int y, int w, int h)
