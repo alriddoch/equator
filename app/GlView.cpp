@@ -720,7 +720,7 @@ void GlView::screenPoint(float x, float y, float z,
         GLdouble mvmatrix[16], projmatrix[16];
         // float z = 0.5;
         if (z < -1) {
-            z = getZ(x, get_height() - y);
+            z = getZ(::lrintf(x), ::lrintf(get_height() - y));
         }
 
         setupgl();
@@ -732,8 +732,8 @@ void GlView::screenPoint(float x, float y, float z,
 
         double tx, ty, tz;
         gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
-        sx = tx;
-        sy = get_height() - ty;
+        sx = ::lrint(tx);
+        sy = ::lrint(get_height() - ty);
         sz = tz;
     }
 }
@@ -745,7 +745,7 @@ void GlView::realize()
 
 bool GlView::motionNotifyEvent(GdkEventMotion*event)
 {
-    mousex = event->x; mousey = event->y;
+    mousex = lrint(event->x); mousey = lrint(event->y);
     if (clickx != 0) {
         if (make_current()) {
             // glAccum(GL_RETURN, 1.0f);
@@ -753,6 +753,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             swap_buffers();
         }
     }
+    return TRUE;
 }
 
 void GlView::mouseEffects()
@@ -824,10 +825,10 @@ bool GlView::buttonPressEvent(GdkEventButton * event)
     std::cout << "BUTTON" << event->button << std::endl << std::flush;
     switch (event->button) {
         case 1:
-            clickOn(event->x, event->y);
+            clickOn(::lrint(event->x), ::lrint(event->y));
             break;
         case 2:
-            midClickOn(event->x, event->y);
+            midClickOn(::lrint(event->x), ::lrint(event->y));
             break;
         case 3:
             m_mainWindow.setCurrentModel(&m_model);
@@ -843,10 +844,10 @@ bool GlView::buttonReleaseEvent(GdkEventButton * event)
 {
     switch (event->button) {
         case 1:
-            clickOff(event->x, event->y);
+            clickOff(::lrint(event->x), ::lrint(event->y));
             break;
         case 2:
-            midClickOff(event->x, event->y);
+            midClickOff(::lrint(event->x), ::lrint(event->y));
             break;
         case 3:
         default:

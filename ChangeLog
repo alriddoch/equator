@@ -1,5 +1,12 @@
 2003-08-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* Add tests for float -> int conversion functions.
+
+	* app/GlView.cpp: Use float -> int conversion functions to get
+	  rid of a bunch of warnings.
+
+2003-08-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/Holo.cpp: Try out anti-aliased lines in Holo view.
 
 	* app/MainWindow.cpp, app/MainWindow.h: Make newModel function
