@@ -76,7 +76,7 @@ void IsoMap::drawMapObject(CoalObject & map_object)
 void IsoMap::drawMap(CoalDatabase & map_base)
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
     glDisable(GL_DEPTH_TEST);
     int count = map_base.GetRegionCount();
     for (int i = 0; i < count; i++) {
@@ -85,7 +85,8 @@ void IsoMap::drawMap(CoalDatabase & map_base)
             drawMapRegion(*region);
         }
     }
-    glDepthMask(GL_TRUE);
+    // glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
 
     count = map_base.GetObjectCount();
     for (int i = 0; i < count; i++) {
@@ -97,7 +98,9 @@ void IsoMap::drawMap(CoalDatabase & map_base)
 
 }
 
-void IsoMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy)
+bool IsoMap::selectMap(CoalDatabase & map_base,
+                       int nx, int ny, int fx, int fy,
+                       bool check)
 {
     GLuint selectBuf[32768];
 
@@ -115,6 +118,8 @@ void IsoMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy)
 
     m_window.setPickProjection(); // Sets the projection, sets up names
                                   // and sets up the modelview
+
+    glTranslatef(m_xoff, m_yoff, m_zoff);
 
     int nameCount = 0;
     std::map<int, CoalRegion *> nameDict;
@@ -147,9 +152,14 @@ void IsoMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy)
 
     int hits = glRenderMode(GL_RENDER);
 
+    if (!check) {
+        m_selection.clear();
+    }
+
     cout << "Got " << hits << " hits" << endl << flush;
-    if (hits < 1) { return ; }
-    m_selection.clear();
+    if (hits < 1) { return false; }
+
+    if (check && m_selection.empty()) { return true; }
 
     GLuint * ptr = &selectBuf[0];
     for (int i = 0; i < hits; i++) {
@@ -159,24 +169,38 @@ void IsoMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy)
             int hitName = *(ptr++);
             cout << "{" << hitName << "}";
             std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
-            if (I != nameDict.end()) {
-                m_selection[I->second] = 0;
+            if (check) {
+                if (m_selection.find(I->second) != m_selection.end()) {
+                    return true;
+                    cout << "SELECTION VERIFIED" << endl << flush;
+                }
             } else {
-                cout << "UNKNOWN NAME" << endl << flush;
+                if (I != nameDict.end()) {
+                    m_selection[I->second] = 0;
+                } else {
+                    cout << "UNKNOWN NAME" << endl << flush;
+                }
             }
         }
     }
     cout << endl << flush;
-    return;
+    return !check;
 
 }
 
 void IsoMap::load(Gtk::FileSelection * fsel)
 {
     CoalIsoLoader loader (m_database);
-    loader.LoadMap(fsel->get_filename().c_str());
-    CoalDebug debug;
-    debug.Dump (m_database);
+
+    std::string filename = fsel->get_filename();
+    loader.LoadMap(filename.c_str());
+    size_t i = filename.find_last_of('/');
+    if (i == 0) {
+        m_name = filename;
+    } else {
+        m_name = filename.substr(i+1);
+    }
+ 
 
     delete fsel;
 }
@@ -187,7 +211,8 @@ void IsoMap::cancel(Gtk::FileSelection * fsel)
 }
 
 IsoMap::IsoMap(GlView & window) : Layer(window, "map", "IsoMap"),
-                                        m_database(*new CoalDatabase())
+                                        m_database(*new CoalDatabase()),
+                                        m_validDrag(false)
 {
 }
 
@@ -201,7 +226,10 @@ void IsoMap::importFile()
 
 void IsoMap::draw()
 {
+    glPushMatrix();
+    glTranslatef(m_xoff, m_yoff, m_zoff);
     drawMap(m_database);
+    glPopMatrix();
 }
 
 void IsoMap::select(int x, int y)
@@ -213,3 +241,39 @@ void IsoMap::select(int nx, int ny, int fx, int fy)
 {
     selectMap(m_database, nx, ny, fx, fy);
 }
+
+void IsoMap::dragStart(int x, int y)
+{
+    if (selectMap(m_database, x, y, x+1, y+1, true)) {
+        m_validDrag = true;
+        if (m_selection.empty()) {
+            cout << "Moving whole layer" << endl << flush;
+            // Moving whole layer
+        } else {
+            cout << "Moving selection layer" << endl << flush;
+            // Moving selection
+        }
+    } else {
+            cout << "Moving nothing" << endl << flush;
+        m_validDrag = false;
+    }
+}
+
+void IsoMap::dragUpdate(float x, float y, float z)
+{
+}
+
+void IsoMap::dragEnd(float x, float y, float z)
+{
+    if (m_validDrag) {
+        if (m_selection.empty()) {
+            m_xoff += x;
+            m_yoff += y;
+            m_zoff += z;
+        } else {
+            // FIXME move the current selection
+        }
+        m_validDrag = false;
+    }
+}
+

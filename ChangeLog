@@ -1,3 +1,26 @@
+2001-12-17  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/BladeMap.h, app/IsoMap.cpp, app/IsoMap.h,
+	  app/Holo.h, app/Layer.h:
+	  Implement depth buffer use in map drawing. Implement select code to
+	  check whether this layer, or a selected proportion of this layer
+	  has been clicked on. Set the name of the layer according to the
+	  map that has been loaded into it. Add support for moving the
+	  whole layer around relative to the origin.
+
+	* app/GlView.cpp:
+	  Ensure that zooming beyond the zoom limits does not cause CPU
+	  thrashing. Implement more generic interface for dragging, and
+	  use it to implement panning, and dragging of layers, using the
+	  tools in the main window.
+
+	* app/LayerWindow.cpp: Set minimum size to something sensible.
+
+	* app/MainWindow.cpp, app/MainWindow.h:
+	  Make all the tool buttons toggle, and implement radio button
+	  behavoir. Expose the selected tool so it can be used by the view
+	  code.
+
 2001-12-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/BladeMap.h, app/Holo.cpp, app/Holo.h,

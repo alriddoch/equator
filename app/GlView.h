@@ -21,10 +21,12 @@ class GlView : public Gtk::GLArea {
     Layer * m_currentLayer;
     float m_xoff, m_yoff, m_zoff;
     int clickx,clicky;
-    double dragx,dragy,dragz;
+    double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
 
     enum view { PLAN, ISO, PERSP } m_projection;
+
+    enum drag { NONE, SELECT, MOVE, PAN } m_dragType;
 
     void setPlan();
     void setIsometric();
@@ -42,8 +44,11 @@ class GlView : public Gtk::GLArea {
 
     void clickOn(int x, int y);
     void clickOff(int x, int y);
-    void startDrag(int x, int y);
-    void endDrag(int x, int y);
+    void midClickOn(int x, int y);
+    void midClickOff(int x, int y);
+
+    void worldPoint(int x, int y, double & z,
+                    double * wx, double * wy, double * wz);
 
     virtual void realize_impl();
     virtual gint motion_notify_event_impl(GdkEventMotion*); 

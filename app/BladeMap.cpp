@@ -75,7 +75,8 @@ void BladeMap::drawMapObject(CoalObject & map_object)
 void BladeMap::drawMap(CoalDatabase & map_base)
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
+    //glDepthMask(GL_FALSE);
+    //glDisable(GL_DEPTH_TEST);
     int count = map_base.GetRegionCount();
     for (int i = 0; i < count; i++) {
         CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
@@ -83,7 +84,8 @@ void BladeMap::drawMap(CoalDatabase & map_base)
             drawMapRegion(*region);
         }
     }
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
+    //glEnable(GL_DEPTH_TEST);
 
     count = map_base.GetObjectCount();
     for (int i = 0; i < count; i++) {
@@ -95,7 +97,9 @@ void BladeMap::drawMap(CoalDatabase & map_base)
 
 }
 
-void BladeMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy)
+bool BladeMap::selectMap(CoalDatabase & map_base,
+                         int nx, int ny, int fx, int fy,
+                         bool check)
 {
     GLuint selectBuf[32768];
 
@@ -112,6 +116,8 @@ void BladeMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy
 
     m_window.setPickProjection(); // Sets the projection, sets up names
                                   // and sets up the modelview
+
+    glTranslatef(m_xoff, m_yoff, m_zoff);
 
     int nameCount = 0;
     std::map<int, CoalRegion *> nameDict;
@@ -140,9 +146,14 @@ void BladeMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy
 
     int hits = glRenderMode(GL_RENDER);
 
+    if (!check) {
+        m_selection.clear();
+    }
+
     cout << "Got " << hits << " hits" << endl << flush;
-    if (hits < 1) { return ; }
-    m_selection.clear();
+    if (hits < 1) { return false; }
+
+    if (check && m_selection.empty()) { return true; }
 
     // Need to find out which is the closest his under some circumstances,
     // as layers may overlap. This will be tricky. Probably need to
@@ -155,22 +166,37 @@ void BladeMap::selectMap(CoalDatabase & map_base, int nx, int ny, int fx, int fy
             int hitName = *(ptr++);
             cout << "{" << hitName << "}";
             std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
-            if (I != nameDict.end()) {
-                m_selection[I->second] = 0;
+            if (check) {
+                if (m_selection.find(I->second) != m_selection.end()) {
+                    return true;
+                    cout << "SELECTION VERIFIED" << endl << flush;
+                }
             } else {
-                cout << "UNKNOWN NAME" << endl << flush;
+                if (I != nameDict.end()) {
+                    m_selection[I->second] = 0;
+                } else {
+                    cout << "UNKNOWN NAME" << endl << flush;
+                }
             }
         }
     }
     cout << endl << flush;
-    return;
+    return !check;
 
 }
 
 void BladeMap::load(Gtk::FileSelection * fsel)
 {
     CoalBladeLoader loader (m_database);
-    loader.LoadMap(fsel->get_filename().c_str());
+
+    std::string filename = fsel->get_filename();
+    loader.LoadMap(filename.c_str());
+    size_t i = filename.find_last_of('/');
+    if (i == 0) {
+        m_name = filename;
+    } else {
+        m_name = filename.substr(i+1);
+    }
 
     delete fsel;
 }
@@ -181,7 +207,8 @@ void BladeMap::cancel(Gtk::FileSelection * fsel)
 }
 
 BladeMap::BladeMap(GlView & window) : Layer(window, "map", "BladeMap"),
-                                        m_database(*new CoalDatabase())
+                                        m_database(*new CoalDatabase()),
+                                        m_validDrag(false)
 {
 }
 
@@ -195,7 +222,10 @@ void BladeMap::importFile()
 
 void BladeMap::draw()
 {
+    glPushMatrix();
+    glTranslatef(m_xoff, m_yoff, m_zoff);
     drawMap(m_database);
+    glPopMatrix();
 }
 
 void BladeMap::select(int x, int y)
@@ -206,4 +236,36 @@ void BladeMap::select(int x, int y)
 void BladeMap::select(int nx, int ny, int fx, int fy)
 {
     selectMap(m_database, nx, ny, fx, fy);
+}
+
+void BladeMap::dragStart(int x, int y)
+{
+    if (selectMap(m_database, x, y, x+1, y+1, true)) {
+        m_validDrag = true;
+        if (m_selection.empty()) {
+            // Moving whole layer
+        } else {
+            // Moving selection
+        }
+    } else {
+        m_validDrag = false;
+    }
+}
+
+void BladeMap::dragUpdate(float x, float y, float z)
+{
+}
+
+void BladeMap::dragEnd(float x, float y, float z)
+{
+    if (m_validDrag) {
+        if (m_selection.empty()) {
+            m_xoff += x;
+            m_yoff += y;
+            m_zoff += z;
+        } else {
+            // FIXME move the current selection
+        }
+        m_validDrag = false;
+    }
 }

@@ -16,6 +16,10 @@ class InheritanceWindow;
 class ServerWindow;
 class GlView;
 
+namespace Gtk {
+  class ToggleButton;
+}
+
 class MainWindow : public Gtk::Window
 {
   private:
@@ -25,6 +29,20 @@ class MainWindow : public Gtk::Window
     InheritanceWindow * m_inheritancewindow;
     ServerWindow * m_serverwindow;
 
+  public:
+    typedef enum {
+        SELECT, AREA, VERTEX, TILER, MOVE
+    } toolType;
+
+  private:
+    toolType m_tool;
+
+    Gtk::ToggleButton * select_tool;
+    Gtk::ToggleButton * area_tool;
+    Gtk::ToggleButton * vertex_tool;
+    Gtk::ToggleButton * tiler_tool;
+    Gtk::ToggleButton * move_tool;
+
     void destroy_handler();
   public:
     MainWindow();
@@ -33,12 +51,17 @@ class MainWindow : public Gtk::Window
         return m_layerwindow;
     }
 
+    const toolType getTool() {
+        return m_tool;
+    }
+
     gint quit( GdkEventAny *);
     void new_view();
     void menu_quit();
     void inheritance_dialog();
     void server_dialog();
     void open_layers(GlView *);
+    void toolSelect(toolType);
 
     SigC::Signal1<void, ViewWindow *> modelAdded;
 };

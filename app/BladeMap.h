@@ -21,11 +21,12 @@ class BladeMap : public Layer {
   private:
     CoalDatabase & m_database;
     std::map<CoalRegion *,int> m_selection;
+    bool m_validDrag;
 
     void drawMapRegion(CoalRegion & map_region);
     void drawMapObject(CoalObject & map_object);
     void drawMap(CoalDatabase & map_base);
-    void selectMap(CoalDatabase & map_base,int,int,int,int);
+    bool selectMap(CoalDatabase & map_base,int,int,int,int, bool check = false);
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
   public:
@@ -34,6 +35,9 @@ class BladeMap : public Layer {
     void draw();
     void select(int x, int y);
     void select(int x, int y, int w, int h);
+    void dragStart(int x, int y);
+    void dragUpdate(float x, float y, float z);
+    void dragEnd(float x, float y, float z);
 };
 
 #endif // EQUATOR_APP_BLADEMAP_H

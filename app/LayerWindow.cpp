@@ -56,6 +56,7 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(GTK_POLICY_ALWAYS, GTK_POLICY_ALWAYS);
+    scrolled_window->set_usize(250,150);
     scrolled_window->add(*m_clist);
 
     vbox->pack_start(*scrolled_window, true, true, 0);

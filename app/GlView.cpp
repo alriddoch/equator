@@ -21,10 +21,11 @@
 static const bool pretty = false;
 
 GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
-                               m_xoff(0), m_yoff(0), m_zoff(0),
                                m_currentLayer(NULL),
+                               m_xoff(0), m_yoff(0), m_zoff(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
+                               m_dragType(NONE),
                                m_viewwindow(w)
 {
     set_events(GDK_POINTER_MOTION_MASK|
@@ -169,7 +170,9 @@ void GlView::zoomIn()
     if (new_scale > 16.0f) {
         new_scale = 16.0f;
     }
-    setScale(new_scale);
+    if (m_scale != new_scale) {
+        setScale(new_scale);
+    }
 }
 
 void GlView::zoomOut()
@@ -178,7 +181,9 @@ void GlView::zoomOut()
     if (new_scale < 0.0625f) {
         new_scale = 0.0625f;
     }
-    setScale(new_scale);
+    if (m_scale != new_scale) {
+        setScale(new_scale);
+    }
 }
 
 void GlView::initgl()
@@ -297,30 +302,86 @@ void GlView::importFile()
 
 void GlView::clickOn(int x, int y)
 {
-    clickx = x; clicky = y;
+    switch (m_viewwindow.m_mainwindow.getTool()) {
+        case MainWindow::SELECT:
+            if (make_current()) {
+                m_currentLayer->select(mousex, height() - mousey);
+            }
+            break;
+        case MainWindow::AREA:
+            clickx = x; clicky = y;
+            m_dragType = GlView::SELECT;
+            break;
+        case MainWindow::MOVE:
+            //clickx = x; clicky = y;
+            m_currentLayer->dragStart(x, height() - y);
+            dragDepth = -2;
+            worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
+            m_dragType = GlView::MOVE;
+            break;
+        case MainWindow::VERTEX:
+        case MainWindow::TILER:
+        default:
+            break;
+    }
 }
 
 void GlView::clickOff(int x, int y)
 {
-    if (make_current()) {
-        if ((clickx == mousex) && (clicky == clicky)) {
-            m_currentLayer->select(mousex, height() - mousey);
-        } else {
-            m_currentLayer->select(clickx, height() - clicky,
-                                   mousex, height() - mousey);
-        }
-    } else {
-        cout << "FAILED TO GET LOCK" << endl << flush;
+    switch (m_viewwindow.m_mainwindow.getTool()) {
+        case MainWindow::AREA:
+            if (make_current()) {
+                if ((clickx == mousex) && (clicky == clicky)) {
+                    m_currentLayer->select(mousex, height() - mousey);
+                } else {
+                    m_currentLayer->select(clickx, height() - clicky,
+                                           mousex, height() - mousey);
+                }
+            }
+            m_dragType = GlView::NONE;
+            break;
+        case MainWindow::MOVE:
+            {
+                double tx, ty, tz;
+                worldPoint(x, y, dragDepth, &tx, &ty, &tz);
+                // Send move thingy to layer
+                m_currentLayer->dragEnd(tx - dragx, ty - dragy, tz - dragz);
+                m_dragType = GlView::NONE;
+            }
+            break;
+        case MainWindow::SELECT:
+        case MainWindow::VERTEX:
+        case MainWindow::TILER:
+            break;
     }
     clickx = 0; clicky = 0;
 }
 
-void GlView::startDrag(int x, int y)
+void GlView::midClickOn(int x, int y)
+{
+    dragDepth = -2;
+    worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
+    m_dragType = GlView::MOVE;
+}
+
+void GlView::midClickOff(int x, int y)
+{
+    double tx, ty, tz;
+    worldPoint(x, y, dragDepth, &tx, &ty, &tz);
+    m_xoff += (tx - dragx);
+    m_yoff += (ty - dragy);
+    m_zoff += (tz - dragz);
+    m_dragType = GlView::NONE;
+}
+
+void GlView::worldPoint(int x, int y, double &z,
+                        double * wx, double * wy, double * wz)
 {
     if (make_current()) {
         GLint viewport[4];
         GLdouble mvmatrix[16], projmatrix[16];
-        float z = 0.5;
+        // float z = 0.5;
+        if (z < -1) { z = getZ(x, height() - y); }
 
         setupgl();
         origin();
@@ -329,14 +390,15 @@ void GlView::startDrag(int x, int y)
         glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
         glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
-        gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, &dragx, &dragy, &dragz);
+        gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
         cout << "[" << x << ":" << y << ":" << z << "]";
-        cout << "{" << dragx << ":" << dragy << ":" << dragz << "}" << endl << flush;
+        cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << endl << flush;
     }
         
 
 }
 
+#if 0
 void GlView::endDrag(int x, int y)
 {
     if (make_current()) {
@@ -364,9 +426,12 @@ void GlView::endDrag(int x, int y)
         drawgl();
     }
         
-
+    dragx = 0.0f;
+    dragy = 0.0f;
+    dragz = 0.0f;
     // Use the ammount the user has dragged to pan the display
 }
+#endif
 
 void GlView::realize_impl()
 {
@@ -377,6 +442,7 @@ void GlView::realize_impl()
 gint GlView::motion_notify_event_impl(GdkEventMotion*event)
 {
     mousex = event->x; mousey = event->y; 
+    // We may want to be a little smarter about this
     setupgl();
     drawgl();
 }
@@ -389,7 +455,7 @@ int GlView::button_press_event_impl(GdkEventButton * event)
             clickOn(event->x, event->y);
             break;
         case 2:
-            startDrag(event->x, event->y);
+            midClickOn(event->x, event->y);
             break;
         case 3:
             m_popup->popup(event->button,event->time);
@@ -407,7 +473,7 @@ int GlView::button_release_event_impl(GdkEventButton * event)
             clickOff(event->x, event->y);
             break;
         case 2:
-            endDrag(event->x, event->y);
+            midClickOff(event->x, event->y);
             break;
         case 3:
         default:
@@ -490,20 +556,21 @@ void GlView::setPickProjection()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glInitNames();
-        if (m_projection == GlView::PLAN) {
-            glTranslatef(0.0f, 0.0f, -10.0f);
-        } else {
-            glTranslatef(0.0f, 0.0f, -10.0f);
-            glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-            glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        }
-        glScalef(m_scale, m_scale, m_scale);
-        glTranslatef(m_xoff, m_yoff, m_zoff);
+    if (m_projection == GlView::PLAN) {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+    } else {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+    }
+    glScalef(m_scale, m_scale, m_scale);
+    glTranslatef(m_xoff, m_yoff, m_zoff);
 }
 
 const float GlView::getZ(int x, int y) const
 {
     float z = 0;
     glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
+    cout << "GOT Z " << z << endl << flush;
     return z;
 }

@@ -14,13 +14,14 @@
 #include <gtk--/tearoffmenuitem.h>
 #include <gtk--/menubar.h>
 #include <gtk--/button.h>
+#include <gtk--/togglebutton.h>
 #include <gtk--/box.h>
 #include <gtk--/pixmap.h>
 #include <gtk--/table.h>
 
 #include <iostream>
 
-MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
+MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL), m_tool(MainWindow::SELECT)
 {
     destroy.connect(slot(this, &MainWindow::destroy_handler));
 
@@ -65,35 +66,42 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     vbox->pack_start(*menu_bar, false, false, 0);
 
     Gtk::Table * table = manage( new Gtk::Table(5, 2, true) );
-    Gtk::Button * b = manage( new Gtk::Button() );
+    Gtk::ToggleButton * b = select_tool = manage( new Gtk::ToggleButton() );
+    b->set_active(true); // Do this before we connect to the signal
+    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::SELECT));
+
     Gtk::Pixmap * p = manage( new Gtk::Pixmap("arrow.xpm") );
     b->add(*p);
     table->attach(*b, 0, 1, 0, 1);
-    b = manage( new Gtk::Button() );
+    b = area_tool = manage( new Gtk::ToggleButton() );
+    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::AREA));
     p = manage( new Gtk::Pixmap("select.xpm") );
     b->add(*p);
     table->attach(*b, 1, 2, 0, 1);
-    b = manage( new Gtk::Button() );
+    b = vertex_tool = manage( new Gtk::ToggleButton() );
+    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::VERTEX));
     p = manage( new Gtk::Pixmap("vertex.xpm") );
     b->add(*p);
     table->attach(*b, 2, 3, 0, 1);
-    b = manage( new Gtk::Button() );
+    b = tiler_tool = manage( new Gtk::ToggleButton() );
+    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::TILER));
     p = manage( new Gtk::Pixmap("tile.xpm") );
     b->add(*p);
     table->attach(*b, 3, 4, 0, 1);
-    b = manage( new Gtk::Button() );
-    p = manage( new Gtk::Pixmap("info.xpm") );
+    b = move_tool = manage( new Gtk::ToggleButton() );
+    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::MOVE));
+    p = manage( new Gtk::Pixmap("move.xpm") );
     b->add(*p);
     table->attach(*b, 4, 5, 0, 1);
-    b = manage( new Gtk::Button("6") );
+    b = manage( new Gtk::ToggleButton("6") );
     table->attach(*b, 0, 1, 1, 2);
-    b = manage( new Gtk::Button("7") );
+    b = manage( new Gtk::ToggleButton("7") );
     table->attach(*b, 1, 2, 1, 2);
-    b = manage( new Gtk::Button("8") );
+    b = manage( new Gtk::ToggleButton("8") );
     table->attach(*b, 2, 3, 1, 2);
-    b = manage( new Gtk::Button("9") );
+    b = manage( new Gtk::ToggleButton("9") );
     table->attach(*b, 3, 4, 1, 2);
-    b = manage( new Gtk::Button("10") );
+    b = manage( new Gtk::ToggleButton("10") );
     table->attach(*b, 4, 5, 1, 2);
 
     vbox->pack_end(*table, true, true, 0);
@@ -150,4 +158,19 @@ void MainWindow::open_layers(GlView * view)
         m_layerwindow->setView(view);
     }
     m_layerwindow->show_all();
+}
+
+void MainWindow::toolSelect(MainWindow::toolType tool)
+{
+    static bool changing = false;
+    if (!changing) {
+        changing = true;
+        m_tool = tool;
+        select_tool->set_active(tool==MainWindow::SELECT);
+        area_tool->set_active(tool==MainWindow::AREA);
+        vertex_tool->set_active(tool==MainWindow::VERTEX);
+        tiler_tool->set_active(tool==MainWindow::TILER);
+        move_tool->set_active(tool==MainWindow::MOVE);
+        changing = false;
+    }
 }
