@@ -2,11 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <iostream>
 
 #include "MainWindow.h"
 
 #include <gtk--/main.h>
+
+Gtk::Main * kit;
+
+#ifdef BUILD_AS_GIMP_PLUGIN
 
 #include <libgimp/gimp.h>
 #include <libgimp/gimpintl.h>
@@ -47,8 +55,6 @@ extern "C" void query(void)
                            nargs, 0, args, NULL);
 }
 
-Gtk::Main * kit;
-
 extern "C" void run(gchar * name,
                     gint nparams,
                     GimpParam *param,
@@ -79,3 +85,19 @@ int main(int argc, char ** argv)
     }
     return 0;
 }
+
+#else // BUILD_AS_GIMP_PLUGIN
+
+int main(int argc, char ** argv)
+{
+    kit = new Gtk::Main(argc, argv);
+
+    MainWindow * window = new MainWindow();
+
+    window->set_title("Equator");
+
+    kit->run();
+
+    return 0;
+}
+#endif // BUILD_AS_GIMP_PLUGIN

@@ -1,3 +1,8 @@
+2001-12-11  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/equator_plugin.cpp: Made plugin functionality optional, so
+	  app will still build and run if gimp is not installed.
+
 2001-12-10  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/MainWindow.cpp, app/GlView.cpp:
