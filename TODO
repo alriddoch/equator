@@ -1,7 +1,5 @@
 Make mouse wheel zoom.
 
-Re-fresh when changing from entity to vertex mode.
-
 Enable resizing of bboxes.
 
 Implement saving and loading as a bunch of atlas objects saved into a
