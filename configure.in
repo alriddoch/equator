@@ -40,7 +40,9 @@ CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
 LIBS="$LIBS $SDL_LIBS"
 
 PKG_CHECK_MODULES(WF, wfmath-0.2 >= 0.2.10 skstream-0.2 >= 0.2.4 \
-                      atlascpp-0.4 >= 0.4.5 mercator-0.2 ,
+                      atlascpp-0.4 >= 0.4.5 mercator-0.2 \
+                      coal-0.4 coal-blade-0.4 coal-iso-0.4 \
+                          ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         LIBS="$LIBS $WF_LIBS"
@@ -57,10 +59,6 @@ LIBS="$LIBS $ERIS_LIBS"
 AC_CHECK_LIB(SDL_image,IMG_Load)
 AC_CHECK_LIB(GL,glViewport)
 AC_CHECK_LIB(GLU,gluPerspective)
-
-AC_CHECK_LIB(coal,main)
-AC_CHECK_LIB(coalblade,main)
-AC_CHECK_LIB(coaliso,main)
 
 dnl Versions required
 
