@@ -154,9 +154,7 @@ void GlView::setScale(GLfloat s)
     // Representation of the scale inside the adjustment is
     // log2 of the scale factor, to give the user a sane scale
     m_scaleAdj.set_value(log2(s));
-    redraw();
     m_viewWindow.setTitle();
-    viewChanged.emit();
 }
 
 void GlView::setFace(GLfloat d, GLfloat r)
@@ -164,7 +162,6 @@ void GlView::setFace(GLfloat d, GLfloat r)
     m_declAdj.set_value(d);
     m_rotaAdj.set_value(r);
     redraw();
-    viewChanged.emit();
 }
 
 void GlView::zoomIn()

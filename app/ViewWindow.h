@@ -29,6 +29,7 @@ class ViewWindow : public Gtk::Window
     int m_viewContext;
     Gtk::VRuler * m_vRuler;
     Gtk::HRuler * m_hRuler;
+    bool m_scrollLock;
     Gtk::VScrollbar * m_vScrollbar;
     Gtk::HScrollbar * m_hScrollbar;
     Gtk::Adjustment * m_vAdjust;
@@ -49,11 +50,12 @@ class ViewWindow : public Gtk::Window
 
     void setTitle();
     void cursorMoved();
-    void viewMoved();
     void vAdjustChanged();
     void hAdjustChanged();
     void glViewChanged();
-    void doRulers();
+
+    void updateViewCoords();
+    void updateRulers();
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H

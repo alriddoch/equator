@@ -29,7 +29,8 @@ using Gtk::Menu_Helpers::TearoffMenuElem;
 using Gtk::Menu_Helpers::AccelKey;
 using Gtk::Menu_Helpers::MenuList;
 
-ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0)
+ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
+                                                    m_scrollLock(false)
 {
     MainWindow & m_mainWindow = w;
     Model & m_model = m;
@@ -256,11 +257,10 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0)
     add(*vbox);
 
     cursorMoved();
-    viewMoved();
+    updateViewCoords();
 
     show_all();
 
-    // m_glarea->viewChanged.connect(slot(*this, &ViewWindow::glViewChanged));
     m_glarea->getDeclinationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     m_glarea->getRotationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     m_glarea->getScaleAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
@@ -287,36 +287,28 @@ void ViewWindow::cursorMoved()
     m_cursorCoords->push(text.str(), m_cursorContext);
 }
 
-void ViewWindow::viewMoved()
-{
-    float x = m_glarea->getXoff();
-    float y = m_glarea->getYoff();
-    float z = m_glarea->getZoff();
-    std::stringstream text;
-    text << " " << x << "," << y << "," << z << " ";
-    m_viewCoords->pop(m_viewContext);
-    m_viewCoords->push(text.str(), m_viewContext);
-    doRulers();
-}
-
 void ViewWindow::vAdjustChanged()
 {
+    if (m_scrollLock) { return; }
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
-    viewMoved();
+    updateViewCoords();
 }
 
 void ViewWindow::hAdjustChanged()
 {
+    if (m_scrollLock) { return; }
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
-    viewMoved();
+    updateViewCoords();
 }
 
 void ViewWindow::glViewChanged()
 {
+    if (m_scrollLock) { return; }
+    m_scrollLock = true;
     std::cout << "Changing sliders to take accout of view change"
               << std::endl << std::flush;
     float wx, wy, wz;
@@ -347,10 +339,23 @@ void ViewWindow::glViewChanged()
     m_hAdjust->set_value(-th);
     m_vAdjust->set_value(tv);
 
-    doRulers();
+    updateRulers();
+    m_scrollLock = false;
 }
 
-void ViewWindow::doRulers()
+void ViewWindow::updateViewCoords()
+{
+    float x = m_glarea->getXoff();
+    float y = m_glarea->getYoff();
+    float z = m_glarea->getZoff();
+    std::stringstream text;
+    text << " " << x << "," << y << "," << z << " ";
+    m_viewCoords->pop(m_viewContext);
+    m_viewCoords->push(text.str(), m_viewContext);
+    updateRulers();
+}
+
+void ViewWindow::updateRulers()
 {
     float th = m_hAdjust->get_value(), tv = m_vAdjust->get_value();
     float winx = m_glarea->get_width() / (40.0f * m_glarea->getScale());

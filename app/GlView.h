@@ -205,8 +205,6 @@ class GlView : public Gtk::DrawingArea {
     void redraw();
 
     const float getZ(int x, int y) const;
-
-    SigC::Signal0<void> viewChanged;
 };
 
 #endif // EQUATOR_APP_GLVIEW_H
