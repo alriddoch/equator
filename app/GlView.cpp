@@ -480,12 +480,12 @@ void GlView::clickOn(int x, int y)
             m_model.getCursor(cx, cy, cz);
             screenPoint(cx, cy, cz, tx, ty, cursDepth);
             double nx, ny, nz;
-            // Calculate the world coords with the same depth, at the current
-            // position of the mouse.
             double z = getZ(x, get_height() - y);
             if (z > 0.99) {
                 z = cursDepth;
             }
+            // Calculate the world coords with the same depth, at the current
+            // position of the mouse.
             worldPoint(x, y, z, &nx, &ny, &nz);
             m_model.setCursor(nx, ny, nz);
             }
@@ -500,8 +500,8 @@ void GlView::clickOn(int x, int y)
 
 void GlView::clickOff(int x, int y)
 {
-    switch (m_mainWindow.getTool()) {
-        case MainWindow::AREA:
+    switch (m_dragType) {
+        case GlView::SELECT:
             if (make_current()) {
                 if ((clickx == x) && (clicky == y)) {
                     m_model.getCurrentLayer()->select(*this, x, get_height() - y);
@@ -510,9 +510,7 @@ void GlView::clickOff(int x, int y)
                 }
             }
             break;
-        case MainWindow::MOVE:
-        case MainWindow::ROTATE:
-        case MainWindow::SCALE:
+        case GlView::MOVE:
             {
                 double tx, ty, tz;
                 worldPoint(x, y, dragDepth, &tx, &ty, &tz);
@@ -520,8 +518,7 @@ void GlView::clickOff(int x, int y)
                 m_model.getCurrentLayer()->dragEnd(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
             }
             break;
-        case MainWindow::SELECT:
-        case MainWindow::DRAW:
+        default:
             break;
     }
     clickx = 0; clicky = 0;
@@ -565,14 +562,14 @@ void GlView::midClickOff(int x, int y)
     double tx, ty, tz;
     int dx = x - clickx,
         dy = y - clicky;
-    switch (m_mainWindow.getNavMode()) {
-        case MainWindow::PAN:
+    switch (m_dragType) {
+        case GlView::PAN:
             worldPoint(x, y, dragDepth, &tx, &ty, &tz);
             setXoff(getXoff() + (tx - dragx) );
             setYoff(getYoff() + (ty - dragy) );
             setZoff(getZoff() + (tz - dragz) );
             break;
-        case MainWindow::ORBIT:
+        case GlView::ORBIT:
             {
                 float rot = getRotation() + (dx * 360.f) / get_width();
                 float dec = getDeclination() - (dy * 180.f) / get_height();
@@ -584,7 +581,7 @@ void GlView::midClickOff(int x, int y)
                 setDeclination(dec);
             }
             break;
-        case MainWindow::ZOOM:
+        case GlView::ZOOM:
             {
                 float sc = getLogScale() + (dy * 4.f) / get_height();
                 if (sc > 16.f) { sc = 16.f; }
@@ -692,7 +689,6 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
                 if (z > 0.99) {
                     z = dragDepth;
                 }
-                std::cout << "MOD" << std::endl << std::flush;
                 worldPoint(mousex, mousey, z, &tx, &ty, &tz);
                 setXoff(getXoff() + (tx - dragx) );
                 setYoff(getYoff() + (ty - dragy) );

@@ -19,7 +19,7 @@
 #include <iostream>
 #include <cassert>
 
-static const bool debug_flag = true;
+static const bool debug_flag = false;
 
 GameView::GameView(Model & m, Server & s) : Layer(m, m.getName(), "Game View"),
                                             m_serverConnection(s)

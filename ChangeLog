@@ -1,5 +1,12 @@
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.cpp: Clean up use of m_dragType rather than anything
+	  else to determine what the mouse is currently doing.
+
+	* app/GameView.cpp: Disable verbose debug output.
+
+2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp: Improve the feel of placing the cursor by
 	  checking the depth of what the user is clicking on. Use similar
 	  check to try and improve the feel of mouse based panning.
