@@ -51,7 +51,7 @@ class Server : public SigC::Object {
     void gotAvatar(Eris::Avatar *);
     void worldEnter(Eris::Entity *r);
 
-    void charMoved(Eris::Entity *);
+    void charMoved();
 
     void checkEntityForNewLayers(Eris::Entity & ent);
 

@@ -44,7 +44,7 @@ MovableEntity::MovableEntity(const std::string & id, Eris::TypeInfo * t,
     updateTime = SDL_GetTicks();
 }
 
-void MovableEntity::movedSignal(Eris::Entity *)
+void MovableEntity::movedSignal()
 {
     updateTime = SDL_GetTicks();
 }

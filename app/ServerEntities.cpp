@@ -1204,13 +1204,12 @@ void ServerEntities::gotNewEntity(Eris::Entity *ent)
     m_model.update(); // cause a re-draw
 }
 
-void ServerEntities::entityChanged(Eris::Entity *ent,
-                                   const Eris::StringSet &attrs)
+void ServerEntities::entityChanged(const Eris::StringSet &attrs)
 {
     m_model.update();   // a bit excessive I suppose
 }
 
-void ServerEntities::entityMoved(Eris::Entity *)
+void ServerEntities::entityMoved()
 {
     m_model.update();   // a bit excessive I suppose
 }

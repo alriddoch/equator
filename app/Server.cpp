@@ -257,7 +257,7 @@ void Server::worldEnter(Eris::Entity * chr)
     chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
 }
 
-void Server::charMoved(Eris::Entity *)
+void Server::charMoved()
 {
     std::cout << "Char moved" << std::endl << std::flush;
 }

@@ -32,7 +32,7 @@ class MovableEntity : public RenderableEntity
 {
     float updateTime;
   public:
-    void movedSignal(Eris::Entity *);
+    void movedSignal();
 
     MovableEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
 

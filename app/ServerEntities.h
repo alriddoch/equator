@@ -140,8 +140,8 @@ class ServerEntities : public Layer {
     void align(Alignment );
     
     void gotNewEntity(Eris::Entity *);
-    void entityChanged(Eris::Entity *, const Eris::StringSet &attrs);
-    void entityMoved(Eris::Entity *);
+    void entityChanged(const Eris::StringSet &attrs);
+    void entityMoved();
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H
