@@ -1,6 +1,7 @@
 /* LIB3DS mesh01 */
 
-static const float arrow_mesh[] =    { 0, -0, -40, 
+
+static const float arrow_mesh[]    = { 0, -0, -40, 
                                        0, -0, -40, 
                                        0, -0, 40, 
                                        0, -0, 40, 
@@ -504,4 +505,7 @@ static const float arrow_mesh[] =    { 0, -0, -40,
                                        0, -0, 40, 
                                        0, -0, 40, 
                                        0, -0, 40, 
-};
+ };
+
+static const int arrow_mesh_size = 504;
+

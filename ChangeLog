@@ -1,3 +1,8 @@
+2003-02-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.cpp, app/HeightManager.h: Add decorations to
+	  terrain segments to allow manipulation of height control points.
+
 2003-02-17  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp: Modify use of mercator now that segments are
