@@ -63,7 +63,7 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     add(*vbox);
 }
 
-void NewLayerWindow::show(GlView * view)
+void NewLayerWindow::doshow(GlView * view)
 {
     m_currentView = view;
     show_all();

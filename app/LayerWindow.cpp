@@ -100,7 +100,7 @@ void LayerWindow::setView(GlView * view)
 
 void LayerWindow::newLayer()
 {
-    m_newLayerWindow->show(m_currentView);
+    m_newLayerWindow->doshow(m_currentView);
 }
 
 // FIXME How do we get notification of the current view?

@@ -43,7 +43,7 @@ class NewLayerWindow : public Gtk::Window
   public:
     NewLayerWindow();
 
-    void show(GlView * view);
+    void doshow(GlView * view);
 
     void okay();
     void cancel();

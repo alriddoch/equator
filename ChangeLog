@@ -1,0 +1,5 @@
+2001-11-16  Anders Petersson  <demitar@innocent.com>
+
+	* app/NewLayerWindow.h, app/NewLayerWindow.cpp, app/LayerWindow.h:
+	  Changed the name of NewLayerWindow::show to NewLayerWindow::doshow so
+	  that it doesn't clash with gtk-- 1.2.7
