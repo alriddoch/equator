@@ -125,11 +125,11 @@ void HeightManager::heightMapRegion(Mercator::Segment * map)
             harray[++idx] = j;
             harray[++idx] = h;
             if (h > 0) {
-                carray[++cdx] = h / 20.0f - 0.5f;
+                carray[++cdx] = -0.5f + h / 20.0f;
                 carray[++cdx] = 0.5f + h / 20.0f;
-                carray[++cdx] = h / 20.0f - 1.5f;
+                carray[++cdx] = -1.5f + h / 20.0f;
             } else {
-                carray[++cdx] = 0.8f + h / 20.0f;
+                carray[++cdx] = 0.f;
                 carray[++cdx] = 0.8 + h / 20.0f;
                 carray[++cdx] = 1.0f + h / 2000.0f;
             }

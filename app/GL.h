@@ -9,6 +9,9 @@
 #include <GL/gl.h>
 
 #ifndef GL_EXT_compiled_vertex_array
+typedef void (APIENTRY * PFNGLLOCKARRAYSEXTPROC) (GLint first, GLsizei count);
+typedef void (APIENTRY * PFNGLUNLOCKARRAYSEXTPROC) (void);
+
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysExt;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysExt;
 #endif // GL_EXT_compiled_vertex_array
