@@ -1,3 +1,6 @@
+Implement saving and loading as a bunch of atlas objects saved into a
+.equator file which is just xml.
+
 When importing/exporting data, treat as floating layer while user provides
 options. This means asking the user for options after data is loaded, but
 before its used to modify model.
