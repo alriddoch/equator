@@ -1,5 +1,9 @@
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Holo.cpp: Correctly restore blend function.
+
+2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp: Allow manipulation of camera in realtime using
 	  new tools.
 

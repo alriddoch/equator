@@ -101,6 +101,7 @@ void Holo::draw(GlView & view)
     glDepthMask(GL_TRUE);
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
     glDisable(GL_TEXTURE_2D);
