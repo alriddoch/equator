@@ -30,7 +30,7 @@ class HeightManager : public Layer {
 
     void selectRegion(Mercator::Segment * map);
     void outlineLineStrip(float *, unsigned int, float);
-    void heightMapRegion(Mercator::Segment * map);
+    void heightMapRegion(GlView & view, Mercator::Segment * map);
     void drawRegion(GlView & view, Mercator::Segment * map);
   public:
     static const int segSize = 64;

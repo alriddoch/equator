@@ -62,8 +62,8 @@ HeightManager::HeightManager(Model &m) : Layer(m, "heightfield", "HeightField"),
         }
         if (++i >= segSize - 1) { break; }
         for (int j = segSize - 1; j >= 0; --j) {
-            m_lineIndeces[++idx] = j * segSize + i;
             m_lineIndeces[++idx] = j * segSize + i + 1;
+            m_lineIndeces[++idx] = j * segSize + i;
         }
     }
     m_numLineIndeces = ++idx;
@@ -115,7 +115,7 @@ void HeightManager::outlineLineStrip(float * varray, unsigned int size,
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void HeightManager::heightMapRegion(Mercator::Segment * map)
+void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
 {
     float * harray = new float[segSize * segSize * 3];
     float * carray = new float[segSize * segSize * 3];
@@ -145,8 +145,13 @@ void HeightManager::heightMapRegion(Mercator::Segment * map)
     if (have_GL_EXT_compiled_vertex_array) {
         glLockArraysEXT(0, segSize * segSize);
     }
-    glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
-                   GL_UNSIGNED_INT, m_lineIndeces);
+    if (view.getRenderMode() == GlView::LINE) {
+        glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
+                       GL_UNSIGNED_INT, m_lineIndeces);
+    } else {
+        glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
+                       GL_UNSIGNED_INT, m_lineIndeces);
+    }
     if (have_GL_EXT_compiled_vertex_array) {
         glUnlockArraysEXT();
     }
@@ -185,7 +190,7 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
         outlineLineStrip(varray, segSize * 4, view.getAnimCount());
         glDisable(GL_TEXTURE_1D);
         // if (view.getScale() > 0.05f) {
-            heightMapRegion(map);
+            heightMapRegion(view, map);
         // }
         return;
     }
