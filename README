@@ -2,6 +2,9 @@
 Equator build notes
 -------------------
 
+This dependency list is not maintained. For the real dependencies, see
+the output of the configure script.
+
 Required libraries:
 
 	Atlas-C++ v0.4.4
@@ -19,5 +22,5 @@ created by bear
 24 April 2002
 <bear@code-bear.dyndns.org>
 update by Al Riddoch
-28th March 2003
+21st November 2003
 <alriddoch@zepler.org>
