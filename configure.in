@@ -1,6 +1,6 @@
 dnl Initialise autoconf
 
-AC_INIT(app/equator.cpp)
+AC_INIT(app/equator_plugin.cpp)
 AM_CONFIG_HEADER(config.h)
 
 dnl Initialise automake

@@ -1,9 +1,13 @@
+2003-06-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* Makefile.am: Update so dist and distcheck run.
+
 2003-06-22  Damien McGinnes
 
-        * app/ServerEntities.cpp: fixed, and put back terrain mod test.
-         it adds a circle, square, rectangle and rotated rectangle and uses
-         level, adjusted and sloped mods (hard coded to add to segments at
-         -1,0 and -1,1)
+	* app/ServerEntities.cpp: fixed, and put back terrain mod test.
+	 it adds a circle, square, rectangle and rotated rectangle and uses
+	 level, adjusted and sloped mods (hard coded to add to segments at
+	 -1,0 and -1,1)
 
 2003-06-22  Al Riddoch  <alriddoch@zepler.org>
 

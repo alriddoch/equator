@@ -1,3 +1,5 @@
+INCLUDES = -I$(top_srcdir)
+
 bin_PROGRAMS = equator
 
 equator_SOURCES = MainWindow.cpp MainWindow.h \
@@ -24,4 +26,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \
 		  Texture.cpp Texture.h \
+		  types.h GL.h operations.h debug.h \
+		  arrow_mesh.h \
 		  equator_plugin.cpp
