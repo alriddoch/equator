@@ -28,12 +28,10 @@
 
 #include <cassert>
 
-ConnectWindow::ConnectWindow(MainWindow & mw) :
+ConnectWindow::ConnectWindow() :
                  Gtk::Dialog("Connect to server", false, true),
-                 m_mainWindow(mw), m_hostEntry(0),
-                 m_portChoice(0), m_portSpin(0),
-                 m_connectButton(0),
-                 m_status(0),
+                 m_hostEntry(0), m_portChoice(0), m_portSpin(0),
+                 m_connectButton(0), m_status(0),
                  m_customPort(6767), m_portNum(6767), m_server(0)
 {
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
@@ -117,7 +115,7 @@ void ConnectWindow::doshow()
 
 void ConnectWindow::createConnection()
 {
-    assert(m_server == NULL);
+    assert(m_server == 0);
 
     m_status->push("Connecting...", m_statusContext);
 
@@ -142,8 +140,16 @@ void ConnectWindow::createConnection()
 
 void ConnectWindow::failure(const std::string & msg)
 {
+    assert(m_server != 0);
+
+    std::cout << "ConnectWindow::failure" << std::endl << std::flush;
+    std::cout << msg << std::endl << std::flush;
+
     m_status->pop(m_statusContext);
     m_status->push("Connection failed", m_statusContext);
+
+    m_failure.disconnect();
+    m_connected.disconnect();
 
     delete m_server;
     m_server = 0;
@@ -151,18 +157,18 @@ void ConnectWindow::failure(const std::string & msg)
     m_hostEntry->set_editable(true);
     m_connectButton->set_sensitive(true);
     m_portChoice->set_sensitive(true);
-
-    std::cout << "Got connection failure in ConnectWindow" << std::endl
-              << std::flush;
-    std::cout << msg << std::endl << std::flush;
 }
 
 void ConnectWindow::connected()
 {
-    assert(m_server != NULL);
+    assert(m_server != 0);
 
     m_status->pop(m_statusContext);
     m_status->push("Connected", m_statusContext);
+
+    serverConnected.emit(m_server);
+
+    m_server = 0;
 
     m_hostEntry->set_editable(true);
     m_connectButton->set_sensitive(true);

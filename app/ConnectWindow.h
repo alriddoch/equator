@@ -7,13 +7,7 @@
 
 #include <gtkmm/dialog.h>
 
-class MainWindow;
 class Server;
-class Model;
-
-namespace Eris {
-  class Entity;
-}
 
 namespace Gtk {
   class Entry;
@@ -23,19 +17,9 @@ namespace Gtk {
   class Statusbar;
 }
 
-namespace Atlas {
-  namespace Objects {
-    namespace Entity {
-      class Player;
-    }
-  }
-}
-
 class ConnectWindow : public Gtk::Dialog
 {
   private:
-    MainWindow & m_mainWindow;
-
     Gtk::Entry * m_hostEntry;
     Gtk::OptionMenu * m_portChoice;
     Gtk::SpinButton * m_portSpin;
@@ -53,7 +37,7 @@ class ConnectWindow : public Gtk::Dialog
     void setPort(int );
     void setCustomPort();
   public:
-    ConnectWindow(MainWindow & m);
+    ConnectWindow();
 
     bool deleteEvent(GdkEventAny*) {
         hide();
@@ -68,6 +52,8 @@ class ConnectWindow : public Gtk::Dialog
     void connected();
 
     void dismiss(int);
+
+    SigC::Signal1<void, Server *> serverConnected;
 };
 
 #endif // EQUATOR_APP_NEWSERVERWINDOW_H

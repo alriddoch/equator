@@ -7,7 +7,6 @@
 #include "LayerWindow.h"
 #include "InheritanceWindow.h"
 #include "ServerWindow.h"
-#include "NewServerWindow.h"
 #include "Model.h"
 #include "Palette.h"
 
@@ -42,7 +41,6 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_layerwindow (*new LayerWindow(*this) ),
     m_inheritancewindow (*new InheritanceWindow(*this) ),
     m_serverwindow (*new ServerWindow(*this) ),
-    m_newServerwindow (*new NewServerWindow(*this) ),
     m_palettewindow (*new Palette(*this) )
 {
     signal_delete_event().connect(slot(*this, &MainWindow::destroy_handler));
@@ -242,7 +240,8 @@ void MainWindow::palette_window()
 
 void MainWindow::new_server_dialog()
 {
-    m_newServerwindow.show_all();
+    m_serverwindow.show_all();
+    m_serverwindow.connect();
 }
 
 void MainWindow::layer_window()

@@ -3,6 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "ServerWindow.h"
+#include "ConnectWindow.h"
 #include "ViewWindow.h"
 #include "GlView.h"
 #include "Layer.h"
@@ -18,7 +19,8 @@
 #include <vector>
 
 ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
-                                              m_mainWindow(mw)
+                                       m_connectWindow(*new ConnectWindow()),
+                                       m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
@@ -39,6 +41,12 @@ ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
 
     // show_all();
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
+    m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
+}
+
+void ServerWindow::connect()
+{
+    m_connectWindow.show_all();
 }
 
 void ServerWindow::newServer(Server * server)

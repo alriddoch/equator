@@ -1,3 +1,12 @@
+2003-12-19  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/ConnectWindow.cpp, app/ConnectWindow.h: Add connected signal,
+	  get rid of MainWindow reference, and clean up error reporting.
+
+	* app/MainWindow.cpp, app/MainWindow.h, app/ServerWindow.cpp,
+	  app/ServerWindow.h: Move the ConnectWindow into the ServerWindow,
+	  and handle it in there.
+
 2003-12-17  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ConnectWindow.cpp app/ConnectWindow.h: Add new window for

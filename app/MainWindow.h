@@ -15,10 +15,7 @@ class LayerWindow;
 class InheritanceWindow;
 class ServerWindow;
 class Palette;
-class NewServerWindow;
-class GlView;
 class Model;
-class Server;
 
 namespace Gtk {
   class ToggleButton;
@@ -62,13 +59,11 @@ class MainWindow : public Gtk::Window
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors
     SigC::Signal1<void, Model *> modelAdded;
-    SigC::Signal1<void, Server *> serverAdded;
     SigC::Signal1<void, Model *> currentModelChanged;
 
     LayerWindow & m_layerwindow;
     InheritanceWindow & m_inheritancewindow;
     ServerWindow & m_serverwindow;
-    NewServerWindow & m_newServerwindow;
     Palette & m_palettewindow;
 
     MainWindow();

@@ -9,7 +9,9 @@
 
 class MainWindow;
 class Server;
-class NewServerWindow;
+class ConnectWindow;
+class LoginWindow;
+class CharacterWindow;
 
 namespace Gtk {
   class OptionMenu;
@@ -21,6 +23,10 @@ class ServerWindow : public Gtk::Window
     Gtk::OptionMenu * m_serverMenu;
     Server * m_currentServer;
 
+    ConnectWindow & m_connectWindow;
+    LoginWindow * m_loginWindow;
+    CharacterWindow * m_characterWindow;
+
   public:
     MainWindow & m_mainWindow;
 
@@ -30,6 +36,8 @@ class ServerWindow : public Gtk::Window
         hide();
         return 1;
     }
+
+    void connect();
 
     void newServer(Server *);
     void setServer(Server *);
