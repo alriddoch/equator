@@ -1,3 +1,7 @@
+2004-02-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/CharacterWindow.cpp: Update to latest eris API.
+
 2004-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp,

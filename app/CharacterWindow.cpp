@@ -122,20 +122,21 @@ void CharacterWindow::gotCharacterList()
 
     std::cout << "GOT CHARACTER LIST" << std::endl << std::flush;
 
-    Eris::CharacterList chars = m_server->m_player->getCharacters();
-    Eris::CharacterList::iterator I = chars.begin();
+    const Eris::CharacterMap & chars = m_server->m_player->getCharacters();
+    Eris::CharacterMap::const_iterator I = chars.begin();
     // std::list<Glib::ustring> listStrings;
     for(; I != chars.end(); ++I) {
-        Atlas::Objects::Entity::GameEntity & ge = *I;
+        const std::string & id = I->first;
+        const Atlas::Objects::Entity::GameEntity & ge = I->second;
         Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
         Gtk::HBox * hbox = manage(new Gtk::HBox(false, 3));
         Gtk::Label * l = manage(new Gtk::Label());
-        l->set_markup(ge.getName() + " <i>(" + ge.getId() + ")</i>");
+        l->set_markup(ge.getName() + " <i>(" + id + ")</i>");
         hbox->pack_start(*l, Gtk::PACK_SHRINK);
         item->add(*hbox);
         item->show_all();
         m_nameEntry->get_list()->children().push_back(*item);
-        m_nameEntry->set_item_string(*item, ge.getId());
+        m_nameEntry->set_item_string(*item, id);
         // listStrings.push_back(ge.getName());
     }
     // m_nameEntry->set_popdown_strings(listStrings);
@@ -146,20 +147,19 @@ void CharacterWindow::select_child(Gtk::Widget & w)
     m_selectedCharacter.clear();
     std::string id = m_nameEntry->get_entry()->get_text();
     std::cout << "Selected " << id << std::endl << std::flush;
-    Eris::CharacterList chars = m_server->m_player->getCharacters();
-    Eris::CharacterList::iterator I = chars.begin();
-    for(; I != chars.end(); ++I) {
-        Atlas::Objects::Entity::GameEntity & ge = *I;
-        if (id == ge.getId()) {
-            m_selectedCharacter = id;
-            m_nameEntry->get_entry()->set_text(ge.getName());
-            m_typeEntry->set_text(ge.getParents().front().asString());
-            m_typeEntry->set_editable(false);
-            m_takeButton->set_sensitive(true);
-            m_createButton->set_sensitive(false);
-            return;
-        }
+    const Eris::CharacterMap & chars = m_server->m_player->getCharacters();
+    Eris::CharacterMap::const_iterator I = chars.find(id);
+    if (I == chars.end()) {
+        return;
     }
+    const Atlas::Objects::Entity::GameEntity & ge = I->second;
+    m_selectedCharacter = id;
+    m_nameEntry->get_entry()->set_text(ge.getName());
+    m_typeEntry->set_text(ge.getParents().front().asString());
+    m_typeEntry->set_editable(false);
+    m_takeButton->set_sensitive(true);
+    m_createButton->set_sensitive(false);
+    return;
 }
 
 void CharacterWindow::selection_changed()
