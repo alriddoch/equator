@@ -11,6 +11,7 @@
 
 #include <GL/glu.h>
 
+#include <gtk--/main.h>
 #include <gtk--/menuitem.h>
 #include <gtk--/menushell.h>
 #include <gtk--/fileselection.h>
@@ -63,9 +64,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Undo"));
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Redo"));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut"));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy"));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste"));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut", Gtk::Menu_Helpers::CTL|'x'));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy", Gtk::Menu_Helpers::CTL|'c'));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste", Gtk::Menu_Helpers::CTL|'v'));
+    edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Delete", Gtk::Menu_Helpers::CTL|'d'));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Edit",*menu_sub));
 
@@ -149,6 +152,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Net",*menu_sub));
 
     // list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Float 3"));
+
+    // Gtk::Main::timeout.connect(slot(this, &GlView::animate), 1000);
 
     m_popup->accelerate(m_viewWindow);
 
@@ -352,7 +357,21 @@ void GlView::drawgl()
             }
         }
     }
+    glFlush();
     swap_buffers();
+}
+
+gint GlView::animate()
+{
+    cout << "ANIMATE" << std::endl << std::flush;
+    if (make_current()) {
+        setupgl();
+        origin();
+        cursor();
+        //swap_buffers();
+        cout << "ANIMATED" << std::endl << std::flush;
+    }
+    return 1;
 }
 
 void GlView::clickOn(int x, int y)

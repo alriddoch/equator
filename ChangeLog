@@ -1,3 +1,15 @@
+2002-02-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.h, app/ServerEntities.cpp:
+	  Implemented dragging to move entities.
+
+	* app/Server.h, app/Server.cpp: Added method to move entites
+	  around using priveleged avatar.
+
+	* app/MainWindow.h, app/MainWindow.cpp, app/GlView.cpp,
+	  app/GlView.cpp: Experiment with Gtkmm idle features.
+	  Add more edit menu entries, with accelerators.
+
 Thursday, February 07 2002, James Turner <james@worldforge.org>
 
 	* ServerEntities.cpp/.h: Bind to various Eris signals, notably

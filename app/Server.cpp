@@ -186,3 +186,21 @@ void Server::avatarCreateEntity(const Atlas::Message::Object::MapType & ent)
     
     connection.send(c);
 }
+
+void Server::avatarMoveEntity(const std::string & id, const Vector3D & pos,
+                              const Vector3D & vel)
+{
+    Move m = Move::Instantiate();
+
+    Atlas::Message::Object::MapType ent;
+    ent["id"] = id;
+    ent["pos"] = pos.asObject();
+    if (vel) {
+        ent["velocity"] = vel.asObject();
+    }
+    m.SetArgs(Atlas::Message::Object::ListType(1, ent));
+    m.SetFrom(character->getID());
+    m.SetTo(id);
+
+    connection.send(m);
+}

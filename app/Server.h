@@ -5,6 +5,8 @@
 #ifndef EQUATOR_SERVER_H
 #define EQUATOR_SERVER_H
 
+#include "Vector3D.h"
+
 #include <Eris/Connection.h>
 
 #include <gtk--/main.h>
@@ -67,6 +69,8 @@ class Server : public SigC::Object {
     void moveCharacter(const Vector3D & pos);
 
     void avatarCreateEntity(const Atlas::Message::Object::MapType &);
+    void avatarMoveEntity(const std::string &, const Vector3D & pos,
+                          const Vector3D & vel = Vector3D());
 
     const Vector3D getAbsCharPos();
 };

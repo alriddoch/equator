@@ -253,8 +253,8 @@ bool ServerEntities::selectSingleEntity(GlView & view,
             entname_t::const_iterator I = m_nameDict.find(hitName);
             if (check) {
                 if (m_selection == I->second) {
-                    return true;
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
+                    return true;
                 }
             } else {
                 if (I != m_nameDict.end()) {
@@ -303,7 +303,7 @@ void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
-                               m_selection(NULL),
+                               m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
     Eris::TypeInfo::BoundType.connect(SigC::slot(this, &ServerEntities::newType));
@@ -358,6 +358,28 @@ void ServerEntities::popSelection()
         m_selection = m_selectionStack.back();
         m_selectionStack.pop_back();
     }
+}
+
+void ServerEntities::dragStart(GlView & view, int x, int y)
+{
+    if (selectSingleEntity(view, x, y, true)) {
+        m_validDrag = true;
+    }
+}
+
+void ServerEntities::dragUpdate(GlView & view, float x, float y, float z)
+{
+}
+
+void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
+{
+    if (m_validDrag) {
+        std::cout << "MOVING " << m_selection->getID() << " to " << x
+                  << ":" << y << ":" << z << std::endl << std::flush;
+        m_serverConnection.avatarMoveEntity(m_selection->getID(),
+                   Vector3D(m_selection->getPosition()) + Vector3D(x, y, z));
+    }
+    m_validDrag = true;
 }
 
 void ServerEntities::insert(const Vector3D & pos)

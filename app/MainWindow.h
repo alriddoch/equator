@@ -55,6 +55,7 @@ class MainWindow : public Gtk::Window
     Gtk::ToggleButton * vertex_mode;
 
     void destroy_handler();
+    gint idle();
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors

@@ -1,3 +1,7 @@
+Fix cyphesis so the creator can perceive the world.
+
+Fix move code so that it sets the ref correctly.
+
 Pad out manipulation of entities, including moving and deleting. Resizing
 can come later.
 

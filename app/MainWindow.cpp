@@ -148,6 +148,8 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     set_title("Equator");
 
+    // Gtk::Main::timeout.connect(slot(this, &MainWindow::idle), 1000);
+
     show_all();
 
 }
@@ -161,6 +163,12 @@ void MainWindow::destroy_handler()
 {
     // This is called from the detructor, so must not contain anything else
     Gtk::Main::quit();
+}
+
+gint MainWindow::idle()
+{
+    std::cout << "IDLE" << std::endl << std::flush;
+    return 1;
 }
 
 void MainWindow::newModel()

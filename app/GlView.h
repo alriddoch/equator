@@ -50,6 +50,8 @@ class GlView : public Gtk::GLArea {
     void face();
     void cursor();
     void drawgl();
+    void redraw();
+    gint animate();
 
     void clickOn(int x, int y);
     void clickOff(int x, int y);
@@ -88,7 +90,6 @@ class GlView : public Gtk::GLArea {
 
     const std::string details() const;
 
-    void redraw();
     void setPickProjection();
 
     const float getZ(int x, int y) const;

@@ -35,6 +35,7 @@ class ServerEntities : public Layer {
     Eris::Entity * m_selection; 
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
+    bool m_validDrag;
 
     int m_nameCount;
     entname_t m_nameDict;
@@ -58,9 +59,9 @@ class ServerEntities : public Layer {
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection();
     void popSelection();
-    void dragStart(GlView & view, int x, int y) { }
-    void dragUpdate(GlView & view, float x, float y, float z) { }
-    void dragEnd(GlView & view, float x, float y, float z) { }
+    void dragStart(GlView & view, int x, int y);
+    void dragUpdate(GlView & view, float x, float y, float z);
+    void dragEnd(GlView & view, float x, float y, float z);
     void insert(const Vector3D &);
     
     void gotNewEntity(Eris::Entity *ent);
