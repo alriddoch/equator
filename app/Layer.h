@@ -9,6 +9,7 @@
 #include <sigc++/object.h>
 
 class GlView;
+class Model;
 
 namespace Gtk {
   class FileSelection;
@@ -16,24 +17,24 @@ namespace Gtk {
 
 class Layer : public SigC::Object {
   protected:
-    Layer(GlView & w, const std::string & n, const std::string & t) :
-          m_window(w), m_name(n), m_type(t), m_visible(true),
+    Layer(Model & m, const std::string & n, const std::string & t) :
+          m_model(m), m_name(n), m_type(t), m_visible(true),
           m_xoff(0.0f), m_yoff(0.0f), m_zoff(0.0f) { }
     virtual ~Layer() { }
 
-    GlView & m_window;
+    Model & m_model;
     std::string m_name;
     std::string m_type;
     bool m_visible;
     float m_xoff, m_yoff, m_zoff;
   public:
     virtual void importFile() = 0;
-    virtual void draw() = 0;
-    virtual void select(int x, int y) = 0;
-    virtual void select(int x, int y, int fx, int fy) = 0;
-    virtual void dragStart(int x, int y) = 0;
-    virtual void dragUpdate(float x, float y, float z) = 0;
-    virtual void dragEnd(float x, float y, float z) = 0;
+    virtual void draw(GlView & view) = 0;
+    virtual void select(GlView & view, int x, int y) = 0;
+    virtual void select(GlView & view, int x, int y, int fx, int fy) = 0;
+    virtual void dragStart(GlView & view, int x, int y) = 0;
+    virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
+    virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
 
     const std::string & getType() const {
         return m_type;
