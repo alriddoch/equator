@@ -94,7 +94,7 @@ int main(int argc, char ** argv)
 {
     kit = new Gtk::Main(argc, argv);
 
-    Gdk::GL::init();
+    Gdk::GL::init(argc, argv);
 
     MainWindow * window = new MainWindow();
 
