@@ -109,16 +109,7 @@ void Server::checkEntityForNewLayers(Eris::Entity & ent)
         TerrainEntity & tent = dynamic_cast<TerrainEntity &>(ent);
         std::cout << "Found a terrain entity"
                   << std::endl << std::flush;
-        // FIXME Can we just call createTerrainLayer() here?
-        EntityRenderer * er = tent.m_drawer;
-        if (er != 0) {
-            TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
-            if (tr != 0) {
-                Terrain * layer = new Terrain(*m_model, tr->m_terrain);
-                layer->readTerrain(ent);
-                m_model->addLayer(layer);
-            }
-        }
+        createTerrainLayer(&tent);
     }
     
     int numEnts = ent.getNumMembers();
@@ -149,16 +140,16 @@ void Server::createLayers()
 
 }
 
-void Server::createTerrainLayer(TerrainEntity * te)
+void Server::createTerrainLayer(TerrainEntity * tent)
 {
     assert(m_model != 0);
 
-    EntityRenderer * er = te->m_drawer;
+    EntityRenderer * er = tent->m_drawer;
     if (er != 0) {
         TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
         if (tr != 0) {
             Terrain * layer = new Terrain(*m_model, tr->m_terrain);
-            layer->readTerrain(*te);
+            layer->readTerrain(*tent);
             m_model->addLayer(layer);
         }
     }
