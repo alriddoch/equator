@@ -601,22 +601,17 @@ void GlView::mouseEffects()
                                       0.f, 0.f, 0.f };
 
         glVertexPointer(3, GL_FLOAT, 0, dvertices);
-        if (pretty) {
-            // Set The Blending Function For Translucency
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            glEnable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
-            glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-            glDrawArrays(GL_LINE_STRIP, 0, 5);
-            glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-            glDrawArrays(GL_QUADS, 0, 4);
-            glDisable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glEnable(GL_DEPTH_TEST);
-        } else {
-            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-            glDrawArrays(GL_LINE_STRIP, 0, 5);
-        }
+        // Set The Blending Function For Translucency
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+        glDrawArrays(GL_LINE_STRIP, 0, 5);
+        glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
+        glDrawArrays(GL_QUADS, 0, 4);
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
     }
 }
 

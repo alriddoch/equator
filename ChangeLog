@@ -1,3 +1,7 @@
+2004-01-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GlView.cpp: Clean up dragbox code a bit.
+
 2004-01-29  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.cpp: Fix frame buffer and depth restoring for animation.
