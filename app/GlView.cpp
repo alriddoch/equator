@@ -10,10 +10,12 @@
 #include "ViewWindow.h"
 #include "Layer.h"
 
+#include "visual/Renderer.h"
+
+#include "common/debug.h"
+
 #include "gui/gtkmm/CameraControl.h"
 #include "gui/gtkmm/DockWindow.h"
-
-#include "visual/Renderer.h"
 
 #include <wfmath/point.h>
 
@@ -37,6 +39,8 @@
 static const bool pretty = true;
 
 static const float Deg2Rad = M_PI / 180.0f;
+
+static const bool debug_flag = false;
 
 float deg2Rad(float d)
 {
@@ -580,6 +584,7 @@ void GlView::midClickOff(int x, int y)
         default:
             break;
     }
+    clickx = 0; clicky = 0;
     m_dragType = GlView::NONE;
 }
 
@@ -602,8 +607,8 @@ void GlView::worldPoint(int x, int y, double &z,
         glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
         gluUnProject(x, get_height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
-        std::cout << "[" << x << ":" << y << ":" << z << "]";
-        std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
+        // std::cout << "[" << x << ":" << y << ":" << z << "]";
+        // std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
     }
 }
 
@@ -647,7 +652,6 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
     double tx, ty, tz;
     int dx = mousex - clickx,
         dy = mousey - clicky;
-    worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
     switch (m_dragType) {
         case GlView::NONE:
         case GlView::SELECT:
@@ -659,6 +663,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
                 case MainWindow::SCALE:
                     {
                         // Send move thingy to layer
+                        worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
                         m_model.getCurrentLayer()->dragUpdate(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
                     }
                     break;
@@ -670,6 +675,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             }
             break;
         case GlView::PAN:
+            worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
             setXoff(getXoff() + (tx - dragx) );
             setYoff(getYoff() + (ty - dragy) );
             setZoff(getZoff() + (tz - dragz) );
@@ -678,7 +684,6 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             {
                 float rot = getRotation() + (dx * 360.f) / get_width();
                 float dec = getDeclination() - (dy * 180.f) / get_height();
-                std::cout << "DEC: " << getDeclination() << "," << dec << "," << dy << std::endl << std::flush;
                 while (rot > 360.f) { rot -= 360.f; }
                 while (rot < 0.f) { rot += 360.f; }
                 while (dec > 360.f) { dec -= 360.f; }
@@ -789,7 +794,7 @@ void GlView::swap_buffers()
 
 bool GlView::buttonPressEvent(GdkEventButton * event)
 {
-    std::cout << "BUTTON" << event->button << std::endl << std::flush;
+    debug(std::cout << "BUTTON" << event->button << std::endl << std::flush;);
     switch (event->button) {
         case 1:
             clickOn(::lrint(event->x), ::lrint(event->y));
@@ -918,9 +923,9 @@ void GlView::getViewOffset(float & h, float & v, float & d)
     v = vo.y();
     d = vo.z();
 
-    std::cout << "Getting getViewOffset " << h << ":" << v << ":" << d
-              << " " << getXoff() << ":" << getYoff() << ":" << getZoff()
-              << std::endl << std::flush;
+    debug(std::cout << "Getting getViewOffset " << h << ":" << v << ":" << d
+                    << " " << getXoff() << ":" << getYoff() << ":" << getZoff()
+                    << std::endl << std::flush;);
 }
 
 void GlView::setViewOffset(float h, float v, float d)
@@ -996,6 +1001,6 @@ const float GlView::getZ(int x, int y) const
 {
     float z = 0;
     glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
-    std::cout << "GOT Z " << z << std::endl << std::flush;
+    debug(std::cout << "GOT Z " << z << std::endl << std::flush;);
     return z;
 }

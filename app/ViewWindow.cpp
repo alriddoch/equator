@@ -8,6 +8,8 @@
 #include "Model.h"
 #include "MainWindow.h"
 
+#include "common/debug.h"
+
 #include <gtkmm/menu.h>
 #include <gtkmm/menubar.h>
 #include <gtkmm/menuitem.h>
@@ -38,6 +40,8 @@ using Gtk::Menu_Helpers::AccelKey;
 #else
 using Gtk::AccelKey;
 #endif
+
+static const bool debug_flag = false;
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
                                                     m_scrollLock(false)
@@ -340,16 +344,16 @@ void ViewWindow::hAdjustChanged()
 void ViewWindow::glViewChanged()
 {
     m_scrollLock = true;
-    std::cout << "Changing sliders to take accout of view change"
-              << std::endl << std::flush;
+    debug(std::cout << "Changing sliders to take accout of view change"
+                    << std::endl << std::flush;);
     float wx, wy, wz;
     m_glarea->m_model.getSize(wx, wy, wz);
     float winx = m_glarea->get_width() / (40.0f * m_glarea->getScale());
     float winy = m_glarea->get_height() / (40.0f * m_glarea->getScale());
     float worldSize = hypot(wx, wy);
 
-    std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
-              << std::endl << std::flush;
+    debug(std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
+              << std::endl << std::flush;);
 
     m_hAdjust->set_lower(-worldSize);
     m_vAdjust->set_lower(-worldSize);
