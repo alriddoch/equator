@@ -38,6 +38,10 @@ class Cal3dStore : public Layer {
   public:
     Cal3dStore(Model &);
 
+    Cal3dModel & getModel() {
+        return m_cal3dModel;
+    }
+
     void loadModel(const std::string &);
     void loadFile(const std::string &);
 

@@ -1,3 +1,6 @@
+Add play button to Cal3dStoreOptions. Add new treadmill channel for testing
+animation speed.
+
 Why is selectMod_t in ServerEntities? It seems like it should be general
 purpose. m_renderMode in ServerEntities could probably be in Layer.
 

@@ -30,10 +30,21 @@ class Cal3dStoreOptions : public OptionBox
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
+
+    Gtk::TreeModel::Row animationRow;
+    Gtk::TreeModel::Row actionRow;
+    Gtk::TreeModel::Row meshRow;
+    Gtk::TreeModel::Row materialRow;
+
     Gtk::Menu * m_popupMenu;
 
     Cal3dStore & m_cal3dStore;
 
+    void skeletonLoaded(const std::string &);
+    void animationLoaded(const std::string &, int);
+    void actionLoaded(const std::string &, int);
+    void meshLoaded(const std::string &, int);
+    void materialLoaded(const std::string &, int);
   public:
     explicit Cal3dStoreOptions(Cal3dStore &);
 

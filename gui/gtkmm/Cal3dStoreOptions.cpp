@@ -4,6 +4,8 @@
 
 #include "Cal3dStoreOptions.h"
 
+#include "app/Cal3dStore.h"
+
 #include <gtkmm/box.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/label.h>
@@ -60,6 +62,61 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
+
+    animationRow = *(m_treeModel->append());
+    animationRow[*m_nameColumn] = Glib::ustring("Animations");
+
+    actionRow = *(m_treeModel->append());
+    actionRow[*m_nameColumn] = Glib::ustring("Actions");
+
+    meshRow = *(m_treeModel->append());
+    meshRow[*m_nameColumn] = Glib::ustring("Meshes");
+
+    materialRow = *(m_treeModel->append());
+    materialRow[*m_nameColumn] = Glib::ustring("Materials");
+
+    Cal3dModel & m = s.getModel();
+
+    m.skeletonLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::skeletonLoaded));
+    m.animationLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::animationLoaded));
+    m.actionLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::actionLoaded));
+    m.meshLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::meshLoaded));
+    m.materialLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::materialLoaded));
+}
+
+void Cal3dStoreOptions::skeletonLoaded(const std::string & s)
+{
+    std::cout << "Loaded " << s << std::endl << std::flush;
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+    row[*m_nameColumn] = Glib::ustring(s);
+}
+
+void Cal3dStoreOptions::animationLoaded(const std::string & s, int id)
+{
+    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
+    Gtk::TreeModel::Row row = *(m_treeModel->append(animationRow.children()));
+    row[*m_nameColumn] = Glib::ustring(s);
+}
+
+void Cal3dStoreOptions::actionLoaded(const std::string & s, int id)
+{
+    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
+    Gtk::TreeModel::Row row = *(m_treeModel->append(actionRow.children()));
+    row[*m_nameColumn] = Glib::ustring(s);
+}
+
+void Cal3dStoreOptions::meshLoaded(const std::string & s, int id)
+{
+    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
+    Gtk::TreeModel::Row row = *(m_treeModel->append(meshRow.children()));
+    row[*m_nameColumn] = Glib::ustring(s);
+}
+
+void Cal3dStoreOptions::materialLoaded(const std::string & s, int id)
+{
+    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
+    Gtk::TreeModel::Row row = *(m_treeModel->append(materialRow.children()));
+    row[*m_nameColumn] = Glib::ustring(s);
 }
 
 #if 0

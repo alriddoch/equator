@@ -216,7 +216,6 @@ void LayerWindow::modelAdded(Model * model)
 
 void LayerWindow::visibleToggled(const Glib::ustring& path_string)
 {
-    std::cout << "GGO: " << path_string << std::endl << std::flush;
     GtkTreePath *gpath = gtk_tree_path_new_from_string (path_string.c_str());
     Gtk::TreePath path(gpath);
 

@@ -1,5 +1,16 @@
 2005-02-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Cal3dStore.h: Add an accessor making the model available to
+	  the options gui.
+
+	* app/LayerWindow.cpp: Remove some debug output.
+
+	* gui/gtkmm/Cal3dStoreOptions.cpp, gui/gtkmm/Cal3dStoreOptions.h:
+	  Hook into the loader to store information about the verious files
+	  loaded.
+
+2005-02-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/ViewWindow.cpp: Use stock menu item where possible.
 
 2005-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
