@@ -16,6 +16,7 @@
 
 #include <Eris/World.h>
 
+#include <iostream>
 #include <cassert>
 
 static const bool debug_flag = true;

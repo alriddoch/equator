@@ -20,6 +20,7 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
+#include <iostream>
 #include <cassert>
 
 CharacterWindow::CharacterWindow() :

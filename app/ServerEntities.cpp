@@ -30,6 +30,7 @@
 // #include <wfmath/ball.h>
 
 #include <Atlas/Codecs/XML.h>
+#include <Atlas/Message/Encoder.h>
 #include <Atlas/Message/DecoderBase.h>
 
 #include <GL/glu.h>
