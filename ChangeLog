@@ -1,3 +1,8 @@
+2004-02-08  Ron Steinke  <rsteinke@w-link.net>
+
+        * configure.ac, acinclude.m4: Use new combined macro for libz, libpng,
+          SDL and SDL_image check that will also work under win32.
+
 2004-02-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/CharacterWindow.cpp: Update to latest eris API.
