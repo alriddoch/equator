@@ -65,6 +65,7 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_redrawRequired(true),
+           m_frameStore(0),
            m_viewNo(m.getViewNo()),
            m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
            m_xAdj(*manage( new Gtk::Adjustment(0., -500., 500.) )),
@@ -367,6 +368,27 @@ void GlView::drawgl()
             }
         }
         glFlush();
+        if (m_frameStore != 0) {
+            if ((m_frameStoreWidth != get_width()) ||
+                (m_frameStoreHeight != get_height())) {
+                delete [] m_frameStore;
+                delete [] m_depthStore;
+                m_frameStore = 0;
+            }
+        }
+        if (m_frameStore == 0) {
+            m_frameStoreWidth = get_width();
+            m_frameStoreHeight = get_height();
+
+            m_frameStore = new GLubyte[get_width() * get_height() * 3];
+            m_depthStore = new GLuint[get_width() * get_height()];
+        }
+        std::cout << "Frampt " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+        std::cout << "Grimple " << get_width() << " " << get_height() << std::endl << std::flush;
+        glReadPixels(0, 0, get_width(), get_height(),
+                     GL_RGB, GL_UNSIGNED_BYTE, m_frameStore);
+        glReadPixels(0, 0, get_width(), get_height(),
+                     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
         swap_buffers();
     }
 }
@@ -376,6 +398,18 @@ bool GlView::animate()
     if (m_redrawRequired) {
         redraw();
         m_redrawRequired = false;
+    } else {
+        if ((m_frameStoreWidth == get_width()) &&
+            (m_frameStoreHeight == get_height()) &&
+            (make_current())) {
+            glRasterPos2i(0,0);
+            glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                         GL_RGB, GL_UNSIGNED_BYTE, m_frameStore);
+            glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                         GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+            std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+            swap_buffers();
+        }
     }
 #if 0
     m_animCount += 0.02f;

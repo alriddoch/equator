@@ -28,6 +28,10 @@ class GlView : public Gtk::DrawingArea {
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     bool m_redrawRequired;
+    GLubyte * m_frameStore;
+    GLuint * m_depthStore;
+    int m_frameStoreWidth;
+    int m_frameStoreHeight;
 
     void redraw();
   public:
