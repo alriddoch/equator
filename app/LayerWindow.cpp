@@ -36,7 +36,7 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::Menu * menu = manage( new Gtk::Menu() );
 
     m_viewMenu->set_menu(menu);
-    tophbox->pack_start(*m_viewMenu, true, false, 2);
+    tophbox->pack_start(*m_viewMenu, true, true, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
     vbox->pack_start(*tophbox, false, false, 2);
@@ -92,9 +92,8 @@ void LayerWindow::setView(GlView * view)
         set_sensitive(false);
         return;
     }
-    set_sensitive(true);
 
-    // m_viewLabel->set(view->m_viewwindow.getName());
+    set_sensitive(true);
 
     const std::list<Layer *> & layers = view->getLayers();
  
@@ -123,6 +122,7 @@ void LayerWindow::addModel(ViewWindow * view)
     Gtk::Menu_Helpers::MenuList& model_menu = m_viewMenu->get_menu()->items();
     if (model_menu.empty()) {
         set_sensitive(true);
+        setView(view->getView());
     }
     model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
 }

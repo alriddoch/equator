@@ -1,5 +1,11 @@
 2001-12-06  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/LayerWindow.cpp: Sorted out packing of optionmenu.
+
+	* app/MainWindow.cpp: Add some more button graphics.
+
+2001-12-06  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/equator_plugin.cpp: New version of main function and
 	  related code which enables equator to be launched as a gimp
 	  extension, and this grant it access to gimps features.
