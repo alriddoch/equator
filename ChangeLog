@@ -1,3 +1,31 @@
+2001-12-10  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/BladeMap.h, app/GlView.cpp, app/GlView.h,
+	  app/IsoMap.cpp, app/IsoMap.h, app/Layer.h, app/Texture.cpp,
+	  app/Texture.h:
+	  Added support for selection by clicking, or dragging a box round
+	  objects.
+
+	* app/BladeMap.cpp, app/BladeMap.h, app/GlView.cpp, app/Holo.h,
+	  app/IsoMap.cpp, app/IsoMap.h:
+	  Made file loading only happen if the user requests it.
+
+	* app/GlView.cpp, app/GlView.h:
+	  Added selection interface, and utility function that can be used
+	  to set up the projection for picking.
+
+	* app/GlView.cpp, app/GlView.h:
+	  Implemented re-ordering of layers, and made sure layer order is
+	  intuitive.
+
+	* app/Holo.cpp:
+	  Tweaked to ensure the grid is drawn with or without depth testing
+	  on.
+
+	* app/LayerWindow.cpp, app/LayerWindow.h:
+	  Added graphics for the layer buttons, and implemented manipulating
+	  order of layers.
+
 2001-12-06  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/LayerWindow.cpp: Sorted out packing of optionmenu.

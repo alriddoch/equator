@@ -234,3 +234,14 @@ void Tile::draw()
     glEnd();
     glDisable(GL_TEXTURE_2D);
 }
+
+void Tile::select()
+{
+    if (tex_id == -1) { return; }
+    glBegin(GL_QUADS);
+    glTexCoord2f(m_pw/2, 0); glVertex3f(0.0f, 0.0f, 0.0f);
+    glTexCoord2f(m_pw, m_ph/2); glVertex3f(tileSize, 0.0f, 0.0f);
+    glTexCoord2f(m_pw/2, m_ph); glVertex3f(tileSize, tileSize, 0.0f);
+    glTexCoord2f(0, m_ph/2); glVertex3f(0.0f, tileSize, 0.0f);
+    glEnd();
+}

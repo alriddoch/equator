@@ -14,17 +14,23 @@
 
 #include <gtk--/menuitem.h>
 #include <gtk--/menushell.h>
+#include <gtk--/fileselection.h>
 
 #include <iostream>
 
-GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(0),
+static const bool pretty = false;
+
+GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL),
+                               clickx(0), clicky(0), dragx(0), dragy(0),
                                m_viewwindow(w)
 {
-    set_events(GDK_EXPOSURE_MASK|
+    set_events(GDK_POINTER_MOTION_MASK|
+               GDK_EXPOSURE_MASK|
                GDK_BUTTON_PRESS_MASK|
                GDK_BUTTON_RELEASE_MASK);
 
-    m_layers.push_front( new Holo(*this) );
+    m_currentLayer = new Holo(*this);
+    m_layers.push_front( m_currentLayer );
 
     m_popup = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& list_popup = m_popup->items();
@@ -33,6 +39,8 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(0),
     Gtk::Menu_Helpers::MenuList& file_popup = menu_sub->items();
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save"));
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save As..."));
+    file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", slot(this, &GlView::importFile)));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Close"));
 
@@ -138,6 +146,7 @@ void GlView::setScale(GLfloat s)
 {
     m_scale = s;
     if (make_current()) {
+        setupgl();
         drawgl();
     }
     m_viewwindow.setTitle();
@@ -209,8 +218,93 @@ void GlView::drawgl()
         for(I = m_layers.begin(); I != m_layers.end(); I++) {
             (*I)->draw();
         }
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Func tion For Translucency
+        if (clickx != 0) {
+            glTranslatef(clickx, height() - clicky, 100.0f);
+            float x = mousex - clickx;
+            float y = clicky - mousey;
+            cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << endl << flush;
+            if (pretty) {
+                glEnable(GL_BLEND);
+                glDisable(GL_DEPTH_TEST);
+                glBegin(GL_LINES);
+                glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+                glVertex3f(0.0f, 0.0f, 0.0f);
+                glVertex3f(x, 0.0f, 0.0f);
+                glVertex3f(x, 0.0f, 0.0f);
+                glVertex3f(x, y, 0.0f);
+                glVertex3f(x, y, 0.0f);
+                glVertex3f(0.0f, y, 0.0f);
+                glVertex3f(0.0f, y, 0.0f);
+                glVertex3f(0.0f, 0.0f, 0.0f);
+                glEnd();
+                glBegin(GL_QUADS);
+                glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
+                glVertex3f(0.0f, 0.0f, 0.0f);
+                glVertex3f(x, 0.0f, 0.0f);
+                glVertex3f(x, y, 0.0f);
+                glVertex3f(0.0f, y, 0.0f);
+                glEnd();
+                glDisable(GL_BLEND);
+                glEnable(GL_DEPTH_TEST);
+            } else {
+                glBegin(GL_LINES);
+                glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+                glVertex3f(0.0f, 0.0f, 0.0f);
+                glVertex3f(x, 0.0f, 0.0f);
+                glVertex3f(x, 0.0f, 0.0f);
+                glVertex3f(x, y, 0.0f);
+                glVertex3f(x, y, 0.0f);
+                glVertex3f(0.0f, y, 0.0f);
+                glVertex3f(0.0f, y, 0.0f);
+                glVertex3f(0.0f, 0.0f, 0.0f);
+                glEnd();
+            }
+        }
     }
     swap_buffers();
+}
+
+void GlView::importFile()
+{
+    if (m_currentLayer != NULL) {
+        m_currentLayer->importFile();
+    }
+}
+
+void GlView::clickOn(int x, int y)
+{
+    clickx = x; clicky = y;
+}
+
+void GlView::clickOff(int x, int y)
+{
+    if (make_current()) {
+        if ((clickx == mousex) && (clicky == clicky)) {
+            m_currentLayer->select(mousex, height() - mousey);
+        } else {
+            m_currentLayer->select(clickx, height() - clicky,
+                                   mousex, height() - mousey);
+        }
+    } else {
+        cout << "FAILED TO GET LOCK" << endl << flush;
+    }
+    clickx = 0; clicky = 0;
+}
+
+void GlView::startDrag(int x, int y)
+{
+    dragx = x; dragy = y;
+}
+
+void GlView::endDrag(int x, int y)
+{
+    // Use the ammount the user has dragged to pan the display
 }
 
 void GlView::realize_impl()
@@ -219,20 +313,52 @@ void GlView::realize_impl()
     initgl();
 }
 
+gint GlView::motion_notify_event_impl(GdkEventMotion*event)
+{
+    mousex = event->x; mousey = event->y; 
+    setupgl();
+    drawgl();
+}
+
 int GlView::button_press_event_impl(GdkEventButton * event)
 {
-    m_popup->popup(event->button,event->time);
+    cout << "BUTTON" << event->button << endl << flush;
+    switch (event->button) {
+        case 1:
+            clickOn(event->x, event->y);
+            break;
+        case 2:
+            startDrag(event->x, event->y);
+            break;
+        case 3:
+            m_popup->popup(event->button,event->time);
+            break;
+        default:
+            break;
+    }
     return TRUE;
 }
 
-int GlView::button_release_event_impl(GdkEventButton*)
+int GlView::button_release_event_impl(GdkEventButton * event)
 {
+    switch (event->button) {
+        case 1:
+            clickOff(event->x, event->y);
+            break;
+        case 2:
+            endDrag(event->x, event->y);
+            break;
+        case 3:
+        default:
+            break;
+    }
     return TRUE;
 }
 
 int GlView::expose_event_impl(GdkEventExpose * event)
 {
     if (event->count>0) return 0;
+    setupgl();
     drawgl();
     return TRUE;
 }
@@ -256,7 +382,60 @@ const std::string GlView::details() const
 void GlView::addLayer(Layer * layer)
 {
     std::list<Layer *>::iterator I = m_layers.begin();
-    for (int i = m_currentLayer; i > -1 && I != m_layers.end(); I++, i--) {}
+    for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
+    if (I != m_layers.end()) { ++I; }
     m_layers.insert(I, layer);
+    m_currentLayer = layer;
     m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
+}
+
+void GlView::raiseCurrentLayer()
+{
+    std::list<Layer *>::iterator I = m_layers.begin();
+    for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
+    if (I == m_layers.end()) { return; }
+    I = m_layers.erase(I);
+    if (I != m_layers.end()) { ++I; }
+    m_layers.insert(I, m_currentLayer);
+    m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
+}
+
+void GlView::lowerCurrentLayer()
+{
+    std::list<Layer *>::iterator I = m_layers.begin();
+    for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
+    if (I == m_layers.end()) { return; }
+    if (I == m_layers.begin()) { return; }
+    I = m_layers.erase(I);
+    m_layers.insert(--I, m_currentLayer);
+    m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
+}
+
+void GlView::setPickProjection() const
+{
+    if (m_projection == GlView::PERSP) {
+        if (width()>height()) {
+            GLfloat w = (GLfloat) width() / (GLfloat) height();
+            glFrustum( -w, w, -1.0f, 1.0f, 0.65f, 60.0f );
+        } else {
+            GLfloat h = (GLfloat) height() / (GLfloat) width();
+            glFrustum( -1.0f, 1.0f, -h, h, 0.65f, 60.0f );
+        }
+    } else {
+        float xsize = width() / 40.0f / 2.0f;
+        float ysize = height() / 40.0f / 2.0f;
+        glOrtho(-xsize, xsize, -ysize, ysize, -100000.0f, 100000.0f);
+    }
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glInitNames();
+    if (m_projection == GlView::PLAN) {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+        glScalef(m_scale, m_scale, m_scale);
+    } else {
+        glTranslatef(0.0f, 0.0f, -10.0f);
+        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+        glScalef(m_scale, m_scale, m_scale);
+    }
 }

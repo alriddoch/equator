@@ -18,7 +18,10 @@ class GlView : public Gtk::GLArea {
     Gtk::Menu * m_popup;
     std::list<Layer *> m_layers;
     float m_scale;
-    int m_currentLayer;
+    Layer * m_currentLayer;
+    int clickx,clicky;
+    int dragx,dragy;
+    int mousex,mousey;
 
     enum view { PLAN, ISO, PERSP } m_projection;
 
@@ -33,8 +36,15 @@ class GlView : public Gtk::GLArea {
     void setupgl();
     void drawgl();
 
+    void importFile();
+
+    void clickOn(int x, int y);
+    void clickOff(int x, int y);
+    void startDrag(int x, int y);
+    void endDrag(int x, int y);
+
     virtual void realize_impl();
-    // virtual gint motion_notify_event_impl(GdkEventMotion*); 
+    virtual gint motion_notify_event_impl(GdkEventMotion*); 
     virtual gint button_press_event_impl(GdkEventButton*); 
     virtual gint button_release_event_impl(GdkEventButton*); 
     virtual gint expose_event_impl(GdkEventExpose* expose);
@@ -52,12 +62,21 @@ class GlView : public Gtk::GLArea {
         return m_layers;
     }
 
-    const int getCurrentLayer() const {
+    const Layer * getCurrentLayer() const {
         return m_currentLayer;
+    }
+
+    void setCurrentLayer(Layer * l) {
+        m_currentLayer = l;
     }
 
     const std::string details() const;
     void addLayer(Layer *);
+
+    void raiseCurrentLayer();
+    void lowerCurrentLayer();
+
+    void setPickProjection() const;
 };
 
 #endif // EQUATOR_APP_GLVIEW_H

@@ -30,12 +30,13 @@ class LayerWindow : public Gtk::Window
 
     explicit LayerWindow(MainWindow &);
 
-    gint buttonEvent(GdkEventButton*);
-
     void setView(GlView * view);
     void addModel(ViewWindow * view);
+    void selectionMade(gint row, gint column, GdkEvent * event);
 
     void newLayerRequested();
+    void raiseLayer();
+    void lowerLayer();
 
 };
 

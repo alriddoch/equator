@@ -52,6 +52,7 @@ class Tile {
 
     bool load(const std::string & filename);
     void draw();
+    void select();
 
     bool loaded() const { return (tex_id != -1); }
     float pw() { return m_pw; }

@@ -7,6 +7,8 @@
 
 #include "Layer.h"
 
+#include <map>
+
 class CoalRegion;
 class CoalObject;
 class CoalDatabase;
@@ -18,14 +20,20 @@ namespace Gtk {
 class BladeMap : public Layer {
   private:
     CoalDatabase & m_database;
+    std::map<CoalRegion *,int> m_selection;
 
     void drawMapRegion(CoalRegion & map_region);
     void drawMapObject(CoalObject & map_object);
     void drawMap(CoalDatabase & map_base);
+    void selectMap(CoalDatabase & map_base,int,int,int,int);
     void load(Gtk::FileSelection *);
+    void cancel(Gtk::FileSelection *);
   public:
     explicit BladeMap(const GlView &);
+    void importFile();
     void draw();
+    void select(int x, int y);
+    void select(int x, int y, int w, int h);
 };
 
 #endif // EQUATOR_APP_BLADEMAP_H

@@ -25,10 +25,6 @@ ViewWindow::ViewWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     frame->set_border_width(4);
     frame->add(*m_glarea);
 
-    //Gtk::EventBox * ebox = manage( new Gtk::EventBox() );
-    //ebox->add(*frame);
-    //ebox->button_press_event.connect(slot(this, &ViewWindow::buttonEvent));
-
     add(*frame);
 
     m_popup = manage( new Gtk::Menu() );
@@ -40,12 +36,6 @@ ViewWindow::ViewWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_popup->append(*menu_item);
 
     show_all();
-}
-
-gint ViewWindow::buttonEvent(GdkEventButton*event)
-{
-    m_popup->popup(event->button,event->time);
-    return TRUE;
 }
 
 void ViewWindow::setTitle()

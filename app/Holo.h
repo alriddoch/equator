@@ -7,10 +7,20 @@
 
 #include "Layer.h"
 
+namespace Gtk {
+  class FileSelection;
+}
+
 class Holo : public Layer {
+  private:
+    void importFile() { }
+    void load(Gtk::FileSelection *) { }
+    void cancel(Gtk::FileSelection *) { }
   public:
     explicit Holo(const GlView &);
     void draw();
+    void select(int x, int y) { }
+    void select(int x, int y, int w, int h) { }
 };
 
 #endif // EQUATOR_APP_HOLO_H
