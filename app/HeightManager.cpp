@@ -36,11 +36,6 @@ void HeightManager::load(Gtk::FileSelection * fsel)
     m_model.m_terrain.setBasePoint(posx + 1, posy,     16.0);
     m_model.m_terrain.setBasePoint(posx,     posy + 1, 20.0);
     m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 40.0);
-    for(int i = posx; i < posx + 2; ++i) {
-        for(int j = posy; j < posy + 2; ++j) {
-            m_model.m_terrain.refresh(i, j);
-        }
-    }
     // m_model.m_heightData.load(fsel->get_filename(),posx,posy);
     // FIXME Handle error conditions from height loader
 
@@ -222,7 +217,11 @@ void HeightManager::draw(GlView & view)
         for (; J != col.end(); ++J) {
             glPushMatrix();
             glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
-            drawRegion(view, J->second);
+            Mercator::Segment * s = J->second;
+            if (!s->isValid()) {
+                s->populate();
+            }
+            drawRegion(view, s);
             glPopMatrix();
         }
     }
@@ -394,8 +393,8 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
             std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName);
             if (K != nameDict.end()) {
                 const GroundCoord & c = K->second;
-                m_selection.insert(m_model.m_terrain.getSegmentSafe(c.first,
-                                                                    c.second));
+                m_selection.insert(m_model.m_terrain.getSegment(c.first,
+                                                                c.second));
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
             }
@@ -497,7 +496,6 @@ void HeightManager::dragEnd(GlView & view, float x, float y, float z)
               << std::endl << std::flush;
     ref.height() += z; 
     m_model.m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, ref);
-    m_model.m_terrain.refresh(m_dragPoint.first, m_dragPoint.second);
 }
 
 void HeightManager::insert(const WFMath::Point<3> & curs)
@@ -508,5 +506,4 @@ void HeightManager::insert(const WFMath::Point<3> & curs)
               << " to " << curs.z()
               << std::endl << std::flush;
     m_model.m_terrain.setBasePoint(posx,     posy,     curs.z());
-    m_model.m_terrain.refresh(posx,     posy);
 }
