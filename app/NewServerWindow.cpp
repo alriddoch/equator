@@ -21,6 +21,9 @@
 #include <gtkmm/adjustment.h>
 #include <gtkmm/main.h>
 #include <gtkmm/statusbar.h>
+#include <gtkmm/alignment.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/stock.h>
 
 NewServerWindow::NewServerWindow(MainWindow & mw) :
                  Gtk::Window(Gtk::WINDOW_TOPLEVEL), m_mainWindow(mw),
@@ -34,15 +37,35 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
                  m_customPort(6767), m_portNum(6767),
                  m_server(NULL)
 {
+    set_border_width(6);
+
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
+    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 0);
+    vbox->pack_start(*(manage( new Gtk::HSeparator() )), Gtk::PACK_SHRINK, 6);
+    Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
+    Gtk::Button * b = manage( new Gtk::Button(Gtk::Stock::OK) );
+    b->signal_clicked().connect(slot(*this, &NewServerWindow::dismiss));
+    a->add(*b);
+    vbox->pack_start(*a, Gtk::PACK_SHRINK, 0);
+
+    add(*vbox);
+
+    vbox = manage( new Gtk::VBox() );
+    hbox->pack_start(*vbox, Gtk::PACK_SHRINK, 6);
+
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage(new Gtk::Label("Server:"))));
+    vbox->pack_start(*a, Gtk::PACK_SHRINK, 6);
+
+    hbox = manage( new Gtk::HBox() );
     hbox->pack_start(*(manage( new Gtk::Label("Hostname:") )), Gtk::AttachOptions(0), 2);
     m_hostEntry = manage( new Gtk::Entry() );
     m_hostEntry->set_text("localhost");
     m_hostEntry->set_max_length(60);
     hbox->pack_end(*m_hostEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 6);
 
     hbox = manage( new Gtk::HBox() );
     hbox->pack_start(*(manage( new Gtk::Label("Port:") )), Gtk::AttachOptions(0), 2);
@@ -58,11 +81,17 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     m_portSpin = manage( new Gtk::SpinButton(*adj, 1) );
     m_portSpin->set_sensitive(false);
     hbox->pack_end(*m_portSpin, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 6);
 
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     m_connectButton = manage( new Gtk::Button("Connect") );
     m_connectButton->signal_clicked().connect(slot(*this, &NewServerWindow::createConnection));
-    vbox->pack_start(*m_connectButton, Gtk::AttachOptions(0), 0);
+    a->add(*m_connectButton);
+    vbox->pack_start(*a, Gtk::AttachOptions(0), 0);
+
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage(new Gtk::Label("Account:"))));
+    vbox->pack_start(*a, Gtk::AttachOptions(0), 6);
 
     hbox = manage( new Gtk::HBox() );
     hbox->pack_start(*(manage( new Gtk::Label("Username:") )), Gtk::AttachOptions(0), 2);
@@ -116,15 +145,9 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     m_viewButton->set_sensitive(false);
     vbox->pack_start(*m_viewButton, Gtk::AttachOptions(0), 0);
 
-    Gtk::Button * b = manage( new Gtk::Button("Dismiss") );
-    b->signal_clicked().connect(slot(*this, &NewServerWindow::dismiss));
-    vbox->pack_start(*b, Gtk::AttachOptions(0), 0);
-
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Connection status");
     vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
-
-    add(*vbox);
 
     set_title("Connect to server");
     signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));

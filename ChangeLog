@@ -1,3 +1,8 @@
+2003-09-11  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/NewServerWindow.cpp: Ground work for applying some Human
+	  Interface Guidelines to the gui.
+
 2003-08-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/types.h: Get rid of hardcoded heighfield alignment
