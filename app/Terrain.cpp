@@ -303,7 +303,7 @@ void Terrain::draw(GlView & view)
     }
 }
 
-void Terrain::animate(GlView & view)
+bool Terrain::animate(GlView & view)
 #if 0
 {
     HeightData::Terrain::const_iterator I = m_model.m_heightData.begin();
@@ -334,13 +334,14 @@ void Terrain::animate(GlView & view)
         for (; J != col.end(); ++J) {
             glPushMatrix();
             glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
-            std::cout << "Animating segment at " << I->first << "," << J->first
-                      << std::endl << std::flush;
+            // std::cout << "Animating segment at " << I->first << "," << J->first
+                      // << std::endl << std::flush;
             // FIXME Actually do some animation maybe?
             drawRegion(view, *J->second, GroundCoord(I->first, J->first));
             glPopMatrix();
         }
     }
+    return false;
 }
 #endif
 

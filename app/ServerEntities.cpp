@@ -179,6 +179,14 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
 {
     glDepthFunc(GL_LEQUAL);
 
+    // if (phase != 0.f) {
+    std::cout << "phase " << phase << std::endl << std::flush;
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glScalef(phase, phase, phase);
+        glMatrixMode(GL_MODELVIEW);
+    // }
+
     GLfloat scale = 0.5f * view.getScale();
     GLfloat sx[] = { scale, scale, scale, 0 };
 
@@ -209,6 +217,13 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
     glDisable(GL_TEXTURE_1D);
 
     glDepthFunc(GL_LESS);
+
+    // if (phase != 0.f) {
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+    // }
+
 }
 
 void ServerEntities::orient(const WFMath::Quaternion & orientation)
@@ -387,6 +402,7 @@ bool ServerEntities::selectEntities(GlView & view,
                 if (I != m_nameDict.end()) {
                     m_selection = I->second;
                     m_selectionList.insert(I->second);
+                    view.startAnimation();
                     // m_selectionStack[I->second] = 0;
                 } else {
                     std::cout << "UNKNOWN NAME" << std::endl << std::flush;
@@ -780,10 +796,10 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     glTranslatef(pos.x(), pos.y(), pos.z());
 }
 
-void ServerEntities::animate(GlView & view)
+bool ServerEntities::animate(GlView & view)
 {
     if (m_selection == NULL) {
-        return;
+        return false;
     }
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
@@ -791,6 +807,7 @@ void ServerEntities::animate(GlView & view)
     draw3DSelectedBox(view, m_selection->getBBox(),
                       view.getAnimCount());
     glPopMatrix();
+    return true;
 }
 
 void ServerEntities::draw(GlView & view)

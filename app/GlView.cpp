@@ -214,6 +214,11 @@ void GlView::initgl()
 
     setupgl();
 
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnableClientState(GL_VERTEX_ARRAY);
+
     uint8_t ants[] = { 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0, 0x0,
                         0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
                         0xff, 0xff, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff };
@@ -240,9 +245,6 @@ void GlView::initgl()
 void GlView::setupgl()
 {
     if (make_current()) {
-        glClearColor(0.0, 0.0, 0.0, 0.0);
-        glEnable(GL_DEPTH_TEST);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glViewport(0, 0, (GLint)(get_width()), (GLint)(get_height()));
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -266,7 +268,6 @@ void GlView::setupgl()
             glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
         }
 
-        glEnableClientState(GL_VERTEX_ARRAY);
     }
 }
 
@@ -334,40 +335,6 @@ void GlView::drawgl()
                 (*I)->draw(*this);
             }
         }
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        if ((clickx != 0) && (m_dragType == GlView::SELECT)) {
-            glTranslatef(clickx, get_height() - clicky, 100.0f);
-            float x = mousex - clickx;
-            float y = clicky - mousey;
-            std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
-            const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
-                                          x, 0.f, 0.f,
-                                          x, y, 0.f,
-                                          0.f, y, 0.f,
-                                          0.f, 0.f, 0.f };
-
-            glVertexPointer(3, GL_FLOAT, 0, dvertices);
-            if (pretty) {
-                // Set The Blending Function For Translucency
-                glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-                glEnable(GL_BLEND);
-                glDisable(GL_DEPTH_TEST);
-                glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-                glDrawArrays(GL_LINE_STRIP, 0, 5);
-                glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-                glDrawArrays(GL_QUADS, 0, 4);
-                glDisable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glEnable(GL_DEPTH_TEST);
-            } else {
-                glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-                glDrawArrays(GL_LINE_STRIP, 0, 5);
-            }
-        }
         glFlush();
         if (m_frameStore != 0) {
             if ((m_frameStoreWidth != get_width()) ||
@@ -390,6 +357,8 @@ void GlView::drawgl()
                      GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
         glReadPixels(0, 0, get_width(), get_height(),
                      GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+
+        mouseEffects();
         swap_buffers();
     }
 }
@@ -401,41 +370,47 @@ bool GlView::animate()
         m_redrawRequired = false;
         return true;
     }
-    if (m_refreshRequired &&
-        (m_frameStoreWidth == get_width()) &&
-        (m_frameStoreHeight == get_height()) &&
-        (make_current())) {
-        glRasterPos2i(0,0);
-        glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                     GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
-        glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
-        std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
-        swap_buffers();
-        m_refreshRequired = false;
+    if (!m_refreshRequired ||
+        (m_frameStoreWidth != get_width()) ||
+        (m_frameStoreHeight != get_height()) ||
+        !make_current()) {
+        return true;
     }
-#if 0
+    m_refreshRequired = false;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glRasterPos2i(0,0);
+    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                 GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
+    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+    std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+
     m_animCount += 0.02f;
     if (m_animCount > 1.0f) {
         m_animCount = 0.0f;
     }
-    if (make_current()) {
-        setupgl();
-        origin();
-        // glClear( GL_COLOR_BUFFER_BIT );
-        // glAccum(GL_RETURN, 1.0f);
-        // cursor();
-        const std::list<Layer *> & layers = m_model.getLayers();
-        std::list<Layer *>::const_iterator I;
-        for(I = layers.begin(); I != layers.end(); I++) {
-            if ((*I)->isVisible()) {
-                (*I)->animate(*this);
+
+    setupgl();
+    origin();
+
+    const std::list<Layer *> & layers = m_model.getLayers();
+    std::list<Layer *>::const_iterator I;
+    for(I = layers.begin(); I != layers.end(); I++) {
+        if ((*I)->isVisible()) {
+            if ((*I)->animate(*this)) {
+                m_refreshRequired = true;
             }
         }
-        mouseEffects();
-        swap_buffers();
     }
-#endif
+    mouseEffects();
+
+    swap_buffers();
     return true;
 }
 
@@ -592,11 +567,12 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
 {
     mousex = lrint(event->x); mousey = lrint(event->y);
     if (clickx != 0) {
-        if (make_current()) {
+        startAnimation();
+        // if (make_current()) {
             // glAccum(GL_RETURN, 1.0f);
-            mouseEffects();
-            swap_buffers();
-        }
+            // mouseEffects();
+            // swap_buffers();
+        // }
     }
     return TRUE;
 }

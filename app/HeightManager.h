@@ -42,7 +42,7 @@ class HeightManager : public Layer {
     void importFile();
     void exportFile() { }
     void draw(GlView & view);
-    void animate(GlView & view);
+    bool animate(GlView & view);
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection() { }

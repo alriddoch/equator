@@ -52,7 +52,7 @@ class Terrain : public Layer {
     virtual void selectNone();
 
     virtual void draw(GlView & view);
-    virtual void animate(GlView & view);
+    virtual bool animate(GlView & view);
     virtual void select(GlView & view, int x, int y);
     virtual void select(GlView & view, int x, int y, int w, int h);
     virtual void pushSelection() { }

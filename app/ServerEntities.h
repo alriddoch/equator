@@ -109,7 +109,7 @@ class ServerEntities : public Layer {
     virtual void selectNone();
 
     void draw(GlView & view);
-    void animate(GlView & view);
+    bool animate(GlView & view);
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection();

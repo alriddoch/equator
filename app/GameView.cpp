@@ -152,9 +152,10 @@ void GameView::draw(GlView & view)
     glDepthFunc(GL_LESS);
 }
 
-void GameView::animate(GlView & view)
+bool GameView::animate(GlView & view)
 {
     // Nothing
+    return false;
 }
 
 void GameView::select(GlView & view, int x, int y)

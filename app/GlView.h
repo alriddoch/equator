@@ -207,6 +207,10 @@ class GlView : public Gtk::DrawingArea {
         m_redrawRequired = true;
     }
 
+    void startAnimation() {
+        m_refreshRequired = true;
+    }
+
     const std::string details() const;
 
     void setPickProjection(int nx, int ny, int fx, int fy);

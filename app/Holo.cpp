@@ -78,3 +78,8 @@ void Holo::draw(GlView & view)
     delete [] varray;
 
 }
+
+bool Holo::animate(GlView &)
+{
+    return false;
+}

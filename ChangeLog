@@ -1,3 +1,15 @@
+2004-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GameView.h, app/GameView.cpp, app/Holo.cpp, app/Holo.h,
+	  app/Layer.h, app/ServerEntities.h, app/Terrain.cpp, app/Terrain.h:
+	  Return value animate now flags whether animation is running.
+
+	* app/GlView.cpp, app/ServerEntities.cpp: Implement animation
+	  by restoring the whole window each frame from a back store.
+
+	* app/GlView.cpp: Remove duplicated code for drawing the dragbox
+	  selection.
+
 2004-01-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.h, app/GlView.cpp: Fix glReadPixels call to use RGBA

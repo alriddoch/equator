@@ -38,7 +38,7 @@ class GameView : public Layer {
     virtual void selectNone();
 
     virtual void draw(GlView & view);
-    virtual void animate(GlView & view);
+    virtual bool animate(GlView & view);
     virtual void select(GlView & view, int x, int y);
     virtual void select(GlView & view, int x, int y, int fx, int fy);
     virtual void pushSelection();
