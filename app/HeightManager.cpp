@@ -22,6 +22,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
+#include <math.h>
 
 void HeightManager::load(Gtk::FileSelection * fsel)
 {
@@ -85,21 +86,31 @@ void HeightManager::importFile()
 void HeightManager::selectRegion(Mercator::Segment * map)
 {
     int size = map->getSize();
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(size / 2.0f, size / 2.0f ,0.0f);
+    float vertices[size * 4 * 3 + 1];
+    vertices[0] = vertices[1] = size / 2.f;
+    vertices[2] = 0.f;
+
     for (int i = 0; i < size; ++i) {
-        glVertex3f(i, 0.0f, map->get(i, 0));
+        vertices[3 * i + 1] = i;
+        vertices[3 * i + 2] = 0.f;
+        vertices[3 * i + 3] = map->get(i, 0);
+
+        vertices[3 * (size + i) + 1] = size - 1;
+        vertices[3 * (size + i) + 2] = i;
+        vertices[3 * (size + i) + 3] = map->get(size - 1, i);
+
+        vertices[3 * (2 * size + i) + 1] = size - 1 - i;
+        vertices[3 * (2 * size + i) + 2] = size - 1;
+        vertices[3 * (2 * size + i) + 3] = map->get(size - 1 - i, size - 1);
+
+        vertices[3 * (3 * size + i) + 1] = 0.f;
+        vertices[3 * (3 * size + i) + 2] = size - 1 - i;
+        vertices[3 * (3 * size + i) + 3] = map->get(0.f, size - 1 -i);
     }
-    for (int i = 0; i < size; ++i) {
-        glVertex3f(size - 1, i, map->get(size - 1, i));
-    }
-    for (int i = size - 1; i >= 0; --i) {
-        glVertex3f(i, size - 1, map->get(i, size - 1));
-    }
-    for (int i = size - 1; i >= 0; --i) {
-        glVertex3f(0.0f, i, map->get(0, i));
-    }
-    glEnd();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, size * 4 + 1);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void HeightManager::outlineLineStrip(float * varray, unsigned int size,
@@ -471,8 +482,8 @@ void HeightManager::dragEnd(GlView & view, float x, float y, float z)
 
 void HeightManager::insert(const WFMath::Point<3> & curs)
 {
-    int posx = round(curs.x() / segSize);
-    int posy = round(curs.y() / segSize);
+    int posx = ::round(curs.x() / segSize);
+    int posy = ::round(curs.y() / segSize);
     std::cout << "Setting height at " << posx << "," << posy
               << " to " << curs.z()
               << std::endl << std::flush;

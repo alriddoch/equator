@@ -230,63 +230,103 @@ void Tile::draw()
     glBindTexture(GL_TEXTURE_2D, tex_id);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
-    glTexCoord2f(m_pw/2, 0); glVertex3f(0.0f, 0.0f, 0.0f);
-    glTexCoord2f(m_pw, m_ph/2); glVertex3f(tileSize, 0.0f, 0.0f);
-    glTexCoord2f(m_pw/2, m_ph); glVertex3f(tileSize, tileSize, 0.0f);
-    glTexCoord2f(0, m_ph/2); glVertex3f(0.0f, tileSize, 0.0f);
-    glEnd();
+    float texcoords[] = { m_pw / 2.f, 0.f,
+                          m_pw, m_ph / 2.f,
+                          m_pw / 2.f, m_ph,
+                          0, m_ph / 2.f };
+    float vertices[] = { 0.f, 0.f, 0.f,
+                         tileSize, 0.f, 0.f,
+                         tileSize, tileSize, 0.f,
+                         0.f, tileSize, 0.f };
+                        
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+    glDrawArrays(GL_QUADS, 0, 4);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+
     glDisable(GL_TEXTURE_2D);
 }
 
 void Tile::draw(const Mercator::Terrain & h, int x, int y)
 {
+    // FIXME vertex array version untested
     if (tex_id == -1) { return; }
     glBindTexture(GL_TEXTURE_2D, tex_id);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_TRIANGLE_STRIP);
     float dw = m_pw / (2 * tileSize);
     float dh = m_ph / (2 * tileSize);
-    for(int i = 0; i < tileSize; ++i) {
-         for(int j = 0; j <= tileSize; ++j) {
-            glTexCoord2d(m_pw/2 + dw * (i - j), dh * (i + j)); glVertex3f(i, j, h.get(x + i, y + j) / 32.0f);
-            glTexCoord2d(m_pw/2 + dw * (i - j + 1), dh * (i + j + 1)); glVertex3f(i + 1, j, h.get(x + i + 1, y + j) / 32.0f);
-         }
-         if (++i == tileSize) { break; }
-         for(int j = tileSize; j > -1; --j) {
-            glTexCoord2d(m_pw/2 + dw * (i - j + 1), dh * (i + j + 1)); glVertex3f(i + 1, j, h.get(x + i + 1, y + j) / 32.0f);
-            glTexCoord2d(m_pw/2 + dw * (i - j), dh * (i + j)); glVertex3f(i, j, h.get(x + i, y + j) / 32.0f);
-         }
+    int tile_size = tileSize + 1;
+    GLfloat vertices[(tile_size * tile_size) * 3],
+            texcoord[(tile_size * tile_size) * 3];
+    int tindex = -1;
+    int vindex = -1;
+    for(int j = 0; j < tile_size; ++j) {
+        for(int i = 0; i < tile_size; ++i) {
+            texcoord[++tindex] = m_pw/2 + dw * (i - j);
+            texcoord[++tindex] = dh * (i + j);
+            vertices[++vindex] = i;
+            vertices[++vindex] = j;
+            vertices[++vindex] = h.get(x + i, y + j);
+        }
     }
-    glEnd();
+    GLuint indices[(int)tileSize * tile_size * 4];
+    int iindex = -1;
+    for (int i = 0; i < tile_size - 1; ++i) {
+        for (int j = 0; j < tile_size; ++j) {
+            indices[++iindex] = j * tile_size + i;
+            indices[++iindex] = j * tile_size + i + 1;
+        }
+        if (++i >= tileSize) { break; }
+        for (int j = tileSize; j >= 0; --j) {
+            indices[++iindex] = j * tile_size + i + 1;
+            indices[++iindex] = j * tile_size + i;
+        }
+    }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, texcoord);
+    glDrawElements(GL_TRIANGLE_STRIP, ++iindex, GL_UNSIGNED_INT, indices);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
 }
 
 
 void Tile::outline(float offset)
 {
-    glBegin(GL_LINES);
-    glColor3f(0.0f, 0.0f, 0.5f);
-    glTexCoord1f(offset); glVertex3f(0.0f, 0.0f, 0.0f);
-    glTexCoord1f(offset + tileSize); glVertex3f(tileSize, 0.0f, 0.0f);
-    glTexCoord1f(offset + tileSize); glVertex3f(tileSize, 0.0f, 0.0f);
-    glTexCoord1f(offset); glVertex3f(tileSize, tileSize, 0.0f);
-    glTexCoord1f(offset); glVertex3f(tileSize, tileSize, 0.0f);
-    glTexCoord1f(offset + tileSize); glVertex3f(0.0f, tileSize, 0.0f);
-    glTexCoord1f(offset + tileSize); glVertex3f(0.0f, tileSize, 0.0f);
-    glTexCoord1f(offset); glVertex3f(0.0f, 0.0f, 0.0f);
-    glEnd();
+    GLfloat vertices[] = { 0.f, 0.f, 0.f,
+                           tileSize, 0.f, 0.f,
+                           tileSize, tileSize, 0.f,
+                           0.f, tileSize, 0.f,
+                           0.f, 0.f, 0.f };
 
+    GLfloat texcoords[] = { offset, offset + tileSize,
+                            offset, offset + tileSize,
+                            offset };
+    glColor3f(0.0f, 0.0f, 0.5f);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
+    glDrawArrays(GL_LINE_STRIP, 0, 5);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void Tile::select()
 {
+    GLfloat vertices[] = { 0.f, 0.f, 0.f,
+                           tileSize, 0.f, 0.f, 
+                           tileSize, tileSize, 0.f,
+                           0.f, tileSize, 0.f };
     if (tex_id == -1) { return; }
-    glBegin(GL_QUADS);
-    glTexCoord2f(m_pw/2, 0); glVertex3f(0.0f, 0.0f, 0.0f);
-    glTexCoord2f(m_pw, m_ph/2); glVertex3f(tileSize, 0.0f, 0.0f);
-    glTexCoord2f(m_pw/2, m_ph); glVertex3f(tileSize, tileSize, 0.0f);
-    glTexCoord2f(0, m_ph/2); glVertex3f(0.0f, tileSize, 0.0f);
-    glEnd();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glDrawArrays(GL_QUADS, 0, 4);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }

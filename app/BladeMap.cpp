@@ -58,26 +58,34 @@ void BladeMap::drawMapRegion(Coal::Landscape & map_region)
     Coal::RectShape * crs = dynamic_cast<Coal::RectShape *>(cs);
     if (crs != NULL) {
         if (tex_id == -1) {
-            glBegin(GL_QUADS);
             glColor3f(cg->bkgdcolor.red / 255.0f,
                       cg->bkgdcolor.green / 255.0f,
                       cg->bkgdcolor.blue / 255.0f);
         } else {
             glBindTexture(GL_TEXTURE_2D, tex_id);
             glEnable(GL_TEXTURE_2D);
-            glBegin(GL_QUADS);                // start drawing a polygon
             glColor3f(1.0, 0.0, 1.0);
         }
         glNormal3f(0, 0, 1);
-        glTexCoord2f(crs->getLeft() / 16.0f, crs->getTop() / 16.0f);
-        glVertex3f(crs->getLeft(), crs->getTop(), 0.0f);
-        glTexCoord2f(crs->getLeft() / 16.0f, crs->getBottom() / 16.0f);
-        glVertex3f(crs->getLeft(), crs->getBottom(), 0.0f);
-        glTexCoord2f(crs->getRight() / 16.0f, crs->getBottom() / 16.0f);
-        glVertex3f(crs->getRight(), crs->getBottom(), 0.0f);
-        glTexCoord2f(crs->getRight() / 16.0f, crs->getTop() / 16.0f);
-        glVertex3f(crs->getRight(), crs->getTop(), 0.0f);
-        glEnd();
+
+        const GLfloat texcoords[] = {
+                            crs->getLeft() / 16.0f, crs->getTop() / 16.0f,
+                            crs->getLeft() / 16.0f, crs->getBottom() / 16.0f,
+                            crs->getRight() / 16.0f, crs->getBottom() / 16.0f,
+                            crs->getRight() / 16.0f, crs->getTop() / 16.0f };
+        const GLfloat vertices[] = {
+                            crs->getLeft(), crs->getTop(), 0.0f,
+                            crs->getLeft(), crs->getBottom(), 0.0f,
+                            crs->getRight(), crs->getBottom(), 0.0f,
+                            crs->getRight(), crs->getTop(), 0.0f };
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glTexCoordPointer(3, GL_FLOAT, 0, texcoords);
+        glDrawArrays(GL_QUADS, 0, 4);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+
         if (tex_id != -1) {
             glDisable(GL_TEXTURE_2D);
         }

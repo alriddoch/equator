@@ -1,3 +1,12 @@
+Implement the world size.
+
+Implement terrain heightmaps as vertex array.
+
+Parameterise the terrain heightmap code so it is no longer locked to 200x200.
+
+Vision shift: Aim to create a useful tool for game developers generally.
+
+Sort out the ui bugs. Think about how we should handle the terrain.
 Re-work rendering options so that they work per-layer. This also applies to visibility
 of layers, and probably layer order should be removed.
 

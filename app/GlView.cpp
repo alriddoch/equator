@@ -512,10 +512,13 @@ void GlView::drawgl()
         glTranslatef(cx, cy, cz);
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, m_antTexture);
-        glBegin(GL_LINES);
-        glTexCoord1f(0.0f); glVertex3f(0.0f,0.0f,0.0f);
-        glTexCoord1f(cz); glVertex3f(0.0f,0.0f,-cz);
-        glEnd();
+        const GLfloat vertices[] = { 0.f, 0.f, 0.f, 0.f, 0.f, -cz };
+        const GLfloat texcoords[] = { 0.f, cz };
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
+        glDrawArrays(GL_LINES, 0, 2);
         glDisable(GL_TEXTURE_1D);
         face();
         cursor();
@@ -539,46 +542,31 @@ void GlView::drawgl()
             float x = mousex - clickx;
             float y = clicky - mousey;
             std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
+            const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
+                                          x, 0.f, 0.f,
+                                          x, y, 0.f,
+                                          0.f, y, 0.f,
+                                          0.f, 0.f, 0.f };
+
+            glVertexPointer(3, GL_FLOAT, 0, dvertices);
             if (pretty) {
                 glEnable(GL_BLEND);
                 glDisable(GL_DEPTH_TEST);
-                glBegin(GL_LINES);
                 glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glVertex3f(x, 0.0f, 0.0f);
-                glVertex3f(x, 0.0f, 0.0f);
-                glVertex3f(x, y, 0.0f);
-                glVertex3f(x, y, 0.0f);
-                glVertex3f(0.0f, y, 0.0f);
-                glVertex3f(0.0f, y, 0.0f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glEnd();
-                glBegin(GL_QUADS);
+                glDrawArrays(GL_LINE_STRIP, 0, 5);
                 glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glVertex3f(x, 0.0f, 0.0f);
-                glVertex3f(x, y, 0.0f);
-                glVertex3f(0.0f, y, 0.0f);
-                glEnd();
+                glDrawArrays(GL_QUADS, 0, 4);
                 glDisable(GL_BLEND);
                 glEnable(GL_DEPTH_TEST);
             } else {
-                glBegin(GL_LINES);
                 glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glVertex3f(x, 0.0f, 0.0f);
-                glVertex3f(x, 0.0f, 0.0f);
-                glVertex3f(x, y, 0.0f);
-                glVertex3f(x, y, 0.0f);
-                glVertex3f(0.0f, y, 0.0f);
-                glVertex3f(0.0f, y, 0.0f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glEnd();
+                glDrawArrays(GL_LINE_STRIP, 0, 5);
             }
         }
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glFlush();
         swap_buffers();
-        // glAccum(GL_LOAD, 1.0f);
     }
 }
 
@@ -784,42 +772,28 @@ void GlView::mouseEffects()
         float x = mousex - clickx;
         float y = clicky - mousey;
         std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
+        const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
+                                      x, 0.f, 0.f,
+                                      x, y, 0.f,
+                                      0.f, y, 0.f,
+                                      0.f, 0.f, 0.f };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, dvertices);
         if (pretty) {
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
-            glBegin(GL_LINES);
             glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(x, 0.0f, 0.0f);
-            glVertex3f(x, 0.0f, 0.0f);
-            glVertex3f(x, y, 0.0f);
-            glVertex3f(x, y, 0.0f);
-            glVertex3f(0.0f, y, 0.0f);
-            glVertex3f(0.0f, y, 0.0f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glEnd();
-            glBegin(GL_QUADS);
+            glDrawArrays(GL_LINE_STRIP, 0, 5);
             glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(x, 0.0f, 0.0f);
-            glVertex3f(x, y, 0.0f);
-            glVertex3f(0.0f, y, 0.0f);
-            glEnd();
+            glDrawArrays(GL_QUADS, 0, 4);
             glDisable(GL_BLEND);
             glEnable(GL_DEPTH_TEST);
         } else {
-            glBegin(GL_LINES);
             glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(x, 0.0f, 0.0f);
-            glVertex3f(x, 0.0f, 0.0f);
-            glVertex3f(x, y, 0.0f);
-            glVertex3f(x, y, 0.0f);
-            glVertex3f(0.0f, y, 0.0f);
-            glVertex3f(0.0f, y, 0.0f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glEnd();
+            glDrawArrays(GL_LINE_STRIP, 0, 5);
         }
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
 }
 

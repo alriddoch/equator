@@ -66,6 +66,32 @@ PKG_CHECK_MODULES(GTK, gtkglextmm-1.0 ,
         AC_MSG_ERROR(Couldn't find GTK libs.)
     ])
 
+AC_MSG_CHECKING([for round in libm])
+AC_TRY_COMPILE([
+  #include <cmath>
+],[
+  round(0.1);
+],[
+  AC_MSG_RESULT(yes)
+],[
+    AC_MSG_RESULT(no)
+    AC_MSG_CHECKING([for round in libm with _ISOC99_SOURCE])
+
+    CXXFLAGS="$CXXFLAGS -D_ISOC99_SOURCE"
+
+    AC_TRY_COMPILE([
+      #include <math.h>
+    ],[
+      round(0.1);
+    ],[
+      AC_MSG_RESULT(yes)
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+])
+
+
 dnl Generate files
 AC_OUTPUT([
 	Makefile

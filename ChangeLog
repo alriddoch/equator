@@ -1,3 +1,10 @@
+2003-04-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/GlView.cpp, app/HeightManager.cpp,
+	  app/Holo.cpp, app/ServerEntities.cpp, app/Texture.cpp:
+	  Re-write all drawing code so it uses vertex arrays
+	  instead of discrete vertex calls.
+
 2003-04-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp, app/ServerEntities.h: Add code to hook up to

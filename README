@@ -5,24 +5,19 @@ Equator build notes
 Required libraries:
 
 	Atlas-C++ v0.4.4
-	coal 0.2.4
-	SigC++ v1.0.2
+	coal 0.3.x
+	SigC++ v1.2.x
 	SDL v1.2.
 	SDL Image v1.2
-	Gtk v1.2
-	Gtk-- v1.1.7
-	GtkGLArea v1.2
-	GtkGLArea-- v1.1
-	libXML v1.8
-
-Optional libraries:
-
-	GIMP v1.2
-	GIMP PlugIn v1.2
+	Gtk v2.x
+	Gtkmm v2.0.x
+	GtkGLExt v0.7
+	GtkGLExtmm v0.7
+	libXML v2
 
 created by bear
 24 April 2002
 <bear@code-bear.dyndns.org>
 update by Al Riddoch
-25th April 2002
+28th March 2003
 <alriddoch@zepler.org>
