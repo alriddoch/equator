@@ -59,14 +59,14 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
-    Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
-    dialog_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(*this, &MainWindow::openLayers)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(*this, &MainWindow::inheritance_dialog)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(*this, &MainWindow::server_dialog)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(*this, &MainWindow::palette)));
+    Gtk::Menu_Helpers::MenuList& window_sub = menu_sub->items();
+    window_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(*this, &MainWindow::layer_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(*this, &MainWindow::inheritance_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(*this, &MainWindow::server_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(*this, &MainWindow::palette_window)));
 
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Windows", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::AccelKey('q',Gdk::CONTROL_MASK), slot(*this, &MainWindow::menu_quit)));
 
@@ -225,17 +225,17 @@ void MainWindow::menu_quit()
     Gtk::Main::quit();
 }
 
-void MainWindow::inheritance_dialog()
+void MainWindow::inheritance_window()
 {
     m_inheritancewindow.show_all();
 }
 
-void MainWindow::server_dialog()
+void MainWindow::server_window()
 {
     m_serverwindow.show_all();
 }
 
-void MainWindow::palette()
+void MainWindow::palette_window()
 {
     m_palettewindow.show_all();
 }
@@ -245,7 +245,7 @@ void MainWindow::new_server_dialog()
     m_newServerwindow.show_all();
 }
 
-void MainWindow::openLayers()
+void MainWindow::layer_window()
 {
     m_layerwindow.show_all();
 }

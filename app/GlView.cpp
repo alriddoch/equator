@@ -260,7 +260,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
     layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(m_mainWindow, &MainWindow::openLayers)));
+    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(m_mainWindow, &MainWindow::layer_window)));
 
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& current_layer_popup = menu_sub_sub->items();

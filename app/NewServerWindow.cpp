@@ -37,7 +37,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
                  m_viewButton(0), m_status(0),
                  m_customPort(6767), m_portNum(6767), m_server(0)
 {
-    add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
     signal_response().connect(slot(*this, &NewServerWindow::dismiss));
 
     Gtk::VBox * vbox = get_vbox();
@@ -190,9 +190,10 @@ void NewServerWindow::setSelectedCharacter(std::string charId)
     std::cout << charId << std::endl << std::flush;
     Eris::CharacterList chars = m_server->m_player->getCharacters();
     Eris::CharacterList::iterator I = chars.begin();
+    std::cout << chars.size() << " characters" << std::endl << std::flush;
     for(; I != chars.end(); ++I) {
         if (charId == I->getId()) {
-            std::cout << "GOT IT" << std::endl << std::flush;
+            std::cout << "GOT IT " << charId << " " << I->getId() << std::endl << std::flush;
             m_avatarNameEntry->set_text(I->getName());
             m_avatarTypeEntry->set_text(I->getParents().front().asString());
         }

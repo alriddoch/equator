@@ -1,5 +1,13 @@
 2003-09-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/NewServerWindow.cpp: More debugging output.
+
+	* app/MainWindow.h, app/MainWindow.cpp, app/GlView.cpp:
+	  Change some references to dialog to be window, as the widgets
+	  in question are windows.
+
+2003-09-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/Server.cpp, app/Server.h: Add new function for taking
 	  existing character.
 

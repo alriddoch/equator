@@ -85,11 +85,11 @@ class MainWindow : public Gtk::Window
     Model & newModel();
     void newView(Model *);
     void menu_quit();
-    void inheritance_dialog();
-    void server_dialog();
-    void palette();
+    void inheritance_window();
+    void server_window();
+    void palette_window();
     void new_server_dialog();
-    void openLayers();
+    void layer_window();
     void toolSelect(toolType);
     void modeSelect(toolMode);
     void setCurrentModel(Model *);
