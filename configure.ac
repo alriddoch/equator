@@ -122,22 +122,7 @@ if test $cross_compiling == no; then
     AC_MSG_ERROR(Couldn't find GLU)
 ])
 
-  AC_CHECK_LIB(cal3d,main, [
-    EQUATOR_LIBS="$EQUATOR_LIBS -lcal3d"
-  ], [
-    AC_MSG_ERROR(Couldn't find Cal3D. Please goto http://sourceforge.net/projects/cal3d/)
-])
-
  else
-   AC_CHECK_HEADER(cal3d/cal3d.h,
-       [found_cal3d=yes break],
-       [found_cal3d=no])
-
-   if test $found_cal3d == yes; then
-       EQUATOR_LIBS="$EQUATOR_LIBS -lcal3d"
-   else
-       AC_MSG_ERROR(Error could not find Cal3D)
-   fi
    AC_CHECK_HEADER(GL/gl.h,
        [found_gl=yes break],
        [found_gl=no])
@@ -166,12 +151,21 @@ PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.3 >= 1.3.2 varconf-1.0 sage ,
         EQUATOR_LIBS="$EQUATOR_LIBS $WF_LIBS"
     ],
     [
-        AC_MSG_ERROR(Couldn't find WF libs.)
+        AC_MSG_ERROR(Couldn't find WorldForge libs.)
     ])
 
 AM_PATH_LIB3DS(1.2.0, , AC_MSG_ERROR(Couldn't find lib3ds))
 CPPFLAGS="$CPPFLAGS $LIB3DS_CFLAGS"
 EQUATOR_LIBS="$EQUATOR_LIBS $LIB3DS_LIBS"
+
+PKG_CHECK_MODULES(CAL3D, cal3d,
+    [
+        CPPFLAGS="$CPPFLAGS $CAL3D_CFLAGS"
+        EQUATOR_LIBS="$EQUATOR_LIBS $CAL3D_LIBS"
+    ],
+    [
+        AC_MSG_ERROR(Could not find cal3d library)
+    ])
 
 dnl Versions required
 
