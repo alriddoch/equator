@@ -1,0 +1,222 @@
+? reparent.diff
+Index: TODO
+===================================================================
+RCS file: /home/cvspsrv/worldforge/forge/clients/equator/TODO,v
+retrieving revision 1.25
+diff -u -d -r1.25 TODO
+--- TODO	28 Sep 2003 23:15:05 -0000	1.25
++++ TODO	17 Dec 2003 01:08:57 -0000
+@@ -1,3 +1,7 @@
++Fix "Select Avatar" and "Create Avatar" buttons so that only one is
++sensitive if no avatars can be selected. Avatar selector could also probably
++do with being insensitive if its empty.
++
+ Add option to control camera using joystick.
+ 
+ Interface thoughts - left button should be proactive, so middle button
+Index: app/InheritanceWindow.cpp
+===================================================================
+RCS file: /home/cvspsrv/worldforge/forge/clients/equator/app/InheritanceWindow.cpp,v
+retrieving revision 1.8
+diff -u -d -r1.8 InheritanceWindow.cpp
+--- app/InheritanceWindow.cpp	12 Aug 2003 00:07:14 -0000	1.8
++++ app/InheritanceWindow.cpp	17 Dec 2003 01:08:57 -0000
+@@ -27,7 +27,7 @@
+                                      m_mainWindow(mw)
+ {
+     // destroy.connect(slot(this, &InheritanceWindow::destroy_handler));
+-    Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
++    m_vbox = manage( new Gtk::VBox(false, 2) );
+ 
+     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
+ 
+@@ -36,7 +36,7 @@
+     tophbox->pack_start(*m_connectionLabel, true, false, 2);
+     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
+    
+-    vbox->pack_start(*tophbox, false, false, 2);
++    m_vbox->pack_start(*tophbox, false, false, 2);
+ 
+     m_columns = new Gtk::TreeModelColumnRecord();
+     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+@@ -60,7 +60,7 @@
+     scrolled_window->add(*m_treeView);
+     // scrolled_window->add(*m_classTree);
+ 
+-    vbox->pack_start(*scrolled_window, true, true, 2);
++    m_vbox->pack_start(*scrolled_window, true, true, 2);
+ 
+     static const gchar *titles[] = { "Name", "Attribute", NULL };
+     Atlas::Message::Element::MapType test;
+@@ -74,24 +74,29 @@
+     // m_attributeTree->set_column_width (0, 100);
+     // m_attributeTree->set_column_width (1, 100);
+ 
+-    vbox->pack_start(*manage(new Gtk::HSeparator()), false, false, 0);
++    m_vbox->pack_start(*manage(new Gtk::HSeparator()), false, false, 0);
+ 
+     scrolled_window = manage(new Gtk::ScrolledWindow());
+     scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+     scrolled_window->add(*m_attributeTree);
+ 
+-    vbox->pack_start(*scrolled_window, true, true, 2);
++    m_vbox->pack_start(*scrolled_window, true, true, 2);
+ 
+     Gtk::HBox * bothbox = manage( new Gtk::HBox() );
+     //Gtk::Button * b = manage( new Gtk::Button("New...") );
+     //b->clicked.connect(slot(this, &InheritanceWindow::newLayer));
+     //bothbox->pack_start(*b, true, true, 0);
+ 
+-    vbox->pack_end(*bothbox, false, true, 2);
++    m_vbox->pack_end(*bothbox, false, true, 2);
+ 
+-    add(*vbox);
++    add(*m_vbox);
+     set_title("Inheritance");
+ 
+     // show_all();
+     signal_delete_event().connect(slot(*this, &InheritanceWindow::deleteEvent));
+ }
++
++void InheritanceWindow::takeThat(Gtk::Widget & w)
++{
++    m_vbox->pack_end(w);
++}
+Index: app/InheritanceWindow.h
+===================================================================
+RCS file: /home/cvspsrv/worldforge/forge/clients/equator/app/InheritanceWindow.h,v
+retrieving revision 1.5
+diff -u -d -r1.5 InheritanceWindow.h
+--- app/InheritanceWindow.h	6 Sep 2002 10:16:38 -0000	1.5
++++ app/InheritanceWindow.h	17 Dec 2003 01:08:57 -0000
+@@ -11,6 +11,7 @@
+ class AtlasMapWidget;
+ 
+ namespace Gtk {
++   class VBox;
+    class TreeStore;
+    template <class T> class TreeModelColumn;
+    class TreeModelColumnRecord;
+@@ -20,6 +21,7 @@
+ class InheritanceWindow : public Gtk::Window
+ {
+   private:
++    Gtk::VBox * m_vbox;
+     Gtk::Label * m_connectionLabel;
+     Glib::RefPtr<Gtk::TreeStore> m_treeModel;
+     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+@@ -40,6 +42,8 @@
+ 
+     gint buttonEvent(GdkEventButton*);
+ 
++    void takeThat(Gtk::Widget & w);
++
+ };
+ 
+ #endif // EQUATOR_APP_INHERITANCEWINDOW_H
+Index: app/ServerWindow.cpp
+===================================================================
+RCS file: /home/cvspsrv/worldforge/forge/clients/equator/app/ServerWindow.cpp,v
+retrieving revision 1.10
+diff -u -d -r1.10 ServerWindow.cpp
+--- app/ServerWindow.cpp	6 Sep 2002 10:16:38 -0000	1.10
++++ app/ServerWindow.cpp	17 Dec 2003 01:08:58 -0000
+@@ -4,6 +4,8 @@
+ 
+ #include "ServerWindow.h"
+ #include "ViewWindow.h"
++#include "InheritanceWindow.h"
++#include "MainWindow.h"
+ #include "GlView.h"
+ #include "Layer.h"
+ 
+@@ -21,7 +23,7 @@
+                                               m_mainWindow(mw)
+ {
+     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
+-    Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
++    m_vbox = manage( new Gtk::VBox(false, 2) );
+ 
+     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
+ 
+@@ -30,17 +32,49 @@
+     tophbox->pack_start(*m_serverMenu, Gtk::EXPAND | Gtk::FILL, 2);
+     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), Gtk::AttachOptions(0), 2);
+    
+-    vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
++    m_vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
++    Gtk::Button * b = manage( new Gtk::Button("Foo") );
++    Gtk::VBox * bodyvbox = manage( new Gtk::VBox(false, 2) );
++    b->signal_clicked().connect(SigC::bind<Gtk::Widget *>(slot(*this, &ServerWindow::giveAway), bodyvbox));
++    m_vbox->pack_start(*b, Gtk::PACK_SHRINK);
+ 
+-    add(*vbox);
++    bodyvbox->pack_start(*(manage( new Gtk::Button("Foo") ) ) );
++    bodyvbox->pack_start(*(manage( new Gtk::Button("Foo") ) ) );
++    bodyvbox->pack_start(*(manage( new Gtk::Button("Foo") ) ) );
++
++    m_vbox->pack_start(*bodyvbox);
++
++    m_passable = bodyvbox;
++
++    add(*m_vbox);
+     set_title("Servers");
+ 
+-    set_sensitive(false);
++    // set_sensitive(false);
+ 
+     // show_all();
+     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
+ }
+ 
++void ServerWindow::giveAway(Gtk::Widget * w)
++{
++    assert(w != 0);
++
++    if (m_passable != 0) {
++        m_passable->reference();
++        m_vbox->remove(*w);
++        m_mainWindow.m_inheritancewindow.takeThat(*w);
++        m_passable->unreference();
++        m_passable = 0;
++    }
++    // if (w->is_visible()) {
++        // std::cout << "Was visible" << std::endl << std::flush;
++        // w->hide();
++    // } else {
++        // std::cout << "Wasn't visible" << std::endl << std::flush;
++        // w->show();
++    // }
++}
++
+ void ServerWindow::newServer(Server * server)
+ {
+     Gtk::Menu * menu = m_serverMenu->get_menu();
+Index: app/ServerWindow.h
+===================================================================
+RCS file: /home/cvspsrv/worldforge/forge/clients/equator/app/ServerWindow.h,v
+retrieving revision 1.6
+diff -u -d -r1.6 ServerWindow.h
+--- app/ServerWindow.h	6 Sep 2002 10:16:38 -0000	1.6
++++ app/ServerWindow.h	17 Dec 2003 01:08:58 -0000
+@@ -12,15 +12,20 @@
+ class NewServerWindow;
+ 
+ namespace Gtk {
++  class VBox;
+   class OptionMenu;
++  class Widget;
+ };
+ 
+ class ServerWindow : public Gtk::Window
+ {
+   private:
++    Gtk::VBox * m_vbox;
+     Gtk::OptionMenu * m_serverMenu;
++    Gtk::Widget * m_passable;
+     Server * m_currentServer;
+ 
++    void giveAway(Gtk::Widget * w);
+   public:
+     MainWindow & m_mainWindow;
+ 

@@ -1,3 +1,7 @@
+Fix "Select Avatar" and "Create Avatar" buttons so that only one is
+sensitive if no avatars can be selected. Avatar selector could also probably
+do with being insensitive if its empty.
+
 Add option to control camera using joystick.
 
 Interface thoughts - left button should be proactive, so middle button
