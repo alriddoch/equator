@@ -1,3 +1,9 @@
+2004-01-29  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/ServerEntities.cpp: Fix animation of selection bounding box.
+
+	* app/GlView.cpp: Experiment with depth restoring.
+
 2004-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GameView.h, app/GameView.cpp, app/Holo.cpp, app/Holo.h,

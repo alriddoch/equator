@@ -387,9 +387,10 @@ bool GlView::animate()
     glRasterPos2i(0,0);
     glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
                  GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
-    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+    // glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                 // GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
     std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+    // glClear(GL_DEPTH_BUFFER_BIT);
 
     m_animCount += 0.02f;
     if (m_animCount > 1.0f) {
@@ -408,6 +409,7 @@ bool GlView::animate()
             }
         }
     }
+
     mouseEffects();
 
     swap_buffers();

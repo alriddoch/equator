@@ -183,7 +183,7 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
     std::cout << "phase " << phase << std::endl << std::flush;
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
-        glScalef(phase, phase, phase);
+        glTranslatef(phase, phase, phase);
         glMatrixMode(GL_MODELVIEW);
     // }
 
@@ -211,7 +211,6 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
                                         3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_1D);
@@ -794,6 +793,7 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     moveTo(cont, world);
     PosType pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
+    orient(ent->getOrientation());
 }
 
 bool ServerEntities::animate(GlView & view)
@@ -803,7 +803,7 @@ bool ServerEntities::animate(GlView & view)
     }
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
-    moveTo(m_selection->getContainer(), root);
+    moveTo(m_selection, root);
     draw3DSelectedBox(view, m_selection->getBBox(),
                       view.getAnimCount());
     glPopMatrix();
