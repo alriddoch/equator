@@ -106,15 +106,17 @@ AM_PATH_SKSTREAM(0.2.0,
     [
 	dnl CXXFLAGS="$CXXFLAGS $SKSTREAM_CFLAGS"
 	LIBS="$LIBS $SKSTREAM_LIBS"
-    ], 
-    AC_MSG_ERROR(Couldn't find skstream))
+    ])
+dnl    ], 
+dnl    AC_MSG_ERROR(Couldn't find skstream))
 	
 AM_PATH_ERIS(0.9.0,
     [
 	CXXFLAGS="$CXXFLAGS $ERIS_CFLAGS"
 	LIBS="$LIBS $ERIS_LIBS"
-    ],
-    AC_MSG_ERROR(Couldn't find eris))
+    ])
+dnl    ],
+dnl    AC_MSG_ERROR(Couldn't find eris))
 
 dnl AC_CHECK_LIB(efence,main)
 dnl AC_CHECK_LIB(cyphesis,main)

@@ -48,9 +48,9 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     m_portChoice = manage( new Gtk::OptionMenu() );
     Gtk::Menu * portMenu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(this, &NewServerWindow::setPort), 6767)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(this, &NewServerWindow::setPort), 6768)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(this, &NewServerWindow::setCustomPort)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6767)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6768)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCustomPort)));
     m_portChoice->set_menu(portMenu);
     hbox->pack_start(*m_portChoice, false, false, 2);
     Gtk::Adjustment * adj = manage( new Gtk::Adjustment (6767.0, 1.0, 32768.0) );
@@ -60,7 +60,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     vbox->pack_start(*hbox, false, false, 0);
 
     m_connectButton = manage( new Gtk::Button("Connect") );
-    m_connectButton->clicked.connect(slot(this, &NewServerWindow::createConnection));
+    m_connectButton->clicked.connect(slot(*this, &NewServerWindow::createConnection));
     vbox->pack_start(*m_connectButton, false, false, 0);
 
     hbox = manage( new Gtk::HBox() );
@@ -78,11 +78,11 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
 
     hbox = manage( new Gtk::HBox() );
     m_loginButton = manage( new Gtk::Button("Login") );
-    m_loginButton->clicked.connect(slot(this, &NewServerWindow::loginAccount));
+    m_loginButton->clicked.connect(slot(*this, &NewServerWindow::loginAccount));
     m_loginButton->set_sensitive(false);
     hbox->pack_start(*m_loginButton, true, true, 0);
     m_createButton = manage( new Gtk::Button("Create") );
-    m_createButton->clicked.connect(slot(this, &NewServerWindow::createAccount));
+    m_createButton->clicked.connect(slot(*this, &NewServerWindow::createAccount));
     m_createButton->set_sensitive(false);
     hbox->pack_start(*m_createButton, true, true, 0);
     vbox->pack_start(*hbox, false, false, 0);
@@ -102,17 +102,17 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     vbox->pack_start(*hbox, false, false, 0);
 
     m_avatarButton = manage( new Gtk::Button("Create Avatar") );
-    m_avatarButton->clicked.connect(slot(this, &NewServerWindow::createAvatar));
+    m_avatarButton->clicked.connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
     vbox->pack_start(*m_avatarButton, false, false, 0);
 
     m_viewButton = manage( new Gtk::Button("View") );
-    m_viewButton->clicked.connect(slot(this, &NewServerWindow::createView));
+    m_viewButton->clicked.connect(slot(*this, &NewServerWindow::createView));
     m_viewButton->set_sensitive(false);
     vbox->pack_start(*m_viewButton, false, false, 0);
 
     Gtk::Button * b = manage( new Gtk::Button("Dismiss") );
-    b->clicked.connect(slot(this, &NewServerWindow::dismiss));
+    b->clicked.connect(slot(*this, &NewServerWindow::dismiss));
     vbox->pack_start(*b, false, false, 0);
 
     m_status = manage( new Gtk::Statusbar() );
@@ -152,8 +152,8 @@ void NewServerWindow::createConnection()
 
     m_server = new Server();
 
-    m_failure = m_server->connection.Failure.connect(SigC::slot(this, &NewServerWindow::failure));
-    m_connected = m_server->connection.Connected.connect(SigC::slot(this, &NewServerWindow::connected));
+    m_failure = m_server->connection.Failure.connect(SigC::slot(*this, &NewServerWindow::failure));
+    m_connected = m_server->connection.Connected.connect(SigC::slot(*this, &NewServerWindow::connected));
 
     //std::cout << m_hostEntry->get_text() << ": " << m_portNum
               //<< std::endl << std::flush;
@@ -173,7 +173,7 @@ void NewServerWindow::loginAccount()
     m_status->push(m_statusContext, "Logging in");
 
     m_server->login(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAccount()
@@ -184,7 +184,7 @@ void NewServerWindow::createAccount()
     m_status->push(m_statusContext, "Creating account");
 
     m_server->createAccount(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAvatar()
@@ -196,12 +196,12 @@ void NewServerWindow::createAvatar()
 
     m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
 
-    m_worldEnter = m_server->world->Entered.connect(SigC::slot(this,&NewServerWindow::worldEnter));
+    m_worldEnter = m_server->world->Entered.connect(SigC::slot(*this,&NewServerWindow::worldEnter));
 }
 
 void NewServerWindow::createView()
 {
-    SigC::Connection created = m_mainWindow.modelAdded.connect(slot(this, &NewServerWindow::viewCreated));
+    SigC::Connection created = m_mainWindow.modelAdded.connect(slot(*this, &NewServerWindow::viewCreated));
     m_mainWindow.newModel();
     created.disconnect();
     // FIXME Create us a view

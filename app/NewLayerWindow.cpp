@@ -28,7 +28,7 @@ class FactoryItem : public Gtk::ListItem {
     }
 };
 
-NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
+NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
 {
     m_list = manage( new Gtk::List() );
 
@@ -54,17 +54,17 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     // scrolled_window->add(*m_list);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
-    vbox->pack_start(*scrolled_window, true, true, 2);
+    vbox->pack_start(*scrolled_window, Gtk::EXPAND | Gtk::FILL, 2);
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
     Gtk::Button * b = manage( new Gtk::Button("Okay") );
-    b->clicked.connect(slot(this, &NewLayerWindow::okay));
-    hbox->pack_start(*b, true, true, 2);
+    b->clicked.connect(slot(*this, &NewLayerWindow::okay));
+    hbox->pack_start(*b, Gtk::EXPAND | Gtk::FILL, 2);
     b = manage( new Gtk::Button("Cancel") );
-    b->clicked.connect(slot(this, &NewLayerWindow::cancel));
-    hbox->pack_start(*b, true, true, 2);
+    b->clicked.connect(slot(*this, &NewLayerWindow::cancel));
+    hbox->pack_start(*b, Gtk::EXPAND | Gtk::FILL, 2);
 
-    vbox->pack_start(*hbox, false, false, 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 2);
 
     add(*vbox);
 }

@@ -16,13 +16,21 @@ class Model;
 namespace Gtk {
    class CList;
    class OptionMenu;
-   class Pixmap;
+   class ListStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+   class TreeView;
 }
 
 class LayerWindow : public Gtk::Window
 {
   private:
-    Gtk::CList * m_clist;
+    Glib::RefPtr<Gtk::ListStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > * m_visColumn;
+    Gtk::TreeModelColumn<Glib::ustring> * m_typeColumn;
+    Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
+    Gtk::TreeView * m_treeView;
     Gtk::OptionMenu * m_modelMenu;
     GdkPixmap * m_eye;
     GdkBitmap * m_eyemask;
