@@ -95,12 +95,31 @@ dnl LDFLAGS="$LDFLAGS $SIGC_LIBS"
 AC_LANG_CPLUSPLUS
 AC_REQUIRE_CPP
 
-AC_CHECK_LIB(coal,main)
-AC_CHECK_LIB(coalblade,main)
-AC_CHECK_LIB(coaliso,main)
+dnl AC_CHECK_LIB(coal,main)
+dnl AC_CHECK_LIB(coalblade,main)
+dnl AC_CHECK_LIB(coaliso,main)
 dnl AC_CHECK_LIB(gtkgl,main)
 dnl AC_CHECK_LIB(gtkglmm,main)
-AC_CHECK_LIB(wfmath,main)
+dnl AC_CHECK_LIB(wfmath,main)
+
+WF_CHECK_COAL(0.3.0)
+CXXFLAGS="$CXXFLAGS $COAL_CFLAGS"
+LIBS="$LIBS $COAL_LIBS"
+
+dnl These checks have to go after we add COAL_LIBS,
+dnl so we catch any -L flags
+AC_CHECK_LIB(coalblade,main)
+AC_CHECK_LIB(coaliso,main)
+LIBS="$LIBS -lcoalblade -lcoaliso"
+
+AM_PATH_WFMATH(0.2.8,
+    [
+      CXXFLAGS="$CXXFLAGS $WFMATH_CFLAGS"
+      LIBS="$LIBS $WFMATH_LIBS"
+    ],
+    [
+      AC_MSG_ERROR(Couldn't find wfmath)
+    ])
 
 AM_PATH_SKSTREAM(0.2.0, 
     [
