@@ -80,7 +80,7 @@ void HeightManager::importFile()
 
 void HeightManager::selectRegion(Mercator::Segment * map)
 {
-    int size = map->getSize();
+    int size = map->getResolution();
     float vertices[size * 4 * 3 + 1];
     vertices[0] = vertices[1] = size / 2.f;
     vertices[2] = 0.f;
