@@ -49,10 +49,18 @@ AC_REQUIRE_CPP
 SDL_VERSION=1.2.0
 WF_CHECK_SDL_IMAGE($SDL_VERSION)
 
-AC_CHECK_LIB(GL,glViewport, [ LIBS="$LIBS -lGL" ],
+if test x$win32 == xtrue ; then
+    GLLIB="opengl32"
+    GLULIB="glu32"
+else
+    GLLIB="GL"
+    GLULIB="GLU"
+fi
+
+AC_CHECK_LIB($GLLIB,glViewport, [ LIBS="$LIBS -l$GLLIB" ],
     AC_MSG_ERROR(Could not find OpenGL library)
 )
-AC_CHECK_LIB(GLU,gluPerspective, [ LIBS="$LIBS -lGLU" ],
+AC_CHECK_LIB($GLULIB,gluPerspective, [ LIBS="$LIBS -l$GLULIB" ],
     AC_MSG_ERROR(Could not find OpenGL U library)
 )
 
