@@ -27,6 +27,8 @@
 #include <math.h>
 
 using Atlas::Message::Element;
+using Atlas::Message::MapType;
+using Atlas::Message::ListType;
 
 void Terrain::load(Gtk::FileSelection * fsel)
 {
@@ -86,29 +88,30 @@ Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
 
 void Terrain::readTerrain(const Eris::Entity & ent)
 {
-    if (!ent.hasProperty("terrain")) {
+    if (!ent.hasAttr("terrain")) {
         std::cerr << "Terrain object has no terrain" << std::endl << std::flush;
-        std::cerr << "Terrain " << ent.getID() << std::endl << std::flush;
+        std::cerr << "Terrain " << ent.getId() << std::endl << std::flush;
         return;
     }
-    const Element & terrain = ent.getProperty("terrain");
+    // FIXME JAMES STOP BEGIN SUCH A DUMBASS!
+    const Element terrain = ent.valueOfAttr("terrain");
     if (!terrain.isMap()) {
         std::cerr << "Terrain is not a map" << std::endl << std::flush;
     }
-    const Element::MapType & tmap = terrain.asMap();
-    Element::MapType::const_iterator I = tmap.find("points");
+    const MapType & tmap = terrain.asMap();
+    MapType::const_iterator I = tmap.find("points");
     int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
     if ((I == tmap.end()) || !I->second.isMap()) {
         std::cerr << "No terrain points" << std::endl << std::flush;
     }
-    const Element::MapType & plist = I->second.asMap();
-    Element::MapType::const_iterator J = plist.begin();
+    const MapType & plist = I->second.asMap();
+    MapType::const_iterator J = plist.begin();
     for(; J != plist.end(); ++J) {
         if (!J->second.isList()) {
             std::cout << "Non list in points" << std::endl << std::flush;
             continue;
         }
-        const Element::ListType & point = J->second.asList();
+        const ListType & point = J->second.asList();
         if (point.size() < 3) {
             std::cout << "point without 3 nums" << std::endl << std::flush;
             continue;

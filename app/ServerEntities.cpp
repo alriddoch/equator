@@ -25,14 +25,14 @@
 
 #include <Eris/Connection.h>
 #include <Eris/Entity.h>
-#include <Eris/World.h>
+#include <Eris/View.h>
 #include <Eris/TypeInfo.h>
 
 #include <wfmath/atlasconv.h>
 // #include <wfmath/ball.h>
 
 #include <Atlas/Codecs/XML.h>
-#include <Atlas/Message/Encoder.h>
+#include <Atlas/Message/MEncoder.h>
 #include <Atlas/Message/DecoderBase.h>
 
 #include <GL/glu.h>
@@ -46,6 +46,8 @@
 static const bool debug_flag = false;
 
 using Atlas::Message::Element;
+using Atlas::Message::MapType;
+using Atlas::Message::ListType;
 
 EntityImportOptions * ServerEntities::m_importOptions = 0;
 EntityExportOptions * ServerEntities::m_exportOptions = 0;
@@ -53,7 +55,7 @@ EntityExportOptions * ServerEntities::m_exportOptions = 0;
 
 class DummyDecoder : public Atlas::Message::DecoderBase {
   private:
-    virtual void objectArrived(const Atlas::Message::Element&) { }
+    virtual void messageArrived(const MapType &) { }
   public:
     DummyDecoder() { }
 };
@@ -62,13 +64,13 @@ class FileDecoder : public Atlas::Message::DecoderBase {
   private:
     std::fstream m_file;
     Atlas::Codecs::XML m_codec;
-    Element::MapType m_entities;
+    MapType m_entities;
     int m_count;
     std::string m_topLevelId;
 
-    virtual void objectArrived(const Element & obj) {
-        const Element::MapType & omap = obj.asMap();
-        Element::MapType::const_iterator I = omap.find("id");
+    virtual void messageArrived(const MapType & omap) {
+        // const MapType & omap = obj.asMap();
+        MapType::const_iterator I = omap.find("id");
         if ((I == omap.end()) ||
             (!I->second.isString()) || (I->second.asString().empty())) {
             std::cerr << "WARNING: Object in file has no id. Not stored."
@@ -86,13 +88,13 @@ class FileDecoder : public Atlas::Message::DecoderBase {
             }
             m_topLevelId = id;
         }
-        m_entities[id] = obj;
+        m_entities[id] = omap;
         m_count++;
     }
   public:
     FileDecoder(const std::string & filename) :
                 m_file(filename.c_str(), std::ios::in),
-                m_codec(m_file, this), m_count(0)
+                m_codec(m_file, *this), m_count(0)
     {
     }
 
@@ -110,7 +112,7 @@ class FileDecoder : public Atlas::Message::DecoderBase {
         }
     }
 
-    const Element::MapType & getEntities() const {
+    const MapType & getEntities() const {
         return m_entities;
     }
 
@@ -293,13 +295,13 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
     } // else draw it without using its bbox FIXME how ?
 
     if (openEntity) {
-        int numEnts = ent->getNumMembers();
+        int numEnts = ent->numContained();
         entstack_t::const_iterator J = I;
         if (ent != m_world) {
             ++J;
         }
         for (int i = 0; i < numEnts; i++) {
-            Eris::Entity * e = ent->getMember(i);
+            Eris::Entity * e = ent->getContained(i);
             assert(e != 0);
 
             drawEntity(view, e, 0, J);
@@ -342,13 +344,13 @@ void ServerEntities::selectEntity(GlView & view,
     }
 
     if (openEntity) {
-        int numEnts = ent->getNumMembers();
+        int numEnts = ent->numContained();
         entstack_t::const_iterator J = I;
         if (ent != m_world) {
             ++J;
         }
         for (int i = 0; i < numEnts; i++) {
-            Eris::Entity * e = ent->getMember(i);
+            Eris::Entity * e = ent->getContained(i);
             assert(e != 0);
 
             selectEntity(view, e, nameDict, J);
@@ -372,7 +374,7 @@ bool ServerEntities::selectEntities(GlView & view,
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
-    m_world = m_serverConnection.m_world->getRootEntity();
+    m_world = m_serverConnection.m_view->getTopLevel();
 
     assert(m_world != 0);
 
@@ -407,8 +409,8 @@ bool ServerEntities::selectEntities(GlView & view,
                 if (m_selectionList.find(I->second) != m_selectionList.end()) {
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
                     std::cout << "Setting primart selection from "
-                              << m_selectionPrimary->getID() << " to "
-                              << I->second->getID() << std::endl << std::flush;
+                              << m_selectionPrimary->getId() << " to "
+                              << I->second->getId() << std::endl << std::flush;
                     m_selectionPrimary = I->second;
                     return true;
                 }
@@ -485,13 +487,13 @@ void ServerEntities::selectEntityVertices(GlView & view,
     }
 
     if (openEntity) {
-        int numEnts = ent->getNumMembers();
+        int numEnts = ent->numContained();
         entstack_t::const_iterator J = I;
         if (ent != m_world) {
             ++J;
         }
         for (int i = 0; i < numEnts; i++) {
-            Eris::Entity * e = ent->getMember(i);
+            Eris::Entity * e = ent->getContained(i);
             assert(e != 0);
 
             selectEntityVertices(view, e, lowDict, highDict, J);
@@ -516,7 +518,7 @@ bool ServerEntities::selectVertices(GlView & view,
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
-    m_world = m_serverConnection.m_world->getRootEntity();
+    m_world = m_serverConnection.m_view->getTopLevel();
 
     assert(m_world != 0);
 
@@ -614,7 +616,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
     assert(ent != 0);
     std::cout << "Aligning ... " << std::endl << std::flush;
 
-    Eris::Entity * parent = ent->getContainer();
+    Eris::Entity * parent = ent->getLocation();
     if ((parent != 0) && (m_selectionList.find(ent) != m_selectionList.end())) {
         TerrainEntity * tparent = dynamic_cast<TerrainEntity *>(parent);
         if (tparent != 0) {
@@ -625,12 +627,12 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
                 if (tr != 0) {
                     PosType pos = ent->getPosition();
                     float height = tr->m_terrain.get(pos.x(), pos.y());
-                    std::cout << ent->getID() << " had height of " << pos.z()
+                    std::cout << ent->getId() << " had height of " << pos.z()
                               << " and we change it to terrain level "
                               << height << std::endl << std::flush;
                     pos.z() = height;
-                    m_serverConnection.avatarMoveEntity(ent->getID(),
-                                                ent->getContainer()->getID(),
+                    m_serverConnection.avatarMoveEntity(ent->getId(),
+                                                ent->getLocation()->getId(),
                                                 pos, VelType(0,0,0));
                 }
                 
@@ -641,22 +643,22 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
             std::cout << "Not terrain ... " << std::endl << std::flush;
             PosType pos = ent->getPosition();
             float height = 0.f;
-            std::cout << ent->getID() << " had height of " << pos.z()
+            std::cout << ent->getId() << " had height of " << pos.z()
                       << " and we change it to zero " << height << std::endl << std::flush;
             pos.z() = height;
-            m_serverConnection.avatarMoveEntity(ent->getID(),
-                                        ent->getContainer()->getID(),
+            m_serverConnection.avatarMoveEntity(ent->getId(),
+                                        ent->getLocation()->getId(),
                                         pos, VelType(0,0,0));
         }
 #warning FIXME - get the server object to handle the adjustment.
         // The server object knows about what data we have available.
         // We should probably support alignments like "other layer", "parent"
     }
-    int numEnts = ent->getNumMembers();
-    debug(std::cout << ent->getID() << " " << numEnts << " emts"
+    int numEnts = ent->numContained();
+    debug(std::cout << ent->getId() << " " << numEnts << " emts"
                     << std::endl << std::flush;);
     for (int i = 0; i < numEnts; i++) {
-        Eris::Entity * e = ent->getMember(i);
+        Eris::Entity * e = ent->getContained(i);
         assert(e != 0);
         alignEntityParent(e);
     }
@@ -679,20 +681,20 @@ void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 }
 
 void ServerEntities::insertEntityContents(const std::string & container,
-                     const Atlas::Message::Element::MapType & ent,
-                     const Atlas::Message::Element::MapType & entities)
+                     const MapType & ent,
+                     const MapType & entities)
 {
-    Atlas::Message::Element::MapType::const_iterator I = ent.find("contains");
+    MapType::const_iterator I = ent.find("contains");
     if ((I == ent.end()) || !I->second.isList() || I->second.asList().empty()) {
         return;
     }
-    const Atlas::Message::Element::ListType & contents = I->second.asList();
-    Atlas::Message::Element::ListType::const_iterator J = contents.begin();
+    const ListType & contents = I->second.asList();
+    ListType::const_iterator J = contents.begin();
     for(; J != contents.end(); ++J) {
         if (!J->isString()) { continue; }
-        Atlas::Message::Element::MapType::const_iterator K = entities.find(J->asString());
+        MapType::const_iterator K = entities.find(J->asString());
         if (K == entities.end()) { continue; }
-        Atlas::Message::Element::MapType newEnt = K->second.asMap();
+        MapType newEnt = K->second.asMap();
         newEnt["loc"] = container;
         newEnt.erase("id");
         m_serverConnection.avatarCreateEntity(newEnt);
@@ -711,9 +713,9 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
     FileDecoder fd(filename);
     fd.read();
     fd.report();
-    const Atlas::Message::Element::MapType & fileEnts = fd.getEntities();
+    const MapType & fileEnts = fd.getEntities();
     const std::string & topId = fd.getTopLevel();
-    Atlas::Message::Element::MapType::const_iterator I = fileEnts.find(topId);
+    MapType::const_iterator I = fileEnts.find(topId);
     if (I == fileEnts.end()) {
         std::cerr << "ERROR: Failed to find top level entity " << topId << " in file"
                   << std::endl << std::flush;
@@ -723,14 +725,14 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
                   << std::endl << std::flush;
     }
     if (m_importOptions->m_target == EntityImportOptions::IMPORT_TOPLEVEL) {
-        insertEntityContents(m_serverConnection.m_world->getRootEntity()->getID(),
+        insertEntityContents(m_serverConnection.m_view->getTopLevel()->getId(),
                              I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
         if (m_selectionPrimary == 0) {
             std::cerr << "ERROR: Can't import into selection, as nothing is selected. Tell the user" << std::endl << std::flush;
             return;
         }
-        insertEntityContents(m_selectionPrimary->getID(),
+        insertEntityContents(m_selectionPrimary->getId(),
                              I->second.asMap(), fileEnts);
     }
     // m_model.updated.emit();
@@ -740,13 +742,13 @@ void ServerEntities::exportEntity(const std::string & id,
                                   Atlas::Message::Encoder & e,
                                   Eris::Entity * ee)
 {
-    Atlas::Message::Element::MapType ent;
-    Atlas::Message::Element::ListType contents;
+    MapType ent;
+    ListType contents;
     ent["id"] = id;
-    unsigned int numEnts = ee->getNumMembers();
+    unsigned int numEnts = ee->numContained();
     for(unsigned int i = 0; i < numEnts; ++i) {
-        Eris::Entity * me = ee->getMember(i);
-        std::string eid = me->getID();
+        Eris::Entity * me = ee->getContained(i);
+        std::string eid = me->getId();
         if (m_exportOptions->m_charCheck->get_active() &&
             m_exportOptions->m_charType != 0) {
             Eris::TypeInfoPtr entType = me->getType();
@@ -766,16 +768,16 @@ void ServerEntities::exportEntity(const std::string & id,
     ent["bbox"] = ee->getBBox().toAtlas();
     ent["orientation"] = ee->getOrientation().toAtlas();
     ent["name"] = ee->getName();
-    ent["parents"] = Atlas::Message::Element::ListType(1, *ee->getInherits().begin());
-    Eris::Entity * loc = ee->getContainer();
+    ent["parents"] = ListType(1, ee->getType()->getName());
+    Eris::Entity * loc = ee->getLocation();
     if (loc != 0) {
         // FIXME AJR 2002-07-15
         // The id of the container actually needs a little bit of processing.
         // If we have overriddent the top level container, it needs to be
         // that, otherwise it might need the suffix appended
-        ent["loc"] = loc->getID();
+        ent["loc"] = loc->getId();
     }
-    e.streamMessage(ent);
+    e.streamMessageElement(ent);
 }
 
 void ServerEntities::save(Gtk::FileSelection * fsel)
@@ -790,13 +792,13 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
             break;
         case EntityExportOptions::EXPORT_ALL_SELECTED:
             if (m_selectionPrimary != 0) {
-                export_root = m_selectionPrimary->getContainer();
+                export_root = m_selectionPrimary->getLocation();
             }
             break;
         case EntityExportOptions::EXPORT_ALL:
         case EntityExportOptions::EXPORT_VISIBLE:
         default:
-            export_root = m_serverConnection.m_world->getRootEntity();
+            export_root = m_serverConnection.m_view->getTopLevel();
             break;
     }
 
@@ -807,8 +809,8 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
 
     DummyDecoder d;
     std::fstream ios(filename.c_str(), std::ios::out);
-    Atlas::Codecs::XML codec(ios, &d);
-    Atlas::Message::Encoder e(&codec);
+    Atlas::Codecs::XML codec(ios, d);
+    Atlas::Message::Encoder e(codec);
 
     codec.streamBegin();
 
@@ -816,7 +818,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     if (m_exportOptions->m_setRootCheck->get_active()) {
         exportedRootId = m_exportOptions->m_rootId->get_text();
     } else {
-        exportedRootId = export_root->getID();
+        exportedRootId = export_root->getId();
         if (m_exportOptions->m_appendCheck->get_active()) {
             exportedRootId += m_exportOptions->m_idSuffix->get_text();
         }
@@ -827,14 +829,14 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     }
 
     if (m_exportOptions->m_target == EntityExportOptions::EXPORT_ALL_SELECTED) {
-        Atlas::Message::Element::MapType ent;
-        Atlas::Message::Element::ListType contents;
+        MapType ent;
+        ListType contents;
         ent["id"] = exportedRootId;
-        unsigned int numEnts = export_root->getNumMembers();
+        unsigned int numEnts = export_root->numContained();
         for(unsigned int i = 0; i < numEnts; ++i) {
-            Eris::Entity * me = export_root->getMember(i);
+            Eris::Entity * me = export_root->getContained(i);
             if (m_selectionList.find(me) == m_selectionList.end()) {continue;}
-            std::string eid = me->getID();
+            std::string eid = me->getId();
             if (m_exportOptions->m_appendCheck->get_active()) {
                 eid += m_exportOptions->m_idSuffix->get_text();
             }
@@ -846,8 +848,8 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
         ent["bbox"] = export_root->getBBox().toAtlas();
         ent["orientation"] = export_root->getOrientation().toAtlas();
         ent["name"] = export_root->getName();
-        ent["parents"] = Atlas::Message::Element::ListType(1, *export_root->getInherits().begin());
-        e.streamMessage(ent);
+        ent["parents"] = ListType(1, export_root->getType()->getName());
+        e.streamMessageElement(ent);
     } else {
         exportEntity(exportedRootId, e, export_root);
     }
@@ -868,14 +870,12 @@ void ServerEntities::createOptionsWindows()
 
 void ServerEntities::connectEntity(Eris::Entity * ent)
 {
-    ent->Changed.connect(SigC::bind(
-        SigC::slot(*this, &ServerEntities::entityChanged),
-        ent));
+    ent->Changed.connect(SigC::slot(*this, &ServerEntities::entityChanged));
     ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
 
-    int numEnts = ent->getNumMembers();
+    int numEnts = ent->numContained();
     for (int i = 0; i < numEnts; i++) {
-        Eris::Entity * e = ent->getMember(i);
+        Eris::Entity * e = ent->getContained(i);
         connectEntity(e);
     }
 }
@@ -899,13 +899,13 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
         std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
     }
     
-    Eris::Entity * worldRoot = m_serverConnection.m_world->getRootEntity();
+    Eris::Entity * worldRoot = m_serverConnection.m_view->getTopLevel();
 
     connectEntity(worldRoot);
 
     // observe the Eris world (in the future, we will need to get World* from
     // the server object, when Eris supports multiple world objects
-    m_serverConnection.m_world->EntityCreate.connect(
+    m_serverConnection.m_view->EntityCreated.connect(
         SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
 
@@ -975,13 +975,13 @@ void ServerEntities::modifyEntitySelection(Eris::Entity * ent,
     }
 
     if (openEntity) {
-        int numEnts = ent->getNumMembers();
+        int numEnts = ent->numContained();
         entstack_t::const_iterator J = I;
         if (ent != m_world) {
             ++J;
         }
         for (int i = 0; i < numEnts; i++) {
-            Eris::Entity * e = ent->getMember(i);
+            Eris::Entity * e = ent->getContained(i);
             assert(e != 0);
 
             modifyEntitySelection(e, J, sm, osl, olvs, ohvs);
@@ -1014,7 +1014,7 @@ void ServerEntities::modifySelection(selectMod_t sm)
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
-    m_world = m_serverConnection.m_world->getRootEntity();
+    m_world = m_serverConnection.m_view->getTopLevel();
 
     assert(m_world != 0);
 
@@ -1047,8 +1047,8 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     if ((ent == world) || (ent == 0)) {
         return;
     }
-    Eris::Entity * cont = ent->getContainer();
-    moveTo(cont, world);
+    Eris::Entity * loc = ent->getLocation();
+    moveTo(loc, world);
     PosType pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
     orient(ent->getOrientation());
@@ -1066,7 +1066,7 @@ bool ServerEntities::animate(GlView & view)
 
     // FIXME Need to animate all selected entities
     bool running = false;
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_view->getTopLevel();
     entlist_t::const_iterator I = m_selectionList.begin();
     for (; I != m_selectionList.end(); ++I) {
         glPushMatrix();
@@ -1096,7 +1096,7 @@ bool ServerEntities::animate(GlView & view)
 void ServerEntities::draw(GlView & view)
 {
     m_renderMode = view.getRenderMode(m_name);
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_view->getTopLevel();
     drawWorld(view, root);
 }
 
@@ -1117,7 +1117,7 @@ void ServerEntities::select(GlView & view, int x, int y, int fx, int fy)
 void ServerEntities::pushSelection()
 {
     if (m_selectionPrimary != 0) {
-        std::cout << "Pushing " << m_selectionPrimary->getID() << std::endl << std::flush;
+        std::cout << "Pushing " << m_selectionPrimary->getId() << std::endl << std::flush;
         m_selectionStack.push_back(m_selectionPrimary);
         m_selectionPrimary = 0;
     }
@@ -1160,10 +1160,10 @@ void ServerEntities::dragEnd(GlView & view, const WFMath::Vector<3> & v)
         // Modify the bounding box.
     } else {
         // FIXME Drag everything, or just the one?
-        std::cout << "MOVING " << m_selectionPrimary->getID() << " to " << v
+        std::cout << "MOVING " << m_selectionPrimary->getId() << " to " << v
                   << std::endl << std::flush;
-        m_serverConnection.avatarMoveEntity(m_selectionPrimary->getID(),
-                   m_selectionPrimary->getContainer()->getID(),
+        m_serverConnection.avatarMoveEntity(m_selectionPrimary->getId(),
+                   m_selectionPrimary->getLocation()->getId(),
                    m_selectionPrimary->getPosition() + v);
     }
     m_validDrag = false;
@@ -1174,10 +1174,10 @@ void ServerEntities::insert(const PosType & pos)
     const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
     std::cout << "INSERTING " << type << std::endl << std::flush;
 
-    Atlas::Message::Element::MapType ent;
+    MapType ent;
     ent["objtype"] = "object";
-    ent["parents"] = Atlas::Message::Element::ListType(1, type);
-    ent["loc"] = m_serverConnection.m_world->getRootEntity()->getID();
+    ent["parents"] = ListType(1, type);
+    ent["loc"] = m_serverConnection.m_view->getTopLevel()->getId();
     ent["pos"] = pos.toAtlas();
     
     m_serverConnection.avatarCreateEntity(ent);
@@ -1187,26 +1187,25 @@ void ServerEntities::align(Alignment a)
 {
     if (a != ALIGN_PARENT) { return; }
 
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_view->getTopLevel();
     alignEntityParent(root);
 
 }
 
 void ServerEntities::gotNewEntity(Eris::Entity *ent)
 {
-    ent->Changed.connect(SigC::bind(
-        SigC::slot(*this, &ServerEntities::entityChanged),
-        ent));
+    ent->Changed.connect(SigC::slot(*this, &ServerEntities::entityChanged));
     ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
     m_model.update(); // cause a re-draw
 }
 
-void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent)
+void ServerEntities::entityChanged(Eris::Entity *ent,
+                                   const Eris::StringSet &attrs)
 {
     m_model.update();   // a bit excessive I suppose
 }
 
-void ServerEntities::entityMoved(const PosType &)
+void ServerEntities::entityMoved(Eris::Entity *)
 {
     m_model.update();   // a bit excessive I suppose
 }

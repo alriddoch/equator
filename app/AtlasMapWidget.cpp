@@ -66,14 +66,14 @@ void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
 void AtlasMapWidget::update()
 {
     // clear();
-    Element::MapType::const_iterator I = m_contents.begin();
+    Atlas::Message::MapType::const_iterator I = m_contents.begin();
     for (;I != m_contents.end(); I++) {
         add(/* rows(),*/ I->first, I->second);
     }
 }
 
 AtlasMapWidget::AtlasMapWidget(/* const Gtk::SArray & t, */
-                               const Atlas::Message::Element::MapType & m) :
+                               const Atlas::Message::MapType & m) :
                                m_contents(m)
 {
     m_columns = new Gtk::TreeModelColumnRecord();
@@ -95,7 +95,7 @@ AtlasMapWidget::AtlasMapWidget(/* const Gtk::SArray & t, */
     }
 }
 
-void AtlasMapWidget::setContents(const Atlas::Message::Element::MapType & m)
+void AtlasMapWidget::setContents(const Atlas::Message::MapType & m)
 {
     m_contents = m;
     update();

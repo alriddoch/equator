@@ -11,11 +11,11 @@
 
 #include "common/configuration.h"
 
-#include <Eris/World.h>
+#include <Eris/View.h>
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 
-#include <Atlas/Objects/Entity/GameEntity.h>
+#include <Atlas/Objects/Entity.h>
 
 #include <varconf/Config.h>
 
@@ -28,8 +28,8 @@
 
 using Atlas::Objects::Entity::GameEntity;
 
-RenderableEntity::RenderableEntity(const GameEntity &ge,
-                             Eris::World * w) : Eris::Entity(ge, w), m_drawer(0)
+RenderableEntity::RenderableEntity(const GameEntity &ge, Eris::TypeInfo * t,
+                             Eris::View * v) : Eris::Entity(ge, t, v), m_drawer(0)
 {
 }
 
@@ -37,25 +37,25 @@ void RenderableEntity::constrainChild(RenderableEntity &, PosType &)
 {
 }
 
-MovableEntity::MovableEntity(const GameEntity &ge,
-                             Eris::World * w) : RenderableEntity(ge, w)
+MovableEntity::MovableEntity(const GameEntity &ge, Eris::TypeInfo * t,
+                             Eris::View * v) : RenderableEntity(ge, t, v)
 {
     Moved.connect(SigC::slot(*this, &MovableEntity::movedSignal));
     updateTime = SDL_GetTicks();
 }
 
-void MovableEntity::movedSignal(const PosType &)
+void MovableEntity::movedSignal(Eris::Entity *)
 {
     updateTime = SDL_GetTicks();
 }
 
-AutonomousEntity::AutonomousEntity(const GameEntity &ge,
-                             Eris::World * w) : MovableEntity(ge, w)
+AutonomousEntity::AutonomousEntity(const GameEntity &ge, Eris::TypeInfo * t,
+                                   Eris::View * v) : MovableEntity(ge, t, v)
 {
 }
 
-TerrainEntity::TerrainEntity(const GameEntity &ge,
-                             Eris::World * w) : RenderableEntity(ge, w)
+TerrainEntity::TerrainEntity(const GameEntity &ge, Eris::TypeInfo * t,
+                             Eris::View * v) : RenderableEntity(ge, t, v)
 {
 }
 
@@ -74,8 +74,8 @@ void TerrainEntity::constrainChild(RenderableEntity & re, PosType & pos)
     tr->m_terrain.getHeightAndNormal(pos.x(), pos.y(), pos.z(), n);
 }
 
-TreeEntity::TreeEntity(const GameEntity &ge,
-                             Eris::World * w) : RenderableEntity(ge, w)
+TreeEntity::TreeEntity(const GameEntity &ge, Eris::TypeInfo * t,
+                       Eris::View * v) : RenderableEntity(ge, t, v)
 {
 }
 
@@ -138,32 +138,34 @@ WEFactory::~WEFactory()
 {
 }
 
-bool WEFactory::accept(const GameEntity&, Eris::World * w)
+bool WEFactory::accept(const GameEntity&, Eris::TypeInfo * w)
 {
     return true;
 }
 
-Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
+Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
+                                       Eris::TypeInfo * type,
+                                       Eris::View * v)
 {
     SigC::Slot0<void> slot;
     RenderableEntity * re = 0;
 
-    Eris::TypeInfoPtr type = w->getConnection()->getTypeService()->getTypeForAtlas(ge);
-    if (type->safeIsA(autonomousType)) {
-        AutonomousEntity * ae = new AutonomousEntity(ge,w);
+    // Eris::TypeInfoPtr type = v->getConnection()->getTypeService()->getTypeForAtlas(ge);
+    if (type->isA(autonomousType)) {
+        AutonomousEntity * ae = new AutonomousEntity(ge, type, v);
         slot = SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(),
                                               ae);
         re = ae;
-    } else if (type->safeIsA(terrainType)) {
-        TerrainEntity * te = new TerrainEntity(ge,w);
+    } else if (type->isA(terrainType)) {
+        TerrainEntity * te = new TerrainEntity(ge, type, v);
         slot = SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
         re = te;
-    } else if (type->safeIsA(treeType)) {
-        TreeEntity * te = new TreeEntity(ge,w);
+    } else if (type->isA(treeType)) {
+        TreeEntity * te = new TreeEntity(ge, type, v);
         slot = SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
         re = te;
     } else {
-        re = new RenderableEntity(ge, w);
+        re = new RenderableEntity(ge, type, v);
         slot = SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(),
                                               re);
     }

@@ -10,8 +10,9 @@
 #include "app/ServerEntities.h"
 #include "app/AtlasMapWidget.h"
 
-#include <Eris/World.h>
+#include <Eris/View.h>
 #include <Eris/Entity.h>
+#include <Eris/TypeInfo.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
@@ -32,6 +33,8 @@
 #include <vector>
 
 using Atlas::Message::Element;
+using Atlas::Message::MapType;
+using Atlas::Message::ListType;
 
 EntityTree::EntityTree(MainWindow & mw): OptionBox("Entity Tree"),
                                                        m_currentModel(0),
@@ -91,13 +94,13 @@ EntityTree::EntityTree(MainWindow & mw): OptionBox("Entity Tree"),
 
     vbox->pack_start(*scrolled_window, Gtk::PACK_EXPAND_WIDGET, 2);
 
-    Atlas::Message::Element::MapType test;
-    test["Footle"] = Atlas::Message::Element::ListType(1, "foo");
+    MapType test;
+    test["Footle"] = ListType(1, "foo");
     test["foo"] = 23;
     test["bar"] = 0.1;
     test["baz"] = "hello";
-    test["mim"] = test;
-    test["grep"] = test;
+    test["mim"] = ListType(1, 235);;
+    test["grep"] = ListType(1, 0.2342);;
     m_attributeTree = manage( new AtlasMapWidget(/* titles, */ test) );
     // m_attributeTree->set_column_width (0, 100);
     // m_attributeTree->set_column_width (1, 100);
@@ -132,13 +135,13 @@ void EntityTree::descendEntityTree(Eris::Entity * node,
     assert(node != NULL);
 
     std::cout << "Node " << node->getName() << std::endl << std::flush;
-    row[*m_idColumn] = node->getID();
-    row[*m_typeColumn] = *node->getInherits().begin();
+    row[*m_idColumn] = node->getId();
+    row[*m_typeColumn] = node->getType()->getName();
     row[*m_nameColumn] = node->getName();
 
-    int numEnts = node->getNumMembers();
+    int numEnts = node->numContained();
     for (int i = 0; i < numEnts; ++i) {
-        Eris::Entity * child = node->getMember(i);
+        Eris::Entity * child = node->getContained(i);
         Gtk::TreeModel::Row childrow = *(m_treeModel->append(row.children()));
         descendEntityTree(child, childrow);
     }
@@ -179,9 +182,9 @@ void EntityTree::currentModelChanged(Model * m)
         return;
     }
 
-    assert(server.m_world != 0);
+    assert(server.m_view != 0);
 
-    Eris::Entity * root = server.m_world->getRootEntity();
+    Eris::Entity * root = server.m_view->getTopLevel();
 
     if (root == 0) {
         std::cout << "No root entity" << std::endl << std::flush;

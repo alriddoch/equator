@@ -286,7 +286,7 @@ void NewServerWindow::createAvatar()
     m_status->pop(m_statusContext);
     m_status->push("Creating avatar", m_statusContext);
 
-    m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
+    m_server->m_avatar = m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
 
     m_worldEnter = m_server->m_world->Entered.connect(SigC::slot(*this,&NewServerWindow::worldEnter));
 }

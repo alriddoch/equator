@@ -27,6 +27,8 @@ dnl Test for C++ compiler
 
 AC_PROG_CXX
 
+CXXFLAGS="$CXXFLAGS -Wall -DATLAS_ELEMENT_TYPEDEF_PRIVATE"
+
 AC_ARG_ENABLE(debug,
     [  --enable-debug          enable debug information [default=no]],
     [
@@ -51,7 +53,7 @@ WF_CHECK_SDL_IMAGE($SDL_VERSION)
 
 WF_CHECK_GL_LIBS
 
-PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 varconf-1.0 sage ,
+PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.3 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         LIBS="$LIBS $WF_LIBS"

@@ -105,8 +105,8 @@ class ServerEntities : public Layer {
     void saveOptions(Gtk::FileSelection *);
 
     void insertEntityContents(const std::string & container,
-                              const Atlas::Message::Element::MapType & ent,
-                              const Atlas::Message::Element::MapType & entities);
+                              const Atlas::Message::MapType & ent,
+                              const Atlas::Message::MapType & entities);
     void exportEntity(const std::string & id,
                       Atlas::Message::Encoder & e, Eris::Entity *);
 
@@ -139,9 +139,9 @@ class ServerEntities : public Layer {
     void insert(const PosType &);
     void align(Alignment );
     
-    void gotNewEntity(Eris::Entity *ent);
-    void entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent);
-    void entityMoved(const PosType &);
+    void gotNewEntity(Eris::Entity *);
+    void entityChanged(Eris::Entity *, const Eris::StringSet &attrs);
+    void entityMoved(Eris::Entity *);
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H

@@ -14,7 +14,7 @@
 
 #include "common/debug.h"
 
-#include <Eris/World.h>
+#include <Eris/View.h>
 
 #include <iostream>
 #include <cassert>
@@ -64,7 +64,7 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
             pe->constrainChild(*me, pos);;
         }
     } else {
-        debug(std::cout << "Eris::Entity \"" << ent->getID()
+        debug(std::cout << "Eris::Entity \"" << ent->getId()
                         << "\" is not a MovableEntity"
                         << std::endl << std::flush;);
     }
@@ -87,13 +87,13 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
         return;
     }
 
-    int numEnts = ent->getNumMembers();
-    debug(std::cout << ent->getID() << " " << numEnts << " emts"
+    int numEnts = ent->numContained();
+    debug(std::cout << ent->getId() << " " << numEnts << " emts"
                     << std::endl << std::flush;);
     for (int i = 0; i < numEnts; i++) {
-        Eris::Entity * e = ent->getMember(i);
+        Eris::Entity * e = ent->getContained(i);
         if (!e->isVisible()) { continue; }
-        // debug(std::cout << ":" << e->getID() << e->getPosition() << ":"
+        // debug(std::cout << ":" << e->getId() << e->getPosition() << ":"
                         // << e->getBBox().u << e->getBBox().v
                         // << std::endl << std::flush;);
         drawEntity(view, e, re, camPos);
@@ -144,7 +144,7 @@ void GameView::selectNone()
 
 void GameView::draw(GlView & view)
 {
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_view->getTopLevel();
     drawWorld(view, root);
 }
 

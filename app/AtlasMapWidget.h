@@ -22,16 +22,16 @@ class AtlasMapWidget : public Gtk::TreeView
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
     Gtk::TreeModelColumn<Glib::ustring> * m_valueColumn;
     Gtk::TreeModelColumnRecord * m_columns;
-    Atlas::Message::Element::MapType m_contents;
+    Atlas::Message::MapType m_contents;
 
     void add(/* Gtk::CTree_Helpers::RowList,*/ const std::string&,
              const Atlas::Message::Element &);
     void update();
   public:
     AtlasMapWidget(/* const Gtk::SArray &, */
-                   const Atlas::Message::Element::MapType &);
+                   const Atlas::Message::MapType &);
 
-    void setContents(const Atlas::Message::Element::MapType &);
+    void setContents(const Atlas::Message::MapType &);
     void setAttr(const std::string &, const Atlas::Message::Element &);
 
 };

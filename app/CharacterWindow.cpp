@@ -6,10 +6,11 @@
 
 #include "Server.h"
 
-#include <Eris/World.h>
-#include <Eris/Player.h>
+#include <Eris/View.h>
+#include <Eris/Avatar.h>
+#include <Eris/Account.h>
 
-#include <Atlas/Objects/Entity/GameEntity.h>
+#include <Atlas/Objects/Entity.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
@@ -106,8 +107,8 @@ void CharacterWindow::useServer(Server * s)
 
     m_server = s;
     m_serverLabel->set_text(std::string("Create avatar on ") + m_server->getName() + ":");
-    m_charlist = m_server->m_player->GotAllCharacters.connect(slot(*this, &CharacterWindow::gotCharacterList));
-    m_server->m_player->refreshCharacterInfo();
+    m_charlist = m_server->m_account->GotAllCharacters.connect(slot(*this, &CharacterWindow::gotCharacterList));
+    m_server->m_account->refreshCharacterInfo();
 
     std::list<Glib::ustring> listStrings;
     m_nameEntry->set_popdown_strings(listStrings);
@@ -122,7 +123,7 @@ void CharacterWindow::gotCharacterList()
 
     std::cout << "GOT CHARACTER LIST" << std::endl << std::flush;
 
-    const Eris::CharacterMap & chars = m_server->m_player->getCharacters();
+    const Eris::CharacterMap & chars = m_server->m_account->getCharacters();
     Eris::CharacterMap::const_iterator I = chars.begin();
     // std::list<Glib::ustring> listStrings;
     for(; I != chars.end(); ++I) {
@@ -131,7 +132,7 @@ void CharacterWindow::gotCharacterList()
         Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
         Gtk::HBox * hbox = manage(new Gtk::HBox(false, 3));
         Gtk::Label * l = manage(new Gtk::Label());
-        l->set_markup(ge.getName() + " <i>(" + id + ")</i>");
+        l->set_markup(ge->getName() + " <i>(" + id + ")</i>");
         hbox->pack_start(*l, Gtk::PACK_SHRINK);
         item->add(*hbox);
         item->show_all();
@@ -147,15 +148,15 @@ void CharacterWindow::select_child(Gtk::Widget & w)
     m_selectedCharacter.clear();
     std::string id = m_nameEntry->get_entry()->get_text();
     std::cout << "Selected " << id << std::endl << std::flush;
-    const Eris::CharacterMap & chars = m_server->m_player->getCharacters();
+    const Eris::CharacterMap & chars = m_server->m_account->getCharacters();
     Eris::CharacterMap::const_iterator I = chars.find(id);
     if (I == chars.end()) {
         return;
     }
     const Atlas::Objects::Entity::GameEntity & ge = I->second;
     m_selectedCharacter = id;
-    m_nameEntry->get_entry()->set_text(ge.getName());
-    m_typeEntry->set_text(ge.getParents().front().asString());
+    m_nameEntry->get_entry()->set_text(ge->getName());
+    m_typeEntry->set_text(ge->getParents().front());
     m_typeEntry->set_editable(false);
     m_takeButton->set_sensitive(true);
     m_createButton->set_sensitive(false);
@@ -186,7 +187,7 @@ void CharacterWindow::take()
 
     m_server->takeCharacter(m_selectedCharacter);
 
-    m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
+    m_created = m_server->m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &CharacterWindow::created));
 }
 
 void CharacterWindow::create()
@@ -201,7 +202,7 @@ void CharacterWindow::create()
 
     m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
 
-    m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
+    m_created = m_server->m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &CharacterWindow::created));
 }
 
 void CharacterWindow::failure(const std::string & msg)

@@ -6,7 +6,7 @@
 
 #include "Server.h"
 
-#include <Eris/Player.h>
+#include <Eris/Account.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
@@ -109,7 +109,7 @@ void LoginWindow::login()
 
 
     m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = m_server->m_player->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
+    m_loggedIn = m_server->m_account->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
 }
 
 void LoginWindow::failure(const std::string & msg)

@@ -24,7 +24,7 @@ class RenderableEntity : public Eris::Entity
   public:
     EntityRenderer * m_drawer;
 
-    RenderableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    RenderableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
     virtual void constrainChild(RenderableEntity &, PosType & pos);
 };
 
@@ -32,9 +32,9 @@ class MovableEntity : public RenderableEntity
 {
     float updateTime;
   public:
-    void movedSignal(const PosType &);
+    void movedSignal(Eris::Entity *);
 
-    MovableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    MovableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
 
     const float getTime() {
         return updateTime;
@@ -44,14 +44,14 @@ class MovableEntity : public RenderableEntity
 class AutonomousEntity : public MovableEntity
 {
   public:
-    AutonomousEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    AutonomousEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
 
 };
 
 class TerrainEntity : public RenderableEntity
 {
   public:
-    TerrainEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    TerrainEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
 
     virtual void constrainChild(RenderableEntity &, PosType & pos);
 };
@@ -59,7 +59,7 @@ class TerrainEntity : public RenderableEntity
 class TreeEntity : public RenderableEntity
 {
   public:
-    TreeEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    TreeEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
 
 };
 
@@ -107,8 +107,8 @@ class WEFactory : public Eris::Factory
     explicit WEFactory(Eris::TypeService &, Renderer &);
     virtual ~WEFactory();
     
-    virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::World *);
-    virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity &, Eris::World *);
+    virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *);
+    virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *, Eris::View *);
 
     SigC::Signal1<void, AutonomousEntity *> AutonomousEntityCreated;
     SigC::Signal1<void, TerrainEntity *> TerrainEntityCreated;

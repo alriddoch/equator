@@ -10,7 +10,7 @@
 
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
-#include <Eris/typeService.h>
+#include <Eris/TypeService.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
@@ -84,13 +84,13 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
 
     vbox->pack_start(*scrolled_window, Gtk::PACK_EXPAND_WIDGET, 2);
 
-    Atlas::Message::Element::MapType test;
-    test["Footle"] = Atlas::Message::Element::ListType(1, "foo");
+    Atlas::Message::MapType test;
+    test["Footle"] = Atlas::Message::ListType(1, "foo");
     test["foo"] = 23;
     test["bar"] = 0.1;
     test["baz"] = "hello";
-    test["mim"] = test;
-    test["grep"] = test;
+    test["mim"] = Atlas::Message::ListType(1, 235);
+    test["grep"] = Atlas::Message::ListType(1, 0.4556);
     m_attributeTree = manage( new AtlasMapWidget(/* titles, */ test) );
     // m_attributeTree->set_column_width (0, 100);
     // m_attributeTree->set_column_width (1, 100);

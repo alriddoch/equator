@@ -15,9 +15,10 @@
 
 namespace Eris {
   class Connection;
-  class Player;
+  class Account;
+  class Avatar;
   class Lobby;
-  class World;
+  class View;
   class Room;
   class Entity;
 }
@@ -45,10 +46,10 @@ class Server : public SigC::Object {
     void roomEnter(Eris::Room *r);
 
     void worldEntityCreate(Eris::Entity *r);
-    void gotAvatar();
+    void gotAvatar(Eris::Avatar *);
     void worldEnter(Eris::Entity *r);
 
-    void charMoved(const PosType &);
+    void charMoved(Eris::Entity *);
 
     void checkEntityForNewLayers(Eris::Entity & ent);
 
@@ -66,9 +67,10 @@ class Server : public SigC::Object {
     Renderer & m_renderer;
 
     Eris::Connection & m_connection;
-    Eris::Player * m_player;
+    Eris::Account * m_account;
+    Eris::Avatar * m_avatar;
     Eris::Lobby * m_lobby;
-    Eris::World * m_world;
+    Eris::View * m_view;
     Eris::Entity * m_character;
 
     SigC::Connection inputHandler;
@@ -108,7 +110,7 @@ class Server : public SigC::Object {
     void moveCharacter(const PosType & pos);
     void modifyTerrain(Terrain * layer, TerrainEntity * entity);
 
-    void avatarCreateEntity(const Atlas::Message::Element::MapType &);
+    void avatarCreateEntity(const Atlas::Message::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,
                           const PosType & pos);
     void avatarMoveEntity(const std::string &, const std::string &loc,
