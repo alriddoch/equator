@@ -32,6 +32,7 @@ void HeightManager::load(Gtk::FileSelection * fsel)
 
 void HeightManager::cancel(Gtk::FileSelection * fsel)
 {
+    delete fsel;
 }
 
 HeightManager::HeightManager(Model &m) :

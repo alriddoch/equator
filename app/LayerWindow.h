@@ -12,6 +12,7 @@ class ViewWindow;
 class GlView;;
 class NewLayerWindow;;
 class Model;
+class Layer;
 
 namespace Gtk {
    class OptionMenu;
@@ -26,9 +27,10 @@ class LayerWindow : public Gtk::Window
 {
   private:
     Glib::RefPtr<Gtk::ListStore> m_treeModel;
-    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > * m_visColumn;
+    Gtk::TreeModelColumn<bool> * m_visColumn;
     Gtk::TreeModelColumn<Glib::ustring> * m_typeColumn;
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumn<Layer *> * m_ptrColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
@@ -41,6 +43,9 @@ class LayerWindow : public Gtk::Window
     Model * m_currentModel;
     NewLayerWindow * m_newLayerWindow;
     SigC::Connection m_updateSignal;
+
+    void visibleToggled(const Glib::ustring& path_string);
+    void selectionChanged();
 
   public:
     // MainWindow & m_mainWindow;
@@ -55,7 +60,6 @@ class LayerWindow : public Gtk::Window
     void setModel(Model * model);
     void updateLayers();
     void addModel(Model * view);
-    void selectionMade(gint row, gint column, GdkEvent * event);
 
     void newLayerRequested();
     void raiseLayer();

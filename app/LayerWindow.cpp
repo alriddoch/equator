@@ -11,7 +11,6 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/menuitem.h>
 #include <gtkmm/box.h>
-// #include <gtkmm/clist.h>
 #include <gtkmm/label.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
@@ -51,36 +50,35 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
    
     vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
     
-    // static const gchar *titles[] = { "Visible", "Type", "Name", NULL };
-    // m_clist = manage( new Gtk::CList(titles) );
     m_columns = new Gtk::TreeModelColumnRecord();
-    m_visColumn = new Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> >();
+    m_visColumn = new Gtk::TreeModelColumn<bool>();
     m_typeColumn = new Gtk::TreeModelColumn<Glib::ustring>();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_ptrColumn = new Gtk::TreeModelColumn<Layer*>();
     m_columns->add(*m_visColumn);
     m_columns->add(*m_typeColumn);
     m_columns->add(*m_nameColumn);
+    m_columns->add(*m_ptrColumn);
 
     m_treeModel = Gtk::ListStore::create(*m_columns);
-
-    Gtk::TreeModel::Row row = *(m_treeModel->append());
-    row[*m_typeColumn] = Glib::ustring("test type");
-    row[*m_nameColumn] = Glib::ustring("test name");
-
-    //m_clist->select_row.connect(slot(this,&LayerWindow::selectionMade));
-    //m_clist->set_column_width (0, 50);
-    //m_clist->set_column_width (1, 80);
-    //m_clist->set_column_width (2, 80);
 
     m_treeView = manage( new Gtk::TreeView() );
 
     m_treeView->set_model( m_treeModel );
-    m_treeView->append_column("Visible", *m_visColumn);
+
+    Gtk::CellRendererToggle * crt = manage( new Gtk::CellRendererToggle() );
+    crt->signal_toggled().connect( SigC::slot(*this, &LayerWindow::visibleToggled) );
+    int column_no = m_treeView->append_column("Visible", *crt);
+    Gtk::TreeViewColumn * column = m_treeView->get_column(column_no - 1);
+    column->add_attribute(crt->property_active(), *m_visColumn);
+    column->set_clickable();
+
     m_treeView->append_column("Type", *m_typeColumn);
     m_treeView->append_column("Name", *m_nameColumn);
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+    m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &LayerWindow::selectionChanged) );
 
     vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::AttachOptions(0), 0);
 
@@ -156,12 +154,15 @@ void LayerWindow::setModel(Model * model)
         m_updateSignal.disconnect();
     }
 
+    if (model == m_currentModel) {
+	return;
+    }
+
     m_currentModel = model;
 
     if (m_currentModel == NULL) {
         set_sensitive(false);
-#warning Clear the list model
-        // m_clist->clear();
+        m_treeModel->clear();
         return;
     }
 
@@ -173,32 +174,26 @@ void LayerWindow::setModel(Model * model)
 
 void LayerWindow::updateLayers()
 {
-
-#warning Clear the list model
-    // m_clist->clear();
+    std::cout << "Got update layers" << std::endl << std::flush;
+    m_treeModel->clear();
     const std::list<Layer *> & layers = m_currentModel->getLayers();
  
     std::list<Layer *>::const_iterator I = layers.begin();
     for (; I != layers.end(); I++) {
-        // std::vector<Gtk::string> entry(1,"");
-        // entry.push_back((*I)->getType());
-        // entry.push_back((*I)->getName());
-        // m_clist->rows().push_front(entry);
+        Gtk::TreeModel::Row row = *(m_treeModel->append());
+        row[*m_visColumn] = (*I)->isVisible();
+        row[*m_typeColumn] = Glib::ustring((*I)->getType());
+        row[*m_nameColumn] = Glib::ustring((*I)->getName());
+	row[*m_ptrColumn] = *I;
         if (*I == m_currentModel->getCurrentLayer()) {
-#warning Implement handling the selected row
-            // m_clist->rows().front()->select();
+            m_refTreeSelection->select(row);
         }
-        if (!(*I)->isVisible()) {
-            continue;
-        }
-#warning Implement handling the visible icon
-        // m_clist->cell(0, 0).set_pixmap(m_eye,m_eyemask);
     }
-
 }
 
 void LayerWindow::addModel(Model * model)
 {
+    std::cout << "Got add model" << std::endl << std::flush;
     Gtk::Menu * menu = m_modelMenu->get_menu();
     std::stringstream ident;
     ident << model->getName() << "-" << model->getModelNo();
@@ -217,27 +212,39 @@ void LayerWindow::addModel(Model * model)
     // m_viewMenu->set_menu(m_viewMenu->get_menu());
 }
 
-void LayerWindow::selectionMade(gint row, gint column, GdkEvent * event)
+void LayerWindow::visibleToggled(const Glib::ustring& path_string)
 {
-    const std::list<Layer *> & layers = m_currentModel->getLayers();
-    std::list<Layer *>::const_iterator I = layers.begin();
-    for (int i = layers.size() - 1; i > row && I != layers.end(); --i, ++I) { }
-    if (I == layers.end()) {
-        std::cerr << "No layer described" << std::endl << std::flush;
-        return;
+    std::cout << "GGO: " << path_string << std::endl << std::flush;
+    GtkTreePath *gpath = gtk_tree_path_new_from_string (path_string.c_str());
+    Gtk::TreePath path(gpath);
+
+    /* get toggled iter */
+    Gtk::TreeRow row = *(m_treeModel->get_iter(path));
+
+    bool visible = row[*m_visColumn];
+    Layer * layer = row[*m_ptrColumn];
+
+    /* do something with the value */
+    visible = layer->toggleVisible();
+
+    /* set new value */
+    row[*m_visColumn] = visible;
+}
+
+void LayerWindow::selectionChanged()
+{
+    std::cout << "Got selection change" << std::endl << std::flush;
+    Gtk::TreeIter i = m_refTreeSelection->get_selected();
+    if (!i) {
+	std::cout << "Nothing selected no more" << std::endl << std::flush;
+	return;
     }
-    m_currentModel->setCurrentLayer(*I);
-    std::cout << "new sel " << row << " " << column << " " << (*I)->getName() << std::endl << std::flush;
-    if (column == 0) {
-        bool vis = (*I)->toggleVisible();
-        if (vis) {
-#warning Handle setting pixmaps
-            // m_clist->cell(row, column).set_pixmap(m_eye,m_eyemask);
-        } else {
-            // m_clist->cell(row, column).set_pixmap(m_null,m_nullmask);
-        }
-        m_currentModel->update();
-    }
+    Gtk::TreeModel::Row row = *i;
+    Layer * layer = row[*m_ptrColumn];
+
+    m_currentModel->setCurrentLayer(layer);
+
+    std::cout << layer->getName() << " is now current" << std::endl << std::flush;
 }
 
 void LayerWindow::newLayerRequested()

@@ -1,4 +1,14 @@
-2002-08-31  Al Riddoch  <alriddoch@zepler.org>
+2002-09-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* More progress on Gtk2 port.
+
+	* app/HeightManager.cpp: Close the import dialog when the user
+	  presses close.
+
+	* app/LayerWindow.cpp: Fix issues with the selected layer changing
+	  when switching between windows.
+
+2002-09-06  Al Riddoch  <alriddoch@zepler.org>
 
 	* Lots of progress on the Gtk2 port.
 

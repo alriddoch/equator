@@ -1,1 +1,0 @@
-#undef BUILD_AS_GIMP_PLUGIN

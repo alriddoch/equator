@@ -65,7 +65,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     table->attach(*m_glarea, 1, 2, 1, 2, Gtk::FILL | Gtk::EXPAND,
                                          Gtk::FILL | Gtk::EXPAND);
 
-    vbox->pack_start(*table, Gtk::FILL | Gtk::EXPAND, 0);
+    vbox->pack_start(*table, Gtk::PACK_EXPAND_WIDGET, 0);
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
 
