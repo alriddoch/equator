@@ -23,6 +23,12 @@ void Cal3dStore::load(Gtk::FileSelection * fsel)
     std::string path = fsel->get_filename();
     delete fsel;
 
+    loadModel(path);
+}
+
+
+void Cal3dStore::loadModel(const std::string & path)
+{
     struct stat sbuf;
     if (stat(path.c_str(), &sbuf)) {
         // FIXME Message Dialog

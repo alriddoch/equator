@@ -35,6 +35,8 @@ class Cal3dStore : public Layer {
   public:
     Cal3dStore(Model &);
 
+    void loadModel(const std::string &);
+
     virtual void options();
     virtual void importFile();
     virtual void exportFile();

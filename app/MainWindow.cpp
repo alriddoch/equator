@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "Server.h"
 #include "Palette.h"
+#include "Cal3dStore.h"
 
 #include "gui/gtkmm/EntityTree.h"
 #include "gui/gtkmm/DockWindow.h"
@@ -25,6 +26,7 @@
 #include <gtkmm/table.h>
 #include <gtkmm/tooltips.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/filechooserdialog.h>
 
 #include <gdkmm/pixmap.h>
 
@@ -70,8 +72,7 @@ MainWindow::MainWindow() :
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("New", *menu_sub));
     // file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::NEW), SigC::slot(*this, &MainWindow::menuNewModel)));
-    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::OPEN)));
-    file_menu.back().set_sensitive(false);
+    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::OPEN), SigC::slot(*this, &MainWindow::open_option)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::PREFERENCES)));
     file_menu.back().set_sensitive(false);
@@ -211,6 +212,40 @@ MainWindow::MainWindow() :
 
 }
 
+void MainWindow::open_option()
+{
+    Gtk::FileChooserDialog fc("");
+    fc.set_transient_for(*this);
+
+    fc.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    fc.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+
+    Gtk::FileFilter filter_cfg;
+    filter_cfg.set_name("Cal3d files");
+    filter_cfg.add_pattern("*.cfg");
+    fc.add_filter(filter_cfg);
+
+    Gtk::FileFilter filter_cal;
+    filter_cal.set_name("Sear Cal3d files");
+    filter_cal.add_pattern("*.cal");
+    fc.add_filter(filter_cal);
+
+    int result = fc.run();
+
+    switch (result) {
+        case Gtk::RESPONSE_OK:
+            std::cout << "LOAD: " << fc.get_filename()
+                      << std::endl << std::flush;
+            loadFile(fc.get_filename());
+            break;
+        case Gtk::RESPONSE_CANCEL:
+            break;
+        default:
+            break;
+    }
+}
+
 gint MainWindow::quit(GdkEventAny *)
 {
     return 0;
@@ -260,6 +295,30 @@ Server & MainWindow::newServer(const std::string & name)
     serverAdded.emit(server);
 
     return *server;
+}
+
+void MainWindow::loadFile(const std::string & filename)
+{
+    std::string suffix;
+    unsigned int pos = filename.find_last_of(".");
+
+    if (pos != std::string::npos) {
+        suffix = filename.substr(pos + 1, std::string::npos);
+    }
+
+    if (suffix == "cfg") {
+        Model & m = newModel();
+        Cal3dStore * calLayer = new Cal3dStore(m);
+        m.addLayer(calLayer);
+        calLayer->loadModel(filename);
+        m.setName(calLayer->getName());
+    } else if (suffix == "cal") {
+        std::cout << ".cal files not yet supported" << std::endl << std::flush;
+    } else {
+        // FIXME Message Dialog
+        std::cout << "UNKNOWN" << std::endl << std::flush;
+        // wuh
+    }
 }
 
 void MainWindow::menu_quit()

@@ -1,5 +1,11 @@
 2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Cal3dStore.cpp, app/Cal3dStore.h, app/MainWindow.cpp,
+	  app/MainWindow.h: Add interface for loading cal3d files
+	  and allow them to be opened from the main menu.
+
+2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.cpp, app/Model.h, app/Model.cpp, app/Holo.cpp: Default
 	  to a box Holo backdrop. Store a pointer to the backdrop layer
 	  in the Model, and then change the backdrop type depending on

@@ -67,6 +67,7 @@ class MainWindow : public Gtk::Window
 
     void menuNewModel();
     void showOptionBox(OptionBox &);
+    void open_option();
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors
@@ -101,6 +102,7 @@ class MainWindow : public Gtk::Window
     Model & newModel();
     void newView(Model *);
     Server & newServer(const std::string & name);
+    void loadFile(const std::string & file);
 
     void menu_quit();
     void inheritance_window();
