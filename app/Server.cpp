@@ -91,7 +91,7 @@ void Server::createCharacter(const std::string & name,
                                  const std::string & type)
 {
 
-    GameEntity chrcter(GameEntity::Instantiate());
+    GameEntity chrcter;
     chrcter.setParents(Atlas::Message::Element::ListType(1,type));
     chrcter.setName(name);
     chrcter.setAttr("description", "an equator avatar");
@@ -330,7 +330,7 @@ void Server::moveCharacter(const PosType & pos)
         return;
     }
     
-    Move m(Move::Instantiate());
+    Move m;
 
     Atlas::Message::Element::MapType marg;
     marg["id"] = m_character->getID();
@@ -361,7 +361,7 @@ const PosType Server::getAbsCharPos()
 
 void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
 {
-    Create c = Create::Instantiate();
+    Create c;
 
     c.setArgs(Atlas::Message::Element::ListType(1, ent));
     c.setFrom(m_character->getID());
@@ -373,7 +373,7 @@ void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
                               const PosType & pos)
 {
-    Move m = Move::Instantiate();
+    Move m;
 
     Atlas::Message::Element::MapType ent;
     ent["id"] = id;
@@ -390,7 +390,7 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
                               const PosType & pos,
                               const VelType & vel)
 {
-    Move m = Move::Instantiate();
+    Move m;
 
     Atlas::Message::Element::MapType ent;
     ent["id"] = id;

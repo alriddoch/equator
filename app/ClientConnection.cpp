@@ -2,6 +2,8 @@
 // the GNU Lesser General Public License (See COPYING for details).
 // Copyright (C) 2001 Alistair Riddoch
 
+#error THis file has been removed from the build
+
 #include <Atlas/Codecs/XML.h>
 #include <Atlas/Net/Stream.h>
 #include <Atlas/Objects/Encoder.h>
@@ -255,7 +257,7 @@ bool ClientConnection::connect(const std::string & server)
 bool ClientConnection::login(const std::string & account,
                              const std::string & password)
 {
-    Atlas::Objects::Operation::Login l = Atlas::Objects::Operation::Login::Instantiate();
+    Atlas::Objects::Operation::Login l;
     Element::MapType acmap;
     acmap["id"] = account;
     acmap["password"] = password;
@@ -271,7 +273,7 @@ bool ClientConnection::login(const std::string & account,
 bool ClientConnection::create(const std::string & account,
                               const std::string & password)
 {
-    Atlas::Objects::Operation::Create c = Atlas::Objects::Operation::Create::Instantiate();
+    Atlas::Objects::Operation::Create c;
     Element::MapType acmap;
     acmap["id"] = account;
     acmap["password"] = password;
