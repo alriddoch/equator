@@ -1,5 +1,9 @@
 2003-01-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/HeightManager.cpp: Switch to accepting float from Mercator.
+
+2003-01-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.cpp, app/HeightManager.h, app/GlView.cpp:
 	  Convert more code to use vertex arrays, to be more efficient.
 

@@ -114,7 +114,7 @@ void HeightManager::heightMapRegion(Mercator::Segment * map)
 {
     float * harray = new float[segSize * segSize * 3];
     float * carray = new float[segSize * segSize * 3];
-    const double * points = map->getPoints();
+    const float * points = map->getPoints();
     int idx = -1, cdx = -1;
     for(int j = 0; j < segSize; ++j) {
         for(int i = 0; i < segSize; ++i) {
