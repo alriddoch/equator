@@ -33,7 +33,7 @@ class LayerPlant : public LayerFactory {
     Layer * newLayer(Model & m) { return new T(m); }
 };
 
-#include <gtkmm/window.h>
+#include <gtkmm/dialog.h>
 
 namespace Gtk {
    class ListStore;
@@ -43,7 +43,7 @@ namespace Gtk {
    class TreeSelection;
 }
 
-class NewLayerWindow : public Gtk::Window
+class NewLayerWindow : public Gtk::Dialog
 {
   private:
     Glib::RefPtr<Gtk::ListStore> m_treeModel;
@@ -55,11 +55,6 @@ class NewLayerWindow : public Gtk::Window
     std::map<Glib::ustring, LayerFactory *> m_factories;
   public:
     NewLayerWindow();
-
-    bool deleteEvent(GdkEventAny*) {
-        hide();
-        return 1;
-    }
 
     void doshow(Model * view);
 

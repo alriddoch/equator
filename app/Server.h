@@ -5,19 +5,27 @@
 #ifndef EQUATOR_SERVER_H
 #define EQUATOR_SERVER_H
 
-#include "Vector3D.h"
+#include "common/Vector3D.h"
 
-#include <Eris/Connection.h>
 #include <Eris/Log.h>
 
-#include <gtkmm/main.h>
+#include <Atlas/Message/Element.h>
+
+#include <glibmm/main.h>
 
 namespace Eris {
+  class Connection;
   class Player;
   class Lobby;
   class World;
   class Room;
   class Entity;
+}
+
+namespace Atlas {
+  namespace Message {
+    class Element;
+  }
 }
 
 class Model;

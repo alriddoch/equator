@@ -75,6 +75,10 @@ class Model : public SigC::Object {
     void importFile();
     void exportFile();
 
+    void selectInvert();
+    void selectAll();
+    void selectNone();
+
     void setName(const std::string & n);
     void addLayer(Layer *);
     void update();

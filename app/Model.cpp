@@ -1,15 +1,10 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2000-2001 Alistair Riddoch
+// Copyright (C) 2000-2003 Alistair Riddoch
 
 #include "Model.h"
 #include "Holo.h"
 
-#include <Mercator/Terrain.h>
-
-#include <GL/glu.h>
-
-#include <sstream>
 #include <iostream>
 
 #include <cassert>
@@ -29,15 +24,36 @@ Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
 
 void Model::importFile()
 {
-    if (m_currentLayer != NULL) {
+    if (m_currentLayer != 0) {
         m_currentLayer->importFile();
     }
 }
 
 void Model::exportFile()
 {
-    if (m_currentLayer != NULL) {
+    if (m_currentLayer != 0) {
         m_currentLayer->exportFile();
+    }
+}
+
+void Model::selectInvert()
+{
+    if (m_currentLayer != 0) {
+        m_currentLayer->selectInvert();
+    }
+}
+
+void Model::selectAll()
+{
+    if (m_currentLayer != 0) {
+        m_currentLayer->selectAll();
+    }
+}
+
+void Model::selectNone()
+{
+    if (m_currentLayer != 0) {
+        m_currentLayer->selectNone();
     }
 }
 

@@ -1,26 +1,19 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2000-2001 Alistair Riddoch
+// Copyright (C) 2000-2003 Alistair Riddoch
 
 #ifndef EQUATOR_APP_LAYER_H
 #define EQUATOR_APP_LAYER_H
 
-#include "Vector3D.h"
+#include "common/Vector3D.h"
 #include "types.h"
 
-#include <string>
 #include <sigc++/object.h>
+
+#include <string>
 
 class GlView;
 class Model;
-
-namespace WFMath {
-  template<const int dim> class Vector;
-}
-
-namespace Gtk {
-  class FileSelection;
-}
 
 class Layer : public SigC::Object {
   protected:
@@ -37,6 +30,10 @@ class Layer : public SigC::Object {
   public:
     virtual void importFile() = 0;
     virtual void exportFile() = 0;
+    virtual void selectInvert() = 0;
+    virtual void selectAll() = 0;
+    virtual void selectNone() = 0;
+
     virtual void draw(GlView & view) = 0;
     virtual void animate(GlView & view) = 0;
     virtual void select(GlView & view, int x, int y) = 0;

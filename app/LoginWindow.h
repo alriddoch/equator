@@ -10,11 +10,11 @@
 class Server;
 
 namespace Gtk {
-  class Entry;
+  class Label;
   class Combo;
+  class Entry;
   class Button;
   class Statusbar;
-  class Label;
 }
 
 class LoginWindow : public Gtk::Dialog
@@ -24,8 +24,8 @@ class LoginWindow : public Gtk::Dialog
     Gtk::Combo * m_userEntry;
     Gtk::Entry * m_passwdEntry;
     Gtk::Button * m_loginButton;
-
     Gtk::Statusbar * m_status;
+
     int m_statusContext;
     Server * m_server;
 

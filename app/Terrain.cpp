@@ -49,9 +49,7 @@ void Terrain::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
-     m_terrain(*new Mercator::Terrain), m_numLineIndeces(0),
-     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
+void Terrain::initIndeces()
 {
     int idx = -1;
     for (int i = 0; i < segSize; ++i) {
@@ -68,6 +66,20 @@ Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
     m_numLineIndeces = ++idx;
 }
 
+Terrain::Terrain(Model & m, Mercator::Terrain & mt) :
+     Layer(m, "terrain", "Terrain"), m_terrain(mt), m_numLineIndeces(0),
+     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
+{
+    initIndeces();
+}
+
+Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
+     m_terrain(*new Mercator::Terrain), m_numLineIndeces(0),
+     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
+{
+    initIndeces();
+}
+
 void Terrain::importFile()
 {
 
@@ -76,6 +88,23 @@ void Terrain::importFile()
     fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &Terrain::cancel),fsel));
     fsel->show();
 
+}
+
+void Terrain::exportFile()
+{
+}
+
+void Terrain::selectInvert()
+{
+}
+
+void Terrain::selectAll()
+{
+}
+
+void Terrain::selectNone()
+{
+    m_selection.clear();
 }
 
 void Terrain::selectRegion(Mercator::Segment & map)
@@ -146,18 +175,12 @@ void Terrain::heightMapRegion(GlView & view, Mercator::Segment & map)
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, harray);
     glColorPointer(3, GL_FLOAT, 0, carray);
-    if (have_GL_EXT_compiled_vertex_array) {
-        glLockArraysEXT(0, (segSize + 1) * (segSize + 1));
-    }
     if (view.getRenderMode(m_name) == GlView::LINE) {
         glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
                        GL_UNSIGNED_INT, m_lineIndeces);
     } else {
         glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
                        GL_UNSIGNED_INT, m_lineIndeces);
-    }
-    if (have_GL_EXT_compiled_vertex_array) {
-        glUnlockArraysEXT();
     }
     glDisableClientState(GL_COLOR_ARRAY);
     delete harray;
@@ -257,10 +280,6 @@ void Terrain::draw(GlView & view)
     glColor3f(1.0f, 0.f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
 
-    if (have_GL_EXT_compiled_vertex_array) {
-        glLockArraysEXT(0, arrow_mesh_size);
-    }
-
     float scale = 0.00625 / view.getScale();
     
     const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
@@ -278,11 +297,6 @@ void Terrain::draw(GlView & view)
             glPopMatrix();
         }
     }
-
-    if (have_GL_EXT_compiled_vertex_array) {
-        glUnlockArraysEXT();
-    }
-
 }
 
 void Terrain::animate(GlView & view)
@@ -421,10 +435,6 @@ void Terrain::dragStart(GlView & view, int x, int y)
 
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
 
-    if (have_GL_EXT_compiled_vertex_array) {
-        glLockArraysEXT(0, arrow_mesh_size);
-    }
-
     float scale = 0.00625 / view.getScale();
     
     const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
@@ -443,10 +453,6 @@ void Terrain::dragStart(GlView & view, int x, int y)
             glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
             glPopMatrix();
         }
-    }
-
-    if (have_GL_EXT_compiled_vertex_array) {
-        glUnlockArraysEXT();
     }
 
     glPopName();

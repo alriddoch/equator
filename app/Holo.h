@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2000-2001 Alistair Riddoch
+// Copyright (C) 2000-2003 Alistair Riddoch
 
 #ifndef EQUATOR_APP_HOLO_H
 #define EQUATOR_APP_HOLO_H
@@ -20,6 +20,10 @@ class Holo : public Layer {
 
     void importFile() { }
     void exportFile() { }
+    void selectInvert() { }
+    void selectAll() { }
+    void selectNone() { }
+
     void draw(GlView & view);
     void animate(GlView & view) { }
     void select(GlView & view, int x, int y) { }

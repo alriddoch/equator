@@ -6,7 +6,6 @@
 #define EQUATOR_APP_MAINWINDOW_H
 
 #include <gtkmm/window.h>
-#include <gtkmm/menu.h>
 
 #include <list>
 
@@ -24,7 +23,6 @@ namespace Gtk {
 class MainWindow : public Gtk::Window
 {
   private:
-    //Gtk::Menu * m_menu;
     std::list<ViewWindow*> m_views;
     std::list<Model*> m_models;
 

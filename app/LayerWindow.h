@@ -8,8 +8,6 @@
 #include <gtkmm/window.h>
 
 class MainWindow;
-class ViewWindow;
-class GlView;;
 class NewLayerWindow;;
 class Model;
 class Layer;

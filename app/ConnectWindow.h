@@ -24,8 +24,8 @@ class ConnectWindow : public Gtk::Dialog
     Gtk::OptionMenu * m_portChoice;
     Gtk::SpinButton * m_portSpin;
     Gtk::Button * m_connectButton;
-
     Gtk::Statusbar * m_status;
+
     int m_customPort;
     int m_portNum;
     int m_statusContext;

@@ -36,8 +36,6 @@ class ViewWindow : public Gtk::Window
     float m_dAdjust;
 
   public:
-    MainWindow & m_mainWindow;
-
     ViewWindow(MainWindow &, Model &);
 
     bool deleteEvent(GdkEventAny*) {

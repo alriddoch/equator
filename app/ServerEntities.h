@@ -48,6 +48,7 @@ class ServerEntities : public Layer {
   private:
     Server & m_serverConnection;
     GlView::rmode_t m_renderMode;
+    Eris::Entity * m_world; 
     Eris::Entity * m_selection; 
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
@@ -97,8 +98,13 @@ class ServerEntities : public Layer {
     void orient(const WFMath::Quaternion & orientation);
   public:
     ServerEntities(Model &, Server &);
-    void importFile();
-    void exportFile();
+
+    virtual void importFile();
+    virtual void exportFile();
+    virtual void selectInvert();
+    virtual void selectAll();
+    virtual void selectNone();
+
     void draw(GlView & view);
     void animate(GlView & view);
     void select(GlView & view, int x, int y);

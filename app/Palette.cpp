@@ -7,6 +7,7 @@
 #include "MainWindow.h"
 #include "Model.h"
 
+#include <gtkmm/menu.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/box.h>
 #include <gtkmm/scrolledwindow.h>
@@ -19,19 +20,17 @@
 #include <sstream>
 #include <vector>
 
-Palette::Palette(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
-                                    m_currentModel(NULL),
-                                    m_mainWindow(mw)
+Palette::Palette(MainWindow & mw) : m_currentModel(0), m_mainWindow(mw)
 {
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
-    tophbox->pack_start(*(manage( new Gtk::Label("Model:") )), Gtk::AttachOptions(0), 2);
+    tophbox->pack_start(*(manage( new Gtk::Label("Model:") )), Gtk::PACK_SHRINK, 2);
     m_modelMenu = manage( new Gtk::OptionMenu() );
-    tophbox->pack_start(*m_modelMenu, Gtk::FILL | Gtk::EXPAND, 2);
+    tophbox->pack_start(*m_modelMenu, Gtk::PACK_EXPAND_WIDGET, 2);
    
-    vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*tophbox, Gtk::PACK_SHRINK, 2);
 
     m_notebook = manage( new Gtk::Notebook() );
     m_notebook->set_tab_pos(Gtk::POS_TOP);
@@ -109,7 +108,7 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     sw->add(*m_textureTreeView);
     m_notebook->pages().push_back(Gtk::Notebook_Helpers::TabElem(*sw,"Textures"));
 
-    vbox->pack_start(*m_notebook, Gtk::FILL | Gtk::EXPAND, 2);
+    vbox->pack_start(*m_notebook, Gtk::PACK_EXPAND_WIDGET, 2);
 
     add(*vbox);
     set_sensitive(false);

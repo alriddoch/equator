@@ -1,39 +1,112 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2000-2001 Alistair Riddoch
+// Copyright (C) 2000-2003 Alistair Riddoch
 
-#ifndef EQUATOR_WORLDENTITY_H
-#define EQUATOR_WORLDENTITY_H
+#ifndef APOGEE_WORLDENTITY_H
+#define APOGEE_WORLDENTITY_H
+
+#include "common/Vector3D.h"
 
 #include <Eris/Entity.h>
 #include <Eris/Factory.h>
 
 namespace Eris {
   class TypeInfo;
+  class TypeService;
 }
 
-class Server;
-class Terrain;
+class EntityRenderer;
 
-class TerrainEntity : public Eris::Entity
+class RenderableEntity : public Eris::Entity
+{
+  public:
+    EntityRenderer * m_drawer;
+
+    RenderableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+    virtual void constrainChild(PosType & pos);
+};
+
+class MovableEntity : public RenderableEntity
+{
+    float updateTime;
+  public:
+    void movedSignal(const PosType &);
+
+    MovableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+
+    const float getTime() {
+        return updateTime;
+    }
+};
+
+class AutonomousEntity : public MovableEntity
+{
+  public:
+    AutonomousEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+
+};
+
+class TerrainEntity : public RenderableEntity
 {
   public:
     TerrainEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
 
-    Terrain * m_terrain;
+    virtual void constrainChild(PosType & pos);
 };
+
+class TreeEntity : public RenderableEntity
+{
+  public:
+    TreeEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *);
+
+};
+
+class Renderer;
+
+class RenderFactory
+{
+  public:
+    RenderFactory() { }
+    virtual ~RenderFactory();
+
+    virtual EntityRenderer * newRenderer(Renderer &, Eris::Entity &) const = 0;
+};
+
+template <class R>
+class RendererFactory : public RenderFactory
+{
+  private:
+    std::string m_filename;
+  public:
+    explicit RendererFactory(const std::string & fname) : m_filename(fname) { }
+
+    EntityRenderer * newRenderer(Renderer & r, Eris::Entity & e) const {
+        R * er = new R(r, e);
+        er->load(m_filename);
+        return er;
+    }
+};
+
+class Renderer;
 
 class WEFactory : public Eris::Factory
 {
-  private:
-    static Eris::TypeInfo * terrainType;
   public:
-    Server & m_svr;
+    typedef std::map<Eris::TypeInfo *, RenderFactory *> RendererMap;
+  private:
+    static Eris::TypeInfo * autonomousType;
+    static Eris::TypeInfo * terrainType;
+    static Eris::TypeInfo * treeType;
 
-    explicit WEFactory(Server & a);
+    RendererMap m_renderFactories;
+  public:
+    Renderer & m_renderer;
+
+    explicit WEFactory(Eris::TypeService &, Renderer &);
+    virtual ~WEFactory();
     
     virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::World *);
     virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity &, Eris::World *);
 };
 
-#endif // EQUATOR_WORLDENTITY_H
+#endif // APOGEE_WORLDENTITY_H

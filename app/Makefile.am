@@ -11,7 +11,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  ConnectWindow.cpp ConnectWindow.h \
 		  LoginWindow.cpp LoginWindow.h \
 		  CharacterWindow.cpp CharacterWindow.h \
-		  NewServerWindow.cpp NewServerWindow.h \
 		  Palette.cpp Palette.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
 		  inheritance.cpp inheritance.h \
@@ -21,16 +20,11 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  Server.cpp Server.h \
 		  Layer.cpp Layer.h \
 		  Holo.cpp Holo.h \
-		  TileMap.cpp TileMap.h \
 		  Terrain.cpp Terrain.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \
-		  Texture.cpp Texture.h default_texture.h \
-		  Tile.cpp Tile.h \
-		  types.h GL.h operations.h debug.h \
+		  types.h GL.h operations.h \
 		  arrow_mesh.h \
 		  equator_plugin.cpp
 
-#		  HeightMap.cpp HeightMap.h \
-#		  HeightData.cpp HeightData.h \
-#		  HeightManager.cpp HeightManager.h \
+equator_LDADD = ../visual/libvisual.a ../common/libcommon.a

@@ -4,7 +4,6 @@
 
 #include "AtlasMapWidget.h"
 
-#include <gtkmm/frame.h>
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/treestore.h>
 

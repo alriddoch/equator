@@ -4,6 +4,8 @@
 
 #include "MainWindow.h"
 
+#include "common/configuration.h"
+
 #include <gtkmm.h>
 
 #include <gtkglmm.h>
@@ -72,6 +74,8 @@ extern "C" void run(gchar * name,
 
 int main(int argc, char ** argv)
 {
+    loadConfig(argc, argv);
+
     kit = new Gtk::Main(argc, argv);
 
     Gdk::GL::init();
@@ -92,6 +96,8 @@ int main(int argc, char ** argv)
 
 int main(int argc, char ** argv)
 {
+    loadConfig(argc, argv);
+
     kit = new Gtk::Main(argc, argv);
 
     Gdk::GL::init(argc, argv);

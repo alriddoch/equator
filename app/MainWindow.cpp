@@ -36,7 +36,7 @@
 
 #include <iostream>
 
-MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
+MainWindow::MainWindow() :
     m_tool(MainWindow::SELECT), m_toolMode(MainWindow::ENTITY),
     m_layerwindow (*new LayerWindow(*this) ),
     m_inheritancewindow (*new InheritanceWindow(*this) ),
@@ -85,7 +85,7 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     menu_bar->append(*menu_root);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
-    vbox->pack_start(*menu_bar, Gtk::AttachOptions(0), 0);
+    vbox->pack_start(*menu_bar, Gtk::PACK_SHRINK, 0);
 
     Gtk::Table * table = manage( new Gtk::Table(5, 2, true) );
 
@@ -165,7 +165,7 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     b = manage( new Gtk::ToggleButton("10") );
     table->attach(*b, 3, 4, 3, 4);
 
-    vbox->pack_end(*table);
+    vbox->pack_start(*table, Gtk::PACK_SHRINK);
 
     add(*vbox);
 

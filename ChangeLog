@@ -1,3 +1,65 @@
+2003-12-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* common: Equivalent of a bunch of files from apogee, for
+	  compatability with apogee's rendering code.
+
+	* visual: Directory of IG rendering code from apogee.
+
+	* visual/Renderer.h, visual/Renderer.cpp: Compatable interface
+	  with apogee's renderer.
+
+	* Link to cal3d, lib3ds, varconf and sage for compatability with
+	  apogee.
+
+	* app/AtlasMapWidget.cpp, app/AtlasMapWidget.h, 
+	  app/CharacterWindow.cpp, app/CharacterWindow.h,
+	  app/ConnectWindow.cpp, app/ConnectWindow.h,
+	  app/GlView.cpp, app/GlView.h, app/InheritanceWindow.cpp,
+	  app/Layer.h, app/LayerWindow.cpp, app/LayerWindow.h,
+	  app/LoginWindow.cpp, app/LoginWindow.h, app/MainWindow.cpp,
+	  app/MainWindow.h, app/NewServerWindow.cpp, app/Palette.cpp,
+	  app/Server.cpp, app/Server.h, app/ServerEntities.cpp,
+	  app/ServerWindow.cpp, app/ViewWindow.cpp, app/ViewWindow.h:
+	  Clean up some includes, and packing options.
+
+	* app/BladeMap.cpp, app/BladeMap.h, app/ClientConnection.h,
+	  app/IsoMap.cpp, app/IsoMap.h, app/NewServerWindow.h, app/Texture.h,
+	  app/Tile.h, app/TileMap.h, app/debug.h app/Vector3D.h:
+	  Remove obsolete files from the build.
+
+	* app/GL.h: Switch to using visual/GL.h from apogee.
+
+	* app/GlView.cpp, app/GlView.h, app/ViewWindow.cpp:
+	  Remove popup menu from GlView, and add it as a normal menu
+	  in ViewWindow.
+
+	* app/GlView.cpp: Use a more sane projection by switching
+	  to gluPerspective().
+
+	* app/Holo.h, app/Layer.h, app/Model.cpp, app/Model.h,
+	  app/ServerEntities.cpp, app/ServerEntities.h, app/Terrain.cpp:
+	  Add to Layer interface to handle select all, invert and none
+	  menu options.
+
+	* app/NewLayerWindow.cpp, app/NewLayerWindow.h: Convert
+	  NewLayerWindow to use the Gtk Dialog base class.
+
+	* app/Server.cpp, app/WorldEntity.cpp, app/WorldEntity.h:
+	  Switch to using World Entity factory code from apogee.
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Switch import
+	  and export dialogs to using Dialog base class. Modify world
+	  render interface to match the interface used in apogee. Adapt
+	  for new apogee entity classes.
+
+	* app/Terrain.cpp, app/Terrain.h:
+	  Add new constructor to handle the case if terrain is managed by
+	  the entity renderer rather than this layer.
+
+	* app/Terrain.cpp: Remove use of obsolete extensions.
+
+	* app/equator_plugin.cpp: Load config for apogee code.
+
 2003-12-24  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ConnectWindow.cpp: Set the port number on the spinner even if

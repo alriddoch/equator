@@ -21,6 +21,7 @@ dnl Need libtool
 
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
+AC_PROG_LN_S
 
 dnl Test for C++ compiler
 
@@ -64,7 +65,7 @@ AC_CHECK_LIB(GLU,gluPerspective, [ LIBS="$LIBS -lGLU" ],
     AC_MSG_ERROR(Could not find OpenGL U library)
 )
 
-PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 ,
+PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         LIBS="$LIBS $WF_LIBS"
@@ -72,6 +73,15 @@ PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 ,
     [
         AC_MSG_ERROR(Couldn't find WF libs.)
     ])
+
+AM_PATH_LIB3DS(1.2.0, , AC_MSG_ERROR(Couldn't find lib3ds))
+CPPFLAGS="$CPPFLAGS $LIB3DS_CFLAGS"
+LIBS="$LIBS $LIB3DS_LIBS"
+
+AC_CHECK_LIB(cal3d, main,
+[
+    LIBS="$LIBS -lcal3d"
+], AC_MSG_ERROR(Could not find cal3d library))
 
 dnl Versions required
 
@@ -113,5 +123,7 @@ AC_TRY_COMPILE([
 dnl Generate files
 AC_OUTPUT([
 	Makefile
+	common/Makefile
+	visual/Makefile
 	app/Makefile
 ])

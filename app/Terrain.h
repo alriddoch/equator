@@ -13,8 +13,6 @@ namespace Gtk {
   class FileSelection;
 }
 
-class GlView;
-
 namespace Mercator {
   class Terrain;
   class Segment;
@@ -31,6 +29,8 @@ class Terrain : public Layer {
     int m_numLineIndeces;
     unsigned int * const m_lineIndeces;
 
+    void initIndeces();
+
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
 
@@ -41,10 +41,15 @@ class Terrain : public Layer {
                     const GroundCoord & gc);
   public:
     static const int segSize = 64;
+    explicit Terrain(Model &, Mercator::Terrain &);
     explicit Terrain(Model &);
 
     virtual void importFile();
-    virtual void exportFile() { }
+    virtual void exportFile();
+    virtual void selectInvert();
+    virtual void selectAll();
+    virtual void selectNone();
+
     virtual void draw(GlView & view);
     virtual void animate(GlView & view);
     virtual void select(GlView & view, int x, int y);

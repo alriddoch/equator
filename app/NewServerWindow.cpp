@@ -181,7 +181,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Connection status");
-    // vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
+    // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
     signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));
 }

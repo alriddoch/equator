@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
+#error This file has been removed from the build
+
 #include "IsoMap.h"
 #include "Tile.h"
 #include "GlView.h"

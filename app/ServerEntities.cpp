@@ -12,28 +12,30 @@
 #include "WorldEntity.h"
 #include "Terrain.h"
 
-#include "debug.h"
+#include "common/debug.h"
+
+#include "visual/TerrainRenderer.h"
 
 #include <Mercator/Terrain.h>
-#include <Mercator/Segment.h>
-#include <Mercator/TerrainMod.h>
 
-
+#include <Eris/Connection.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 #include <Eris/TypeInfo.h>
 
 #include <wfmath/atlasconv.h>
-#include <wfmath/ball.h>
+// #include <wfmath/ball.h>
 
 #include <Atlas/Codecs/XML.h>
+#include <Atlas/Message/DecoderBase.h>
 
 #include <GL/glu.h>
 
 #include <gtkmm/fileselection.h>
-#include <gtkmm/frame.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/label.h>
+#include <gtkmm/alignment.h>
+#include <gtkmm/stock.h>
 
 #include <fstream>
 
@@ -42,7 +44,6 @@
 static const bool debug_flag = false;
 
 using Atlas::Message::Element;
-typedef Atlas::Message::Element Element;
 
 ImportOptions * ServerEntities::m_importOptions = NULL;
 ExportOptions * ServerEntities::m_exportOptions = NULL;
@@ -116,7 +117,7 @@ class FileDecoder : public Atlas::Message::DecoderBase {
     }
 };
 
-class ImportOptions : public Gtk::Window
+class ImportOptions : public Gtk::Dialog
 {
   private:
     
@@ -127,40 +128,48 @@ class ImportOptions : public Gtk::Window
     ImportTarget m_target;
 
     ImportOptions() : m_target(IMPORT_TOPLEVEL) {
-        Gtk::VBox * vbox = manage( new Gtk::VBox() );
+        Gtk::VBox * vbox = get_vbox();
 
-        Gtk::Frame * frame = manage( new Gtk::Frame("Import entities into..") );
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
+        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
+        vbox = manage( new Gtk::VBox() );
+        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 12);
+
+        Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+        a->add(*manage( new Gtk::Label("Import entities into..") ) );
+        vbox->pack_start(*a);
+
+        hbox = manage( new Gtk::HBox() );
+        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
+        vbox = manage( new Gtk::VBox() );
+        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
         Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("top level") );
         rb1->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_TOPLEVEL));
-        hbox->pack_start(*rb1, false, false, 2);
+        vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
         Gtk::RadioButton::Group rgp = rb1->get_group();
         Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
         rb->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
-        hbox->pack_start(*rb, false, false, 2);
-        frame->add(*hbox);
-        vbox->pack_start(*frame, false, false, 2);
+        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
 
-        hbox = manage( new Gtk::HBox() );
-        m_ok = manage( new Gtk::Button("OK") );
-        hbox->pack_start(*m_ok, true, true, 2);
-        Gtk::Button * b = manage( new Gtk::Button("Cancel") );
-        b->signal_clicked().connect(slot(*this, &ImportOptions::cancel));
-        hbox->pack_start(*b, true, true, 2);
-        vbox->pack_end(*hbox, false, false, 2);
-        add(*vbox);
+        add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
+        m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
+
+        signal_response().connect(slot(*this, &ImportOptions::response));
     }
 
     void setImportTarget(ImportTarget it) {
         m_target = it;
     }
 
-    void cancel() {
+    void response(int) {
         hide();
     }
 };
 
-class ExportOptions : public Gtk::Window
+class ExportOptions : public Gtk::Dialog
 {
   private:
     
@@ -177,70 +186,82 @@ class ExportOptions : public Gtk::Window
     Eris::TypeInfoPtr m_charType;
 
     ExportOptions() : m_target(EXPORT_ALL), m_charType(NULL) {
-        Gtk::VBox * vbox = manage( new Gtk::VBox() );
+        Gtk::VBox * vbox = get_vbox();
 
-        Gtk::Frame * frame = manage( new Gtk::Frame("Export..") );
-        Gtk::VBox * rbox = manage( new Gtk::VBox() );
+        Gtk::HBox * hbox = manage( new Gtk::HBox() );
+        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
+        Gtk::VBox * mainvbox = manage( new Gtk::VBox() );
+        hbox->pack_start(*mainvbox, Gtk::PACK_EXPAND_WIDGET, 12);
+
+        Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+        a->add(*manage( new Gtk::Label("Export..") ) );
+        mainvbox->pack_start(*a);
+
+        hbox = manage( new Gtk::HBox() );
+        mainvbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
+        vbox = manage( new Gtk::VBox() );
+        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
         Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("all entities") );
         rb1->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL));
-        rbox->pack_start(*rb1, false, false, 2);
+        vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
         Gtk::RadioButton::Group rgp = rb1->get_group();
         Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "visible entities") );
         rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_VISIBLE));
-        rbox->pack_start(*rb, false, false, 2);
+        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
         rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
         rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_SELECTION));
-        rbox->pack_start(*rb, false, false, 2);
+        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
         rb = manage( new Gtk::RadioButton(rgp, "all selected entities") );
         rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
-        rbox->pack_start(*rb, false, false, 2);
+        vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
         m_charCheck = manage( new Gtk::CheckButton("Remove characters") );
-        rbox->pack_start(*m_charCheck, false, false, 0);
+        vbox->pack_start(*m_charCheck, Gtk::PACK_SHRINK, 6);
         
-        frame->add(*rbox);
-        vbox->pack_start(*frame, false, false, 2);
+        a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+        a->add(*manage( new Gtk::Label("ID handling") ) );
+        mainvbox->pack_start(*a);
 
-        frame = manage( new Gtk::Frame("ID handling") );
-        Gtk::VBox * lvbox = manage( new Gtk::VBox() );
-        Gtk::HBox * hbox = manage( new Gtk::HBox() );
+        hbox = manage( new Gtk::HBox() );
+        mainvbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
+        vbox = manage( new Gtk::VBox() );
+        hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
+
         m_appendCheck = manage( new Gtk::CheckButton("Append") );
-        hbox->pack_start(*m_appendCheck, false, false, 0);
+        vbox->pack_start(*m_appendCheck, Gtk::PACK_SHRINK, 6);
+
+        hbox = manage( new Gtk::HBox() );
+        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
         m_idSuffix = manage( new Gtk::Entry() );
         m_idSuffix->set_text("_map");
-        hbox->pack_start(*m_idSuffix, false, false, 0);
+        hbox->pack_start(*m_idSuffix, Gtk::PACK_SHRINK, 6);
+
         Gtk::Label * t = manage( new Gtk::Label("to IDs in file.") );
-        hbox->pack_end(*t, false, false, 0);
-        lvbox->pack_start(*hbox, false, false, 2);
+        hbox->pack_start(*t, Gtk::PACK_SHRINK, 6);
+
+        m_setRootCheck = manage( new Gtk::CheckButton("Set root id to ") );
+        vbox->pack_start(*m_setRootCheck, Gtk::PACK_SHRINK, 6);
 
         hbox = manage( new Gtk::HBox() );
-        m_setRootCheck = manage( new Gtk::CheckButton("Set root id to ") );
-        hbox->pack_start(*m_setRootCheck, false, false, 0);
+        vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
         m_rootId = manage( new Gtk::Entry() );
         m_rootId->set_text("world_0");
-        hbox->pack_start(*m_rootId, false, false, 0);
-        t = manage( new Gtk::Label(".") );
-        hbox->pack_end(*t, false, false, 0);
-        lvbox->pack_start(*hbox, false, false, 2);
+        hbox->pack_start(*m_rootId, Gtk::PACK_SHRINK, 6);
 
-        frame->add(*lvbox);
-        vbox->pack_start(*frame, false, false, 2);
+        add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
+        m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
 
-        hbox = manage( new Gtk::HBox() );
-        m_ok = manage( new Gtk::Button("OK") );
-        hbox->pack_start(*m_ok, true, true, 2);
-        Gtk::Button * b = manage( new Gtk::Button("Cancel") );
-        b->signal_clicked().connect(slot(*this, &ExportOptions::cancel));
-        hbox->pack_start(*b, true, true, 2);
-
-        vbox->pack_start(*hbox, false, false, 2);
-        add(*vbox);
+        signal_response().connect(slot(*this, &ExportOptions::response));
     }
 
     void setExportTarget(ExportTarget et) {
         m_target = et;
     }
 
-    void cancel() {
+    void response(int) {
         hide();
     }
 };
@@ -366,21 +387,25 @@ void ServerEntities::orient(const WFMath::Quaternion & orientation)
 }
 
 
-void ServerEntities::drawEntity(Eris::Entity* world,
-                                Eris::Entity* ent,
+void ServerEntities::drawEntity(Eris::Entity* ent,
+                                Eris::Entity* pe,
                                 entstack_t::const_iterator I)
 {
-    assert(ent != NULL);
+    assert(ent != 0);
 
     PosType pos = ent->getPosition();
 
     // This is where code would go to adjust position for velocity etc.
 
+    // Manipulate camera position if necessary
+
+    // Check type of entity to see if it should be rendered
+
     glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
     orient(ent->getOrientation());
 
-    bool openEntity = ((ent == world) ||
+    bool openEntity = ((ent == m_world) ||
                        ((I != m_selectionStack.end()) && (*I == ent)));
 
     if (ent->hasBBox()) {
@@ -404,7 +429,7 @@ void ServerEntities::drawEntity(Eris::Entity* world,
     if (openEntity) {
         int numEnts = ent->getNumMembers();
         entstack_t::const_iterator J = I;
-        if (ent != world) {
+        if (ent != m_world) {
             ++J;
         }
         debug(std::cout << ent->getID() << " " << numEnts << " emts"
@@ -413,7 +438,7 @@ void ServerEntities::drawEntity(Eris::Entity* world,
             Eris::Entity * e = ent->getMember(i);
             assert(e != NULL);
 
-            drawEntity(world, e, J);
+            drawEntity(e, 0, J);
         }
     }
 
@@ -424,7 +449,9 @@ void ServerEntities::drawWorld(Eris::Entity * wrld)
 {
     assert(wrld != NULL);
 
-    drawEntity(wrld, wrld, m_selectionStack.begin());
+    m_world = wrld;
+
+    drawEntity(wrld, 0, m_selectionStack.begin());
 }
 
 void ServerEntities::selectEntity(Eris::Entity * wrld,
@@ -569,20 +596,24 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
     if ((parent != 0) && (m_selectionList.find(ent) != m_selectionList.end())) {
         TerrainEntity * tparent = dynamic_cast<TerrainEntity *>(parent);
         if (tparent != 0) {
-            std::cout << "Terrain ... " << std::endl << std::flush;
-            if (tparent->m_terrain != 0) {
-                PosType pos = ent->getPosition();
-                float height = tparent->m_terrain->m_terrain.get(pos.x(),
-                                                                 pos.y());
-                std::cout << ent->getID() << " had height of " << pos.z()
-                          << " and we change it to terrain level " << height << std::endl << std::flush;
-                pos.z() = height;
-                m_serverConnection.avatarMoveEntity(ent->getID(),
-                                            ent->getContainer()->getID(),
-                                            pos, VelType(0,0,0));
+            EntityRenderer * er = tparent->m_drawer;
+            if (er != 0) {
+                std::cout << "Terrain ... " << std::endl << std::flush;
+                TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
+                if (tr != 0) {
+                    PosType pos = ent->getPosition();
+                    float height = tr->m_terrain.get(pos.x(), pos.y());
+                    std::cout << ent->getID() << " had height of " << pos.z()
+                              << " and we change it to terrain level "
+                              << height << std::endl << std::flush;
+                    pos.z() = height;
+                    m_serverConnection.avatarMoveEntity(ent->getID(),
+                                                ent->getContainer()->getID(),
+                                                pos, VelType(0,0,0));
+                }
                 
             } else {
-                std::cout << "No terrain ... " << std::endl << std::flush;
+                std::cout << "No renderer ... " << std::endl << std::flush;
             }
         } else {
             std::cout << "Not terrain ... " << std::endl << std::flush;
@@ -614,12 +645,15 @@ void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
     m_loadOptionsDone.disconnect();
     m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::load), fsel));
     m_importOptions->show_all();
+    fsel->hide();
 }
 
 void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 {
+    m_saveOptionsDone.disconnect();
     m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::save), fsel));
     m_exportOptions->show_all();
+    fsel->hide();
 }
 
 void ServerEntities::insertEntityContents(const std::string & container,
@@ -649,8 +683,6 @@ void ServerEntities::insertEntityContents(const std::string & container,
 
 void ServerEntities::load(Gtk::FileSelection * fsel)
 {
-    m_importOptions->hide();
-
     std::string filename = fsel->get_filename();
     delete fsel;
 
@@ -726,8 +758,6 @@ void ServerEntities::exportEntity(const std::string & id,
 
 void ServerEntities::save(Gtk::FileSelection * fsel)
 {
-    m_exportOptions->hide();
-
     std::string filename = fsel->get_filename();
     delete fsel;
 
@@ -735,14 +765,17 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     switch (m_exportOptions->m_target) {
         case ExportOptions::EXPORT_SELECTION:
             export_root = m_selection;
+            break;
         case ExportOptions::EXPORT_ALL_SELECTED:
-            if (m_selection != NULL) {
+            if (m_selection != 0) {
                 export_root = m_selection->getContainer();
             }
+            break;
         case ExportOptions::EXPORT_ALL:
         case ExportOptions::EXPORT_VISIBLE:
         default:
             export_root = m_serverConnection.m_world->getRootEntity();
+            break;
     }
 
     if (export_root == NULL) {
@@ -871,6 +904,21 @@ void ServerEntities::exportFile()
     fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::saveOptions),fsel));
     fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::cancel),fsel));
     fsel->show();
+}
+
+void ServerEntities::selectInvert()
+{
+}
+
+void ServerEntities::selectAll()
+{
+}
+
+void ServerEntities::selectNone()
+{
+    m_selection = 0;
+    m_selectionList.clear();
+    m_selectionStack.clear();
 }
 
 void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)

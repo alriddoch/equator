@@ -4,13 +4,8 @@
 
 #include "LoginWindow.h"
 
-#include "MainWindow.h"
 #include "Server.h"
-#include "Model.h"
 
-#include <Eris/Connection.h>
-#include <Eris/Lobby.h>
-#include <Eris/World.h>
 #include <Eris/Player.h>
 
 #include <gtkmm/box.h>
@@ -18,8 +13,6 @@
 #include <gtkmm/label.h>
 #include <gtkmm/combo.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/main.h>
 #include <gtkmm/statusbar.h>
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
@@ -82,7 +75,7 @@ LoginWindow::LoginWindow() :
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Login status");
-    // vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
+    // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
     signal_delete_event().connect(slot(*this, &LoginWindow::deleteEvent));
 }

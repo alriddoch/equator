@@ -8,20 +8,18 @@
 #include "Terrain.h"
 
 #include <gtkmm/scrolledwindow.h>
-#include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeselection.h>
 #include <gtkmm/stock.h>
-#include <gtkmm/stockitem.h>
 
 #include <iostream>
 
 std::map<std::string, LayerFactory *> LayerFactory::factories;
 
-NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
+NewLayerWindow::NewLayerWindow()
 {
     m_columns = new Gtk::TreeModelColumnRecord();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
@@ -42,57 +40,23 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
     m_factories["HoloWorld"] = factory;
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     row[*m_nameColumn]     = "HoloWorld";
-    //m_list->add(*(manage( new FactoryItem(factory, "HoloWorld") )));
-
-    // factory = new LayerPlant<BladeMap>();
-    // LayerFactory::factories["BladeMap"] = factory;
-    // m_factories["BladeMap"] = factory;
-    // row = *(m_treeModel->append());
-    // row[*m_nameColumn]     = "BladeMap";
-    //m_list->add(*(manage( new FactoryItem(factory, "BladeMap") )));
-
-    // factory = new LayerPlant<IsoMap>();
-    // LayerFactory::factories["IsoMap"] = factory;
-    // m_factories["IsoMap"] = factory;
-    // row = *(m_treeModel->append());
-    // row[*m_nameColumn]     = "IsoMap";
-    //m_list->add(*(manage( new FactoryItem(factory, "IsoMap") )));
-
-    // factory = new LayerPlant<HeightManager>();
-    // LayerFactory::factories["HeightManager"] = factory;
-    // m_factories["HeightManager"] = factory;
-    // row = *(m_treeModel->append());
-    // row[*m_nameColumn]     = "HeightManager";
-    //m_list->add(*(manage( new FactoryItem(factory, "HeightManager") )));
 
     factory = new LayerPlant<Terrain>();
     LayerFactory::factories["Terrain"] = factory;
     m_factories["Terrain"] = factory;
     row = *(m_treeModel->append());
     row[*m_nameColumn]     = "Terrain";
-    //m_list->add(*(manage( new FactoryItem(factory, "HeightManager") )));
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
     scrolled_window->set_size_request(250,150);
     scrolled_window->add(*m_treeView);
-    // scrolled_window->add(*m_list);
 
-    Gtk::VBox * vbox = manage( new Gtk::VBox() );
-    vbox->pack_start(*scrolled_window, Gtk::EXPAND | Gtk::FILL, 2);
+    get_vbox()->pack_start(*scrolled_window);
 
-    Gtk::HBox * hbox = manage( new Gtk::HBox() );
-    Gtk::Button * b = manage( new Gtk::Button(Gtk::Stock::OK) );
-    b->signal_clicked().connect(slot(*this, &NewLayerWindow::okay));
-    hbox->pack_start(*b, Gtk::EXPAND | Gtk::FILL, 2);
-    b = manage( new Gtk::Button(Gtk::Stock::CANCEL) );
+    Gtk::Button * b = add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
     b->signal_clicked().connect(slot(*this, &NewLayerWindow::cancel));
-    hbox->pack_start(*b, Gtk::EXPAND | Gtk::FILL, 2);
-
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 2);
-
-    add(*vbox);
-
-    signal_delete_event().connect(slot(*this, &NewLayerWindow::deleteEvent));
+    b = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
+    b->signal_clicked().connect(slot(*this, &NewLayerWindow::okay));
 }
 
 void NewLayerWindow::doshow(Model * model)

@@ -10,11 +10,11 @@
 class Server;
 
 namespace Gtk {
-  class Entry;
+  class Label;
   class Combo;
+  class Entry;
   class Button;
   class Statusbar;
-  class Label;
 }
 
 namespace Eris {
@@ -29,8 +29,8 @@ class CharacterWindow : public Gtk::Dialog
     Gtk::Entry * m_typeEntry;
     Gtk::Button * m_takeButton;
     Gtk::Button * m_createButton;
-
     Gtk::Statusbar * m_status;
+
     int m_statusContext;
     Server * m_server;
     std::string m_selectedCharacter;

@@ -1,9 +1,18 @@
+Make sure when TerrainEntity is created, we create a Terrain rendering layer.
+This is the only outstanding issue that I know of since the conversion to
+using chunks of apogee code.
+
+Use WorldEntity source files from apogee, and adapt code to match.
+
+Arrange so that an adjustment is the master of the camera control, so
+its easier to keep widgets in sync.
+
+Can we make an assumption about the horizontal field of view typically
+used by most users? If so, we can look at the window size as a proportion,
+and adjust the projection's field of view accordingly.
+
 Because the view window is now being created earlier, the creation of the
 terrain layer is somehow being missed.
-
-Fix "Select Avatar" and "Create Avatar" buttons so that only one is
-sensitive if no avatars can be selected. Avatar selector could also probably
-do with being insensitive if its empty.
 
 Add option to control camera using joystick.
 
@@ -57,8 +66,6 @@ Add way for admin account to make sure it moves its avatar in such a
 way that it gets appearance/disappearance ops.
 
 Make common base for entity based layers.
-
-Sort out windows so they are not deleted when the user clicks on close.
 
 What NOW!?
 

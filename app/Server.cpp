@@ -9,6 +9,9 @@
 #include "ServerEntities.h"
 #include "Terrain.h"
 
+#include "visual/TerrainRenderer.h"
+#include "visual/Renderer.h"
+
 #include <Eris/Avatar.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
@@ -24,9 +27,9 @@
 #include <Atlas/Objects/Operation/Move.h>
 #include <Atlas/Objects/Operation/Create.h>
 
-#include <glibmm/main.h>
-
 #include <sigc++/object_slot.h>
+
+#include <cassert>
 
 using Atlas::Message::Element;
 
@@ -64,7 +67,10 @@ void Server::takeCharacter(const std::string & id)
 
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
-    m_world->registerFactory(new WEFactory(*this));
+
+    Renderer r;
+    m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
+                                           r));
 }
 
 void Server::createCharacter(const std::string & name,
@@ -83,8 +89,10 @@ void Server::createCharacter(const std::string & name,
 
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
-    m_world->registerFactory(new WEFactory(*this));
 
+    Renderer r;
+    m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
+                                           r));
 }
 
 void Server::readTerrain(Terrain & t, Eris::Entity & ent)
@@ -153,14 +161,21 @@ void Server::readTerrain(Terrain & t, Eris::Entity & ent)
 
 void Server::checkEntityForNewLayers(Eris::Entity & ent)
 {
+    assert(m_model != 0);
+
     if (typeid(ent) == typeid(TerrainEntity)) {
         TerrainEntity & tent = dynamic_cast<TerrainEntity &>(ent);
         std::cout << "Found a terrain entity"
                   << std::endl << std::flush;
-        Terrain * layer = new Terrain(*m_model);
-        readTerrain(*layer, ent);
-        m_model->addLayer(layer);
-        tent.m_terrain = layer;
+        EntityRenderer * er = tent.m_drawer;
+        if (er != 0) {
+            TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
+            if (tr != 0) {
+                Terrain * layer = new Terrain(*m_model, tr->m_terrain);
+                readTerrain(*layer, ent);
+                m_model->addLayer(layer);
+            }
+        }
     }
     
     int numEnts = ent.getNumMembers();
