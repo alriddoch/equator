@@ -44,6 +44,11 @@ class NewLayerWindow : public Gtk::Window
   public:
     NewLayerWindow();
 
+    gint delete_event_impl(GdkEventAny*) {
+        hide();
+        return 1;
+    }
+
     void doshow(Model * view);
 
     void okay();

@@ -1,3 +1,8 @@
+Make all the windows implement delete_event_impl() so they don't get deleted.
+
+Add clipentry base class, which Layer classes have an associated derived
+type to store stuff they copy and cut.
+
 Add capabilty to select existing avatar/character in the connection window.
 
 Add way for admin account to make sure it moves its avatar in such a
@@ -14,15 +19,6 @@ Is this all a bunch of arse?
 
 Prabably best to try and get an editor which can edit and produce decent
 tile maps, heightmaps, and entity maps.
-
-How do we deal with heightmaps?
-Should a heightmap be just another layer? If so, how to link it to
-other layers? Map layers really need a common reference point for HeightMaps.
-This could be a single layer which many heightfields, or a way of agregating
-multiple layers.
-
-Draw walking ant by using 1D texture, lined box, without depth test.
-May have to copy to back buffer.
 
 Investigate call of ->getID() on null pointer from ServerEntities.cpp:378
 

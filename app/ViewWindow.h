@@ -29,6 +29,12 @@ class ViewWindow : public Gtk::Window
 
     ViewWindow(MainWindow &, Model &);
 
+    gint delete_event_impl(GdkEventAny*) {
+        std::cout << "CLOSE!" << std::endl << std::flush;
+        // Fix it here so it don't close
+        return 1;
+    }
+
     GlView * getView() const {
         return m_glarea;
     }

@@ -47,6 +47,11 @@ class Palette : public Gtk::Window
 
     explicit Palette(MainWindow &);
 
+    gint delete_event_impl(GdkEventAny*) {
+        hide();
+        return 1;
+    }
+
     void addModel(Model *);
     void setModel(Model *);
     void syncModel(Model *);

@@ -28,6 +28,11 @@ class InheritanceWindow : public Gtk::Window
 
     explicit InheritanceWindow(MainWindow &);
 
+    gint delete_event_impl(GdkEventAny*) {
+        hide();
+        return 1;
+    }
+
     gint buttonEvent(GdkEventButton*);
 
 };

@@ -16,11 +16,76 @@
 #include <Eris/World.h>
 #include <Eris/TypeInfo.h>
 
+#include <Atlas/Codecs/XML.h>
+
 #include <GL/glu.h>
+
+#include <gtk--/fileselection.h>
+
+#include <fstream>
 
 static const bool debug_flag = false;
 
 using Atlas::Message::Object;
+
+class DummyDecoder : public Atlas::Message::DecoderBase {
+  private:
+    virtual void ObjectArrived(const Atlas::Message::Object&) { }
+  public:
+    DummyDecoder() { }
+};
+
+class FileDecoder : public Atlas::Message::DecoderBase {
+    std::fstream m_file;
+    Atlas::Codecs::XML m_codec;
+    Object::MapType m_entities;
+    int m_count;
+    std::string m_topLevelId;
+
+    virtual void ObjectArrived(const Object & obj) {
+        const Object::MapType & omap = obj.AsMap();
+        Object::MapType::const_iterator I;
+        if (((I = omap.find("id")) == omap.end()) ||
+            (!I->second.IsString()) || (I->second.AsString().empty())) {
+            std::cerr << "WARNING: Object in file has no id. Not stored."
+                      << std::endl << std::flush;
+            return;
+        }
+        const std::string & id = I->second.AsString();
+        if (((I = omap.find("loc")) == omap.end()) ||
+            (!I->second.IsString()) || (I->second.AsString().empty())) {
+            // Entity with loc attribute must be the root entity
+            if (!m_topLevelId.empty()) {
+                std::cerr << "ERROR: File contained TLE with id = "
+                          << m_topLevelId << " and also contains another id = "
+                          << id << std::endl << std::flush;
+            }
+            m_topLevelId = id;
+        }
+        m_entities["id"] = obj;
+        m_count++;
+    }
+  public:
+    FileDecoder(const std::string & filename) :
+                m_file(filename.c_str(), std::ios::in),
+                m_codec(m_file, this), m_count(0)
+    {
+    }
+
+    void read() {
+        while (!m_file.eof()) {
+            m_codec.Poll();
+        }
+    }
+
+    void report() {
+        std::cout << m_count << " objects read from file and stored."
+                  << std::endl << std::flush;
+        if (m_topLevelId.empty()) {
+            std::cerr << "WARNING: No TLE found" << std::endl << std::flush;
+        }
+    }
+};
 
 inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
 {
@@ -449,6 +514,32 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
     }
 }
 
+void ServerEntities::load(Gtk::FileSelection * fsel)
+{
+    std::string filename = fsel->get_filename();
+    delete fsel;
+
+    // m_model.updated.emit();
+}
+
+void ServerEntities::save(Gtk::FileSelection * fsel)
+{
+    std::string filename = fsel->get_filename();
+    delete fsel;
+
+    DummyDecoder d;
+    std::fstream ios(filename.c_str(), std::ios::out);
+    Atlas::Codecs::XML codec(ios, &d);
+    Atlas::Message::Encoder e(&codec);
+
+    e.StreamMessage(Atlas::Message::Object::MapType());
+}
+
+void ServerEntities::cancel(Gtk::FileSelection * fsel)
+{
+    delete fsel;
+}
+
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
@@ -471,6 +562,22 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     Eris::World::Instance()->EntityCreate.connect(
 	SigC::slot(this, &ServerEntities::gotNewEntity)
     );
+}
+
+void ServerEntities::importFile()
+{
+    Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");
+    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::load),fsel));
+    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
+    fsel->show();
+}
+
+void ServerEntities::exportFile()
+{
+    Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Atlas Map File");
+    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::save),fsel));
+    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
+    fsel->show();
 }
 
 void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)

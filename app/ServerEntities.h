@@ -62,10 +62,14 @@ class ServerEntities : public Layer {
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
     void alignEntityHeight(Eris::Entity * ent, const WFMath::Point<3> & o);
+
+    void load(Gtk::FileSelection *);
+    void save(Gtk::FileSelection *);
+    void cancel(Gtk::FileSelection *);
   public:
     ServerEntities(Model &, Server &);
-    void importFile() { }
-    void exportFile() { }
+    void importFile();
+    void exportFile();
     void draw(GlView & view);
     void animate(GlView & view);
     void select(GlView & view, int x, int y);

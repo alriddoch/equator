@@ -38,6 +38,11 @@ class LayerWindow : public Gtk::Window
 
     explicit LayerWindow(MainWindow &);
 
+    gint delete_event_impl(GdkEventAny*) {
+        hide();
+        return 1;
+    }
+
     void setModel(Model * model);
     void updateLayers();
     void addModel(Model * view);

@@ -1,3 +1,15 @@
+2002-05-02  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/InheritanceWindow.h, app/LayerWindow.h, app/NewLayerWindow.h,
+	  app/NewServerWindow.h, app/Palette.h, app/ServerWindow.h,
+	  app/ViewWindow.h: Added handler for attempt to close window,
+	  so windows which are permanent are just hidden, and view windows
+	  cannot be closed.
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Added beginnings
+	  of code for handling importing and exporting of atlas files
+	  full of entities.
+
 2002-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp: Made selection verification in the
