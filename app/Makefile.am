@@ -27,5 +27,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  arrow_mesh.h \
 		  equator_plugin.cpp
 
-equator_LDADD = ../visual/libvisual.a ../common/libcommon.a \
-                ../gui/gtkmm/libguigtkmm.a
+equator_LDADD = $(top_builddir)/visual/libvisual.a \
+                $(top_builddir)/common/libcommon.a \
+                $(top_builddir)/gui/gtkmm/libguigtkmm.a
