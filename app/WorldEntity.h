@@ -94,9 +94,9 @@ class WEFactory : public Eris::Factory
   public:
     typedef std::map<Eris::TypeInfo *, RenderFactory *> RendererMap;
   private:
-    static Eris::TypeInfo * autonomousType;
-    static Eris::TypeInfo * terrainType;
-    static Eris::TypeInfo * treeType;
+    Eris::TypeInfo * autonomousType;
+    Eris::TypeInfo * terrainType;
+    Eris::TypeInfo * treeType;
 
     RendererMap m_renderFactories;
   public:

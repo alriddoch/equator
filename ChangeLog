@@ -1,5 +1,10 @@
 2003-12-31  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/WorldEntity.h, app/WorldEntity.cpp: Pick up latest cleaner
+	  versions from apogee.
+
+2003-12-31  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.h, app/Server.cpp: Add a Renderer instance to the server
 	  object so it lasts long enough. Should really be attached to
 	  the renderer itself.

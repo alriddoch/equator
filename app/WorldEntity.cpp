@@ -79,8 +79,16 @@ RenderFactory::~RenderFactory()
 {
 }
 
-WEFactory::WEFactory(Eris::TypeService & ts, Renderer & r) : m_renderer(r)
+WEFactory::WEFactory(Eris::TypeService & ts, Renderer & r) :
+    autonomousType(ts.getTypeByName("character")),
+    terrainType(ts.getTypeByName("world")),
+    treeType(ts.getTypeByName("tree")),
+    m_renderer(r)
 {
+    assert(autonomousType != 0);
+    assert(terrainType != 0);
+    assert(treeType != 0);
+
     const varconf::sec_map & cal3d_list = global_conf->getSection("cal3d");
     varconf::sec_map::const_iterator I = cal3d_list.begin();
     for(; I != cal3d_list.end(); ++I) {
@@ -101,32 +109,18 @@ WEFactory::WEFactory(Eris::TypeService & ts, Renderer & r) : m_renderer(r)
         m_renderFactories.insert(std::make_pair(ti, rf));
     }
 
-    
+    RenderFactory * rf = new RendererFactory<TerrainRenderer>("");
+    Eris::TypeInfo * ti = ts.getTypeByName("world");
+    assert(ti != 0);
+    m_renderFactories.insert(std::make_pair(ti, rf));
 }
 
 WEFactory::~WEFactory()
 {
 }
 
-Eris::TypeInfo * WEFactory::autonomousType = 0;
-Eris::TypeInfo * WEFactory::terrainType = 0;
-Eris::TypeInfo * WEFactory::treeType = 0;
-
 bool WEFactory::accept(const GameEntity&, Eris::World * w)
 {
-    // if (autonomousType == 0) {
-        // autonomousType = w->getConnection()->getTypeService()->getTypeByName("autonomous_entity");
-        if (autonomousType == 0) {
-            autonomousType = w->getConnection()->getTypeService()->getTypeByName("character");
-        }
-    // }
-    if (terrainType == 0) {
-        terrainType = w->getConnection()->getTypeService()->getTypeByName("world");
-    }
-    if (treeType == 0) {
-        treeType = w->getConnection()->getTypeService()->getTypeByName("tree");
-    }
-
     return true;
 }
 
@@ -138,7 +132,7 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
         re = new AutonomousEntity(ge,w);
     } else if (type->safeIsA(terrainType)) {
         re = new TerrainEntity(ge,w);
-        re->m_drawer = new TerrainRenderer(m_renderer, *re);
+        // re->m_drawer = new TerrainRenderer(m_renderer, *re);
     } else if (type->safeIsA(treeType)) {
         re = new TreeEntity(ge,w);
     } else {
