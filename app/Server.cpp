@@ -59,18 +59,24 @@ void Server::loginComplete()
     // are at
 }
 
-void Server::takeCharacter(const std::string & id)
+void Server::connectWorldSignals()
 {
-    m_world = m_player->takeCharacter(id)->getWorld();
-
     m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
     m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
 
-    m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
-                                           m_renderer));
+    WEFactory * wef = new WEFactory(*m_connection.getTypeService(), m_renderer);
+    wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
+    m_world->registerFactory(wef);
+}
+
+void Server::takeCharacter(const std::string & id)
+{
+    m_world = m_player->takeCharacter(id)->getWorld();
+
+    connectWorldSignals();
 }
 
 void Server::createCharacter(const std::string & name,
@@ -84,14 +90,7 @@ void Server::createCharacter(const std::string & name,
     // chrcter.setAttr("sex", "female");
     m_world = m_player->createCharacter(chrcter)->getWorld();
 
-    m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
-    m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
-
-    m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
-    m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
-
-    m_world->registerFactory(new WEFactory(*m_connection.getTypeService(),
-                                           m_renderer));
+    connectWorldSignals();
 }
 
 void Server::readTerrain(Terrain & t, Eris::Entity & ent)
@@ -200,6 +199,21 @@ void Server::createLayers()
 
     checkEntityForNewLayers(*worldRoot);
 
+}
+
+void Server::createTerrainLayer(TerrainEntity * te)
+{
+    assert(m_model != 0);
+
+    EntityRenderer * er = te->m_drawer;
+    if (er != 0) {
+        TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
+        if (tr != 0) {
+            Terrain * layer = new Terrain(*m_model, tr->m_terrain);
+            readTerrain(*layer, *te);
+            m_model->addLayer(layer);
+        }
+    }
 }
 
 void Server::roomEnter(Eris::Room *r)

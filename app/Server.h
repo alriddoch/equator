@@ -31,6 +31,7 @@ namespace Atlas {
 class Model;
 class Terrain;
 class Renderer;
+class TerrainEntity;
 
 class Server : public SigC::Object {
   private:
@@ -45,6 +46,8 @@ class Server : public SigC::Object {
     void charMoved(const PosType &);
 
     void checkEntityForNewLayers(Eris::Entity & ent);
+
+    void connectWorldSignals();
   protected:
     bool inGame;
     std::string m_name;
@@ -86,6 +89,7 @@ class Server : public SigC::Object {
     void createCharacter(const std::string &, const std::string &);
     void takeModel(Model & model);
     void createLayers();
+    void createTerrainLayer(TerrainEntity *);
 
     void moveCharacter(const PosType & pos);
 

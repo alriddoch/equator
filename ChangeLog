@@ -1,5 +1,12 @@
 2004-01-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Server.h, app/Server.cpp: Move in-game transistion code for
+	  taking and creating characters into a single common function.
+	  Create a signal handler for new terrain entity creation, and
+	  hook it up so it creates new terrain layers.
+
+2004-01-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Holo.cpp: Fix mis-rendering of the origin lines in the Holo
 	  layer.
 
