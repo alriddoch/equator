@@ -804,6 +804,10 @@ bool ServerEntities::animate(GlView & view)
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
     moveTo(m_selection, root);
+    if (m_validDrag) {
+        std::cout << "Dragging " << m_dragPoint << std::endl << std::flush;
+        glTranslatef(m_dragPoint.x(), m_dragPoint.y(), m_dragPoint.z());
+    }
     draw3DSelectedBox(view, m_selection->getBBox(),
                       view.getAnimCount());
     glPopMatrix();
@@ -857,6 +861,7 @@ void ServerEntities::dragStart(GlView & view, int x, int y)
 void ServerEntities::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 {
     m_dragPoint = v;
+    std::cout << "Drag changed " << m_dragPoint << std::endl << std::flush;
 }
 
 void ServerEntities::dragEnd(GlView & view, const WFMath::Vector<3> & v)

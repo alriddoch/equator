@@ -430,7 +430,7 @@ void GlView::clickOn(int x, int y)
             m_dragType = GlView::SELECT;
             break;
         case MainWindow::MOVE:
-            //clickx = x; clicky = y;
+            clickx = x; clicky = y;
             m_model.getCurrentLayer()->dragStart(*this, x, get_height() - y);
             dragDepth = -2;
             worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);

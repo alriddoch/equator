@@ -1,5 +1,10 @@
 2004-01-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.cpp, app/ServerEntities.cpp: Implement drag feedback
+	  using marching ants highlighted box.
+
+2004-01-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GameView.cpp, app/GameView.h, app/GlView.cpp,
 	  app/Holo.h, app/Layer.h, app/ServerEntities.cpp,
 	  app/ServerEntities.h, app/Terrain.cpp, app/Terrain.h:
