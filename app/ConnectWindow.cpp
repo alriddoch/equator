@@ -36,8 +36,10 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
                  m_customPort(6767), m_portNum(6767), m_server(0),
                  m_mainWindow(mw)
 {
+    m_connectButton = add_button("Con_nect", Gtk::RESPONSE_ACCEPT);
+    m_connectButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-    signal_response().connect(SigC::slot(*this, &ConnectWindow::dismiss));
+    signal_response().connect(SigC::slot(*this, &ConnectWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -81,12 +83,6 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     hbox->pack_start(*table);
 
     vbox->pack_start(*hbox);
-
-    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    m_connectButton = manage( new Gtk::Button("Co_nnect", true) );
-    m_connectButton->signal_clicked().connect(SigC::slot(*this, &ConnectWindow::createConnection));
-    a->add(*m_connectButton);
-    vbox->pack_start(*a);
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Connection status");
@@ -187,9 +183,13 @@ void ConnectWindow::connected()
     hide();
 }
 
-void ConnectWindow::dismiss(int response)
+void ConnectWindow::response(int response)
 {
-    m_failure.disconnect();
-    m_connected.disconnect();
-    hide();
+    if (response == Gtk::RESPONSE_ACCEPT) {
+        createConnection();
+    } else if (response == Gtk::RESPONSE_CLOSE) {
+        m_failure.disconnect();
+        m_connected.disconnect();
+        hide();
+    }
 }

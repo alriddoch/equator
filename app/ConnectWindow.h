@@ -37,6 +37,7 @@ class ConnectWindow : public Gtk::Dialog
 
     void setPort(int );
     void setCustomPort();
+    void response(int);
   public:
     MainWindow & m_mainWindow;
 
@@ -53,8 +54,6 @@ class ConnectWindow : public Gtk::Dialog
 
     void failure(const std::string & msg);
     void connected();
-
-    void dismiss(int);
 
     SigC::Signal1<void, Server *> serverConnected;
 };

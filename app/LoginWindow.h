@@ -49,7 +49,7 @@ class LoginWindow : public Gtk::Dialog
     void failure(const std::string & msg);
     void loggedIn();
 
-    void dismiss(int);
+    void response(int);
 
     SigC::Signal1<void, Server *> loginSuccess;
 };

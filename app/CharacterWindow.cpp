@@ -34,8 +34,12 @@ CharacterWindow::CharacterWindow() :
                  m_createButton(0), m_status(0),
                  m_server(0)
 {
+    m_takeButton = add_button("_Take Avatar", Gtk::RESPONSE_ACCEPT);
+    m_takeButton->set_use_underline();
+    m_createButton = add_button("_Create Avatar", Gtk::RESPONSE_YES);
+    m_createButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-    signal_response().connect(SigC::slot(*this, &CharacterWindow::dismiss));
+    signal_response().connect(SigC::slot(*this, &CharacterWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -76,19 +80,6 @@ CharacterWindow::CharacterWindow() :
     hbox->pack_start(*table);
 
     vbox->pack_start(*hbox);
-
-    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    hbox = manage( new Gtk::HBox(false, 6) );
-    m_takeButton = manage( new Gtk::Button("_Take avatar", true) );
-    m_takeButton->signal_clicked().connect(SigC::slot(*this, &CharacterWindow::take));
-    m_takeButton->set_sensitive(false);
-    hbox->pack_start(*m_takeButton);
-    m_createButton = manage( new Gtk::Button("_Create avatar", true) );
-    m_createButton->signal_clicked().connect(SigC::slot(*this, &CharacterWindow::create));
-    m_createButton->set_sensitive(false);
-    hbox->pack_start(*m_createButton);
-    a->add(*hbox);
-    vbox->pack_start(*a);
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Login status");
@@ -257,10 +248,16 @@ void CharacterWindow::success(Eris::Avatar *)
     hide();
 }
 
-void CharacterWindow::dismiss(int response)
+void CharacterWindow::response(int response)
 {
-    m_failure.disconnect();
-    m_success.disconnect();
-    m_charlist.disconnect();
-    hide();
+    if (response == Gtk::RESPONSE_ACCEPT) {
+        take();
+    } else if (response == Gtk::RESPONSE_YES) {
+        create();
+    } else if (response == Gtk::RESPONSE_CLOSE) {
+        m_failure.disconnect();
+        m_success.disconnect();
+        m_charlist.disconnect();
+        hide();
+    }
 }

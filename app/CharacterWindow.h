@@ -62,7 +62,7 @@ class CharacterWindow : public Gtk::Dialog
     void failure(const std::string & msg);
     void success(Eris::Avatar *);
 
-    void dismiss(int);
+    void response(int);
 };
 
 #endif // EQUATOR_APP_CHARACTER_WINDOW_H

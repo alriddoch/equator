@@ -31,8 +31,10 @@ LoginWindow::LoginWindow() :
                  m_loginButton(0), m_status(0),
                  m_server(0)
 {
+    m_loginButton = add_button("_Login", Gtk::RESPONSE_ACCEPT);
+    m_loginButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-    signal_response().connect(SigC::slot(*this, &LoginWindow::dismiss));
+    signal_response().connect(SigC::slot(*this, &LoginWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -71,12 +73,6 @@ LoginWindow::LoginWindow() :
     hbox->pack_start(*table);
 
     vbox->pack_start(*hbox);
-
-    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    m_loginButton = manage( new Gtk::Button("_Login", true) );
-    m_loginButton->signal_clicked().connect(SigC::slot(*this, &LoginWindow::login));
-    a->add(*m_loginButton);
-    vbox->pack_start(*a);
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Login status");
@@ -160,9 +156,13 @@ void LoginWindow::loggedIn()
     hide();
 }
 
-void LoginWindow::dismiss(int response)
+void LoginWindow::response(int response)
 {
-    m_failure.disconnect();
-    m_loggedIn.disconnect();
-    hide();
+    if (response == Gtk::RESPONSE_ACCEPT) {
+        login();
+    } else if (response == Gtk::RESPONSE_CLOSE) {
+        m_failure.disconnect();
+        m_loggedIn.disconnect();
+        hide();
+    }
 }
