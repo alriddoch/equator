@@ -1,3 +1,7 @@
+2003-04-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp: Fix attribute enums for GtkGLextMM.
+
 2003-03-31  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.h, app/GlView.cpp: Add camera control window to allow

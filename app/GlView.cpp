@@ -34,13 +34,13 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysExt = 0;
 bool have_GL_EXT_compiled_vertex_array = false;
 
 int attrlist[] = {
-    GDK_GL_RGBA,
-    GDK_GL_DOUBLEBUFFER,
-    GDK_GL_DEPTH_SIZE, 1,
+    Gdk::GL::RGBA,
+    Gdk::GL::DOUBLEBUFFER,
+    Gdk::GL::DEPTH_SIZE, 1,
     // GDK_GL_ACCUM_RED_SIZE, 1,
     // GDK_GL_ACCUM_GREEN_SIZE, 1,
     // GDK_GL_ACCUM_BLUE_SIZE, 1,
-    GDK_GL_NONE
+    Gdk::GL::NONE
 };
 
 static const bool pretty = true;
