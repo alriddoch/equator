@@ -1,6 +1,12 @@
 2004-01-09  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.cpp, app/GlView.h, app/ViewWindow.cpp, app/ViewWindow.h:
+	  An improved way of eliminating unnecessary redraws using a lock
+	  class which automatically redraws when all the locks are released.
+
+2004-01-09  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GlView.cpp, app/GlView.h, app/ViewWindow.cpp, app/ViewWindow.h:
 	  Improve view performance by elimination some unnecessary redraws.
 
 2004-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>

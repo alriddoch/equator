@@ -29,7 +29,6 @@ class ViewWindow : public Gtk::Window
     int m_viewContext;
     Gtk::VRuler * m_vRuler;
     Gtk::HRuler * m_hRuler;
-    bool m_scrollLock;
     Gtk::VScrollbar * m_vScrollbar;
     Gtk::HScrollbar * m_hScrollbar;
     Gtk::Adjustment * m_vAdjust;

@@ -23,9 +23,28 @@ class Renderer;
 
 class GlView : public Gtk::DrawingArea {
   public:
+    class RedrawLock {
+       private:
+         RedrawLock(RedrawLock &); // unimplemneted - don't copy
+         RedrawLock & operator=(RedrawLock &); // unimplemneted - don't copy
+
+         GlView & view;
+       public:
+         explicit RedrawLock(GlView & v) : view(v) {
+             ++view.m_redrawLock;
+         }
+         ~RedrawLock() {
+             if (--view.m_redrawLock == 0) {
+                 view.redraw();
+             }
+         }
+    };
+
     typedef enum view { ORTHO, PERSP } projection_t;
     typedef enum drag { NONE, SELECT, MOVE, PAN } drag_t;
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
+  private:
+    int m_redrawLock;
   public:
     const int m_viewNo;
     Gtk::Adjustment & m_scaleAdj;
