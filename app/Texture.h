@@ -29,4 +29,33 @@ class Texture {
     static int get(const std::string & filename);
 };
 
+class Tile {
+  private:
+    static unsigned int twoN(unsigned int);
+
+    static std::map<std::string, Tile *> & tiles() {
+        if (tiledb == NULL) {
+            tiledb = new std::map<std::string, Tile *>;
+        }
+        return *tiledb;
+    }
+
+    static std::map<std::string, Tile *> * tiledb;
+
+    int tex_id;
+    float tileSize;
+    float m_pw, m_ph;
+  public:
+    static Tile * get(const std::string & filename);
+
+    Tile() : tex_id(-1), m_pw(0), m_ph(0) { }
+
+    bool load(const std::string & filename);
+    void draw();
+
+    bool loaded() const { return (tex_id != -1); }
+    float pw() { return m_pw; }
+    float ph() { return m_ph; }
+};
+
 #endif // APOGEE_VISUAL_TEXTURE_H

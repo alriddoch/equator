@@ -1,3 +1,20 @@
+2001-11-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ClientConnection.h, app/ClientConnection.cpp: Connection class
+	  for handling connections to servers.
+
+	* app/inheritance.cpp, app/inheritance.h, app/operations.h:
+	  Code to handle storing information about operation definitions
+	  and entity classes.
+
+	* app/IsoMap.cpp, app/Texture.cpp, app/Texture.h: Add code to handle
+	  iso tiles as textures. Use this to render Iso maps.
+
+	* app/LayerWindow.cpp: Make this window non-sensitive when there
+	  are no views.
+
+	* app/MainWindow.cpp, app/MainWindow.h: Add server window to main menu.
+
 2001-11-16  Anders Petersson  <demitar@innocent.com>
 
 	* app/NewLayerWindow.h, app/NewLayerWindow.cpp, app/LayerWindow.h:

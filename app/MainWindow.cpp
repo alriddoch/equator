@@ -6,6 +6,7 @@
 #include "ViewWindow.h"
 #include "LayerWindow.h"
 #include "InheritanceWindow.h"
+#include "ServerWindow.h"
 
 #include <gtk--/main.h>
 #include <gtk--/menu.h>
@@ -31,7 +32,9 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
 
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<GlView*>(slot(this, &MainWindow::open_layers),NULL)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entities..."));
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
@@ -87,6 +90,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
 
     m_layerwindow = manage( new LayerWindow(*this) );
     m_inheritancewindow = manage( new InheritanceWindow(*this) );
+    m_serverwindow = manage( new ServerWindow(*this) );
 }
 
 gint MainWindow::quit(GdkEventAny *)
@@ -119,9 +123,16 @@ void MainWindow::inheritance_dialog()
     m_inheritancewindow->show_all();
 }
 
+void MainWindow::server_dialog()
+{
+    m_serverwindow->show_all();
+}
+
 void MainWindow::open_layers(GlView * view)
 {
     cout << "open layers" << endl << flush;
-    m_layerwindow->setView(view);
+    if (view != NULL) {
+        m_layerwindow->setView(view);
+    }
     m_layerwindow->show_all();
 }

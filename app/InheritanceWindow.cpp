@@ -4,6 +4,7 @@
 
 #include "InheritanceWindow.h"
 #include "AtlasMapWidget.h"
+#include "inheritance.h"
 
 #include <gtk--/frame.h>
 #include <gtk--/menuitem.h>

@@ -13,6 +13,7 @@
 class ViewWindow;
 class LayerWindow;
 class InheritanceWindow;
+class ServerWindow;
 class GlView;
 
 class MainWindow : public Gtk::Window
@@ -22,6 +23,7 @@ class MainWindow : public Gtk::Window
     std::list<ViewWindow*> m_views;
     LayerWindow * m_layerwindow;
     InheritanceWindow * m_inheritancewindow;
+    ServerWindow * m_serverwindow;
 
     void destroy_handler();
   public:
@@ -35,6 +37,7 @@ class MainWindow : public Gtk::Window
     void new_view();
     void menu_quit();
     void inheritance_dialog();
+    void server_dialog();
     void open_layers(GlView *);
 
 };

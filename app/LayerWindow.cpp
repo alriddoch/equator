@@ -67,6 +67,7 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     add(*vbox);
     set_title("Layers");
+    set_sensitive(false);
 
     m_newLayerWindow = manage( new NewLayerWindow() );
     // show_all();
@@ -78,7 +79,11 @@ void LayerWindow::setView(GlView * view)
 
     m_currentView = view;
 
-    if (m_currentView == NULL) { return; }
+    if (m_currentView == NULL) {
+        set_sensitive(false);
+        return;
+    }
+    set_sensitive(true);
 
     m_viewLabel->set(view->m_viewwindow.getName());
 
