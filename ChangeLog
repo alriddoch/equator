@@ -1,3 +1,11 @@
+2004-01-15  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* visual/Renderer.h, visual/Renderer.cpp: Add the orient
+	  method for handling quaternions.
+
+	* app/WorldEntity.h, app/WorldEntity.cpp: Latest version from
+	  apogee to handle new RenderableEntity changes.
+
 2004-01-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/WorldEntity.h, app/WorldEntity.cpp, app/GameView.cpp:

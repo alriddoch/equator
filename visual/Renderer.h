@@ -7,9 +7,15 @@
 
 #include <sigc++/signal.h>
 
+namespace WFMath {
+  class Quaternion;
+}
+
 class Renderer {
   public:
     Renderer() { }
+
+    void orient(const WFMath::Quaternion &);
 
     void fogOn() { }
     void fogOff() { }

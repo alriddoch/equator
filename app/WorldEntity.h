@@ -71,7 +71,7 @@ class RenderFactory
     RenderFactory() { }
     virtual ~RenderFactory();
 
-    virtual EntityRenderer * newRenderer(Renderer &, Eris::Entity &) const = 0;
+    virtual EntityRenderer * newRenderer(Renderer &, RenderableEntity &) const = 0;
 };
 
 template <class R>
@@ -82,7 +82,7 @@ class RendererFactory : public RenderFactory
   public:
     explicit RendererFactory(const std::string & fname) : m_filename(fname) { }
 
-    EntityRenderer * newRenderer(Renderer & r, Eris::Entity & e) const {
+    EntityRenderer * newRenderer(Renderer & r, RenderableEntity & e) const {
         R * er = new R(r, e);
         er->load(m_filename);
         return er;

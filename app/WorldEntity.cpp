@@ -111,15 +111,25 @@ WEFactory::WEFactory(Eris::TypeService & ts, Renderer & r) :
         m_renderFactories.insert(std::make_pair(ti, rf));
     }
 
+    const varconf::sec_map & forest_list = global_conf->getSection("forest");
+    I = forest_list.begin();
+    for(; I != forest_list.end(); ++I) {
+        const std::string filename = I->second;
+        RenderFactory * rf = new RendererFactory<ForestRenderer>(filename);
+        Eris::TypeInfo * ti = ts.getTypeByName(I->first);
+        assert(ti != 0);
+        m_renderFactories.insert(std::make_pair(ti, rf));
+    }
+
     RenderFactory * rf = new RendererFactory<TerrainRenderer>("");
     Eris::TypeInfo * ti = ts.getTypeByName("world");
     assert(ti != 0);
     m_renderFactories.insert(std::make_pair(ti, rf));
 
-    rf = new RendererFactory<ForestRenderer>("");
-    ti = ts.getTypeByName("forest");
-    assert(ti != 0);
-    m_renderFactories.insert(std::make_pair(ti, rf));
+    // rf = new RendererFactory<ForestRenderer>("");
+    // ti = ts.getTypeByName("forest");
+    // assert(ti != 0);
+    // m_renderFactories.insert(std::make_pair(ti, rf));
 }
 
 WEFactory::~WEFactory()
