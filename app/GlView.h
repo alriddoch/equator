@@ -102,6 +102,26 @@ class GlView : public Gtk::DrawingArea {
 
     explicit GlView(MainWindow &, ViewWindow&, Model&);
 
+    Gtk::Adjustment & getXAdjustment() {
+        return m_xAdj;
+    }
+
+    Gtk::Adjustment & getYAdjustment() {
+        return m_yAdj;
+    }
+
+    Gtk::Adjustment & getZAdjustment() {
+        return m_zAdj;
+    }
+
+    Gtk::Adjustment & getRotationAdjustment() {
+        return m_rotaAdj;
+    }
+
+    Gtk::Adjustment & getDeclinationAdjustment() {
+        return m_declAdj;
+    }
+
     float getXoff() const {
         return m_xAdj.get_value();
     }

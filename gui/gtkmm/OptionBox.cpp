@@ -8,6 +8,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/eventbox.h>
 
 #include <cassert>
 
@@ -17,12 +18,11 @@ OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
     pack_start(*tophbox, Gtk::PACK_SHRINK, 6);
 
+    Gtk::EventBox * eb = manage( new Gtk::EventBox() );
     Gtk::Label * l = manage( new Gtk::Label(title) );
-    l->drag_source_set(m_targetList,
-                       Gdk::ModifierType(GDK_BUTTON1_MASK | GDK_BUTTON3_MASK),
-                       Gdk::DragAction(GDK_ACTION_COPY | GDK_ACTION_MOVE));
     Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-    a->add(*l);
+    eb->add(*l);
+    a->add(*eb);
     tophbox->pack_start(*a, Gtk::PACK_EXPAND_WIDGET);
 
     Gtk::Button * b = manage( new Gtk::Button(Gtk::Stock::CLOSE) );
@@ -31,10 +31,9 @@ OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
     a->add(*b);
     tophbox->pack_start(*a, Gtk::PACK_EXPAND_WIDGET);
 
-    l->set_events(l->get_events() | Gdk::ALL_EVENTS_MASK |
-               Gdk::BUTTON_MOTION_MASK |
-               Gdk::POINTER_MOTION_MASK
-               );
+    eb->drag_source_set(m_targetList, Gdk::ModifierType(GDK_BUTTON1_MASK),
+                       Gdk::DragAction(GDK_ACTION_COPY | GDK_ACTION_MOVE));
+    eb->drag_source_set_icon(Gtk::Stock::DND);
 }
 
 void OptionBox::setDock(Gtk::Window * dock)
