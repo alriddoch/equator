@@ -23,6 +23,7 @@ class LoginWindow : public Gtk::Dialog
     Gtk::Label * m_serverLabel;
     Gtk::Combo * m_userEntry;
     Gtk::Entry * m_passwdEntry;
+    Gtk::Button * m_createButton;
     Gtk::Button * m_loginButton;
     Gtk::Statusbar * m_status;
 

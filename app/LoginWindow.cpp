@@ -28,9 +28,11 @@
 LoginWindow::LoginWindow() :
                  Gtk::Dialog("Login to server", false, true),
                  m_userEntry(0), m_passwdEntry(0),
-                 m_loginButton(0), m_status(0),
+                 m_createButton(0), m_loginButton(0), m_status(0),
                  m_server(0)
 {
+    m_createButton = add_button("_Create Account", Gtk::RESPONSE_YES);
+    m_createButton->set_use_underline();
     m_loginButton = add_button("_Login", Gtk::RESPONSE_ACCEPT);
     m_loginButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
@@ -85,6 +87,7 @@ void LoginWindow::doshow()
 {
     m_userEntry->get_entry()->set_editable(true);
     m_passwdEntry->set_editable(true);
+    m_createButton->set_sensitive(true);
     m_loginButton->set_sensitive(true);
     show_all();
 }
@@ -97,6 +100,23 @@ void LoginWindow::useServer(Server * s)
     m_serverLabel->set_text(std::string("Login to ") + m_server->getName() + ":");
 }
 
+void LoginWindow::create()
+{
+    assert(m_server != 0);
+
+    m_status->push("Creating account...", m_statusContext);
+
+    m_userEntry->get_entry()->set_editable(false);
+    m_passwdEntry->set_editable(false);
+    m_createButton->set_sensitive(false);
+    m_loginButton->set_sensitive(false);
+
+    m_server->createAccount(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
+
+    m_failure = m_server->m_account->LoginFailure.connect(SigC::slot(*this, &LoginWindow::failure));
+    m_loggedIn = m_server->m_account->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
+}
+
 void LoginWindow::login()
 {
     assert(m_server != 0);
@@ -105,6 +125,7 @@ void LoginWindow::login()
 
     m_userEntry->get_entry()->set_editable(false);
     m_passwdEntry->set_editable(false);
+    m_createButton->set_sensitive(false);
     m_loginButton->set_sensitive(false);
 
     m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
@@ -132,6 +153,7 @@ void LoginWindow::failure(const std::string & msg)
 
     m_userEntry->get_entry()->set_editable(true);
     m_passwdEntry->set_editable(true);
+    m_createButton->set_sensitive(true);
     m_loginButton->set_sensitive(true);
 }
 
@@ -160,6 +182,8 @@ void LoginWindow::response(int response)
 {
     if (response == Gtk::RESPONSE_ACCEPT) {
         login();
+    } else if (response == Gtk::RESPONSE_YES) {
+        create();
     } else if (response == Gtk::RESPONSE_CLOSE) {
         m_failure.disconnect();
         m_loggedIn.disconnect();
