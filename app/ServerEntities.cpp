@@ -901,7 +901,9 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     
     Eris::Entity * worldRoot = m_serverConnection.m_view->getTopLevel();
 
-    connectEntity(worldRoot);
+    if (worldRoot != 0) {
+        connectEntity(worldRoot);
+    }
 
     // observe the Eris world (in the future, we will need to get World* from
     // the server object, when Eris supports multiple world objects

@@ -145,8 +145,9 @@ void Server::createLayers()
 
     Eris::Entity * worldRoot = m_view->getTopLevel();
 
-    checkEntityForNewLayers(*worldRoot);
-
+    if (worldRoot != 0) {
+        checkEntityForNewLayers(*worldRoot);
+    }
 }
 
 void Server::createTerrainLayer(TerrainEntity * tent)

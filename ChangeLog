@@ -1,3 +1,8 @@
+2004-08-17  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/Server.cpp, app/ServerEntities.cpp: Handle the fact that
+	  the TLVE is still NULL when we get in-game.
+
 2004-08-09  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/AtlasMapWidget.cpp, app/AtlasMapWidget.h, app/CharacterWindow.cpp,
