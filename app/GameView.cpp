@@ -60,7 +60,7 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
         pos = pos + ent->getVelocity() * (double)((worldTime - me->getTime())/1000.0f);
         debug( std::cout << "=" << pos << std::endl << std::flush; );
         if (pe != 0) {
-            pe->constrainChild(pos);;
+            pe->constrainChild(*me, pos);;
         }
     } else {
         debug(std::cout << "Eris::Entity \"" << ent->getID()

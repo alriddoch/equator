@@ -31,7 +31,7 @@ RenderableEntity::RenderableEntity(const GameEntity &ge,
 {
 }
 
-void RenderableEntity::constrainChild(PosType & pos)
+void RenderableEntity::constrainChild(RenderableEntity &, PosType &)
 {
 }
 
@@ -57,7 +57,7 @@ TerrainEntity::TerrainEntity(const GameEntity &ge,
 {
 }
 
-void TerrainEntity::constrainChild(PosType & pos)
+void TerrainEntity::constrainChild(RenderableEntity & re, PosType & pos)
 {
     if (m_drawer == 0) {
         std::cout << "Constraint, but no drawer" << std::endl << std::flush;

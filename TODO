@@ -7,15 +7,9 @@ General problem with render context and textures - apogee code tends to
 assume there is only one, and changes are planned for resizing, but
 not creating multiple contexts.
 
-Arrange so that an adjustment is the master of the camera control, so
-its easier to keep widgets in sync.
-
 Can we make an assumption about the horizontal field of view typically
 used by most users? If so, we can look at the window size as a proportion,
 and adjust the projection's field of view accordingly.
-
-Because the view window is now being created earlier, the creation of the
-terrain layer is somehow being missed.
 
 Add option to control camera using joystick.
 
@@ -31,13 +25,8 @@ to be able to store the UI configuration a user likes.
 Use Window::set_geometry_hints to control resizing of main window,
 then use resizing of tables to make buttons flow like in gimp.
 
-Re-think the way model is handled, getting rid of global terrain. Instead
-think of layers as types of rendering.
-
-Add entity media handler. Handle animations, sprites and models for entities.
-
 Implement a stack of operation descriptors per Mode/Layer which provide
-information
+information for undoing.
 
 Fix up Mercator point modification behavoir.
 
