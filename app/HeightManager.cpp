@@ -52,18 +52,18 @@ void HeightManager::cancel(Gtk::FileSelection * fsel)
 
 HeightManager::HeightManager(Model &m) : Layer(m, "heightfield", "HeightField"),
                        m_numLineIndeces(0),
-                       m_lineIndeces(new unsigned int[segSize * segSize * 2])
+                       m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
 {
     int idx = -1;
-    for (int i = 0; i < segSize - 1; ++i) {
-        for (int j = 0; j < segSize; ++j) {
-            m_lineIndeces[++idx] = j * segSize + i;
-            m_lineIndeces[++idx] = j * segSize + i + 1;
+    for (int i = 0; i < segSize; ++i) {
+        for (int j = 0; j < segSize + 1; ++j) {
+            m_lineIndeces[++idx] = j * (segSize + 1) + i;
+            m_lineIndeces[++idx] = j * (segSize + 1) + i + 1;
         }
-        if (++i >= segSize - 1) { break; }
-        for (int j = segSize - 1; j >= 0; --j) {
-            m_lineIndeces[++idx] = j * segSize + i + 1;
-            m_lineIndeces[++idx] = j * segSize + i;
+        if (++i >= segSize) { break; }
+        for (int j = segSize; j >= 0; --j) {
+            m_lineIndeces[++idx] = j * (segSize + 1) + i + 1;
+            m_lineIndeces[++idx] = j * (segSize + 1) + i;
         }
     }
     m_numLineIndeces = ++idx;
@@ -118,12 +118,12 @@ void HeightManager::outlineLineStrip(float * varray, unsigned int size,
 
 void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
 {
-    float * harray = new float[segSize * segSize * 3];
-    float * carray = new float[segSize * segSize * 3];
+    float * const harray = new float[(segSize + 1) * (segSize + 1) * 3];
+    float * const carray = new float[(segSize + 1) * (segSize + 1) * 3];
     const float * points = map->getPoints();
     int idx = -1, cdx = -1;
-    for(int j = 0; j < segSize; ++j) {
-        for(int i = 0; i < segSize; ++i) {
+    for(int j = 0; j < segSize + 1; ++j) {
+        for(int i = 0; i < segSize + 1; ++i) {
             float h = map->get(i,j);
             harray[++idx] = i;
             harray[++idx] = j;
@@ -144,7 +144,7 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
     glVertexPointer(3, GL_FLOAT, 0, harray);
     glColorPointer(3, GL_FLOAT, 0, carray);
     if (have_GL_EXT_compiled_vertex_array) {
-        glLockArraysEXT(0, segSize * segSize);
+        glLockArraysEXT(0, (segSize + 1) * (segSize + 1));
     }
     if (view.getRenderMode(m_name) == GlView::LINE) {
         glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
@@ -164,24 +164,24 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
 
 void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
 {
-    float * varray = new float[segSize * 4 * 3];
+    float * varray = new float[(segSize + 1) * 4 * 3];
     int vdx = -1;
-    for (int i = 0; i < segSize; ++i) {
+    for (int i = 0; i < (segSize + 1); ++i) {
         varray[++vdx] = i;
         varray[++vdx] = 0.0f;
         varray[++vdx] = map->get(i, 0);
     }
-    for (int i = 0; i < segSize; ++i) {
-        varray[++vdx] = segSize - 1;
+    for (int i = 0; i < (segSize + 1); ++i) {
+        varray[++vdx] = (segSize + 1) - 1;
         varray[++vdx] = i;
-        varray[++vdx] = map->get(segSize - 1, i);
+        varray[++vdx] = map->get((segSize + 1) - 1, i);
     }
-    for (int i = segSize - 1; i >= 0; --i) {
+    for (int i = (segSize + 1) - 1; i >= 0; --i) {
         varray[++vdx] = i;
-        varray[++vdx] = segSize - 1;
-        varray[++vdx] = map->get(i, segSize - 1);
+        varray[++vdx] = (segSize + 1) - 1;
+        varray[++vdx] = map->get(i, (segSize + 1) - 1);
     }
-    for (int i = segSize - 1; i >= 0; --i) {
+    for (int i = (segSize + 1) - 1; i >= 0; --i) {
         varray[++vdx] = 0.0f;
         varray[++vdx] = i;
         varray[++vdx] = map->get(0, i);
@@ -190,7 +190,7 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
     if (selected) {
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        outlineLineStrip(varray, segSize * 4, view.getAnimCount());
+        outlineLineStrip(varray, (segSize + 1) * 4, view.getAnimCount());
         glDisable(GL_TEXTURE_1D);
         // if (view.getScale() > 0.05f) {
             heightMapRegion(view, map);
@@ -199,7 +199,7 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
         glColor3f(1.0f, 0.0f, 0.0f);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, varray);
-        glDrawArrays(GL_LINE_STRIP, 0, segSize * 4);
+        glDrawArrays(GL_LINE_STRIP, 0, (segSize + 1) * 4);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
     delete varray;
