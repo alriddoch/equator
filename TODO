@@ -1,3 +1,11 @@
+Re-think the way model is handled, getting rid of global terrain. Instead
+think of layers as types of rendering.
+
+Add entity media handler. Handle animations, sprites and models for entities.
+
+Implement a stack of operation descriptors per Mode/Layer which provide
+information
+
 Fix up Mercator point modification behavoir.
 
 Implement the world size.
