@@ -1,3 +1,8 @@
+2003-01-28  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.cpp, app/HeightManager.h, app/Model.cpp:
+	  Make the terrain segment size 64.
+
 2003-01-27  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ViewWindow.cpp, app/HeightManager.cpp: Remove extraneous debug

@@ -203,7 +203,7 @@ void HeightManager::draw(GlView & view)
         Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
         for (; J != col.end(); ++J) {
             glPushMatrix();
-            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
             drawRegion(view, J->second);
             glPopMatrix();
         }
@@ -240,7 +240,7 @@ void HeightManager::animate(GlView & view)
         Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
         for (; J != col.end(); ++J) {
             glPushMatrix();
-            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
             std::cout << "Animating segment at " << I->first << "," << J->first
                       << std::endl << std::flush;
             // FIXME Actually do some animation maybe?
@@ -294,7 +294,7 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
             nameDict[++nameCount] = GroundCoord(I->first, J->first);
             glLoadName(nameCount);
             glPushMatrix();
-            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
             selectRegion(J->second);
             glPopMatrix();
         }

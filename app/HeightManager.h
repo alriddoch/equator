@@ -33,7 +33,7 @@ class HeightManager : public Layer {
     void heightMapRegion(Mercator::Segment * map);
     void drawRegion(GlView & view, Mercator::Segment * map);
   public:
-    static const int segSize = 200;
+    static const int segSize = 64;
     explicit HeightManager(Model &);
 
     void importFile();
