@@ -1,3 +1,5 @@
+Add controls to affect behavoir of middle button. pan, rotate etc.
+
 Have a media database, and a media mapper, which maps database onto entities.
 This might involve apogee
 

@@ -1,5 +1,13 @@
 2005-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* visual/StockTexture.cpp, visual/StockTexture.h,
+	  visual/holo_texture.h: Handle a bank of builtin stock textures.
+
+	* app/Holo.cpp: Re-write Holo layer to use a single texture quad to
+	  make it much more efficient.
+
+2005-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/ServerWindow.cpp, app/ServerWindow.h: More entries in the
 	  popup.
 

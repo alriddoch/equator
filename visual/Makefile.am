@@ -31,8 +31,10 @@ TerrainRenderer.cpp TerrainRenderer.h:
 ForestRenderer.cpp ForestRenderer.h:
 	$(LN_S) $(apogee_srcdir)/visual/ForestRenderer.cpp $(apogee_srcdir)/visual/ForestRenderer.h .
 
-libvisual_a_SOURCES = GL.h GLU.h default_texture.h \
+libvisual_a_SOURCES = GL.h GLU.h \
+                      default_texture.h holo_texture.h \
                       Texture.cpp Texture.h \
+                      StockTexture.cpp StockTexture.h \
                       Renderer.cpp Renderer.h \
                       Model.cpp Model.h \
                       EntityRenderer.cpp EntityRenderer.h \
