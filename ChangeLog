@@ -1,3 +1,9 @@
+2005-01-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GameView.cpp: Remove some debug output.
+
+	* app/Holo.cpp: Add more holo code.
+
 2005-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* visual/StockTexture.cpp, visual/StockTexture.h,

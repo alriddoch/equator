@@ -20,24 +20,29 @@ void Holo::draw(GlView & view)
     int numlines = (int)(winsize / (40.0f * winscale) + 1);
     int xc = -(int)view.getXoff();
     int yc = -(int)view.getYoff();
-
-    int incr = 1;
-    if (winscale < 0.24f) {
-        incr = 10;
-        xc = xc - xc % 10;
-        yc = yc - yc % 10;
-    }
+    int zc = -(int)view.getYoff();
 
     // THere is an imprecision here. We need a less unweildy calculation for the
     // number of lines we are going to draw
 
-    int plane_varray[] = { xc - numlines, yc - numlines, 0,
+    int plane_varray[] = {
+                           xc - numlines, yc - numlines, 0,
                            xc - numlines, yc + numlines, 0,
                            xc + numlines, yc + numlines, 0,
-                           xc + numlines, yc - numlines, 0 };
+                           xc + numlines, yc - numlines, 0,
+                           xc - numlines, 0, zc - numline,
+                           xc - numlines, 0, zc + numlines,
+                           xc + numlines, 0, zc + numlines,
+                           xc + numlines, 0, zc - numline,
+                           0, yc - numlines, zc - numline,
+                           0, yc - numlines, zc + numlines,
+                           0, yc + numlines, zc + numlines,
+                           0, yc + numlines, zc - numline
+                         };
 
-    static GLfloat sx0[] = {1.f, 0.f, 0.f, 0.f};
-    static GLfloat ty0[] = {0.f, 1.f, 0.f, 0.f};
+    static GLfloat x0[] = {1.f, 0.f, 0.f, 0.f};
+    static GLfloat y0[] = {0.f, 1.f, 0.f, 0.f};
+    static GLfloat z0[] = {0.f, 0.f, 1.f, 0.f};
 
 
     GLuint holo_texture = getStockTexture(STOCK_HOLO);
@@ -49,8 +54,8 @@ void Holo::draw(GlView & view)
     glEnable(GL_TEXTURE_GEN_T);
     glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
     glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, sx0);
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, ty0);
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, x0);
+    glTexGenfv(GL_T, GL_OBJECT_PLANE, y0);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -59,6 +64,14 @@ void Holo::draw(GlView & view)
 
     glVertexPointer(3, GL_INT, 0, plane_varray);
     glDrawArrays(GL_QUADS, 0, 4);
+#if 0
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, x0);
+    glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
+    glDrawArrays(GL_QUADS, 4, 4);
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, y0);
+    glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
+    glDrawArrays(GL_QUADS, 8, 4);
+#endif
 
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
