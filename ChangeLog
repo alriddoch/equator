@@ -1,3 +1,7 @@
+2003-01-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Server.cpp: Update to latest Eris API.
+
 2002-11-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.in: Clean up configure.in.

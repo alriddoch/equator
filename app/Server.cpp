@@ -4,6 +4,7 @@
 
 #include "Server.h"
 
+#include <Eris/Avatar.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
 #include <Eris/World.h>
@@ -69,7 +70,7 @@ void Server::createCharacter(const std::string & name,
     chrcter.SetName(name);
     chrcter.SetAttr("description", "an equator avatar");
     // chrcter.SetAttr("sex", "female");
-    world = player->createCharacter(chrcter);
+    world = player->createCharacter(chrcter)->getWorld();
 
     lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
     lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
