@@ -22,6 +22,13 @@ Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
     m_layers.push_front( m_currentLayer );
 }
 
+void Model::options()
+{
+    if (m_currentLayer != 0) {
+        m_currentLayer->options();
+    }
+}
+
 void Model::importFile()
 {
     if (m_currentLayer != 0) {

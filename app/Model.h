@@ -78,6 +78,7 @@ class Model : public SigC::Object {
         return;
     }
 
+    void options();
     void importFile();
     void exportFile();
 

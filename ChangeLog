@@ -1,5 +1,21 @@
 2005-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* gui/gtkmm/Cal3dStoreOptions.cpp, gui/gtkmm/Cal3dStoreOptions.h:
+	  Options dialog for channel.
+
+	* app/Cal3dStore.cpp, app/Cal3dStore.h: Hookup options dialog.
+
+	* app/MainWindow.h: Make showOptionBox() public.
+
+	* app/Model.cpp, app/Model.h: Add options() to call from view menus.
+
+	* app/ViewWindow.cpp: Add a menu item to the Layers menu for options
+	  or properties.
+
+	* gui/gtkmm/TypeTree.h: Fix header guards.
+
+2005-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Cal3dStore.cpp, app/Cal3dStore.h: Make cal3d import dialog
 	  non application modal.
 

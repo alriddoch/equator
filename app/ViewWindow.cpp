@@ -193,6 +193,8 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
 
     menu_sub_sub = manage( new Gtk::Menu() );
     MenuList& current_layer_menu = menu_sub_sub->items();
+    current_layer_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::PROPERTIES), SigC::slot(m_model, &Model::options)));
+    current_layer_menu.push_back(SeparatorElem());
     current_layer_menu.push_back(MenuElem("Default", SigC::bind<GlView::rmode_t>(SigC::slot(*m_glarea, &GlView::setLayerRenderMode),GlView::DEFAULT)));
     current_layer_menu.push_back(MenuElem("Line", SigC::bind<GlView::rmode_t>(SigC::slot(*m_glarea, &GlView::setLayerRenderMode),GlView::LINE)));
     current_layer_menu.push_back(MenuElem("Solid", SigC::bind<GlView::rmode_t>(SigC::slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SOLID)));

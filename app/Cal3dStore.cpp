@@ -3,7 +3,11 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "Model.h"
+
 #include "Cal3dStore.h"
+#include "MainWindow.h"
+
+#include "gui/gtkmm/Cal3dStoreOptions.h"
 
 #include <gtkmm/stock.h>
 #include <gtkmm/fileselection.h>
@@ -18,6 +22,7 @@
 Cal3dStore::Cal3dStore(Model & model) :
                        Layer(model, "<empty>", "Cal3d animation")
 {
+    m_optionsBox = new Cal3dStoreOptions(*this);
 }
 
 void Cal3dStore::loadModel(const std::string & path)
@@ -85,6 +90,8 @@ void Cal3dStore::import_response(int response, Gtk::FileChooserDialog * fc)
 
 void Cal3dStore::options()
 {
+    std::cout << "Cal3dStore::options" << std::endl << std::flush;
+    m_model.m_mainWindow.showOptionBox(*m_optionsBox);
 }
 
 void Cal3dStore::importFile()

@@ -10,6 +10,8 @@
 
 #include "visual/Model.h"
 
+class Cal3dStoreOptions;
+
 namespace Gtk {
   class FileChooserDialog;
 }
@@ -25,6 +27,8 @@ class Cal3dStore : public Layer {
     int m_lowVertexSelection;
     int m_highVertexSelection;
     bool m_validDrag;
+
+    Cal3dStoreOptions * m_optionsBox;
     // WFMath::Vector<3> m_dragPoint;
 
     int m_nameCount;

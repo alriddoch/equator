@@ -69,7 +69,6 @@ class MainWindow : public Gtk::Window
     gint idle();
 
     void menuNewModel();
-    void showOptionBox(OptionBox &);
     void open_option();
     void open_response(int);
   public:
@@ -107,6 +106,7 @@ class MainWindow : public Gtk::Window
     void newView(Model *);
     Server & newServer(const std::string & name);
     void loadFile(const std::string & file);
+    void showOptionBox(OptionBox &);
 
     void menu_quit();
     void inheritance_window();
