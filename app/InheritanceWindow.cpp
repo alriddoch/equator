@@ -13,8 +13,9 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
 #include <gtkmm/separator.h>
-#include <gtkmm/tree.h>
-#include <gtkmm/ctree.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/treestore.h>
+#include <gtkmm/treeview.h>
 
 #include <iostream>
 #include <vector>
@@ -22,7 +23,7 @@
 using Atlas::Message::Object;
 
 InheritanceWindow::InheritanceWindow(MainWindow & mw) :
-                                     Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                     Gtk::Window(Gtk::WINDOW_TOPLEVEL),
                                      m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &InheritanceWindow::destroy_handler));
@@ -37,12 +38,26 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw) :
    
     vbox->pack_start(*tophbox, false, false, 2);
 
-    m_classTree = manage( new Gtk::Tree() );
+    m_columns = new Gtk::TreeModelColumnRecord();
+    m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_valueColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_columns->add(*m_nameColumn);
+    m_columns->add(*m_valueColumn);
+
+    m_treeModel = Gtk::TreeStore::create(*m_columns);
+
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+    row[*m_nameColumn] = Glib::ustring("test name");
+    row[*m_valueColumn] = Glib::ustring("test value");
+
+    m_treeView = manage( new Gtk::TreeView() );
+
+    m_treeView->set_model( m_treeModel );
     
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
-    scrolled_window->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     // FIXME Add this in a way that won't cause an error
-    scrolled_window->add_with_viewport(*m_classTree);
+    scrolled_window->add(*m_treeView);
     // scrolled_window->add(*m_classTree);
 
     vbox->pack_start(*scrolled_window, true, true, 2);
@@ -55,14 +70,14 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw) :
     test["baz"] = "hello";
     test["mim"] = test;
     test["grep"] = test;
-    m_attributeTree = manage( new AtlasMapWidget(titles, test) );
-    m_attributeTree->set_column_width (0, 100);
-    m_attributeTree->set_column_width (1, 100);
+    m_attributeTree = manage( new AtlasMapWidget(/* titles, */ test) );
+    // m_attributeTree->set_column_width (0, 100);
+    // m_attributeTree->set_column_width (1, 100);
 
     vbox->pack_start(*manage(new Gtk::HSeparator()), false, false, 0);
 
     scrolled_window = manage(new Gtk::ScrolledWindow());
-    scrolled_window->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     scrolled_window->add(*m_attributeTree);
 
     vbox->pack_start(*scrolled_window, true, true, 2);

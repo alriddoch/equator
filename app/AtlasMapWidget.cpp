@@ -3,9 +3,12 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "AtlasMapWidget.h"
-#include <sstream>
 
 #include <gtkmm/frame.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/treestore.h>
+
+#include <sstream>
 
 typedef Atlas::Message::Object AObject;
 
@@ -27,10 +30,12 @@ std::ostream & operator<<(std::ostream& s, const Atlas::Message::Object& v)
     return s;
 }
 
-void AtlasMapWidget::add(Gtk::CTree_Helpers::RowList rowList,
+void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
                          const std::string & name,
                          const AObject & o)
 {
+#warning Fix the AtlasMapWidget class FIXME
+#if 0
     std::vector<const char*> item(2);
     item[0] = name.c_str();
     if (!o.IsList() && !o.IsMap()) {
@@ -56,22 +61,36 @@ void AtlasMapWidget::add(Gtk::CTree_Helpers::RowList rowList,
             }
         }
     }
-
+#endif
 }
 
 void AtlasMapWidget::update()
 {
-    clear();
+    // clear();
     AObject::MapType::const_iterator I = m_contents.begin();
     for (;I != m_contents.end(); I++) {
-        add(rows(), I->first, I->second);
+        add(/* rows(),*/ I->first, I->second);
     }
 }
 
-AtlasMapWidget::AtlasMapWidget(const Gtk::SArray & t,
+AtlasMapWidget::AtlasMapWidget(/* const Gtk::SArray & t, */
                                const Atlas::Message::Object::MapType & m) :
-                               Gtk::CTree(t), m_contents(m)
+                               m_contents(m)
 {
+    m_columns = new Gtk::TreeModelColumnRecord();
+    m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_valueColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_columns->add(*m_nameColumn);
+    m_columns->add(*m_valueColumn);
+
+    m_treeModel = Gtk::TreeStore::create(*m_columns);
+
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+    row[*m_nameColumn] = Glib::ustring("test name");
+    row[*m_valueColumn] = Glib::ustring("test value");
+
+    set_model( m_treeModel );
+
     if (m_contents.size() != 0) {
         update();
     }

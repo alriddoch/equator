@@ -11,14 +11,21 @@ class MainWindow;
 class AtlasMapWidget;
 
 namespace Gtk {
-  class Tree;
+   class TreeStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+   class TreeView;
 };
 
 class InheritanceWindow : public Gtk::Window
 {
   private:
     Gtk::Label * m_connectionLabel;
-    Gtk::Tree * m_classTree;
+    Glib::RefPtr<Gtk::TreeStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumn<Glib::ustring> * m_valueColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
+    Gtk::TreeView * m_treeView;
     AtlasMapWidget * m_attributeTree;
 
   public:

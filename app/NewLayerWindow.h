@@ -36,14 +36,23 @@ class LayerPlant : public LayerFactory {
 #include <gtkmm/window.h>
 
 namespace Gtk {
-  class List;
+   class ListStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+   class TreeView;
+   class TreeSelection;
 }
 
 class NewLayerWindow : public Gtk::Window
 {
   private:
-    Gtk::List * m_list;
+    Glib::RefPtr<Gtk::ListStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
+    Gtk::TreeView * m_treeView;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
     Model * m_currentModel;
+    std::map<Glib::ustring, LayerFactory *> m_factories;
   public:
     NewLayerWindow();
 

@@ -8,9 +8,19 @@
 #include <Atlas/Message/Object.h>
 #include <gtkmm/treeview.h>
 
+namespace Gtk {
+   class TreeStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+};
+
 class AtlasMapWidget : public Gtk::TreeView
 {
   private:
+    Glib::RefPtr<Gtk::TreeStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumn<Glib::ustring> * m_valueColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
     Atlas::Message::Object::MapType m_contents;
 
     void add(/* Gtk::CTree_Helpers::RowList,*/ const std::string&,
