@@ -577,6 +577,7 @@ bool ServerEntities::selectEntities(GlView & view,
 
 void ServerEntities::newType(Eris::TypeInfo * node)
 {
+    std::cout << "GOT NEW SERVER TYPE" << std::endl << std::flush;
     assert(node != NULL);
 
     if (!m_gameEntityType->isBound()) {
@@ -585,6 +586,7 @@ void ServerEntities::newType(Eris::TypeInfo * node)
     if (!node->isA(m_gameEntityType)) {
         return;
     }
+    std::cout << "GOT NEW SERVER GAME ENTITY TYPE" << std::endl << std::flush;
     Palette & p = m_model.m_mainWindow.m_palettewindow;
     p.addEntityEntry(&m_model, node->getName());
     m_model.typesAdded.emit();

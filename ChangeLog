@@ -1,3 +1,8 @@
+2003-02-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Palette.cpp, app/Palette.h, app/ServerEntities.cpp:
+	  Try and hack the entity palette into shape.
+
 2003-02-22  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp, app/HeightManager.h: Implement dragging

@@ -63,11 +63,23 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_tileTreeView = manage( new Gtk::TreeView() );
     m_tileTreeView->set_model( m_tileTreeModel );
 
+    m_refTileTreeSelection = m_tileTreeView->get_selection();
+    m_refTileTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+    m_refTileTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentTile) );
+
     m_entityTreeView = manage( new Gtk::TreeView() );
     m_entityTreeView->set_model( m_entityTreeModel );
 
+    m_refEntityTreeSelection = m_entityTreeView->get_selection();
+    m_refEntityTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+    m_refEntityTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentEntity) );
+
     m_textureTreeView = manage( new Gtk::TreeView() );
     m_textureTreeView->set_model( m_textureTreeModel );
+
+    m_refTextureTreeSelection = m_textureTreeView->get_selection();
+    m_refTextureTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+    m_refTextureTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentTexture) );
 
     Gtk::ScrolledWindow * sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
@@ -108,22 +120,37 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     signal_delete_event().connect(slot(*this, &Palette::deleteEvent));
 }
 
-void Palette::setCurrentTile(int row, int column, GdkEvent *)
+void Palette::setCurrentTile()
 {
-#warning Set the current palette entry
-    // m_currentTile = m_tile_clist->cell(row,0).get_text();
+    Gtk::TreeIter i = m_refTileTreeSelection->get_selected();
+    if (!i) {
+        return;
+    }
+    Gtk::TreeModel::Row row = *i;
+    Glib::ustring t = row[*m_nameColumn];
+    m_currentTile = t;
 }
 
-void Palette::setCurrentEntity(int row, int column, GdkEvent *)
+void Palette::setCurrentEntity()
 {
-#warning Set the current palette entry
-    // m_currentEntity = m_entity_clist->cell(row,0).get_text();
+    Gtk::TreeIter i = m_refEntityTreeSelection->get_selected();
+    if (!i) {
+        return;
+    }
+    Gtk::TreeModel::Row row = *i;
+    Glib::ustring t = row[*m_nameColumn];
+    m_currentEntity = t;
 }
 
-void Palette::setCurrentTexture(int row, int column, GdkEvent *)
+void Palette::setCurrentTexture()
 {
-#warning Set the current palette entry
-    // m_currentTexture = m_texture_clist->cell(row,0).get_text();
+    Gtk::TreeIter i = m_refTextureTreeSelection->get_selected();
+    if (!i) {
+        return;
+    }
+    Gtk::TreeModel::Row row = *i;
+    Glib::ustring t = row[*m_nameColumn];
+    m_currentTexture = t;
 }
 
 void Palette::addModel(Model * model)
@@ -167,6 +194,7 @@ void Palette::setModel(Model * model)
 
 void Palette::syncModel(Model * model)
 {
+    std::cout << "SYINCING" << std::endl << std::flush;
     std::map<Model*,std::list<std::string> >::const_iterator I;
 
     I = m_tiles.find(model);
@@ -174,9 +202,11 @@ void Palette::syncModel(Model * model)
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
 #warning Clear the paletter windows
-        // m_tile_clist->clear();
+        m_tileTreeModel->clear();
         for (; J != entries.end(); J++) {
-            std::vector<std::string> entry(1, *J);
+            Gtk::TreeModel::Row row = *(m_tileTreeModel->append());
+            row[*m_nameColumn] = *J;
+            // std::vector<std::string> entry(1, *J);
             // m_tile_clist->rows().push_back(entry);
         }
     } else { std::cerr << "NO TILES" << std::endl << std::flush; }
@@ -186,24 +216,28 @@ void Palette::syncModel(Model * model)
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
 #warning Clear the paletter windows
-        // m_entity_clist->clear();
+        m_entityTreeModel->clear();
         for (; J != entries.end(); J++) {
-            std::vector<std::string> entry(1, *J);
+            Gtk::TreeModel::Row row = *(m_entityTreeModel->append());
+            row[*m_nameColumn] = *J;
+            // std::vector<std::string> entry(1, *J);
             // m_entity_clist->rows().push_back(entry);
         }
-    } else { std::cerr << "NO TILES" << std::endl << std::flush; }
+    } else { std::cerr << "NO ENTITIES" << std::endl << std::flush; }
 
     I = m_textures.find(model);
     if (I != m_textures.end()) {
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
 #warning Clear the paletter windows
-        // m_texture_clist->clear();
+        m_textureTreeModel->clear();
         for (; J != entries.end(); J++) {
-            std::vector<std::string> entry(1, *J);
+            Gtk::TreeModel::Row row = *(m_textureTreeModel->append());
+            row[*m_nameColumn] = *J;
+            // std::vector<std::string> entry(1, *J);
             // m_texture_clist->rows().push_back(entry);
         }
-    } else { std::cerr << "NO TILES" << std::endl << std::flush; }
+    } else { std::cerr << "NO TEXTURES" << std::endl << std::flush; }
 
     // Update the contents of the windows to the new thingy
     set_sensitive(true);

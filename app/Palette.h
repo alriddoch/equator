@@ -21,6 +21,7 @@ namespace Gtk {
    template <class T> class TreeModelColumn;
    class TreeModelColumnRecord;
    class TreeView;
+   class TreeSelection;
 }
 
 class Palette : public Gtk::Window
@@ -36,6 +37,9 @@ class Palette : public Gtk::Window
     Gtk::TreeView * m_tileTreeView;
     Gtk::TreeView * m_entityTreeView;
     Gtk::TreeView * m_textureTreeView;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTileTreeSelection;
+    Glib::RefPtr<Gtk::TreeSelection> m_refEntityTreeSelection;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTextureTreeSelection;
     // Gtk::CList * m_tile_clist;
     // Gtk::CList * m_entity_clist;
     // Gtk::CList * m_texture_clist;
@@ -51,9 +55,9 @@ class Palette : public Gtk::Window
     std::string m_currentEntity;
     std::string m_currentTexture;
 
-    void setCurrentTile(int row, int column, GdkEvent *);
-    void setCurrentEntity(int row, int column, GdkEvent *);
-    void setCurrentTexture(int row, int column, GdkEvent *);
+    void setCurrentTile();
+    void setCurrentEntity();
+    void setCurrentTexture();
   public:
     MainWindow & m_mainWindow;
 
