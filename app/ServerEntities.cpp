@@ -749,6 +749,14 @@ void ServerEntities::exportEntity(const std::string & id,
     ent["orientation"] = ee->getOrientation().toAtlas();
     ent["name"] = ee->getName();
     ent["parents"] = Atlas::Message::Object::ListType(1, *ee->getInherits().begin());
+    Eris::Entity * loc = ee->getContainer();
+    if (loc != NULL) {
+        // FIXME AJR 2002-07-15
+        // The id of the container actually needs a little bit of processing.
+        // If we have overriddent the top level container, it needs to be
+        // that, otherwise it might need the suffix appended
+        ent["loc"] = loc->getID();
+    }
     e.StreamMessage(ent);
 }
 

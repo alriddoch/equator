@@ -27,6 +27,8 @@ int attrlist[] = {
     GDK_GL_DOUBLEBUFFER,
     GDK_GL_DEPTH_SIZE, 1,
     GDK_GL_ACCUM_RED_SIZE, 1,
+    GDK_GL_ACCUM_GREEN_SIZE, 1,
+    GDK_GL_ACCUM_BLUE_SIZE, 1,
     GDK_GL_NONE
 };
 
@@ -255,8 +257,8 @@ void GlView::zoomIn()
 void GlView::zoomOut()
 {
     float new_scale = m_scale / 2;
-    if (new_scale < 0.0625f) {
-        new_scale = 0.0625f;
+    if (new_scale < 0.0078125f) {
+        new_scale = 0.0078125f;
     }
     if (m_scale != new_scale) {
         setScale(new_scale);

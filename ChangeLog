@@ -1,3 +1,9 @@
+2002-07-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp: Allow a bit more zooming out.
+
+	* app/ServerEntities.cpp: Fix up atlas map export a bit.
+
 2002-05-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp: Implemented exporting
