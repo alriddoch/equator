@@ -292,7 +292,7 @@ void GlView::setupgl()
         } else {
             float xsize = get_width() / 40.0f / 2.0f;
             float ysize = get_height() / 40.0f / 2.0f;
-            glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
+            glOrtho(-xsize, xsize, -ysize, ysize, -100.0f, 100.0f);
         }
 
     }
@@ -451,6 +451,9 @@ bool GlView::animate()
 
 void GlView::clickOn(int x, int y)
 {
+    if (m_dragType != GlView::NONE) {
+        return;
+    }
     switch (m_mainWindow.getTool()) {
         case MainWindow::SELECT:
             if (make_current()) {
@@ -469,6 +472,7 @@ void GlView::clickOn(int x, int y)
             m_dragType = GlView::MOVE;
             break;
         case MainWindow::DRAW:
+            {
             double cursDepth;
             int tx, ty;
             // Get the depth in the current view of the cursor
@@ -478,8 +482,13 @@ void GlView::clickOn(int x, int y)
             double nx, ny, nz;
             // Calculate the world coords with the same depth, at the current
             // position of the mouse.
-            worldPoint(x, y, cursDepth, &nx, &ny, &nz);
+            double z = getZ(x, get_height() - y);
+            if (z > 0.99) {
+                z = cursDepth;
+            }
+            worldPoint(x, y, z, &nx, &ny, &nz);
             m_model.setCursor(nx, ny, nz);
+            }
             break;
         case MainWindow::ROTATE:
         case MainWindow::SCALE:
@@ -500,7 +509,6 @@ void GlView::clickOff(int x, int y)
                     m_model.getCurrentLayer()->select(*this, clickx, get_height() - clicky, x, get_height() - y);
                 }
             }
-            m_dragType = GlView::NONE;
             break;
         case MainWindow::MOVE:
         case MainWindow::ROTATE:
@@ -510,7 +518,6 @@ void GlView::clickOff(int x, int y)
                 worldPoint(x, y, dragDepth, &tx, &ty, &tz);
                 // Send move thingy to layer
                 m_model.getCurrentLayer()->dragEnd(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
-                m_dragType = GlView::NONE;
             }
             break;
         case MainWindow::SELECT:
@@ -518,11 +525,15 @@ void GlView::clickOff(int x, int y)
             break;
     }
     clickx = 0; clicky = 0;
+    m_dragType = GlView::NONE;
     scheduleRedraw();
 }
 
 void GlView::midClickOn(int x, int y)
 {
+    if (m_dragType != GlView::NONE) {
+        return;
+    }
     dragDepth = -2;
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
     clickx = x;
@@ -584,7 +595,8 @@ void GlView::midClickOff(int x, int y)
         default:
             break;
     }
-    clickx = 0; clicky = 0;
+    clickx = 0;
+    clicky = 0;
     m_dragType = GlView::NONE;
 }
 
@@ -675,10 +687,17 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             }
             break;
         case GlView::PAN:
-            worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
-            setXoff(getXoff() + (tx - dragx) );
-            setYoff(getYoff() + (ty - dragy) );
-            setZoff(getZoff() + (tz - dragz) );
+            {
+                double z = getZ(mousex, get_height() - mousey);
+                if (z > 0.99) {
+                    z = dragDepth;
+                }
+                std::cout << "MOD" << std::endl << std::flush;
+                worldPoint(mousex, mousey, z, &tx, &ty, &tz);
+                setXoff(getXoff() + (tx - dragx) );
+                setYoff(getYoff() + (ty - dragy) );
+                setZoff(getZoff() + (tz - dragz) );
+            }
             break;
         case GlView::ORBIT:
             {
@@ -896,7 +915,7 @@ void GlView::setPickProjection(int nx, int ny, int fx, int fy)
     } else {
         float xsize = get_width() / 40.0f / 2.0f;
         float ysize = get_height() / 40.0f / 2.0f;
-        glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
+        glOrtho(-xsize, xsize, -ysize, ysize, -100.0f, 100.0f);
     }
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

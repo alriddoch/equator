@@ -1,5 +1,13 @@
 2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.cpp: Improve the feel of placing the cursor by
+	  checking the depth of what the user is clicking on. Use similar
+	  check to try and improve the feel of mouse based panning.
+	  Make sure a new mouse action cannot be initiated while one is in
+	  progress.
+
+2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp, app/GlView.h, app/MainWindow.cpp, app/MainWindow.h,
 	  app/ViewWindow.cpp: Improve tool tips for main tool buttons.
 	  Remove camera pivot to camera orbit.
