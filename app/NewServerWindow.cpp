@@ -7,7 +7,6 @@
 #include "MainWindow.h"
 #include "Server.h"
 #include "Model.h"
-#include "ServerEntities.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Lobby.h>
@@ -159,8 +158,8 @@ void NewServerWindow::createConnection()
 
     m_server = new Server();
 
-    m_failure = m_server->connection.Failure.connect(SigC::slot(*this, &NewServerWindow::failure));
-    m_connected = m_server->connection.Connected.connect(SigC::slot(*this, &NewServerWindow::connected));
+    m_failure = m_server->m_connection.Failure.connect(SigC::slot(*this, &NewServerWindow::failure));
+    m_connected = m_server->m_connection.Connected.connect(SigC::slot(*this, &NewServerWindow::connected));
 
     //std::cout << m_hostEntry->get_text() << ": " << m_portNum
               //<< std::endl << std::flush;
@@ -180,7 +179,7 @@ void NewServerWindow::loginAccount()
     m_status->push("Logging in", m_statusContext);
 
     m_server->login(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->m_connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAccount()
@@ -191,7 +190,7 @@ void NewServerWindow::createAccount()
     m_status->push("Creating account", m_statusContext);
 
     m_server->createAccount(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->m_connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAvatar()
@@ -203,7 +202,7 @@ void NewServerWindow::createAvatar()
 
     m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
 
-    m_worldEnter = m_server->world->Entered.connect(SigC::slot(*this,&NewServerWindow::worldEnter));
+    m_worldEnter = m_server->m_world->Entered.connect(SigC::slot(*this,&NewServerWindow::worldEnter));
 }
 
 void NewServerWindow::createView()
@@ -213,8 +212,9 @@ void NewServerWindow::createView()
     // model->setServer(m_server);
     // Layer * layer = new HeightManager(*model);
     // model->addLayer(layer);
-    Layer * layer = new ServerEntities(model, *m_server);
-    model.addLayer(layer);
+    // Layer * layer = new ServerEntities(model, *m_server);
+    // model.addLayer(layer);
+    m_server->createLayers(model);
     m_viewButton->set_sensitive(false);
 }
 

@@ -4,7 +4,9 @@
 
 #include "Server.h"
 
+#include "Model.h"
 #include "WorldEntity.h"
+#include "ServerEntities.h"
 
 #include <Eris/Avatar.h>
 #include <Eris/Player.h>
@@ -50,8 +52,11 @@ inline Atlas::Message::Element WFMath::Vector<3>::toAtlas() const
 #endif
 
 Server::Server() : inGame(false),
-                   connection(* new Eris::Connection("equator", true)),
-                   player(NULL), lobby(NULL), world(NULL), character(NULL) { }
+                   m_connection(* new Eris::Connection("equator", true)),
+                   m_player(NULL), m_lobby(NULL), m_world(NULL),
+                   m_character(NULL)
+{
+}
 
 void Server::lobbyTalk(Eris::Room *r, const std::string & nm,
                                       const std::string & t)
@@ -76,15 +81,24 @@ void Server::createCharacter(const std::string & name,
     chrcter.setName(name);
     chrcter.setAttr("description", "an equator avatar");
     // chrcter.setAttr("sex", "female");
-    world = player->createCharacter(chrcter)->getWorld();
+    m_world = m_player->createCharacter(chrcter)->getWorld();
 
-    lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
-    lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
+    m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
+    m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
-    world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
-    world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
-    world->registerFactory(new WEFactory(*this));
+    m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
+    m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
+    m_world->registerFactory(new WEFactory(*this));
 
+}
+
+void Server::createLayers(Model & model)
+{
+    m_model = &model;
+    Layer * layer = new ServerEntities(model, *this);
+    model.addLayer(layer);
+
+#warning FIXME Add terrain layers as required.
 }
 
 void Server::roomEnter(Eris::Room *r)
@@ -94,20 +108,20 @@ void Server::roomEnter(Eris::Room *r)
 
 void Server::connect(const std::string & host, int port)
 {
-    connection.Failure.connect(SigC::slot(*this, &Server::netFailure));
-    connection.Connected.connect(SigC::slot(*this, &Server::netConnected));
-    connection.Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
+    m_connection.Failure.connect(SigC::slot(*this, &Server::netFailure));
+    m_connection.Connected.connect(SigC::slot(*this, &Server::netConnected));
+    m_connection.Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
     Eris::Logged.connect(SigC::slot(*this, &Server::connectionLog));
 
     Eris::setLogLevel(Eris::LOG_DEBUG);
 
     std::cout << host << ":" << port << std::endl << std::flush;
-    connection.connect(host, port);
-    // connection.connect("localhost", 6767);
+    m_connection.connect(host, port);
+    // m_connection.connect("localhost", 6767);
 
 #warning Handle the socket input FIXME
     inputHandler = Glib::signal_io().connect(slot(*this, &Server::poll),
-                                             connection.getFileDescriptor(),
+                                             m_connection.getFileDescriptor(),
                                              Glib::IO_IN);
 }
 
@@ -130,18 +144,18 @@ void Server::netConnected()
 
 void Server::login(const std::string & name, const std::string & password)
 {
-    player = new Eris::Player(&connection);
-    player->login(name, password);
-    lobby = connection.getLobby();
-    lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
+    m_player = new Eris::Player(&m_connection);
+    m_player->login(name, password);
+    m_lobby = m_connection.getLobby();
+    m_lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::createAccount(const std::string& name, const std::string& password)
 {
-    player = new Eris::Player(&connection);
-    player->createAccount(name, name, password);
-    lobby = connection.getLobby();
-    lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
+    m_player = new Eris::Player(&m_connection);
+    m_player->createAccount(name, name, password);
+    m_lobby = m_connection.getLobby();
+    m_lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::netDisconnected()
@@ -151,7 +165,7 @@ void Server::netDisconnected()
 
 bool Server::poll(Glib::IOCondition)
 {
-    //connection.poll();
+    //m_connection.poll();
     Eris::PollDefault::poll();
     return true;
 }
@@ -166,7 +180,7 @@ void Server::worldEnter(Eris::Entity * chr)
     std::cout << "Enter world" << std::endl << std::flush;
     inGame = true;
     chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
-    character = chr;
+    m_character = chr;
 
 }
 
@@ -177,21 +191,21 @@ void Server::charMoved(const WFMath::Point<3> &)
 
 void Server::moveCharacter(const WFMath::Point<3> & pos)
 {
-    if (character == NULL) {
+    if (m_character == NULL) {
         return;
     }
     
     Move m(Move::Instantiate());
 
     Atlas::Message::Element::MapType marg;
-    marg["id"] = character->getID();
-    marg["loc"] = character->getContainer()->getID();
+    marg["id"] = m_character->getID();
+    marg["loc"] = m_character->getContainer()->getID();
     marg["pos"] = pos.toAtlas();
     marg["velocity"] = WFMath::Point<3>(1,0,0).toAtlas();
     m.setArgs(Atlas::Message::Element::ListType(1, marg));
-    m.setFrom(character->getID());
+    m.setFrom(m_character->getID());
 
-    connection.send(m);
+    m_connection.send(m);
     
 }
 
@@ -206,9 +220,9 @@ const WFMath::Point<3> Server::getAbsCharPos()
     if (!inGame) {
         return WFMath::Point<3>();
     }
-    WFMath::Point<3> pos = character->getPosition();
-    Eris::Entity * root = world->getRootEntity();
-    for(Eris::Entity * ref = character->getContainer();
+    WFMath::Point<3> pos = m_character->getPosition();
+    Eris::Entity * root = m_world->getRootEntity();
+    for(Eris::Entity * ref = m_character->getContainer();
         ref != NULL && ref != root;
         ref = ref->getContainer()) {
         pos = pos + ref->getPosition();
@@ -221,10 +235,10 @@ void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
     Create c = Create::Instantiate();
 
     c.setArgs(Atlas::Message::Element::ListType(1, ent));
-    c.setFrom(character->getID());
-    c.setTo(character->getID());
+    c.setFrom(m_character->getID());
+    c.setTo(m_character->getID());
     
-    connection.send(c);
+    m_connection.send(c);
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
@@ -237,10 +251,10 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
     ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
     m.setArgs(Atlas::Message::Element::ListType(1, ent));
-    m.setFrom(character->getID());
+    m.setFrom(m_character->getID());
     m.setTo(id);
 
-    connection.send(m);
+    m_connection.send(m);
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
@@ -255,8 +269,8 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
     ent["loc"] = loc;
     ent["velocity"] = vel.toAtlas();
     m.setArgs(Atlas::Message::Element::ListType(1, ent));
-    m.setFrom(character->getID());
+    m.setFrom(m_character->getID());
     m.setTo(id);
 
-    connection.send(m);
+    m_connection.send(m);
 }

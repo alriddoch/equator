@@ -32,12 +32,14 @@ bool WEFactory::accept(const GameEntity&, Eris::World * w)
 
 Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge, Eris::World * w)
 {
+    std::cout << "ENTITY FACTORY: " << std::flush;
     Eris::Entity * e = 0;
     Eris::TypeInfoPtr type = w->getConnection()->getTypeService()->getTypeForAtlas(ge);
     if (type->safeIsA(terrainType)) {
+        std::cout << "got Terrain Entity" << std::endl << std::flush;
         e = new TerrainEntity(ge,w);
-        std::cout << "Got Terrain Entity" << std::endl << std::flush;
     } else {
+        std::cout << "default" << std::endl << std::flush;
         e = new Eris::Entity(ge, w);
     }
     return e;

@@ -1,5 +1,17 @@
 2003-08-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/WorldEntity.cpp: Debug output.
+
+	* app/Server.h, app/Server.cpp, app/NewServerWindow.cpp,
+	  app/ServerEntities.cpp: Add m_ prefix to member variables
+	  for clarity.
+
+	* app/Server.h, app/Server.cpp, app/NewServerWindow.cpp:
+	  Add Model pointer to server object, and make it responsible for
+	  adding channels to for rendering/handling as required.
+
+2003-08-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/WorldEntity.h app/WorldEntity.cpp: Added Eris compatable
 	  factory for handling different types of entity more easily.
 

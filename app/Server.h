@@ -30,6 +30,8 @@ namespace Atlas {
  }
 }
 
+class Model;
+
 class Server : public SigC::Object {
   private:
     void lobbyTalk(Eris::Room *r, const std::string& nm, const std::string& t);
@@ -43,14 +45,17 @@ class Server : public SigC::Object {
     void charMoved(const WFMath::Point<3> &);
   protected:
     bool inGame;
+
+    Model * m_model;
+
   public:
     Server();
 
-    Eris::Connection & connection;
-    Eris::Player * player;
-    Eris::Lobby * lobby;
-    Eris::World * world;
-    Eris::Entity * character;
+    Eris::Connection & m_connection;
+    Eris::Player * m_player;
+    Eris::Lobby * m_lobby;
+    Eris::World * m_world;
+    Eris::Entity * m_character;
 
     SigC::Connection inputHandler;
 
@@ -65,6 +70,7 @@ class Server : public SigC::Object {
     void login(const std::string &, const std::string &);
     void createAccount(const std::string &, const std::string &);
     void createCharacter(const std::string &, const std::string &);
+    void createLayers(Model & model);
 
     void moveCharacter(const WFMath::Point<3> & pos);
 

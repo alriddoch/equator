@@ -452,7 +452,7 @@ bool ServerEntities::selectEntities(GlView & view,
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
-    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
 
     assert(root != NULL);
 
@@ -634,7 +634,7 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
                   << std::endl << std::flush;
     }
     if (m_importOptions->m_target == ImportOptions::IMPORT_TOPLEVEL) {
-        insertEntityContents(m_serverConnection.world->getRootEntity()->getID(),
+        insertEntityContents(m_serverConnection.m_world->getRootEntity()->getID(),
                              I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
         if (m_selection == NULL) {
@@ -707,7 +707,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
         case ExportOptions::EXPORT_ALL:
         case ExportOptions::EXPORT_VISIBLE:
         default:
-            export_root = m_serverConnection.world->getRootEntity();
+            export_root = m_serverConnection.m_world->getRootEntity();
     }
 
     if (export_root == NULL) {
@@ -733,7 +733,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     }
 
     if (m_exportOptions->m_charCheck->get_active()) {
-        m_exportOptions->m_charType = m_serverConnection.connection.getTypeService()->getTypeByName("character");
+        m_exportOptions->m_charType = m_serverConnection.m_connection.getTypeService()->getTypeByName("character");
     }
 
     if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
@@ -862,8 +862,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
                                m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
-    m_serverConnection.connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
-    m_gameEntityType = m_serverConnection.connection.getTypeService()->getTypeByName("game_entity");
+    m_serverConnection.m_connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
+    m_gameEntityType = m_serverConnection.m_connection.getTypeService()->getTypeByName("game_entity");
     assert(m_gameEntityType != NULL);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
     if (m_gameEntityType->isBound()) {
@@ -873,7 +873,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
         std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
     }
     
-    Eris::Entity * worldRoot = m_serverConnection.world->getRootEntity();
+    Eris::Entity * worldRoot = m_serverConnection.m_world->getRootEntity();
 
     connectEntity(worldRoot);
 
@@ -882,7 +882,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */
-    m_serverConnection.world->EntityCreate.connect(
+    m_serverConnection.m_world->EntityCreate.connect(
         SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
 
@@ -923,7 +923,7 @@ void ServerEntities::animate(GlView & view)
     if (m_selection == NULL) {
         return;
     }
-    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
     moveTo(m_selection->getContainer(), root);
     draw3DSelectedBox(m_selection->getPosition(), m_selection->getBBox(),
@@ -936,7 +936,7 @@ void ServerEntities::draw(GlView & view)
     m_antTexture = view.getAnts();
 
     m_renderMode = view.getRenderMode(m_name);
-    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     drawWorld(root);
 }
 
@@ -999,7 +999,7 @@ void ServerEntities::insert(const WFMath::Point<3> & pos)
     Atlas::Message::Element::MapType ent;
     ent["objtype"] = "object";
     ent["parents"] = Atlas::Message::Element::ListType(1, type);
-    ent["loc"] = m_serverConnection.world->getRootEntity()->getID();
+    ent["loc"] = m_serverConnection.m_world->getRootEntity()->getID();
     ent["pos"] = pos.toAtlas();
     
     m_serverConnection.avatarCreateEntity(ent);
@@ -1009,7 +1009,7 @@ void ServerEntities::align(Alignment a)
 {
     if (a != ALIGN_HEIGHT) { return; }
 
-    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     alignEntityHeight(root, WFMath::Point<3>(0,0,0));
 
 }
