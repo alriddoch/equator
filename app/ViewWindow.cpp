@@ -260,7 +260,10 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0)
 
     show_all();
 
-    m_glarea->viewChanged.connect(slot(*this, &ViewWindow::glViewChanged));
+    // m_glarea->viewChanged.connect(slot(*this, &ViewWindow::glViewChanged));
+    m_glarea->getDeclinationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
+    m_glarea->getRotationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
+    m_glarea->getScaleAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     glViewChanged();
     signal_delete_event().connect(slot(*this, &ViewWindow::deleteEvent));
 }

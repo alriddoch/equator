@@ -1,5 +1,12 @@
 2004-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ViewWindow.cpp: Recalculate scrollbars whenever the scale
+	  or angles change.
+
+	* app/GlView.cpp: Cut down on redundant redraws.
+
+2004-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.h: Add missing scale adjustment accessor.
 
 	* gui/gtkmm/CameraControl.cpp: Modify sliders so they now hook

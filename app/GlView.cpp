@@ -487,11 +487,10 @@ void GlView::midClickOff(int x, int y)
 {
     double tx, ty, tz;
     worldPoint(x, y, dragDepth, &tx, &ty, &tz);
+    m_dragType = GlView::NONE;
     setXoff(getXoff() + (tx - dragx) );
     setYoff(getYoff() + (ty - dragy) );
     setZoff(getZoff() + (tz - dragz) );
-    m_dragType = GlView::NONE;
-    redraw();
 }
 
 void GlView::worldPoint(int x, int y, double &z,
@@ -663,8 +662,9 @@ bool GlView::buttonReleaseEvent(GdkEventButton * event)
 
 bool GlView::exposeEvent(GdkEventExpose * event)
 {
-    if (event->count>0)
+    if (event->count > 0) {
         return 0;
+    }
     redraw();
     return TRUE;
 }
@@ -763,8 +763,6 @@ void GlView::setViewOffset(float h, float v, float d)
     setXoff(vo.x());
     setYoff(vo.y());
     setZoff(vo.z());
-
-    redraw();
 }
 
 float GlView::getViewSize()
