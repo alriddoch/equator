@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "WorldEntity.h"
 #include "ServerEntities.h"
+#include "GameView.h"
 #include "Terrain.h"
 
 #include "visual/TerrainRenderer.h"
@@ -193,6 +194,9 @@ void Server::createLayers()
     assert(m_model != 0);
 
     Layer * layer = new ServerEntities(*m_model, *this);
+    m_model->addLayer(layer);
+
+    layer = new GameView(*m_model, *this);
     m_model->addLayer(layer);
 
     Eris::Entity * worldRoot = m_world->getRootEntity();
