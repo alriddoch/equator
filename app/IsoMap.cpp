@@ -80,7 +80,7 @@ void IsoMap::drawMap(CoalDatabase & map_base)
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glDepthMask(GL_FALSE);
-    glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
     int count = map_base.GetRegionCount();
     for (int i = 0; i < count; i++) {
         CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
@@ -89,7 +89,7 @@ void IsoMap::drawMap(CoalDatabase & map_base)
         }
     }
     // glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
     count = map_base.GetObjectCount();
     for (int i = 0; i < count; i++) {

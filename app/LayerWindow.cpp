@@ -4,8 +4,6 @@
 
 #include "LayerWindow.h"
 #include "MainWindow.h"
-#include "ViewWindow.h"
-#include "GlView.h"
 #include "Model.h"
 #include "Layer.h"
 #include "NewLayerWindow.h"
@@ -27,7 +25,7 @@
 #include <sstream>
 
 LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                           m_currentModel(NULL), m_mainWindow(w)
+                                           m_currentModel(NULL) // , m_mainWindow(w)
 {
     // destroy.connect(slot(this, &LayerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
@@ -100,18 +98,28 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
 void LayerWindow::setModel(Model * model)
 {
-    m_clist->clear();
+    if (m_currentModel != NULL) {
+        m_updateSignal.disconnect();
+    }
 
     m_currentModel = model;
 
     if (m_currentModel == NULL) {
         set_sensitive(false);
+        m_clist->clear();
         return;
     }
 
-    set_sensitive(true);
+    m_updateSignal = m_currentModel->layersChanged.connect(slot(this, &LayerWindow::updateLayers));
+    updateLayers();
 
-    const std::list<Layer *> & layers = model->getLayers();
+    set_sensitive(true);
+}
+
+void LayerWindow::updateLayers()
+{
+    m_clist->clear();
+    const std::list<Layer *> & layers = m_currentModel->getLayers();
  
     std::list<Layer *>::const_iterator I = layers.begin();
     for (; I != layers.end(); I++) {
@@ -119,7 +127,7 @@ void LayerWindow::setModel(Model * model)
         entry.push_back((*I)->getType());
         entry.push_back((*I)->getName());
         m_clist->rows().push_front(entry);
-        if (*I == model->getCurrentLayer()) {
+        if (*I == m_currentModel->getCurrentLayer()) {
             m_clist->rows().front()->select();
         }
     }

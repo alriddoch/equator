@@ -14,8 +14,6 @@ int main(int argc, char ** argv)
 
     MainWindow * window = new MainWindow();
 
-    window->set_title("Equator");
-
     kit.run();
     return 0;
 }

@@ -1,3 +1,17 @@
+2002-01-02  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/equator_plugin.cpp, app/equator.cpp, app/ViewWindow.h,
+	  app/ViewWindow.cpp, app/ServerWindow.h, app/ServerWindow.cpp,
+	  app/NewServerWindow.h, app/NewServerWindow.cpp,
+	  app/NewLayerWindow.cpp, app/MainWindow.h, app/LayerWindow.h,
+	  app/LayerWindow.cpp, app/Layer.h, app/IsoMap.h,
+	  app/IsoMap.cpp, app/InheritanceWindow.cpp, app/Holo.h,
+	  app/Holo.cpp, app/GlView.h, app/GlView.cpp, app/BladeMap.h:
+	  Big batch of changes including code cleanups, implementation
+	  of connecting to server, and displaying server entities.
+	  Re-orginasing of main window buttons to separate tool from
+	  edit mode. Sorted out correct use of depth buffer.
+
 2001-12-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Model.h, app/Model.cpp: Class that stores the world model,

@@ -14,13 +14,12 @@
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) :
                                          Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                         m_glarea(NULL), m_popup(NULL),
-                                         m_mainwindow(w)
+                                         m_glarea(NULL), m_mainWindow(w)
 {
     m.nameChanged.connect(slot(this, &ViewWindow::setTitle));
     // destroy.connect(slot(this, &ViewWindow::destroy_handler));
 
-    m_glarea = manage( new GlView(*this, m) );
+    m_glarea = manage( new GlView(w, *this, m) );
     m_glarea->set_usize(300,300);
 
     Gtk::Frame * frame = manage( new Gtk::Frame() );
@@ -29,14 +28,6 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     frame->add(*m_glarea);
 
     add(*frame);
-
-    m_popup = manage( new Gtk::Menu() );
-    Gtk::MenuItem * menu_item = manage( new Gtk::MenuItem("Foo") );
-    m_popup->append(*menu_item);
-    menu_item = manage( new Gtk::MenuItem("Foo 2") );
-    m_popup->append(*menu_item);
-    menu_item = manage( new Gtk::MenuItem("Foo 3") );
-    m_popup->append(*menu_item);
 
     show_all();
 }

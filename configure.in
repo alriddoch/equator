@@ -5,7 +5,9 @@ AM_CONFIG_HEADER(config.h)
 
 dnl Initialise automake
 
-AM_INIT_AUTOMAKE(equator, 0.0.0)
+AM_INIT_AUTOMAKE(equator, 0.0.2)
+
+AM_MAINTAINER_MODE
 
 dnl Need libtool
 
@@ -70,6 +72,7 @@ dnl AC_CHECK_LIB(ccio,main)
 AC_CHECK_LIB(gtkgl,main)
 AC_CHECK_LIB(gtkglmm,main)
 AC_CHECK_LIB(eris,main)
+dnl AC_CHECK_LIB(efence,main)
 dnl AC_CHECK_LIB(cyphesis,main)
 
 AM_PATH_GIMP(1.2.0,AC_DEFINE(BUILD_AS_GIMP_PLUGIN),AC_MSG_ERROR(Gimp library not found. Equator will be build as a stand alone app only, and no imaging editing features will be available))

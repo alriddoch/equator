@@ -11,9 +11,12 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \
 		  Model.cpp Model.h \
+		  Server.cpp Server.h \
 		  Layer.h \
 		  Holo.cpp Holo.h \
 		  BladeMap.cpp BladeMap.h \
 		  IsoMap.cpp IsoMap.h \
+		  EntityLayer.cpp EntityLayer.h \
+		  ServerEntities.cpp ServerEntities.h \
 		  Texture.cpp Texture.h \
 		  equator_plugin.cpp

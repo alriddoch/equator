@@ -17,25 +17,16 @@ class ViewWindow : public Gtk::Window
 {
   private:
     GlView * m_glarea;
-    Gtk::Menu * m_popup;
-    // std::string m_name;
 
   public:
-    MainWindow & m_mainwindow;
+    MainWindow & m_mainWindow;
 
     ViewWindow(MainWindow &, Model &);
-
-    gint buttonEvent(GdkEventButton*);
-
-    // const std::string & getName() const {
-        // return m_name;
-    // }
 
     GlView * getView() const {
         return m_glarea;
     }
 
-    // void setName(const std::string & n);
     void setTitle();
 };
 

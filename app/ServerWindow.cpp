@@ -14,6 +14,7 @@
 #include <gtk--/label.h>
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
@@ -34,5 +35,35 @@ ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     add(*vbox);
     set_title("Servers");
 
+    set_sensitive(false);
+
     // show_all();
+}
+
+void ServerWindow::newServer(Server * server)
+{
+    Gtk::Menu * menu = m_serverMenu->get_menu();
+    stringstream ident;
+    ident << /* server->getName() << */ "FIXME" /* << server->getModelNo() */;
+    if (menu == NULL) {
+        menu = manage( new Gtk::Menu() );
+        
+        Gtk::Menu_Helpers::MenuList& server_menu = menu->items();
+        server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(slot(this, &ServerWindow::setServer),server)));
+        m_serverMenu->set_menu(menu);
+        set_sensitive(true);
+        setServer(server);
+    } else {
+        Gtk::Menu_Helpers::MenuList& server_menu = menu->items();
+        server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(slot(this, &ServerWindow::setServer),server)));
+    }
+}
+
+void ServerWindow::setServer(Server * server)
+{
+    m_currentServer = server;
+
+    // FIXME Update the contents of the window to reflect the newly selected
+    // server
+
 }

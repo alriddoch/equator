@@ -19,14 +19,15 @@ class ServerWindow : public Gtk::Window
 {
   private:
     Gtk::OptionMenu * m_serverMenu;
-    Server * m_currentConnection;
-    NewServerWindow * m_newServerWindow;
+    Server * m_currentServer;
 
   public:
     MainWindow & m_mainWindow;
 
     explicit ServerWindow(MainWindow &);
 
+    void newServer(Server *);
+    void setServer(Server *);
 };
 
 #endif // EQUATOR_APP_SERVERWINDOW_H

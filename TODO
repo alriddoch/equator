@@ -1,6 +1,11 @@
-Last remaining problem with drag code is that reading depth fails on all
-layers except the Holo layer, which means that correct tracking only
-works in Ortho mode.
+Connection code, once complete needs custom op handler, which allows
+construction of arbitrary ops. This window should allow selection of
+various server subsystems as FROM of op, and also offer options for TO.
+
+Separate tool (select, area, move, draw) from tool_mode (entity, vertex,
+tile) in main window.
+
+Create a palette notebook with panes for tiles, entities etc.
 
 Add to the gimp interface.
 

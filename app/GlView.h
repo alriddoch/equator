@@ -12,23 +12,26 @@
 
 class Layer;
 class ViewWindow;
+class MainWindow;
 class Model;
 
 class GlView : public Gtk::GLArea {
+  public:
+    typedef enum view { ORTHO, PERSP } projection_t;
+    typedef enum drag { NONE, SELECT, MOVE, PAN } drag_t;
+    typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT } rmode_t;
   private:
     Gtk::Menu * m_popup;
     const int m_viewNo;
-    // std::list<Layer *> m_layers;
     float m_scale;
-    // Layer * m_currentLayer;
     float m_xoff, m_yoff, m_zoff;
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
 
-    enum view { ORTHO, PERSP } m_projection;
-
-    enum drag { NONE, SELECT, MOVE, PAN } m_dragType;
+    projection_t m_projection;
+    drag_t m_dragType;
+    rmode_t m_renderMode;
 
     void setOrthographic();
     void setPerspective();
@@ -41,8 +44,6 @@ class GlView : public Gtk::GLArea {
     void setupgl();
     void origin();
     void drawgl();
-
-    // void importFile();
 
     void clickOn(int x, int y);
     void clickOff(int x, int y);
@@ -59,32 +60,25 @@ class GlView : public Gtk::GLArea {
     virtual gint expose_event_impl(GdkEventExpose* expose);
     virtual gint configure_event_impl(GdkEventConfigure *event);
   public:
-    ViewWindow & m_viewwindow;
+    MainWindow & m_mainWindow;
+    ViewWindow & m_viewWindow;
     Model & m_model;
 
-    explicit GlView(ViewWindow&, Model&);
+    explicit GlView(MainWindow &, ViewWindow&, Model&);
 
     float getScale() const {
         return m_scale;
     }
 
-    // const std::list<Layer *> & getLayers() const {
-        // return m_layers;
-    // }
+    enum render getRenderMode() {
+        return m_renderMode;
+    }
 
-    // const Layer * getCurrentLayer() const {
-        // return m_currentLayer;
-    // }
-
-    // void setCurrentLayer(Layer * l) {
-        // m_currentLayer = l;
-    // }
+    void setRenderMode(enum render m) {
+        m_renderMode = m;
+    }
 
     const std::string details() const;
-    // void addLayer(Layer *);
-
-    // void raiseCurrentLayer();
-    // void lowerCurrentLayer();
 
     void redraw();
     void setPickProjection();

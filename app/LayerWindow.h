@@ -25,13 +25,15 @@ class LayerWindow : public Gtk::Window
     Gtk::OptionMenu * m_modelMenu;
     Model * m_currentModel;
     NewLayerWindow * m_newLayerWindow;
+    SigC::Connection m_updateSignal;
 
   public:
-    MainWindow & m_mainWindow;
+    // MainWindow & m_mainWindow;
 
     explicit LayerWindow(MainWindow &);
 
     void setModel(Model * model);
+    void updateLayers();
     void addModel(Model * view);
     void selectionMade(gint row, gint column, GdkEvent * event);
 

@@ -17,6 +17,7 @@ class ServerWindow;
 class NewServerWindow;
 class GlView;
 class Model;
+class Server;
 
 namespace Gtk {
   class ToggleButton;
@@ -35,21 +36,32 @@ class MainWindow : public Gtk::Window
 
   public:
     typedef enum {
-        SELECT, AREA, VERTEX, TILER, MOVE
+        SELECT, AREA, DRAW, ROTATE, SCALE, MOVE
     } toolType;
+
+    typedef enum {
+        ENTITY, VERTEX
+    } toolMode;
 
   private:
     toolType m_tool;
+    toolMode m_toolMode;
 
     Gtk::ToggleButton * select_tool;
     Gtk::ToggleButton * area_tool;
-    Gtk::ToggleButton * vertex_tool;
-    Gtk::ToggleButton * tiler_tool;
+    Gtk::ToggleButton * draw_tool;
+    Gtk::ToggleButton * rotate_tool;
+    Gtk::ToggleButton * scale_tool;
     Gtk::ToggleButton * move_tool;
+
+    Gtk::ToggleButton * entity_mode;
+    Gtk::ToggleButton * vertex_mode;
 
     void destroy_handler();
   public:
-    MainWindow();
+    Gtk::Main & m_main;
+
+    MainWindow(Gtk::Main &);
 
     LayerWindow * getLayerWindow() {
         return m_layerwindow;
@@ -59,8 +71,12 @@ class MainWindow : public Gtk::Window
         return m_tool;
     }
 
+    const toolMode getMode() {
+        return m_toolMode;
+    }
+
     gint quit( GdkEventAny *);
-    void new_view();
+    void newModel();
     void newView(Model *);
     void menu_quit();
     void inheritance_dialog();
@@ -68,8 +84,10 @@ class MainWindow : public Gtk::Window
     void new_server_dialog();
     void open_layers(Model *);
     void toolSelect(toolType);
+    void modeSelect(toolMode);
 
     SigC::Signal1<void, Model *> modelAdded;
+    SigC::Signal1<void, Server *> serverAdded;
 };
 
 #endif // EQUATOR_APP_MAINWINDOW_H

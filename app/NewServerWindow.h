@@ -9,18 +9,77 @@
 #include <gtk--/list.h>
 
 class MainWindow;
+class Server;
+class Model;
+
+namespace Eris {
+  class Entity;
+}
+
+namespace Gtk {
+  class Entry;
+  class OptionMenu;
+  class SpinButton;
+  class Button;
+  class Statusbar;
+}
+
+namespace Atlas {
+  namespace Objects {
+    namespace Entity {
+      class Player;
+    }
+  }
+}
 
 class NewServerWindow : public Gtk::Window
 {
   private:
     MainWindow & m_mainWindow;
+
+    Gtk::Entry * m_hostEntry;
+    Gtk::OptionMenu * m_portChoice;
+    Gtk::SpinButton * m_portSpin;
+    Gtk::Button * m_connectButton;
+    Gtk::Entry * m_userEntry;
+    Gtk::Entry * m_passwdEntry;
+    Gtk::Entry * m_agentNameEntry;
+    Gtk::Entry * m_agentTypeEntry;
+    Gtk::Button * m_loginButton;
+    Gtk::Button * m_createButton;
+    Gtk::Button * m_agentButton;
+    Gtk::Button * m_viewButton;
+    Gtk::Statusbar * m_status;
+    int m_customPort;
+    int m_portNum;
+    int m_statusContext;
+    Server * m_server;
+
+    SigC::Connection m_failure;
+    SigC::Connection m_connected;
+    SigC::Connection m_loggedIn;
+    SigC::Connection m_worldEnter;
+
+    void setPort(int );
+    void setCustomPort();
   public:
     NewServerWindow(MainWindow & m);
 
     void doshow();
 
-    void okay();
-    void cancel();
+    void createConnection();
+    void loginAccount();
+    void createAccount();
+    void createAgent();
+    void createView();
+
+    void failure(const std::string & msg);
+    void connected();
+    void loginComplete(const Atlas::Objects::Entity::Player &);
+    void worldEnter(Eris::Entity*);
+    void viewCreated(Model*);
+
+    void dismiss();
 };
 
 #endif // EQUATOR_APP_NEWSERVERWINDOW_H

@@ -6,7 +6,6 @@
 #include "Holo.h"
 #include "BladeMap.h"
 #include "IsoMap.h"
-#include "GlView.h"
 #include "Model.h"
 
 #include <gtk--/scrolledwindow.h>
@@ -46,7 +45,8 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
     scrolled_window->set_usize(250,150);
-    scrolled_window->add(*m_list);
+    scrolled_window->add_with_viewport(*m_list);
+    // scrolled_window->add(*m_list);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
     vbox->pack_start(*scrolled_window, true, true, 2);

@@ -37,6 +37,8 @@ class IsoMap : public Layer {
     void draw(GlView & view);
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
+    void pushSelection() { }
+    void popSelection() { }
     void dragStart(GlView & view, int x, int y);
     void dragUpdate(GlView & view, float x, float y, float z);
     void dragEnd(GlView & view, float x, float y, float z);

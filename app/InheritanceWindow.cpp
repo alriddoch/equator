@@ -40,7 +40,9 @@ InheritanceWindow::InheritanceWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TO
     
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    scrolled_window->add(*m_classTree);
+    // FIXME Add this in a way that won't cause an error
+    scrolled_window->add_with_viewport(*m_classTree);
+    // scrolled_window->add(*m_classTree);
 
     vbox->pack_start(*scrolled_window, true, true, 2);
 

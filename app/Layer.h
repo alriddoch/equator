@@ -32,6 +32,8 @@ class Layer : public SigC::Object {
     virtual void draw(GlView & view) = 0;
     virtual void select(GlView & view, int x, int y) = 0;
     virtual void select(GlView & view, int x, int y, int fx, int fy) = 0;
+    virtual void pushSelection() = 0;
+    virtual void popSelection() = 0;
     virtual void dragStart(GlView & view, int x, int y) = 0;
     virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
     virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
