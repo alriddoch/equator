@@ -113,6 +113,7 @@ MainWindow::MainWindow() :
     Gtk::Table * table = manage( new Gtk::Table(5, 2, true) );
 
     Gtk::ToggleButton * b = select_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->set_active(true); // Do this before we connect to the signal
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::SELECT));
     Glib::RefPtr<Gdk::Bitmap> pixmask;
@@ -123,6 +124,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Select Item");
 
     b = area_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::AREA));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
     b->add_pixmap(p, pixmask);
@@ -130,6 +132,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Select Multiple Items");
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
     b->add_pixmap(p, pixmask);
@@ -137,6 +140,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Insert Item");
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
     b->add_pixmap(p, pixmask);
@@ -145,6 +149,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Rotate Item");
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
     b->add_pixmap(p, pixmask);
@@ -153,6 +158,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Scale Item");
 
     b = move_tool = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
     b->add_pixmap(p, pixmask);
@@ -160,6 +166,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Move Item");
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->set_active(true); // Do this before we connect to the signal
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::modeSelect),MainWindow::ENTITY));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
@@ -168,6 +175,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Entity Edit Mode");
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
     b->add_pixmap(p, pixmask);
@@ -175,6 +183,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Vertex Edit Mode");
 
     b = pan_mode = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->set_active(true); // Do this before we connect to the signal
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::PAN));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_move_16_xpm);
@@ -183,6 +192,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Pan Camera");
 
     b = orbit_mode = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::ORBIT));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_rotate_16_xpm);
     b->add_pixmap(p, pixmask);
@@ -190,6 +200,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Orbit Camera");
 
     b = zoom_mode = manage( new Gtk::ToggleButton() );
+    b->set_focus_on_click(false);
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::ZOOM));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_zoom_16_xpm);
     b->add_pixmap(p, pixmask);
@@ -197,6 +208,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Zoom Camera");
 
     b = manage( new Gtk::ToggleButton("10") );
+    b->set_focus_on_click(false);
     b->set_sensitive(false);
     table->attach(*b, 3, 4, 3, 4);
 

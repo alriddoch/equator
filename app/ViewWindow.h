@@ -56,6 +56,8 @@ class ViewWindow : public Gtk::Window
 
     void updateViewCoords();
     void updateRulers();
+
+    void motionNotifyEvent(GdkEventMotion * event);
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H

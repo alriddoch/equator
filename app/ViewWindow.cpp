@@ -304,6 +304,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     m_glarea->getZAdjustment().signal_value_changed().connect(SigC::slot(*this, &ViewWindow::glViewChanged));
     glViewChanged();
     signal_delete_event().connect(SigC::slot(*this, &ViewWindow::deleteEvent));
+    m_glarea->signal_motion_notify_event().connect_notify(SigC::slot(*this, &ViewWindow::motionNotifyEvent));
 }
 
 void ViewWindow::setTitle()
@@ -401,9 +402,24 @@ void ViewWindow::updateRulers()
           hrh = th + winx/2,
           vrl = - tv + winy/2,
           vrh = - tv - winy/2;
+    float posx = hrl + m_glarea->mousex / (40.f * m_glarea->getScale()),
+          posy = vrl - m_glarea->mousey / (40.f * m_glarea->getScale());
 
-    m_hRuler->set_range(hrl, hrh, th, hrh);
+    m_hRuler->set_range(hrl, hrh, posx, hrh);
     m_hRuler->draw_ticks();
-    m_vRuler->set_range(vrl, vrh, tv, vrh);
+    m_vRuler->set_range(vrl, vrh, posy, vrh);
     m_vRuler->draw_ticks();
+}
+
+void ViewWindow::motionNotifyEvent(GdkEventMotion * event)
+{
+    double low, up, pos, max;
+
+    m_hRuler->get_range(low, up, pos, max);
+    pos = low + event->x / (40.f * m_glarea->getScale()),
+    m_hRuler->set_range(low, up, pos, max);
+
+    m_vRuler->get_range(low, up, pos, max);
+    pos = low - event->y / (40.f * m_glarea->getScale());
+    m_vRuler->set_range(low, up, pos, max);
 }
