@@ -1,3 +1,8 @@
+Add doted line to insert cursor to show its height.
+
+Re-work the scrolling code so it scrolls round a dynamic world size, and
+handles scrolling from the users perspective.
+
 Make all the windows implement delete_event_impl() so they don't get deleted.
 
 Add clipentry base class, which Layer classes have an associated derived

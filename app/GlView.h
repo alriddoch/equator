@@ -124,10 +124,14 @@ class GlView : public Gtk::GLArea {
     const std::string details() const;
 
     void setPickProjection();
+    void getViewOffset(float & h, float & v, float & d);
+    void setViewOffset(float h, float v, float d);
     float getViewSize();
     void redraw();
 
     const float getZ(int x, int y) const;
+
+    SigC::Signal0<void> viewChanged;
 };
 
 #endif // EQUATOR_APP_GLVIEW_H

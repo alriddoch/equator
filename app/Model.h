@@ -28,6 +28,7 @@ class Model : public SigC::Object {
     Server * m_server;
     std::string m_name;
     float m_cursX, m_cursY, m_cursZ;
+    float m_sizeX, m_sizeY, m_sizeZ;
 
   public:
     MainWindow & m_mainWindow;
@@ -69,6 +70,11 @@ class Model : public SigC::Object {
 
     void getCursor(float & x, float & y, float & z) const {
         x = m_cursX; y = m_cursY; z = m_cursZ;
+        return;
+    }
+
+    void getSize(float & x, float & y, float & z) const {
+        x = m_sizeX; y = m_sizeY; z = m_sizeZ;
         return;
     }
 

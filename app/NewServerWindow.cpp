@@ -173,7 +173,7 @@ void NewServerWindow::loginAccount()
     m_status->push(m_statusContext, "Logging in");
 
     m_server->login(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = Eris::Lobby::instance()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAccount()
@@ -184,7 +184,7 @@ void NewServerWindow::createAccount()
     m_status->push(m_statusContext, "Creating account");
 
     m_server->createAccount(m_userEntry->get_text(), m_passwdEntry->get_text());
-    m_loggedIn = Eris::Lobby::instance()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
+    m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
 }
 
 void NewServerWindow::createAvatar()
@@ -279,7 +279,7 @@ void NewServerWindow::dismiss()
     // The rest of this code resets the status of the dialog sp that it can
     // be used to open a new connection. This cannot be done until Eris
     // adds support for multiple connections.
-#if 0
+#if 1
     m_status->pop(m_statusContext);
     m_hostEntry->set_editable(true);
     m_userEntry->set_editable(true);

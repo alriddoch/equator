@@ -1,3 +1,23 @@
+2002-08-05  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/GlView.h: Add function to get and set
+	  the rendering offset using screen relative values, for
+	  use with the scrollbars. Add a signal which indicates when
+	  the view paramaters have been changed.
+
+	* app/Model.cpp, app/Model.h: Add members to store the
+	  size of the world handled by thing model.
+
+	* app/NewServerWindow.cpp, app/Server.cpp, app/ServerEntities.cpp:
+	  Adapt to new Eris API supporting multiple simultaneous
+	  connections. Fix connection window so it can now be reused.
+
+	* app/ViewWindow.cpp, app/ViewWindow.h: Add view centre readout
+	  to status bar. Rework scrollbar adjustments so they now
+	  represent vertical and horizontal screen relative changes.
+	  Attach scollbars to GlView functions for manipulting
+	  offset.
+
 2002-07-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ViewWindow.cpp: Fix north south direction on scrollbar.

@@ -121,7 +121,7 @@ void Server::login(const std::string & name, const std::string & password)
 {
     player = new Eris::Player(&connection);
     player->login(name, password);
-    lobby = Eris::Lobby::instance();
+    lobby = connection.getLobby();
     lobby->LoggedIn.connect(SigC::slot(this, &Server::loginComplete));
 }
 
@@ -129,7 +129,7 @@ void Server::createAccount(const std::string& name, const std::string& password)
 {
     player = new Eris::Player(&connection);
     player->createAccount(name, name, password);
-    lobby = Eris::Lobby::instance();
+    lobby = connection.getLobby();
     lobby->LoggedIn.connect(SigC::slot(this, &Server::loginComplete));
 }
 

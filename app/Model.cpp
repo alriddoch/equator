@@ -18,7 +18,8 @@ int Model::modelCount = 0;
 Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
                                 m_server(NULL),
                                 m_cursX(0.0f), m_cursY(0.0f), m_cursZ(0.0f),
-                                m_mainWindow(mw),
+                                m_sizeX(500.0f), m_sizeY(500.0f),
+                                m_sizeZ(500.0f), m_mainWindow(mw),
                                 m_heightData(* new HeightData())
 {
     m_currentLayer = new Holo(*this);

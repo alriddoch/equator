@@ -813,7 +813,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     }
 
     if (m_exportOptions->m_charCheck->get_active()) {
-        m_exportOptions->m_charType = Eris::TypeInfo::findSafe("character");
+        m_exportOptions->m_charType = m_serverConnection.connection.getTypeInfoEngine()->findSafe("character");
     }
 
     if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
@@ -862,8 +862,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
                                m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
-    Eris::TypeInfo::BoundType.connect(SigC::slot(this, &ServerEntities::newType));
-    m_gameEntityType = Eris::TypeInfo::findSafe("game_entity");
+    m_serverConnection.connection.getTypeInfoEngine()->BoundType.connect(SigC::slot(this, &ServerEntities::newType));
+    m_gameEntityType = m_serverConnection.connection.getTypeInfoEngine()->findSafe("game_entity");
     assert(m_gameEntityType != NULL);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
     if (m_gameEntityType->isBound()) {
@@ -875,7 +875,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */
-    Eris::World::Instance()->EntityCreate.connect(
+    m_serverConnection.world->EntityCreate.connect(
 	SigC::slot(this, &ServerEntities::gotNewEntity)
     );
 

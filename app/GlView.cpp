@@ -34,6 +34,13 @@ int attrlist[] = {
 
 static const bool pretty = true;
 
+static const float Deg2Rad = M_PI / 180.0f;
+
+float deg2Rad(float d)
+{
+    return (d * Deg2Rad);
+}
+
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
                                m_popup(NULL),
                                m_viewNo(m.getViewNo()),
@@ -234,6 +241,7 @@ void GlView::setScale(GLfloat s)
     m_scale = s;
     redraw();
     m_viewWindow.setTitle();
+    viewChanged.emit();
 }
 
 void GlView::setFace(GLfloat d, GLfloat r)
@@ -241,6 +249,7 @@ void GlView::setFace(GLfloat d, GLfloat r)
     m_declination = d;
     m_rotation = r;
     redraw();
+    viewChanged.emit();
 }
 
 void GlView::zoomIn()
@@ -301,7 +310,7 @@ void GlView::setupgl()
         glViewport(0, 0, (GLint)(width()), (GLint)(height()));
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-    
+
         if (m_projection == GlView::PERSP) {
             if (width()>height()) {
                 GLfloat w = (GLfloat) width() / (GLfloat) height();
@@ -391,7 +400,9 @@ void GlView::drawgl()
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
         for(I = layers.begin(); I != layers.end(); I++) {
-            if ((*I)->isVisible()) { (*I)->draw(*this); }
+            if ((*I)->isVisible()) {
+                (*I)->draw(*this);
+            }
         }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -450,7 +461,9 @@ void GlView::drawgl()
 gint GlView::animate()
 {
     m_animCount += 0.02f;
-    if (m_animCount > 1.0f) { m_animCount = 0.0f; }
+    if (m_animCount > 1.0f) {
+        m_animCount = 0.0f;
+    }
     if (make_current()) {
         setupgl();
         origin();
@@ -460,7 +473,9 @@ gint GlView::animate()
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
         for(I = layers.begin(); I != layers.end(); I++) {
-            if ((*I)->isVisible()) { (*I)->animate(*this); }
+            if ((*I)->isVisible()) {
+                (*I)->animate(*this);
+            }
         }
         mouseEffects();
         swap_buffers();
@@ -516,8 +531,7 @@ void GlView::clickOff(int x, int y)
                 if ((clickx == mousex) && (clicky == clicky)) {
                     m_model.getCurrentLayer()->select(*this, mousex, height() - mousey);
                 } else {
-                    m_model.getCurrentLayer()->select(*this, clickx, height() - clicky,
-                                           mousex, height() - mousey);
+                    m_model.getCurrentLayer()->select(*this, clickx, height() - clicky, mousex, height() - mousey);
                 }
             }
             m_dragType = GlView::NONE;
@@ -571,7 +585,9 @@ void GlView::worldPoint(int x, int y, double &z,
         GLint viewport[4];
         GLdouble mvmatrix[16], projmatrix[16];
         // float z = 0.5;
-        if (z < -1) { z = getZ(x, height() - y); }
+        if (z < -1) {
+            z = getZ(x, height() - y);
+        }
 
         setupgl();
         origin();
@@ -580,7 +596,7 @@ void GlView::worldPoint(int x, int y, double &z,
         glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
         glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
-        gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
+        gluUnProject(x, height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
         std::cout << "[" << x << ":" << y << ":" << z << "]";
         std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
     }
@@ -593,7 +609,9 @@ void GlView::screenPoint(double x, double y, double z,
         GLint viewport[4];
         GLdouble mvmatrix[16], projmatrix[16];
         // float z = 0.5;
-        if (z < -1) { z = getZ(x, height() - y); }
+        if (z < -1) {
+            z = getZ(x, height() - y);
+        }
 
         setupgl();
         origin();
@@ -618,7 +636,7 @@ void GlView::realize_impl()
 
 gint GlView::motion_notify_event_impl(GdkEventMotion*event)
 {
-    mousex = event->x; mousey = event->y; 
+    mousex = event->x; mousey = event->y;
     if (clickx != 0) {
         if (make_current()) {
             glAccum(GL_RETURN, 1.0f);
@@ -632,13 +650,13 @@ void GlView::mouseEffects()
 {
     // We may want to be a little smarter about this
     if (clickx != 0) {
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
-        // glClear( GL_COLOR_BUFFER_BIT );
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE); // Set The Blending Function For Translucency
+        // glClear( GL_COLOR_BUFFER_BIT);
         glTranslatef(clickx, height() - clicky, 100.0f);
         float x = mousex - clickx;
         float y = clicky - mousey;
@@ -720,7 +738,8 @@ int GlView::button_release_event_impl(GdkEventButton * event)
 
 int GlView::expose_event_impl(GdkEventExpose * event)
 {
-    if (event->count>0) return 0;
+    if (event->count>0)
+        return 0;
     redraw();
     return TRUE;
 }
@@ -734,7 +753,7 @@ int GlView::configure_event_impl(GdkEventConfigure*)
 const std::string GlView::details() const
 {
     std::stringstream dets;
-    const char * view =  (m_projection == ORTHO) ? "Orthographic" : "Perspective";
+    const char * view = (m_projection == ORTHO) ? "Orthographic" : "Perspective";
     dets << "-" << m_model.getModelNo() << "." << m_viewNo << " (" << view << ") " << (int)(m_scale * 100) << "%";
     return dets.str();
 }
@@ -768,6 +787,39 @@ void GlView::setPickProjection()
     glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
     glTranslatef(m_xoff, m_yoff, m_zoff);
+}
+
+void GlView::getViewOffset(float & h, float & v, float & d)
+{
+    WFMath::Vector<3> vo(m_xoff, m_yoff, m_zoff);
+    vo.rotateZ(deg2Rad(m_rotation));
+    vo.rotateX(-deg2Rad(m_declination));
+    // vo.rotateZ(-m_rotation);
+    // vo.rotateX(m_declination);
+
+    h = vo.x();
+    v = vo.y();
+    d = vo.z();
+
+    std::cout << "Getting getViewOffset " << h << ":" << v << ":" << d
+              << " " << m_xoff << ":" << m_yoff << ":" << m_zoff
+              << std::endl << std::flush;
+}
+
+void GlView::setViewOffset(float h, float v, float d)
+{
+    WFMath::Vector<3> vo(h, v, d);
+    vo.rotateX(deg2Rad(m_declination));
+    vo.rotateZ(-deg2Rad(m_rotation));
+
+    m_xoff = vo.x();
+    m_yoff = vo.y();
+    m_zoff = vo.z();
+
+    redraw();
+    std::cout << "Setting setViewOffset " << h << ":" << v << ":" << d
+              << " " << m_xoff << ":" << m_yoff << ":" << m_zoff
+              << std::endl << std::flush;
 }
 
 float GlView::getViewSize()
