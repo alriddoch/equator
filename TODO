@@ -3,18 +3,9 @@ Add option to snap view to something or other, probably in camera control
 window. Camera control needs to become an OptionBox, and needs to be
 coordinated by the core object (currently called MainWindow).
 
-Need to modify WEFactory so we can get a signal when a terrain entity is
-created.
-
 General problem with render context and textures - apogee code tends to
 assume there is only one, and changes are planned for resizing, but
 not creating multiple contexts.
-
-Make sure when TerrainEntity is created, we create a Terrain rendering layer.
-This is the only outstanding issue that I know of since the conversion to
-using chunks of apogee code.
-
-Use WorldEntity source files from apogee, and adapt code to match.
 
 Arrange so that an adjustment is the master of the camera control, so
 its easier to keep widgets in sync.

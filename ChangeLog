@@ -1,6 +1,12 @@
+2004-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/InheritanceWindow.cpp: Fix a problem with controlling
+	  sensitivity.
+
 2004-01-05  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
-	* app/GlView.cpp, gui/gtkmm/CameraControl.cpp, gui/gtkmm/CameraControl.h:
+	* app/GlView.cpp, gui/gtkmm/CameraControl.cpp,
+	  gui/gtkmm/CameraControl.h:
 	  Move CameraControl into its own class, and base it on OptionBox.
 
 	* app/LayerWindow.cpp: Tweak the way tree model is cleared for better
@@ -16,9 +22,9 @@
 	  Set name of connection at server object creation time, and add a
 	  unique number to each connection.
 
-	* app/InheritanceWindow.cpp, app/InheritanceWindow.h: Fill out functionality
-	  of this window including OptionMenu to select server, and hierarchy
-	  view.
+	* app/InheritanceWindow.cpp, app/InheritanceWindow.h: Fill out
+	  functionality of this window including OptionMenu to select server,
+	  and hierarchy view.
 
 	* app/LayerWindow.cpp, app/LayerWindow.h: Rename some methods to be more
 	  sane, and fix behavoir of OptionMenu for selecting model.

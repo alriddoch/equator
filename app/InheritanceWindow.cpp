@@ -149,8 +149,10 @@ void InheritanceWindow::currentServerChanged(Server * s)
 
     if (m_currentServer == 0) {
         set_sensitive(false);
+        return;
     }
 
+    set_sensitive(true);
     Eris::TypeService * ts = s->m_connection.getTypeService();
 
     if (ts == 0) {
@@ -166,8 +168,6 @@ void InheritanceWindow::currentServerChanged(Server * s)
     }
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     descendTypeTree(root, row);
-
-    set_sensitive(true);
 }
 
 void InheritanceWindow::serverAdded(Server * s)
