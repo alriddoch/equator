@@ -51,7 +51,6 @@ class GlView : public Gtk::GLArea {
     void face();
     void cursor();
     void drawgl();
-    void redraw();
     gint animate();
     void mouseEffects();
 
@@ -86,12 +85,24 @@ class GlView : public Gtk::GLArea {
         return m_xoff;
     }
 
+    void setXoff(float x) {
+        m_xoff = x;
+    }
+
     float getYoff() const {
         return m_yoff;
     }
 
+    void setYoff(float y) {
+        m_yoff = y;
+    }
+
     float getZoff() const {
         return m_zoff;
+    }
+
+    void setZoff(float z) {
+        m_zoff = z;
     }
 
     enum render getRenderMode() const {
@@ -114,6 +125,7 @@ class GlView : public Gtk::GLArea {
 
     void setPickProjection();
     float getViewSize();
+    void redraw();
 
     const float getZ(int x, int y) const;
 };

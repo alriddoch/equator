@@ -1,3 +1,12 @@
+2002-07-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.h: Add methods to modify offset, and make redraw public.
+
+	* app/Holo.cpp: Render grid according to the view offset.
+
+	* app/ViewWindow.cpp, app/ViewWindow.h: Add ruler and scrollbars
+	  to view, and allow scrolling of the view.
+
 2002-07-17  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp: Implement character filtering in map

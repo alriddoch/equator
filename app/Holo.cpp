@@ -17,6 +17,8 @@ void Holo::draw(GlView & view)
 
     float winscale = view.getScale();
     int numlines = winsize / (40.0f * winscale) + 1;
+    int xc = -(int)view.getXoff();
+    int yc = -(int)view.getYoff();
 
     int incr = 1;
     if (winscale < 0.24f) {
@@ -32,20 +34,20 @@ void Holo::draw(GlView & view)
     for (int i = -(numlines - numlines % incr); i <= numlines; i += incr) {
         if (i == 0) continue;
 
-        glVertex3f(-numlines, i, 0.0f);
-        glVertex3f(numlines, i, 0.0f);
+        glVertex3f(xc-numlines, yc+i, 0.0f);
+        glVertex3f(xc+numlines, yc+i, 0.0f);
 
-        glVertex3f(i, -numlines, 0.0f);
-        glVertex3f(i, numlines, 0.0f);
+        glVertex3f(xc+i, yc-numlines, 0.0f);
+        glVertex3f(xc+i, yc+numlines, 0.0f);
     }
 
     glColor3f(0.0f, 1.0f, 0.0f);
 
-    glVertex3f(-numlines, 0.0f, 0.0f);
-    glVertex3f(numlines, 0.0f, 0.0f);
+    glVertex3f(xc-numlines, 0.0f, 0.0f);
+    glVertex3f(xc+numlines, 0.0f, 0.0f);
 
-    glVertex3f(0.0f, -numlines, 0.0f);
-    glVertex3f(0.0f, numlines, 0.0f);
+    glVertex3f(0.0f, yc-numlines, 0.0f);
+    glVertex3f(0.0f, yc+numlines, 0.0f);
 
     glEnd();
 

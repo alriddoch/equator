@@ -15,6 +15,10 @@ class Model;
 
 namespace Gtk {
   class Statusbar;
+  class VRuler;
+  class HRuler;
+  class VScrollbar;
+  class HScrollbar;
 };
 
 class ViewWindow : public Gtk::Window
@@ -22,6 +26,12 @@ class ViewWindow : public Gtk::Window
   private:
     GlView * m_glarea;
     Gtk::Statusbar * m_cursorCoords;
+    Gtk::VRuler * m_vRuler;
+    Gtk::HRuler * m_hRuler;
+    Gtk::VScrollbar * m_vScrollbar;
+    Gtk::HScrollbar * m_hScrollbar;
+    Gtk::Adjustment * m_north;
+    Gtk::Adjustment * m_east;
     int m_cursorContext;
 
   public:
@@ -40,6 +50,8 @@ class ViewWindow : public Gtk::Window
 
     void setTitle();
     void cursorMoved();
+    void northChanged();
+    void eastChanged();
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H
