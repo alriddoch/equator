@@ -57,17 +57,23 @@ MainWindow::MainWindow() :
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
     file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::NEW), SigC::slot(*this, &MainWindow::menuNewModel)));
+
+    Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& new_sub = menu_sub->items();
+    new_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
+    new_sub.push_back(Gtk::Menu_Helpers::MenuElem("Empty Project", SigC::slot(*this, &MainWindow::menuNewModel)));
+    new_sub.push_back(Gtk::Menu_Helpers::MenuElem("Server Connection...", SigC::slot(*this, &MainWindow::new_server_dialog)));
+
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("New", *menu_sub));
+    // file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::NEW), SigC::slot(*this, &MainWindow::menuNewModel)));
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::OPEN)));
     file_menu.back().set_sensitive(false);
-    file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", SigC::slot(*this, &MainWindow::new_server_dialog)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::PREFERENCES)));
     file_menu.back().set_sensitive(false);
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
+    menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& window_sub = menu_sub->items();
     window_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::slot(*this, &MainWindow::layer_window)));
@@ -81,19 +87,19 @@ MainWindow::MainWindow() :
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::QUIT), SigC::slot(*this, &MainWindow::menu_quit)));
 
     menu->accelerate(*this);
-    //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
-    //menu->append(*menu_items);
-    //menu_items->activate.connect(SigC::slot(this, &MainWindow::newModel));
-
-    //menu_items = manage( new Gtk::MenuItem("Load...") );
-    //menu->append(*menu_items);
 
     Gtk::MenuItem * menu_root = manage( new Gtk::MenuItem("File") );
-
     menu_root->set_submenu(*menu);
-
     Gtk::MenuBar * menu_bar = manage( new Gtk::MenuBar() );
+    menu_bar->append(*menu_root);
 
+    menu = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& help_menu = menu->items();
+    help_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
+    help_menu.push_back(Gtk::Menu_Helpers::MenuElem("About"/*, SigC::slot(*this, &MainWindow::layer_window)*/));
+
+    menu_root = manage( new Gtk::MenuItem("Help") );
+    menu_root->set_submenu(*menu);
     menu_bar->append(*menu_root);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );

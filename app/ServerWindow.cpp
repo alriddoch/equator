@@ -33,8 +33,6 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
                                       m_characterWindow(*new CharacterWindow()),
                                       m_mainWindow(mw)
 {
-    // destroy.connect(SigC::slot(this, &ServerWindow::destroy_handler));
-    // Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
     Gtk::VBox * vbox = this;
 
     m_columns = new Gtk::TreeModelColumnRecord();
@@ -62,10 +60,6 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
 
     vbox->pack_start(*scrolled_window);
 
-    // add(*vbox);
-    // set_title("Servers");
-
-    // show_all();
     signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(SigC::slot(*this, &ServerWindow::loggedIn));

@@ -1,3 +1,15 @@
+2005-01-23  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/MainWindow.cpp: Re-structure the file menu to make creating
+	  a new editing context more logical. Add a help menu.
+
+	* app/Palette.cpp: Correctly initialise the tree views in the palette
+	  panes.
+
+	* app/ServerWindow.cpp: Clean up commented out code.
+
+	* app/ViewWindow.cpp: Make the default portal size more sane.
+
 2005-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/WorldEntity.cpp: Remove asserts and replace with checks, as

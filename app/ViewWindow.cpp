@@ -58,7 +58,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     m_viewCoords->push(" xxx,xxx,xxx ", m_cursorContext);
 
     m_glarea = manage( new GlView(w, *this, m) );
-    m_glarea->set_size_request(300,300);
+    m_glarea->set_size_request(600,400);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
 

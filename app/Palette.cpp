@@ -67,6 +67,8 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_tileTreeView = manage( new Gtk::TreeView() );
     m_tileTreeView->set_model( m_tileTreeModel );
+    m_tileTreeView->append_column("Name", *m_nameColumn);
+    m_tileTreeView->append_column("Image", *m_visColumn);
 
     m_refTileTreeSelection = m_tileTreeView->get_selection();
     m_refTileTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -74,6 +76,8 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_entityTreeView = manage( new Gtk::TreeView() );
     m_entityTreeView->set_model( m_entityTreeModel );
+    m_entityTreeView->append_column("Name", *m_nameColumn);
+    m_entityTreeView->append_column("Image", *m_visColumn);
 
     m_refEntityTreeSelection = m_entityTreeView->get_selection();
     m_refEntityTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -81,6 +85,8 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_textureTreeView = manage( new Gtk::TreeView() );
     m_textureTreeView->set_model( m_textureTreeModel );
+    m_textureTreeView->append_column("Name", *m_nameColumn);
+    m_textureTreeView->append_column("Image", *m_visColumn);
 
     m_refTextureTreeSelection = m_textureTreeView->get_selection();
     m_refTextureTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -215,6 +221,8 @@ void Palette::syncModel(Model * model)
             // m_tile_clist->rows().push_back(entry);
         }
     } else { std::cerr << "NO TILES" << std::endl << std::flush; }
+    Gtk::TreeModel::Row row = *(m_tileTreeModel->append());
+    row[*m_nameColumn] = "TILE";
 
     I = m_entities.find(model);
     if (I != m_entities.end()) {
