@@ -75,6 +75,6 @@ void Holo::draw(GlView & view)
 
     // glDepthMask(GL_TRUE);
 
-    delete varray;
+    delete [] varray;
 
 }
