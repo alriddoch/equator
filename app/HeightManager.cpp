@@ -24,10 +24,10 @@ void HeightManager::load(Gtk::FileSelection * fsel)
     if (x < 0) { posx -= 1; }
     if (y < 0) { posy -= 1; }
     // FIXME Do we even wanna load anymore?
-    m_model.m_terrain.setBasePoint(posx,     posy,     12.0);
+    m_model.m_terrain.setBasePoint(posx,     posy,     -10.0);
     m_model.m_terrain.setBasePoint(posx + 1, posy,     16.0);
-    m_model.m_terrain.setBasePoint(posx,     posy + 1, 18.0);
-    m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 10.0);
+    m_model.m_terrain.setBasePoint(posx,     posy + 1, 20.0);
+    m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 40.0);
     m_model.m_terrain.refresh(posx,     posy);
     m_model.m_terrain.refresh(posx + 1, posy);
     m_model.m_terrain.refresh(posx,     posy + 1);
@@ -54,22 +54,14 @@ HeightManager::HeightManager(Model &m) : Layer(m, "heightfield", "HeightField"),
         for (int j = 0; j < segSize; ++j) {
             m_lineIndeces[++idx] = j * segSize + i;
             m_lineIndeces[++idx] = j * segSize + i + 1;
-            // glVertex3f(i, j, map->get(i, j));
-            // glVertex3f(i + 1, j, map->get(i + 1, j));
         }
         if (++i >= segSize - 1) { break; }
         for (int j = segSize - 1; j >= 0; --j) {
             m_lineIndeces[++idx] = j * segSize + i;
             m_lineIndeces[++idx] = j * segSize + i + 1;
-            // glVertex3f(i, j, map->get(i, j));
-            // glVertex3f(i + 1, j, map->get(i + 1, j));
         }
     }
     m_numLineIndeces = ++idx;
-    for(int i = 0; i < 300; ++i) {
-        std::cout << m_lineIndeces[i] << ":";
-    }
-    std::cout << std::endl << std::flush;
 }
 
 void HeightManager::importFile()
@@ -102,138 +94,95 @@ void HeightManager::selectRegion(Mercator::Segment * map)
     glEnd();
 }
 
-void HeightManager::outlineRegion(Mercator::Segment * map, float count)
+void HeightManager::outlineLineStrip(float * varray, unsigned int size,
+                                     float count)
 {
-#if 0
-    int size = map->getSize();
-    glBegin(GL_LINE_STRIP);
-    for (int i = 0; i < size; ++i) {
-        glTexCoord1f(i + count);
-        glVertex3f(i, 0.0f, map->get(i, 0));
+    float * tarray = new float[size];
+    for(int i = 0; i < size; ++i) {
+        tarray[i] = count + i;
     }
-    for (int i = 0; i < size; ++i) {
-        glTexCoord1f(i + count);
-        glVertex3f(size - 1, i, map->get(size - 1, i));
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, varray);
+    glTexCoordPointer(1, GL_FLOAT, 0, tarray);
+    glDrawArrays(GL_LINE_STRIP, 0, size);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void HeightManager::heightMapRegion(Mercator::Segment * map)
+{
+    float * harray = new float[segSize * segSize * 3];
+    float * carray = new float[segSize * segSize * 3];
+    const double * points = map->getPoints();
+    int idx = -1, cdx = -1;
+    for(int j = 0; j < segSize; ++j) {
+        for(int i = 0; i < segSize; ++i) {
+            float h = map->get(i,j);
+            harray[++idx] = i;
+            harray[++idx] = j;
+            harray[++idx] = h;
+            if (h > 0) {
+                carray[++cdx] = h / 20.0f - 0.5f;
+                carray[++cdx] = 0.5f + h / 20.0f;
+                carray[++cdx] = h / 20.0f - 1.5f;
+            } else {
+                carray[++cdx] = 0.8f + h / 20.0f;
+                carray[++cdx] = 0.8 + h / 20.0f;
+                carray[++cdx] = 1.0f + h / 2000.0f;
+            }
+        }
     }
-    for (int i = size - 1; i >= 0; --i) {
-        glTexCoord1f(i + count);
-        glVertex3f(i, size - 1, map->get(i, size - 1));
-    }
-    for (int i = size - 1; i >= 0; --i) {
-        glTexCoord1f(i + count);
-        glVertex3f(0.0f, i, map->get(0, i));
-    }
-    glEnd();
-#else
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, harray);
+    glColorPointer(3, GL_FLOAT, 0, carray);
+    glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
+                   GL_UNSIGNED_INT, m_lineIndeces);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
+{
     float * varray = new float[segSize * 4 * 3];
-    float * tarray = new float[segSize * segSize * 3];
-    int tdx = -1, vdx = -1;
+    int vdx = -1;
     for (int i = 0; i < segSize; ++i) {
-        tarray[++tdx] = i + count;
         varray[++vdx] = i;
         varray[++vdx] = 0.0f;
         varray[++vdx] = map->get(i, 0);
     }
     for (int i = 0; i < segSize; ++i) {
-        tarray[++tdx] = i + count;
         varray[++vdx] = segSize - 1;
         varray[++vdx] = i;
         varray[++vdx] = map->get(segSize - 1, i);
     }
     for (int i = segSize - 1; i >= 0; --i) {
-        tarray[++tdx] = i + count;
         varray[++vdx] = i;
         varray[++vdx] = segSize - 1;
         varray[++vdx] = map->get(i, segSize - 1);
     }
     for (int i = segSize - 1; i >= 0; --i) {
-        tarray[++tdx] = i + count;
         varray[++vdx] = 0.0f;
         varray[++vdx] = i;
         varray[++vdx] = map->get(0, i);
     }
-    glPushMatrix();
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, varray);
-    glTexCoordPointer(1, GL_FLOAT, 0, tarray);
-    glDrawArrays(GL_LINE_STRIP, 0, ++tdx);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glPopMatrix();
-#endif
-}
-
-void HeightManager::heightMapRegion(Mercator::Segment * map)
-{
-#if 0
-    int size = map->getSize();
-    glBegin(GL_LINE_STRIP);
-    glColor3f(0.5f, 0.0f, 0.0f);
-    for (int i = 0; i < size - 1; ++i) {
-        for (int j = 0; j < size; ++j) {
-            glVertex3f(i, j, map->get(i, j));
-            glVertex3f(i + 1, j, map->get(i + 1, j));
-        }
-        if (++i >= size - 1) { break; }
-        for (int j = size - 1; j >= 0; --j) {
-            glVertex3f(i, j, map->get(i, j));
-            glVertex3f(i + 1, j, map->get(i + 1, j));
-        }
-    }
-    glEnd();
-#else
-    float * harray = new float[segSize * segSize * 3];
-    const double * points = map->getPoints();
-    int idx = -1;
-    for(int j = 0; j < segSize; ++j) {
-        for(int i = 0; i < segSize; ++i) {
-            harray[++idx] = i;
-            harray[++idx] = j;
-            harray[++idx] = map->get(i, j); // points[j * segSize + i];
-        }
-    }
-    for(int i = 0; i < 30; ++i) {
-        std::cout << harray[i] << ":";
-    }
-    std::cout << std::endl << std::flush;
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColor3f(0.5f, 0.0f, 0.0f);
-    glVertexPointer(3, GL_FLOAT, 0, harray);
-    glDrawElements(GL_LINE_STRIP, m_numLineIndeces, GL_UNSIGNED_INT, m_lineIndeces);
-    glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-}
-
-void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
-{
     bool selected = (m_selection.find(map) != m_selection.end());
     if (selected) {
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        outlineRegion(map, view.getAnimCount());
+        outlineLineStrip(varray, segSize * 4, view.getAnimCount());
         glDisable(GL_TEXTURE_1D);
         // if (view.getScale() > 0.05f) {
             heightMapRegion(map);
         // }
         return;
     }
-    int size = map->getSize();
-    glBegin(GL_LINE_STRIP);
     glColor3f(1.0f, 0.0f, 0.0f);
-    for (int i = 0; i < size; ++i) {
-        glVertex3f(i, 0.0f, map->get(i, 0));
-    }
-    for (int i = 0; i < size; ++i) {
-        glVertex3f(size - 1, i, map->get(199, i));
-    }
-    for (int i = size - 1; i >= 0; --i) {
-        glVertex3f(i, size - 1, map->get(i, 199));
-    }
-    for (int i = size - 1; i >= 0; --i) {
-        glVertex3f(0.0f, i, map->get(0, i));
-    }
-    glEnd();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, varray);
+    glDrawArrays(GL_LINE_STRIP, 0, segSize * 4);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void HeightManager::draw(GlView & view)

@@ -41,7 +41,29 @@ float deg2Rad(float d)
     return (d * Deg2Rad);
 }
 
-GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
+static const float cursorLines[] = { 0.0f, 0.2f, 0.0f,
+                                     0.0f, 0.6f, 0.0f,
+                                     0.0f, -0.2f, 0.0f,
+                                     0.0f, -0.6f, 0.0f,
+                                     0.2f, 0.0f, 0.0f,
+                                     0.6f, 0.0f, 0.0f,
+                                     -0.2f, 0.0f, 0.0f,
+                                     -0.6f, 0.0f, 0.0f };
+
+static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
+                                      0.2f, 0.3464f, 0.0f,
+                                      0.3464f, 0.2f, 0.0f,
+                                      0.4f, 0.0f, 0.0f,
+                                      0.3464f, -0.2f, 0.0f,
+                                      0.2f, -0.3464f, 0.0f,
+                                      0.0f, -0.4f, 0.0f,
+                                      -0.2f, -0.3464f, 0.0f,
+                                      -0.3464f, -0.2f, 0.0f,
+                                      -0.4f, 0.0f, 0.0f,
+                                      -0.3464f, 0.2f, 0.0f,
+                                      -0.2f, 0.3464f, 0.0f };
+
+GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                m_popup(NULL),
                                m_viewNo(m.getViewNo()),
                                m_scale(1.0),
@@ -378,32 +400,14 @@ void GlView::face()
 
 void GlView::cursor()
 {
-    glBegin(GL_LINES);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, cursorLines);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glVertex3f(0.0f, 0.2f, 0.0f);
-    glVertex3f(0.0f, 0.6f, 0.0f);
-    glVertex3f(0.0f, -0.2f, 0.0f);
-    glVertex3f(0.0f, -0.6f, 0.0f);
-    glVertex3f(0.2f, 0.0f, 0.0f);
-    glVertex3f(0.6f, 0.0f, 0.0f);
-    glVertex3f(-0.2f, 0.0f, 0.0f);
-    glVertex3f(-0.6f, 0.0f, 0.0f);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
+    glDrawArrays(GL_LINES, 0, 8);
+    glVertexPointer(3, GL_FLOAT, 0, cursorCircle);
     glColor3f(1.0f, 0.2f, 0.2f);
-    glVertex3f(0.0f, 0.4f, 0.0f);
-    glVertex3f(0.2f, 0.3464f, 0.0f);
-    glVertex3f(0.3464f, 0.2f, 0.0f);
-    glVertex3f(0.4f, 0.0f, 0.0f);
-    glVertex3f(0.3464f, -0.2f, 0.0f);
-    glVertex3f(0.2f, -0.3464f, 0.0f);
-    glVertex3f(0.0f, -0.4f, 0.0f);
-    glVertex3f(-0.2f, -0.3464f, 0.0f);
-    glVertex3f(-0.3464f, -0.2f, 0.0f);
-    glVertex3f(-0.4f, 0.0f, 0.0f);
-    glVertex3f(-0.3464f, 0.2f, 0.0f);
-    glVertex3f(-0.2f, 0.3464f, 0.0f);
-    glEnd();
+    glDrawArrays(GL_LINE_LOOP, 0, 12);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void GlView::drawgl()

@@ -29,7 +29,7 @@ class HeightManager : public Layer {
     void cancel(Gtk::FileSelection *);
 
     void selectRegion(Mercator::Segment * map);
-    void outlineRegion(Mercator::Segment * map, float);
+    void outlineLineStrip(float *, unsigned int, float);
     void heightMapRegion(Mercator::Segment * map);
     void drawRegion(GlView & view, Mercator::Segment * map);
   public:
