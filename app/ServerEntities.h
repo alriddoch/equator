@@ -8,8 +8,8 @@
 #include "Layer.h"
 #include "GlView.h"
 
-#include <map>
-#include <vector>
+#include <Atlas/Message/Object.h>
+
 #include <set>
 
 class Server;
@@ -28,6 +28,10 @@ namespace Eris {
   // typedef StringSet -- doesn't work
   typedef std::set<std::string> StringSet;
 }
+
+namespace Atlas { namespace Message {
+  class Object;
+} }
 
 namespace Gtk {
   class FileSelection;
@@ -77,6 +81,11 @@ class ServerEntities : public Layer {
 
     void loadOptions(Gtk::FileSelection *);
     void saveOptions(Gtk::FileSelection *);
+
+    void insertEntityContents(const std::string & container,
+                              const Atlas::Message::Object::MapType & ent,
+                              const Atlas::Message::Object::MapType & entities);
+
 
     void load(Gtk::FileSelection *);
     void save(Gtk::FileSelection *);

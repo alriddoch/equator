@@ -40,6 +40,7 @@ class DummyDecoder : public Atlas::Message::DecoderBase {
 };
 
 class FileDecoder : public Atlas::Message::DecoderBase {
+  private:
     std::fstream m_file;
     Atlas::Codecs::XML m_codec;
     Object::MapType m_entities;
@@ -66,7 +67,7 @@ class FileDecoder : public Atlas::Message::DecoderBase {
             }
             m_topLevelId = id;
         }
-        m_entities["id"] = obj;
+        m_entities[id] = obj;
         m_count++;
     }
   public:
@@ -88,6 +89,14 @@ class FileDecoder : public Atlas::Message::DecoderBase {
         if (m_topLevelId.empty()) {
             std::cerr << "WARNING: No TLE found" << std::endl << std::flush;
         }
+    }
+
+    const Object::MapType & getEntities() const {
+        return m_entities;
+    }
+
+    const std::string & getTopLevel() const {
+        return m_topLevelId;
     }
 };
 
@@ -568,6 +577,7 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
 
 void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 {
+    m_loadOptionsDone.disconnect();
     m_loadOptionsDone = m_importOptions->m_ok->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::load), fsel));
     m_importOptions->show_all();
 }
@@ -578,14 +588,54 @@ void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
     m_exportOptions->show_all();
 }
 
+void ServerEntities::insertEntityContents(const std::string & container,
+                     const Atlas::Message::Object::MapType & ent,
+                     const Atlas::Message::Object::MapType & entities)
+{
+    Atlas::Message::Object::MapType::const_iterator I = ent.find("contains");
+    if ((I == ent.end()) || !I->second.IsList() || I->second.AsList().empty()) {
+        return;
+    }
+    const Atlas::Message::Object::ListType & contents = I->second.AsList();
+    Atlas::Message::Object::ListType::const_iterator J = contents.begin();
+    for(; J != contents.end(); ++J) {
+        if (!J->IsString()) { continue; }
+        Atlas::Message::Object::MapType::const_iterator K = entities.find(J->AsString());
+        if (K == entities.end()) { continue; }
+        Atlas::Message::Object::MapType newEnt = K->second.AsMap();
+        newEnt["loc"] = container;
+        newEnt.erase("id");
+        m_serverConnection.avatarCreateEntity(newEnt);
+        // So the problem here is, we can't just stuff the world full of
+        // entities while we sit here and do nothing, output from the
+        // server will get really backed up, and we also need to solve the
+        // problem of how we handle the contents of this entity
+    }
+}
+
 void ServerEntities::load(Gtk::FileSelection * fsel)
 {
-    m_loadOptionsDone.disconnect();
     m_importOptions->hide();
 
     std::string filename = fsel->get_filename();
     delete fsel;
 
+    FileDecoder fd(filename);
+    fd.read();
+    fd.report();
+    const Atlas::Message::Object::MapType & fileEnts = fd.getEntities();
+    const std::string & topId = fd.getTopLevel();
+    Atlas::Message::Object::MapType::const_iterator I = fileEnts.find(topId);
+    if (I == fileEnts.end()) {
+        std::cerr << "ERROR: Failed to find top level entity " << topId << " in file"
+                  << std::endl << std::flush;
+        return;
+    } else {
+        std::cerr << "Top level entity " << topId << " found in file"
+                  << std::endl << std::flush;
+    }
+    insertEntityContents(m_serverConnection.world->getRootEntity()->getID(),
+                         I->second.AsMap(), fileEnts);
     // m_model.updated.emit();
 }
 
