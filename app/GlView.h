@@ -24,7 +24,7 @@ class Renderer;
 class GlView : public Gtk::DrawingArea {
   public:
     typedef enum view { ORTHO, PERSP } projection_t;
-    typedef enum drag { NONE, SELECT, MOVE, PAN } drag_t;
+    typedef enum drag { NONE, SELECT, MOVE, PAN, PIVOT, ZOOM } drag_t;
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     bool m_redrawRequired;
@@ -66,6 +66,7 @@ class GlView : public Gtk::DrawingArea {
     void setPerspective();
 
     float getScale() const;
+    void setLogScale(float s);
     void setScale(float s);
 
     void setFace(float d, float r);
@@ -134,6 +135,10 @@ class GlView : public Gtk::DrawingArea {
 
     Gtk::Adjustment & getDeclinationAdjustment() {
         return m_declAdj;
+    }
+
+    float getLogScale() const {
+        return m_xAdj.get_value();
     }
 
     float getXoff() const {

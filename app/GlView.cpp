@@ -156,15 +156,22 @@ void GlView::setPerspective()
 
 float GlView::getScale() const
 {
+    // Representation of the scale inside the adjustment is
+    // log2 of the scale factor, to give the user a sane scale
     return pow(2, m_scaleAdj.get_value());
+}
+
+void GlView::setLogScale(GLfloat s)
+{
+    m_scaleAdj.set_value(s);
+    m_viewWindow.setTitle();
 }
 
 void GlView::setScale(GLfloat s)
 {
     // Representation of the scale inside the adjustment is
     // log2 of the scale factor, to give the user a sane scale
-    m_scaleAdj.set_value(log2(s));
-    m_viewWindow.setTitle();
+    setLogScale(log2(s));
 }
 
 void GlView::setFace(GLfloat d, GLfloat r)
@@ -514,7 +521,21 @@ void GlView::midClickOn(int x, int y)
 {
     dragDepth = -2;
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
-    m_dragType = GlView::MOVE;
+    clickx = x;
+    clicky = y;
+    switch (m_mainWindow.getNavMode()) {
+        case MainWindow::PAN:
+            m_dragType = GlView::PAN;
+            break;
+        case MainWindow::PIVOT:
+            m_dragType = GlView::PIVOT;
+            break;
+        case MainWindow::ZOOM:
+            m_dragType = GlView::ZOOM;
+            break;
+        default:
+            break;
+    }
 #if 0
     if (m_mainWindow.getTool() == MainWindow::DRAW) {
         float cx, cy, cz;
@@ -527,11 +548,39 @@ void GlView::midClickOn(int x, int y)
 void GlView::midClickOff(int x, int y)
 {
     double tx, ty, tz;
-    worldPoint(x, y, dragDepth, &tx, &ty, &tz);
+    int dx = x - clickx,
+        dy = y - clicky;
+    switch (m_mainWindow.getNavMode()) {
+        case MainWindow::PAN:
+            worldPoint(x, y, dragDepth, &tx, &ty, &tz);
+            setXoff(getXoff() + (tx - dragx) );
+            setYoff(getYoff() + (ty - dragy) );
+            setZoff(getZoff() + (tz - dragz) );
+            break;
+        case MainWindow::PIVOT:
+            {
+                float rot = getRotation() + (dx * 360) / get_width();
+                float dec = getDeclination() - (dy * 180) / get_height();
+                while (rot > 360) { rot -= 360; }
+                while (rot < 0) { rot += 360; }
+                while (dec > 360) { dec -= 360; }
+                while (dec < 0) { dec += 360; }
+                setRotation(rot);
+                setDeclination(dec);
+            }
+            break;
+        case MainWindow::ZOOM:
+            {
+                float sc = getLogScale() + (dy * 4.f) / get_height();
+                if (sc > 16.f) { sc = 16.f; }
+                if (sc < -16.f) { sc = -16.f; }
+                setLogScale(sc);
+            }
+            break;
+        default:
+            break;
+    }
     m_dragType = GlView::NONE;
-    setXoff(getXoff() + (tx - dragx) );
-    setYoff(getYoff() + (ty - dragy) );
-    setZoff(getZoff() + (tz - dragz) );
 }
 
 void GlView::worldPoint(int x, int y, double &z,
@@ -608,6 +657,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             case MainWindow::SELECT:
             case MainWindow::DRAW:
             case MainWindow::AREA:
+            default:
                 break;
         }
     }
