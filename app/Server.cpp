@@ -4,6 +4,8 @@
 
 #include "Server.h"
 
+#include "WorldEntity.h"
+
 #include <Eris/Avatar.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
@@ -81,6 +83,7 @@ void Server::createCharacter(const std::string & name,
 
     world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
     world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
+    world->registerFactory(new WEFactory(*this));
 
 }
 

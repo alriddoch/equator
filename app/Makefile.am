@@ -14,6 +14,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \
 		  Model.cpp Model.h \
+		  WorldEntity.cpp WorldEntity.h \
 		  Server.cpp Server.h \
 		  Layer.cpp Layer.h \
 		  Holo.cpp Holo.h \

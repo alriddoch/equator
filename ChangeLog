@@ -1,5 +1,12 @@
 2003-08-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/WorldEntity.h app/WorldEntity.cpp: Added Eris compatable
+	  factory for handling different types of entity more easily.
+
+	* app/Server.cpp: Use new entity factory. Doesn't quite work yet.
+
+2003-08-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* Add tests for float -> int conversion functions.
 
 	* app/GlView.cpp: Use float -> int conversion functions to get
