@@ -187,6 +187,16 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
 void NewServerWindow::setSelectedCharacter(std::string charId)
 {
     m_selectedCharacterId = charId;
+    std::cout << charId << std::endl << std::flush;
+    Eris::CharacterList chars = m_server->m_player->getCharacters();
+    Eris::CharacterList::iterator I = chars.begin();
+    for(; I != chars.end(); ++I) {
+        if (charId == I->getId()) {
+            std::cout << "GOT IT" << std::endl << std::flush;
+            m_avatarNameEntry->set_text(I->getName());
+            m_avatarTypeEntry->set_text(I->getParents().front().asString());
+        }
+    }
 
 #warning FIXME Populate widgets with the information
 }
@@ -256,6 +266,14 @@ void NewServerWindow::createAccount()
 
 void NewServerWindow::takeAvatar()
 {
+    assert(m_server != NULL);
+
+    m_status->pop(m_statusContext);
+    m_status->push("Creating avatar", m_statusContext);
+
+    m_server->takeCharacter(m_selectedCharacterId);
+
+    m_worldEnter = m_server->m_world->Entered.connect(SigC::slot(*this,&NewServerWindow::worldEnter));
 }
 
 void NewServerWindow::createAvatar()
@@ -324,17 +342,18 @@ void NewServerWindow::loginComplete(const Atlas::Objects::Entity::Player &)
     m_loginButton->set_sensitive(false);
     m_createButton->set_sensitive(false);
     m_avatarButton->set_sensitive(true);
+    m_takeAvatarButton->set_sensitive(true);
 }
 
 void NewServerWindow::gotCharacterList()
 {
     std::cout << "GOT CHARACTER LIST" << std::endl << std::flush;
-    Eris::CharacterList chars = m_server->m_player->getCharacters();
     Gtk::Menu * characterMenu = m_characterChoice->get_menu();
     Gtk::Menu_Helpers::MenuList& characterEntries = characterMenu->items();
     // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "FOO")));
     // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "BAR")));
     // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "BAZ")));
+    Eris::CharacterList chars = m_server->m_player->getCharacters();
     Eris::CharacterList::iterator I = chars.begin();
     for(; I != chars.end(); ++I) {
         Atlas::Objects::Entity::GameEntity & ge = *I;
@@ -353,6 +372,7 @@ void NewServerWindow::worldEnter(Eris::Entity*)
     m_avatarNameEntry->set_editable(false);
     m_avatarTypeEntry->set_editable(false);
     m_avatarButton->set_sensitive(false);
+    m_takeAvatarButton->set_sensitive(false);
     m_viewButton->set_sensitive(true);
 }
 

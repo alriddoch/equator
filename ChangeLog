@@ -1,3 +1,11 @@
+2003-09-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Server.cpp, app/Server.h: Add new function for taking
+	  existing character.
+
+	* app/NewServerWindow.cpp: Implement populating options
+	  menu with avatars, and using selection to take avatar.
+
 2003-09-11  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/NewServerWindow.h, app/NewServerWindow.cpp: More work in

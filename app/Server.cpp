@@ -75,6 +75,18 @@ void Server::loginComplete(const Atlas::Objects::Entity::Player &p)
     // are at
 }
 
+void Server::takeCharacter(const std::string & id)
+{
+    m_world = m_player->takeCharacter(id)->getWorld();
+
+    m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
+    m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
+
+    m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
+    m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
+    m_world->registerFactory(new WEFactory(*this));
+}
+
 void Server::createCharacter(const std::string & name,
                                  const std::string & type)
 {
