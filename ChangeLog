@@ -1,3 +1,12 @@
+Thursday, February 07 2002, James Turner <james@worldforge.org>
+
+	* ServerEntities.cpp/.h: Bind to various Eris signals, notably
+	  EntiyCreate and Changed, to trigger a model update (and
+	  hence a redraw) when server-driven changes occur. This
+	  means movement and so on should be visible now.
+	* Modified configure.in to check for ris and skstream using
+	  the appropriate macros (AM_PATH_ERIS / AM_PATH_SKSTREAM)
+
 2002-01-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp: Modify the projection so there is not so much

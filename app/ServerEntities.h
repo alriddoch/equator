@@ -10,6 +10,7 @@
 
 #include <map>
 #include <vector>
+#include <set>
 
 class Server;
 class Vector3D;
@@ -18,6 +19,9 @@ namespace Eris {
   class BBox;
   class Entity;
   class TypeInfo;
+  
+  // typedef StringSet -- doesn't work
+  typedef std::set<std::string> StringSet;
 }
 
 class ServerEntities : public Layer {
@@ -58,6 +62,9 @@ class ServerEntities : public Layer {
     void dragUpdate(GlView & view, float x, float y, float z) { }
     void dragEnd(GlView & view, float x, float y, float z) { }
     void insert(const Vector3D &);
+    
+    void gotNewEntity(Eris::Entity *ent);
+    void entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent);
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H

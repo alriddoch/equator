@@ -316,6 +316,12 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     } else {
         std::cerr << "game_entity UNBOUND" << std::endl << std::flush;
     }
+    
+    /* observve the Eris world (in the future, we will need to get World* from
+    the server object, when Eris supports multiple world objects */
+    Eris::World::Instance()->EntityCreate.connect(
+	SigC::slot(this, &ServerEntities::gotNewEntity)
+    );
 }
 
 void ServerEntities::draw(GlView & view)
@@ -366,4 +372,17 @@ void ServerEntities::insert(const Vector3D & pos)
     ent["pos"] = pos.asObject();
     
     m_serverConnection.avatarCreateEntity(ent);
+}
+
+void ServerEntities::gotNewEntity(Eris::Entity *ent)
+{
+    ent->Changed.connect(SigC::bind(
+	SigC::slot(this, &ServerEntities::entityChanged),
+	ent));
+    m_model.update(); // cause a re-draw
+}
+
+void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent)
+{
+    m_model.update();	// a bit excessive I suppose
 }
