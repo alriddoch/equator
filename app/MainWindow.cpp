@@ -276,7 +276,7 @@ void MainWindow::new_server_dialog()
     m_serverwindow.connect();
 }
 
-void MainWindow::toolSelect(MainWindow::toolType tool)
+void MainWindow::toolSelect(MainWindow::ToolType tool)
 {
     static bool changing = false;
     if (!changing) {
@@ -292,7 +292,7 @@ void MainWindow::toolSelect(MainWindow::toolType tool)
     }
 }
 
-void MainWindow::modeSelect(MainWindow::toolMode mode)
+void MainWindow::modeSelect(MainWindow::ToolMode mode)
 {
     static bool changing = false;
     if (!changing) {

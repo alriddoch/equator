@@ -33,15 +33,15 @@ class MainWindow : public Gtk::Window
   public:
     typedef enum {
         SELECT, AREA, DRAW, ROTATE, SCALE, MOVE
-    } toolType;
+    } ToolType;
 
     typedef enum {
         ENTITY, VERTEX
-    } toolMode;
+    } ToolMode;
 
   private:
-    toolType m_tool;
-    toolMode m_toolMode;
+    ToolType m_tool;
+    ToolMode m_toolMode;
 
     Gtk::ToggleButton * select_tool;
     Gtk::ToggleButton * area_tool;
@@ -73,11 +73,11 @@ class MainWindow : public Gtk::Window
 
     MainWindow();
 
-    const toolType getTool() {
+    const ToolType getTool() {
         return m_tool;
     }
 
-    const toolMode getMode() {
+    const ToolMode getMode() {
         return m_toolMode;
     }
 
@@ -93,8 +93,8 @@ class MainWindow : public Gtk::Window
     void new_server_dialog();
     void layer_window();
     void entity_tree_window();
-    void toolSelect(toolType);
-    void modeSelect(toolMode);
+    void toolSelect(ToolType);
+    void modeSelect(ToolMode);
     void setCurrentModel(Model *);
 };
 

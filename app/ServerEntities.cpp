@@ -856,6 +856,7 @@ void ServerEntities::dragStart(GlView & view, int x, int y)
 
 void ServerEntities::dragUpdate(GlView & view, float x, float y, float z)
 {
+    m_dragX = x; m_dragY = y; m_dragZ = z;
 }
 
 void ServerEntities::dragEnd(GlView & view, float x, float y, float z)

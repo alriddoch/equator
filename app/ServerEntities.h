@@ -54,6 +54,7 @@ class ServerEntities : public Layer {
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
     bool m_validDrag;
+    float m_dragX, m_dragY, m_dragZ;
 
     int m_nameCount;
     entname_t m_nameDict;

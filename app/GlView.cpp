@@ -471,6 +471,8 @@ void GlView::clickOff(int x, int y)
             m_dragType = GlView::NONE;
             break;
         case MainWindow::MOVE:
+        case MainWindow::ROTATE:
+        case MainWindow::SCALE:
             {
                 double tx, ty, tz;
                 worldPoint(x, y, dragDepth, &tx, &ty, &tz);
@@ -481,8 +483,6 @@ void GlView::clickOff(int x, int y)
             break;
         case MainWindow::SELECT:
         case MainWindow::DRAW:
-        case MainWindow::ROTATE:
-        case MainWindow::SCALE:
             break;
     }
     clickx = 0; clicky = 0;
@@ -571,47 +571,67 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
     mousex = lrint(event->x); mousey = lrint(event->y);
     if (clickx != 0) {
         startAnimation();
-        // if (make_current()) {
-            // glAccum(GL_RETURN, 1.0f);
-            // mouseEffects();
-            // swap_buffers();
-        // }
+        switch (m_mainWindow.getTool()) {
+                break;
+            case MainWindow::MOVE:
+            case MainWindow::ROTATE:
+            case MainWindow::SCALE:
+                {
+                    double tx, ty, tz;
+                    worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
+                    // Send move thingy to layer
+                    m_model.getCurrentLayer()->dragUpdate(*this, tx - dragx, ty - dragy, tz - dragz);
+                }
+                break;
+            case MainWindow::SELECT:
+            case MainWindow::DRAW:
+            case MainWindow::AREA:
+                break;
+        }
     }
-    return TRUE;
+    return true;
 }
 
 void GlView::mouseEffects()
 {
     // We may want to be a little smarter about this
     if (clickx != 0) {
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        // glClear( GL_COLOR_BUFFER_BIT);
-        glTranslatef(clickx, get_height() - clicky, 100.0f);
-        float x = mousex - clickx;
-        float y = clicky - mousey;
-        std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
-        const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
-                                      x, 0.f, 0.f,
-                                      x, y, 0.f,
-                                      0.f, y, 0.f,
-                                      0.f, 0.f, 0.f };
+        switch (m_mainWindow.getTool()) {
+          case MainWindow::AREA:
+            {
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
+                // glClear( GL_COLOR_BUFFER_BIT);
+                glTranslatef(clickx, get_height() - clicky, 100.0f);
+                float x = mousex - clickx;
+                float y = clicky - mousey;
+                std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
+                const GLfloat dvertices[] = { 0.f, 0.f, 0.f,
+                                              x, 0.f, 0.f,
+                                              x, y, 0.f,
+                                              0.f, y, 0.f,
+                                              0.f, 0.f, 0.f };
 
-        glVertexPointer(3, GL_FLOAT, 0, dvertices);
-        // Set The Blending Function For Translucency
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-        glEnable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-        glDrawArrays(GL_LINE_STRIP, 0, 5);
-        glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
-        glDrawArrays(GL_QUADS, 0, 4);
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_DEPTH_TEST);
+                glVertexPointer(3, GL_FLOAT, 0, dvertices);
+                // Set The Blending Function For Translucency
+                glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+                glEnable(GL_BLEND);
+                glDisable(GL_DEPTH_TEST);
+                glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+                glDrawArrays(GL_LINE_STRIP, 0, 5);
+                glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
+                glDrawArrays(GL_QUADS, 0, 4);
+                glDisable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glEnable(GL_DEPTH_TEST);
+            }
+            break;
+          default:
+            break;
+        }
     }
 }
 
