@@ -68,8 +68,8 @@ class FileDecoder : public Atlas::Message::DecoderBase {
 
     virtual void objectArrived(const Element & obj) {
         const Element::MapType & omap = obj.asMap();
-        Element::MapType::const_iterator I;
-        if (((I = omap.find("id")) == omap.end()) ||
+        Element::MapType::const_iterator I = omap.find("id");
+        if ((I == omap.end()) ||
             (!I->second.isString()) || (I->second.asString().empty())) {
             std::cerr << "WARNING: Object in file has no id. Not stored."
                       << std::endl << std::flush;
@@ -199,12 +199,19 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
 }
 
 void ServerEntities::drawSelectableCorners(GlView & view,
-                                           const WFMath::AxisBox<3> & box)
+                                           Eris::Entity * ent)
 {
+    const WFMath::AxisBox<3> & box = ent->getBBox();
+
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
-    glColor3f(1.f, 0.f, 1.f);
 
     float scale = 0.00625 / view.getScale();
+
+    if (m_lowVertexSelection.find(ent) != m_lowVertexSelection.end()) {
+        glColor3f(1.f, 1.f, 0.f);
+    } else {
+        glColor3f(1.f, 0.f, 1.f);
+    }
 
     glPushMatrix();
     glTranslatef(box.lowCorner().x(),
@@ -213,6 +220,12 @@ void ServerEntities::drawSelectableCorners(GlView & view,
     glScalef(scale, scale, scale);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
     glPopMatrix();
+
+    if (m_highVertexSelection.find(ent) != m_highVertexSelection.end()) {
+        glColor3f(1.f, 1.f, 0.f);
+    } else {
+        glColor3f(1.f, 0.f, 1.f);
+    }
 
     glPushMatrix();
     glTranslatef(box.highCorner().x(),
@@ -271,7 +284,7 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
         if (m_selectionList.find(ent) != m_selectionList.end()) {
             if (m_model.getCurrentLayer() == this) {
                 if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
-                    drawSelectableCorners(view, ent->getBBox());
+                    drawSelectableCorners(view, ent);
                 } else {
                     draw3DSelectedBox(view, ent->getBBox());
                 }
@@ -369,8 +382,10 @@ bool ServerEntities::selectEntities(GlView & view,
     int hits = glRenderMode(GL_RENDER);
 
     if (!check) {
-        m_selection = 0;
+        m_selectionPrimary = 0;
         m_selectionList.clear();
+        m_lowVertexSelection.clear();
+        m_highVertexSelection.clear();
     }
 
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
@@ -387,18 +402,19 @@ bool ServerEntities::selectEntities(GlView & view,
             int hitName = *(ptr++);
             std::cout << "{" << hitName << "}";
             entname_t::const_iterator I = nameDict.find(hitName);
+            // FIXME We should check whether we have a valid hit
             if (check) {
                 if (m_selectionList.find(I->second) != m_selectionList.end()) {
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
                     std::cout << "Setting primart selection from "
-                              << m_selection->getID() << " to "
+                              << m_selectionPrimary->getID() << " to "
                               << I->second->getID() << std::endl << std::flush;
-                    m_selection = I->second;
+                    m_selectionPrimary = I->second;
                     return true;
                 }
             } else {
                 if (I != nameDict.end()) {
-                    m_selection = I->second;
+                    m_selectionPrimary = I->second;
                     m_selectionList.insert(I->second);
                     view.startAnimation();
                     // m_selectionStack[I->second] = 0;
@@ -509,8 +525,8 @@ bool ServerEntities::selectVertices(GlView & view,
     int hits = glRenderMode(GL_RENDER);
 
     if (!check) {
-        m_selection = 0;
-        m_selectionList.clear();
+        m_lowVertexSelection.clear();
+        m_highVertexSelection.clear();
     }
 
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
@@ -529,22 +545,29 @@ bool ServerEntities::selectVertices(GlView & view,
             // FIXME Use I and J
             entname_t::const_iterator I = lowDict.find(hitName);
             entname_t::const_iterator J = highDict.find(hitName);
+            // FIXME We should check whether we have a hit
             if (check) {
-                if (m_selectionList.find(I->second) != m_selectionList.end()) {
+                if ((I != lowDict.end()) && 
+                    (m_lowVertexSelection.find(I->second) !=
+                     m_lowVertexSelection.end())) {
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
-                    std::cout << "Setting primart selection from "
-                              << m_selection->getID() << " to "
-                              << I->second->getID() << std::endl << std::flush;
-                    m_selection = I->second;
+                    return true;
+                } else if ((J != highDict.end()) &&
+                           (m_highVertexSelection.find(J->second) !=
+                            m_highVertexSelection.end())) {
+                    std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
                     return true;
                 }
             } else {
                 // FIXME Use I and J
                 if (I != lowDict.end()) {
-                    m_selection = I->second;
-                    m_selectionList.insert(I->second);
+                    std::cout << "High";
+                    m_lowVertexSelection.insert(I->second);
                     view.startAnimation();
-                    // m_selectionStack[I->second] = 0;
+                } else if (J != highDict.end()) {
+                    std::cout << "Low";
+                    m_highVertexSelection.insert(J->second);
+                    view.startAnimation();
                 } else {
                     std::cout << "UNKNOWN NAME" << std::endl << std::flush;
                 }
@@ -703,11 +726,11 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
         insertEntityContents(m_serverConnection.m_world->getRootEntity()->getID(),
                              I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
-        if (m_selection == 0) {
+        if (m_selectionPrimary == 0) {
             std::cerr << "ERROR: Can't import into selection, as nothing is selected. Tell the user" << std::endl << std::flush;
             return;
         }
-        insertEntityContents(m_selection->getID(),
+        insertEntityContents(m_selectionPrimary->getID(),
                              I->second.asMap(), fileEnts);
     }
     // m_model.updated.emit();
@@ -763,11 +786,11 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     Eris::Entity * export_root = 0;
     switch (m_exportOptions->m_target) {
         case EntityExportOptions::EXPORT_SELECTION:
-            export_root = m_selection;
+            export_root = m_selectionPrimary;
             break;
         case EntityExportOptions::EXPORT_ALL_SELECTED:
-            if (m_selection != 0) {
-                export_root = m_selection->getContainer();
+            if (m_selectionPrimary != 0) {
+                export_root = m_selectionPrimary->getContainer();
             }
             break;
         case EntityExportOptions::EXPORT_ALL:
@@ -860,7 +883,7 @@ void ServerEntities::connectEntity(Eris::Entity * ent)
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
-                               m_selection(0), m_validDrag(false),
+                               m_selectionPrimary(0), m_validDrag(false),
                                m_gameEntityType(0)
 {
     // FIXME This stuff populates palette, but does not belong here.
@@ -983,7 +1006,7 @@ void ServerEntities::modifySelection(selectMod_t sm)
         if (sm == ServerEntities::SELECT_INVERT) {
             oldSelectionList = m_selectionList;
         }
-        m_selection = 0;
+        m_selectionPrimary = 0;
         m_selectionList.clear();
         m_lowVertexSelection.clear();
         m_highVertexSelection.clear();
@@ -1012,7 +1035,7 @@ void ServerEntities::selectAll()
 
 void ServerEntities::selectNone()
 {
-    m_selection = 0;
+    m_selectionPrimary = 0;
     m_selectionList.clear();
     m_selectionStack.clear();
     m_lowVertexSelection.clear();
@@ -1093,10 +1116,10 @@ void ServerEntities::select(GlView & view, int x, int y, int fx, int fy)
 
 void ServerEntities::pushSelection()
 {
-    if (m_selection != 0) {
-        std::cout << "Pushing " << m_selection->getID() << std::endl << std::flush;
-        m_selectionStack.push_back(m_selection);
-        m_selection = 0;
+    if (m_selectionPrimary != 0) {
+        std::cout << "Pushing " << m_selectionPrimary->getID() << std::endl << std::flush;
+        m_selectionStack.push_back(m_selectionPrimary);
+        m_selectionPrimary = 0;
     }
 }
 
@@ -1104,15 +1127,21 @@ void ServerEntities::popSelection()
 {
     if (!m_selectionStack.empty()) {
         std::cout << "Popping" << std::endl << std::flush;
-        m_selection = m_selectionStack.back();
+        m_selectionPrimary = m_selectionStack.back();
         m_selectionStack.pop_back();
     }
 }
 
 void ServerEntities::dragStart(GlView & view, int x, int y)
 {
-    if (selectEntities(view, x, y, x + 1, y + 1, true)) {
-        m_validDrag = true;
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        if (selectVertices(view, x, y, x + 1, y + 1, true)) {
+            m_validDrag = true;
+        }
+    } else {
+        if (selectEntities(view, x, y, x + 1, y + 1, true)) {
+            m_validDrag = true;
+        }
     }
 }
 
@@ -1124,13 +1153,18 @@ void ServerEntities::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 
 void ServerEntities::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
-    if (m_validDrag) {
+    if (!m_validDrag) {
+        return;
+    }
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        // Modify the bounding box.
+    } else {
         // FIXME Drag everything, or just the one?
-        std::cout << "MOVING " << m_selection->getID() << " to " << v
+        std::cout << "MOVING " << m_selectionPrimary->getID() << " to " << v
                   << std::endl << std::flush;
-        m_serverConnection.avatarMoveEntity(m_selection->getID(),
-                   m_selection->getContainer()->getID(),
-                   m_selection->getPosition() + v);
+        m_serverConnection.avatarMoveEntity(m_selectionPrimary->getID(),
+                   m_selectionPrimary->getContainer()->getID(),
+                   m_selectionPrimary->getPosition() + v);
     }
     m_validDrag = false;
 }

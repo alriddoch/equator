@@ -53,7 +53,7 @@ class ServerEntities : public Layer {
   private:
     GlView::rmode_t m_renderMode;
     Eris::Entity * m_world;
-    Eris::Entity * m_selection;
+    Eris::Entity * m_selectionPrimary;
     entlist_t m_selectionList;
     entstack_t m_selectionStack;
     entlist_t m_lowVertexSelection;
@@ -74,7 +74,7 @@ class ServerEntities : public Layer {
 
     void draw3DCube(const WFMath::AxisBox<3> & bbox, bool open = false);
     void draw3DSelectedBox(GlView & view, const WFMath::AxisBox<3> & bbox);
-    void drawSelectableCorners(GlView & view, const WFMath::AxisBox<3> & bbox);
+    void drawSelectableCorners(GlView & view, Eris::Entity *);
     void draw3DBox(const WFMath::AxisBox<3> & bbox);
     void drawEntity(GlView &, Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
     void drawWorld(GlView &, Eris::Entity * wrld);
