@@ -403,7 +403,7 @@ AC_LANG_POP(C)
 dnl
 dnl AM_PATH_LIB3DS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl
-AC_DEFUN(AM_PATH_LIB3DS,
+AC_DEFUN([AM_PATH_LIB3DS],
 [
 
 AC_ARG_WITH(lib3ds-prefix,[  --with-lib3ds-prefix=PFX   Prefix where lib3ds is installed (optional)],
