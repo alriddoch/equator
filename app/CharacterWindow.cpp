@@ -66,7 +66,12 @@ CharacterWindow::CharacterWindow() :
     table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_nameEntry = manage( new Gtk::Combo() );
     m_nameEntry->get_entry()->set_max_length(60);
-    m_nameEntry->get_entry()->set_activates_default();
+    // FIXME A problem occurs of set_activates_default() is called. Pressing
+    // return on a combo causes the list to be opened, which causes
+    // unselect_child() to be emited, which changes the default response,
+    // and causes a differnet default response to be emited from the one
+    // the user expected.
+    // m_nameEntry->get_entry()->set_activates_default();
     table->attach(*m_nameEntry, 1, 3, 0, 1);
     m_nameEntry->get_list()->signal_select_child().connect(SigC::slot(*this, &CharacterWindow::select_child));
     m_nameEntry->get_list()->signal_selection_changed().connect(SigC::slot(*this, &CharacterWindow::selection_changed));
@@ -143,6 +148,10 @@ void CharacterWindow::gotCharacterList()
 
 void CharacterWindow::select_child(Gtk::Widget & w)
 {
+    if (m_server == 0) {
+        return;
+    }
+
     m_selectedCharacter.clear();
     std::string id = m_nameEntry->get_entry()->get_text();
     std::cout << "Selected " << id << std::endl << std::flush;
@@ -243,7 +252,7 @@ void CharacterWindow::success(Eris::Avatar *)
     m_typeEntry->set_editable(true);
     m_createButton->set_sensitive(true);
 
-    std::cout << "Got connection success in CharacterWindow" << std::endl
+    std::cout << "Got character success in CharacterWindow" << std::endl
               << std::flush;
 
     m_failure.disconnect();
