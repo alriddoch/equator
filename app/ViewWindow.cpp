@@ -17,6 +17,7 @@
 #include <gtkmm/ruler.h>
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/adjustment.h>
+#include <gtkmm/stock.h>
 
 #include <iostream>
 #include <sstream>
@@ -26,6 +27,7 @@ using Gtk::Menu_Helpers::SeparatorElem;
 using Gtk::Menu_Helpers::MenuElem;
 using Gtk::Menu_Helpers::RadioMenuElem;
 using Gtk::Menu_Helpers::TearoffMenuElem;
+using Gtk::Menu_Helpers::StockMenuElem;
 using Gtk::Menu_Helpers::AccelKey;
 using Gtk::Menu_Helpers::MenuList;
 
@@ -56,173 +58,188 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     vbox->pack_start(*menubar, Gtk::PACK_SHRINK);
 
     Gtk::Menu *menu_sub = manage( new Gtk::Menu() );
-    MenuList& file_popup = menu_sub->items();
-    file_popup.push_back(TearoffMenuElem());
-    file_popup.push_back(MenuElem("Save"));
-    file_popup.push_back(MenuElem("Save As..."));
-    file_popup.push_back(SeparatorElem());
-    file_popup.push_back(MenuElem("Import...", SigC::slot(m_model, &Model::importFile)));
-    file_popup.push_back(MenuElem("Export...", SigC::slot(m_model, &Model::exportFile)));
-    file_popup.push_back(SeparatorElem());
-    file_popup.push_back(MenuElem("Close"));
+    MenuList& file_menu = menu_sub->items();
+    file_menu.push_back(TearoffMenuElem());
+    file_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::SAVE)));
+    file_menu.back().set_sensitive(false);
+    file_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::SAVE_AS)));
+    file_menu.back().set_sensitive(false);
+    file_menu.push_back(SeparatorElem());
+    file_menu.push_back(MenuElem("Import...", SigC::slot(m_model, &Model::importFile)));
+    file_menu.push_back(MenuElem("Export...", SigC::slot(m_model, &Model::exportFile)));
+    file_menu.push_back(SeparatorElem());
+    file_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::CLOSE)));
+    file_menu.back().set_sensitive(false);
 
     Gtk::MenuItem * menuitem = manage( new Gtk::MenuItem("File") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& edit_popup = menu_sub->items();
-    edit_popup.push_back(TearoffMenuElem());
-    edit_popup.push_back(MenuElem("Undo"));
-    edit_popup.push_back(MenuElem("Redo"));
-    edit_popup.push_back(SeparatorElem());
-    edit_popup.push_back(MenuElem("Cut", AccelKey('x',Gdk::CONTROL_MASK)));
-    edit_popup.push_back(MenuElem("Copy", AccelKey('c',Gdk::CONTROL_MASK)));
-    edit_popup.push_back(MenuElem("Paste", AccelKey('v',Gdk::CONTROL_MASK)));
-    edit_popup.push_back(SeparatorElem());
-    edit_popup.push_back(MenuElem("Delete", AccelKey('d',Gdk::CONTROL_MASK)));
+    MenuList& edit_menu = menu_sub->items();
+    edit_menu.push_back(TearoffMenuElem());
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::UNDO)));
+    edit_menu.back().set_sensitive(false);
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::REDO)));
+    edit_menu.back().set_sensitive(false);
+    edit_menu.push_back(SeparatorElem());
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::CUT)));
+    edit_menu.back().set_sensitive(false);
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::COPY)));
+    edit_menu.back().set_sensitive(false);
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::PASTE)));
+    edit_menu.back().set_sensitive(false);
+    edit_menu.push_back(SeparatorElem());
+    edit_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::DELETE)));
+    edit_menu.back().set_sensitive(false);
 
     menuitem = manage( new Gtk::MenuItem("Edit") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& select_popup = menu_sub->items();
-    select_popup.push_back(TearoffMenuElem());
-    select_popup.push_back(MenuElem("Invert", slot(m_model, &Model::selectInvert)));
-    select_popup.push_back(MenuElem("All", slot(m_model, &Model::selectAll)));
-    select_popup.push_back(MenuElem("None", slot(m_model, &Model::selectNone)));
-    select_popup.push_back(SeparatorElem());
-    select_popup.push_back(MenuElem("Push", AccelKey('>', Gdk::ModifierType(0)), slot(m_model, &Model::pushSelection)));
-    select_popup.push_back(MenuElem("Pop", AccelKey('<', Gdk::ModifierType(0)), slot(m_model, &Model::popSelection)));
-    select_popup.push_back(SeparatorElem());
+    MenuList& select_menu = menu_sub->items();
+    select_menu.push_back(TearoffMenuElem());
+    select_menu.push_back(MenuElem("Invert", slot(m_model, &Model::selectInvert)));
+    select_menu.push_back(MenuElem("All", slot(m_model, &Model::selectAll)));
+    select_menu.push_back(MenuElem("None", slot(m_model, &Model::selectNone)));
+    select_menu.push_back(SeparatorElem());
+    select_menu.push_back(MenuElem("Push", AccelKey('>', Gdk::ModifierType(0)), slot(m_model, &Model::pushSelection)));
+    select_menu.push_back(MenuElem("Pop", AccelKey('<', Gdk::ModifierType(0)), slot(m_model, &Model::popSelection)));
+    select_menu.push_back(SeparatorElem());
 
     Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& align_popup = menu_sub_sub->items();
-    align_popup.push_back(TearoffMenuElem());
-    align_popup.push_back(MenuElem("to parent", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_PARENT)));
-    align_popup.push_back(MenuElem("to grid", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_GRID)));
-    select_popup.push_back(MenuElem("Align", *menu_sub_sub));
+    MenuList& align_menu = menu_sub_sub->items();
+    align_menu.push_back(TearoffMenuElem());
+    align_menu.push_back(MenuElem("to parent", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_PARENT)));
+    align_menu.push_back(MenuElem("to grid", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_GRID)));
+    select_menu.push_back(MenuElem("Align", *menu_sub_sub));
 
     menuitem = manage( new Gtk::MenuItem("Select") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& view_popup = menu_sub->items();
-    view_popup.push_back(TearoffMenuElem());
-    view_popup.push_back(MenuElem("Zoom In", AccelKey('=', Gdk::ModifierType(0)), slot(*m_glarea, &GlView::zoomIn)));
-    view_popup.push_back(MenuElem("Zoom Out", AccelKey('-', Gdk::ModifierType(0)), slot(*m_glarea, &GlView::zoomOut)));
+    MenuList& view_menu = menu_sub->items();
+    view_menu.push_back(TearoffMenuElem());
+    view_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::ZOOM_IN), AccelKey('=', Gdk::ModifierType(0)), slot(*m_glarea, &GlView::zoomIn)));
+    view_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::ZOOM_OUT), AccelKey('-', Gdk::ModifierType(0)), slot(*m_glarea, &GlView::zoomOut)));
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& zoom_popup = menu_sub_sub->items();
-    zoom_popup.push_back(TearoffMenuElem());
-    zoom_popup.push_back(MenuElem("16:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 16)));
-    zoom_popup.push_back(MenuElem("8:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 8)));
-    zoom_popup.push_back(MenuElem("4:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 4)));
-    zoom_popup.push_back(MenuElem("2:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 2)));
-    zoom_popup.push_back(MenuElem("1:1", AccelKey('1', Gdk::ModifierType(0)), SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 1)));
-    zoom_popup.push_back(MenuElem("1:2", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.5f)));
-    zoom_popup.push_back(MenuElem("1:4", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.25f)));
-    zoom_popup.push_back(MenuElem("1:8", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.125f)));
-    zoom_popup.push_back(MenuElem("1:16", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.0625f)));
-    view_popup.push_back(MenuElem("Zoom", *menu_sub_sub));
-    view_popup.push_back(SeparatorElem());
+    MenuList& zoom_menu = menu_sub_sub->items();
+    zoom_menu.push_back(TearoffMenuElem());
+    zoom_menu.push_back(MenuElem("16:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 16)));
+    zoom_menu.push_back(MenuElem("8:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 8)));
+    zoom_menu.push_back(MenuElem("4:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 4)));
+    zoom_menu.push_back(MenuElem("2:1", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 2)));
+    zoom_menu.push_back(MenuElem("1:1", AccelKey('1', Gdk::ModifierType(0)), SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 1)));
+    zoom_menu.push_back(MenuElem("1:2", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.5f)));
+    zoom_menu.push_back(MenuElem("1:4", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.25f)));
+    zoom_menu.push_back(MenuElem("1:8", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.125f)));
+    zoom_menu.push_back(MenuElem("1:16", SigC::bind<float>(slot(*m_glarea, &GlView::setScale), 0.0625f)));
+    view_menu.push_back(MenuElem("Zoom", *menu_sub_sub));
+    view_menu.push_back(SeparatorElem());
     Gtk::RadioMenuItem::Group projection_group;
-    view_popup.push_back(RadioMenuElem(projection_group,
+    view_menu.push_back(RadioMenuElem(projection_group,
                          "Orthographic", slot(*m_glarea, &GlView::setOrthographic)));
-    static_cast<Gtk::RadioMenuItem*>(&view_popup.back())->set_active();
-    view_popup.push_back(RadioMenuElem(projection_group,
+    static_cast<Gtk::RadioMenuItem*>(&view_menu.back())->set_active();
+    view_menu.push_back(RadioMenuElem(projection_group,
                          "Perspective", slot(*m_glarea, &GlView::setPerspective)));
-    view_popup.push_back(SeparatorElem());
+    view_menu.push_back(SeparatorElem());
     Gtk::RadioMenuItem::Group render_group;
-    view_popup.push_back(RadioMenuElem(render_group, "Line", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::LINE)));
-    view_popup.push_back(RadioMenuElem(render_group, "Solid", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SOLID)));
-    static_cast<Gtk::RadioMenuItem*>(&view_popup.back())->set_active();
+    view_menu.push_back(RadioMenuElem(render_group, "Line", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::LINE)));
+    view_menu.push_back(RadioMenuElem(render_group, "Solid", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SOLID)));
+    static_cast<Gtk::RadioMenuItem*>(&view_menu.back())->set_active();
     // m_renderMode = GlView::SOLID;
-    view_popup.push_back(RadioMenuElem(render_group, "Shaded", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SHADED)));
-    view_popup.push_back(RadioMenuElem(render_group, "Textured", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::TEXTURE)));
-    view_popup.push_back(RadioMenuElem(render_group, "Lit", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SHADETEXT)));
-    view_popup.push_back(SeparatorElem());
+    view_menu.push_back(RadioMenuElem(render_group, "Shaded", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SHADED)));
+    view_menu.push_back(RadioMenuElem(render_group, "Textured", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::TEXTURE)));
+    view_menu.push_back(RadioMenuElem(render_group, "Lit", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SHADETEXT)));
+    view_menu.push_back(SeparatorElem());
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& face_popup = menu_sub_sub->items();
-    face_popup.push_back(TearoffMenuElem());
-    face_popup.push_back(MenuElem("Isometric", AccelKey("KP_5"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 60, 45)));
-    face_popup.push_back(MenuElem("North", AccelKey("KP_1"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 0)));
-    face_popup.push_back(MenuElem("South", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 180)));
-    face_popup.push_back(MenuElem("West", AccelKey("KP_3"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, -90)));
-    face_popup.push_back(MenuElem("East", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 90)));
-    face_popup.push_back(MenuElem("Down", AccelKey("KP_7"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 0, 0)));
-    face_popup.push_back(MenuElem("Up", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 180, 0)));
-    view_popup.push_back(MenuElem("Face..", *menu_sub_sub));
-    view_popup.push_back(MenuElem("Camera Control..", slot(*m_glarea, &GlView::showCameraControl)));
-    view_popup.push_back(SeparatorElem());
-    view_popup.push_back(MenuElem("New View", SigC::bind<Model*>(slot(m_mainWindow, &MainWindow::newView),&m_model)));
+    MenuList& face_menu = menu_sub_sub->items();
+    face_menu.push_back(TearoffMenuElem());
+    face_menu.push_back(MenuElem("Isometric", AccelKey("KP_5"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 60, 45)));
+    face_menu.push_back(MenuElem("North", AccelKey("KP_1"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 0)));
+    face_menu.push_back(MenuElem("South", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 180)));
+    face_menu.push_back(MenuElem("West", AccelKey("KP_3"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, -90)));
+    face_menu.push_back(MenuElem("East", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 90, 90)));
+    face_menu.push_back(MenuElem("Down", AccelKey("KP_7"), SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 0, 0)));
+    face_menu.push_back(MenuElem("Up", SigC::bind<float, float>(slot(*m_glarea, &GlView::setFace), 180, 0)));
+    view_menu.push_back(MenuElem("Face..", *menu_sub_sub));
+    view_menu.push_back(MenuElem("Camera Control..", slot(*m_glarea, &GlView::showCameraControl)));
+    view_menu.push_back(SeparatorElem());
+    view_menu.push_back(MenuElem("New View", SigC::bind<Model*>(slot(m_mainWindow, &MainWindow::newView),&m_model)));
 
     menuitem = manage( new Gtk::MenuItem("View") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& layer_popup = menu_sub->items();
-    layer_popup.push_back(TearoffMenuElem());
-    layer_popup.push_back(MenuElem("Layers...", slot(m_mainWindow, &MainWindow::layer_window)));
+    MenuList& layer_menu = menu_sub->items();
+    layer_menu.push_back(TearoffMenuElem());
+    layer_menu.push_back(MenuElem("Layers...", slot(m_mainWindow, &MainWindow::layer_window)));
 
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& current_layer_popup = menu_sub_sub->items();
-    current_layer_popup.push_back(MenuElem("Default", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::DEFAULT)));
-    current_layer_popup.push_back(MenuElem("Line", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::LINE)));
-    current_layer_popup.push_back(MenuElem("Solid", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SOLID)));
-    current_layer_popup.push_back(MenuElem("Shaded", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SHADED)));
-    current_layer_popup.push_back(MenuElem("Textured", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::TEXTURE)));
-    current_layer_popup.push_back(MenuElem("Lit", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SHADETEXT)));
+    MenuList& current_layer_menu = menu_sub_sub->items();
+    current_layer_menu.push_back(MenuElem("Default", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::DEFAULT)));
+    current_layer_menu.push_back(MenuElem("Line", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::LINE)));
+    current_layer_menu.push_back(MenuElem("Solid", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SOLID)));
+    current_layer_menu.push_back(MenuElem("Shaded", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SHADED)));
+    current_layer_menu.push_back(MenuElem("Textured", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::TEXTURE)));
+    current_layer_menu.push_back(MenuElem("Lit", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setLayerRenderMode),GlView::SHADETEXT)));
 
-    layer_popup.push_back(SeparatorElem());
-    layer_popup.push_back(MenuElem("Current Layer", *menu_sub_sub));
+    layer_menu.push_back(SeparatorElem());
+    layer_menu.push_back(MenuElem("Current Layer", *menu_sub_sub));
 
     menuitem = manage( new Gtk::MenuItem("Layers") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& tools_popup = menu_sub->items();
+    MenuList& tools_menu = menu_sub->items();
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& generic_tools_popup = menu_sub_sub->items();
-    generic_tools_popup.push_back(MenuElem("Select single", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
-    generic_tools_popup.push_back(MenuElem("Select area", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
-    generic_tools_popup.push_back(MenuElem("Insert", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
-    generic_tools_popup.push_back(MenuElem("Rotate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
-    generic_tools_popup.push_back(MenuElem("Scale", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
-    generic_tools_popup.push_back(MenuElem("Translate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
-    tools_popup.push_back(MenuElem("Generic", *menu_sub_sub));
+    MenuList& generic_tools_menu = menu_sub_sub->items();
+    generic_tools_menu.push_back(MenuElem("Select single", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
+    generic_tools_menu.push_back(MenuElem("Select area", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
+    generic_tools_menu.push_back(MenuElem("Insert", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
+    generic_tools_menu.push_back(MenuElem("Rotate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
+    generic_tools_menu.back().set_sensitive(false);
+    generic_tools_menu.push_back(MenuElem("Scale", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
+    generic_tools_menu.back().set_sensitive(false);
+    generic_tools_menu.push_back(MenuElem("Translate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
+    tools_menu.push_back(MenuElem("Generic", *menu_sub_sub));
 
     menuitem = manage( new Gtk::MenuItem("Tools") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& filters_popup = menu_sub->items();
+    MenuList& filters_menu = menu_sub->items();
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& entity_filters_popup = menu_sub_sub->items();
-    entity_filters_popup.push_back(MenuElem("Align to heightmap"));
-    filters_popup.push_back(MenuElem("Entity", *menu_sub_sub));
+    MenuList& entity_filters_menu = menu_sub_sub->items();
+    entity_filters_menu.push_back(MenuElem("Align to heightmap"));
+    filters_menu.push_back(MenuElem("Entity", *menu_sub_sub));
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& tile_filters_popup = menu_sub_sub->items();
-    tile_filters_popup.push_back(MenuElem("Do tily thing"));
-    filters_popup.push_back(MenuElem("Tile", *menu_sub_sub));
+    MenuList& tile_filters_menu = menu_sub_sub->items();
+    tile_filters_menu.push_back(MenuElem("Do tily thing"));
+    tile_filters_menu.back().set_sensitive(false);
+    filters_menu.push_back(MenuElem("Tile", *menu_sub_sub));
     menu_sub_sub = manage( new Gtk::Menu() );
-    MenuList& height_filters_popup = menu_sub_sub->items();
-    height_filters_popup.push_back(MenuElem("Match edges"));
-    filters_popup.push_back(MenuElem("HeightMap", *menu_sub_sub));
+    MenuList& height_filters_menu = menu_sub_sub->items();
+    height_filters_menu.push_back(MenuElem("Match edges"));
+    height_filters_menu.back().set_sensitive(false);
+    filters_menu.push_back(MenuElem("HeightMap", *menu_sub_sub));
 
     menuitem = manage( new Gtk::MenuItem("Filters") );
     menuitem->set_submenu(*menu_sub);
     menubar->append(*menuitem);
 
     menu_sub = manage( new Gtk::Menu() );
-    MenuList& net_popup = menu_sub->items();
-    net_popup.push_back(TearoffMenuElem());
-    net_popup.push_back(MenuElem("Connect.."));
-    net_popup.push_back(MenuElem("Disconnect..."));
+    MenuList& net_menu = menu_sub->items();
+    net_menu.push_back(TearoffMenuElem());
+    net_menu.push_back(MenuElem("Connect.."));
+    net_menu.back().set_sensitive(false);
+    net_menu.push_back(MenuElem("Disconnect..."));
+    net_menu.back().set_sensitive(false);
 
     menuitem = manage( new Gtk::MenuItem("Net") );
     menuitem->set_submenu(*menu_sub);

@@ -24,6 +24,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/table.h>
 #include <gtkmm/tooltips.h>
+#include <gtkmm/stock.h>
 
 #include <gdkmm/pixmap.h>
 
@@ -53,12 +54,14 @@ MainWindow::MainWindow() :
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
     file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey('n', Gdk::CONTROL_MASK), SigC::slot(*this, &MainWindow::menuNewModel)));
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::AccelKey('o',Gdk::CONTROL_MASK)));
+    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::NEW), SigC::slot(*this, &MainWindow::menuNewModel)));
+    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::OPEN)));
+    file_menu.back().set_sensitive(false);
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(*this, &MainWindow::new_server_dialog)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Preferences..."));
+    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::PREFERENCES)));
+    file_menu.back().set_sensitive(false);
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
@@ -72,7 +75,7 @@ MainWindow::MainWindow() :
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Windows", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::AccelKey('q',Gdk::CONTROL_MASK), slot(*this, &MainWindow::menu_quit)));
+    file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::QUIT), SigC::slot(*this, &MainWindow::menu_quit)));
 
     menu->accelerate(*this);
     //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
@@ -123,6 +126,7 @@ MainWindow::MainWindow() :
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
     b->add_pixmap(p, pixmask);
+    b->set_sensitive(false);
     table->attach(*b, 3, 4, 0, 1);
     t->set_tip(*b, "Rotate");
 
@@ -130,6 +134,7 @@ MainWindow::MainWindow() :
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
     b->add_pixmap(p, pixmask);
+    b->set_sensitive(false);
     table->attach(*b, 4, 5, 0, 1);
     t->set_tip(*b, "Scale");
 
@@ -156,12 +161,16 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Vertex Mode");
 
     b = manage( new Gtk::ToggleButton("7") );
+    b->set_sensitive(false);
     table->attach(*b, 0, 1, 3, 4);
     b = manage( new Gtk::ToggleButton("8") );
+    b->set_sensitive(false);
     table->attach(*b, 1, 2, 3, 4);
     b = manage( new Gtk::ToggleButton("9") );
+    b->set_sensitive(false);
     table->attach(*b, 2, 3, 3, 4);
     b = manage( new Gtk::ToggleButton("10") );
+    b->set_sensitive(false);
     table->attach(*b, 3, 4, 3, 4);
 
     vbox->pack_start(*table, Gtk::PACK_SHRINK);
