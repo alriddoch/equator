@@ -6,12 +6,7 @@ echo aclocal...
     exit 1
 }
 
-libtoolize --force --copy
-
 aclocal $ACLOCAL_FLAGS
-
-autoheader
-
 
 echo autoheader...
 (autoheader --version) < /dev/null > /dev/null 2>&1 || {
@@ -20,6 +15,14 @@ echo autoheader...
 }    
 
 autoheader
+
+echo libtoolize...
+(libtoolize --version) < /dev/null > /dev/null 2>&1 || {
+    echo libtoolize not found
+    exit 1
+}
+
+libtoolize --automake --force --copy
 
 echo automake...
 (automake --version) < /dev/null > /dev/null 2>&1 || {
@@ -37,6 +40,11 @@ echo autoconf...
 
 autoconf
 
-./configure --enable-maintainer-mode $@
+if test "x$NOCONFIGURE" = "x" ; then
+    CONFIGUREFLAGS="--prefix=/opt/worldforge --enable-maintainer-mode=yes --enable-debug=yes $@"
+    echo Running: configure $CONFIGUREFLAGS
+    ./configure $CONFIGUREFLAGS
+fi
+
 
 exit 0
