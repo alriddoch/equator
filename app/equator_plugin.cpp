@@ -96,7 +96,7 @@ int main(int argc, char ** argv)
 
     Gdk::GL::init(argc, argv);
 
-    MainWindow * window = new MainWindow();
+    /* MainWindow * window = */ new MainWindow();
 
     kit->run();
 

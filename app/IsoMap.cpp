@@ -3,7 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "IsoMap.h"
-#include "Texture.h"
+#include "Tile.h"
 #include "GlView.h"
 #include "Model.h"
 #include "MainWindow.h"
@@ -251,9 +251,9 @@ void IsoMap::cancel(Gtk::FileSelection * fsel)
 
 void IsoMap::installTiles()
 {
+#if 0
     Palette & p = m_model.m_mainWindow.m_palettewindow;
 
-#if 0
     int c = m_database.GetGraphicCount(); 
     for (int i = 0; i < c; i++) {
         CoalGraphic * g = m_database.GetGraphic(i);

@@ -28,7 +28,7 @@ void HeightManager::load(Gtk::FileSelection * fsel)
 {
     float x, y, z;
     m_model.getCursor(x, y, z);
-    int posx = x / segSize, posy = y / segSize;
+    int posx = (int)(x / segSize), posy = (int)(y / segSize);
     if (x < 0) { posx -= 1; }
     if (y < 0) { posy -= 1; }
     // FIXME Do we even wanna load anymore?
@@ -100,7 +100,7 @@ void HeightManager::selectRegion(Mercator::Segment * map)
 
         vertices[3 * (3 * size + i) + 1] = 0.f;
         vertices[3 * (3 * size + i) + 2] = size - 1 - i;
-        vertices[3 * (3 * size + i) + 3] = map->get(0.f, size - 1 -i);
+        vertices[3 * (3 * size + i) + 3] = map->get(0, size - 1 -i);
     }
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawArrays(GL_TRIANGLE_FAN, 0, size * 4 + 1);
@@ -110,7 +110,7 @@ void HeightManager::outlineLineStrip(float * varray, unsigned int size,
                                      float count)
 {
     float * tarray = new float[size];
-    for(int i = 0; i < size; ++i) {
+    for(unsigned int i = 0; i < size; ++i) {
         tarray[i] = count + i;
     }
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -125,7 +125,6 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
 {
     float * const harray = new float[(segSize + 1) * (segSize + 1) * 3];
     float * const carray = new float[(segSize + 1) * (segSize + 1) * 3];
-    const float * points = map->getPoints();
     int idx = -1, cdx = -1;
     for(int j = 0; j < segSize + 1; ++j) {
         for(int i = 0; i < segSize + 1; ++i) {
@@ -500,8 +499,8 @@ void HeightManager::dragEnd(GlView & view, float x, float y, float z)
 
 void HeightManager::insert(const WFMath::Point<3> & curs)
 {
-    int posx = ::round(curs.x() / segSize);
-    int posy = ::round(curs.y() / segSize);
+    int posx = (int)::round(curs.x() / segSize);
+    int posy = (int)::round(curs.y() / segSize);
     std::cout << "Setting height at " << posx << "," << posy
               << " to " << curs.z()
               << std::endl << std::flush;

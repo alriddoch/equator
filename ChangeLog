@@ -1,3 +1,14 @@
+2003-06-26  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/EntityLayer.cpp, app/HeightManager.cpp,
+	  app/Holo.cpp, app/IsoMap.cpp, app/Server.cpp,
+	  app/ServerEntities.cpp, equator_plugin.cpp:
+	  Clean up some compiler warnings.
+
+	* app/IsoMap.cpp, app/Texture.cpp, app/Texture.h:
+	  Migrate tile code into separate file from texture so that
+	  the tile and texture code is unified with apogee.
+
 2003-06-22  Al Riddoch  <alriddoch@zepler.org>
 
 	* Makefile.am: Update so dist and distcheck run.

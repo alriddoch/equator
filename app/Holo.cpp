@@ -16,7 +16,7 @@ void Holo::draw(GlView & view)
     float winsize = std::max(view.get_width(), view.get_height());
 
     float winscale = view.getScale();
-    int numlines = winsize / (40.0f * winscale) + 1;
+    int numlines = (int)(winsize / (40.0f * winscale) + 1);
     int xc = -(int)view.getXoff();
     int yc = -(int)view.getYoff();
 

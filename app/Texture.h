@@ -2,8 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
-#ifndef APOGEE_VISUAL_TEXTURE_H
-#define APOGEE_VISUAL_TEXTURE_H
+#ifndef EQUATOR_TEXTURE_H
+#define EQUATOR_TEXTURE_H
 
 struct SDL_Surface;
 
@@ -14,57 +14,27 @@ class Texture {
   private:
     Texture() { }
 
-    static std::map<std::string, int> & textures() {
+    static std::map<std::string, unsigned int> & textures() {
         if (texturedb == NULL) {
-            texturedb = new std::map<std::string, int>;
+            texturedb = new std::map<std::string, unsigned int>;
         }
         return *texturedb;
     }
     static struct SDL_Surface * imageLoad(const std::string & filename);
 
-    static std::map<std::string, int> * texturedb;
+    static std::map<std::string, unsigned int> * texturedb;
+    static unsigned int defaultTexture;
+    static bool defaultTextureLoaded;
+    static unsigned int defaultTextureWidth;
+    static unsigned int defaultTextureHeight;
   public:
-    static int loadTexture(struct SDL_Surface * image);
+    static unsigned int loadTexture(struct SDL_Surface * image, bool wrap = true);
     static struct SDL_Surface * imageTransform(struct SDL_Surface * image);
-    static int get(const std::string & filename);
+    static unsigned int get(const std::string & filename, bool wrap = true);
+    static unsigned int getDefault();
+
+    static unsigned int getDefaultWidth() { return defaultTextureWidth; }
+    static unsigned int getDefaultHeight() { return defaultTextureHeight; }
 };
 
-namespace Mercator {
-  class Terrain;
-}
-
-class Tile {
-  private:
-    static unsigned int twoN(unsigned int);
-
-    static std::map<std::string, Tile *> & tiles() {
-        if (tiledb == NULL) {
-            tiledb = new std::map<std::string, Tile *>;
-        }
-        return *tiledb;
-    }
-
-    static std::map<std::string, Tile *> * tiledb;
-
-    int tex_id;
-    float tileSize;
-    float m_pw, m_ph;
-  public:
-    static Tile * get(const std::string & filename);
-
-    const std::string m_name;
-
-    Tile(const std::string & n) : tex_id(-1), m_pw(0), m_ph(0), m_name(n) { }
-
-    bool load(const std::string & filename);
-    void draw();
-    void draw(const Mercator::Terrain &, int, int);
-    void select();
-    void outline(float);
-
-    bool loaded() const { return (tex_id != -1); }
-    float pw() { return m_pw; }
-    float ph() { return m_ph; }
-};
-
-#endif // APOGEE_VISUAL_TEXTURE_H
+#endif // EQUATOR_TEXTURE_H

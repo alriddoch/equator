@@ -13,6 +13,4 @@ EntityLayer::EntityLayer(Model & model) : Layer(model, "background", "Entities")
 
 void EntityLayer::draw(GlView & view)
 {
-    float winsize = std::max(view.get_width(), view.get_height());
-
 }

@@ -281,7 +281,7 @@ void BladeMap::cancel(Gtk::FileSelection * fsel)
 
 void BladeMap::installTextures()
 {
-    Palette & p = m_model.m_mainWindow.m_palettewindow;
+    // Palette & p = m_model.m_mainWindow.m_palettewindow;
 
 #if 0
     int c = m_database.GetGraphicCount(); 

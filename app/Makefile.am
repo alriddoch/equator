@@ -25,7 +25,8 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  HeightManager.cpp HeightManager.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \
-		  Texture.cpp Texture.h \
+		  Texture.cpp Texture.h default_texture.h \
+		  Tile.cpp Tile.h \
 		  types.h GL.h operations.h debug.h \
 		  arrow_mesh.h \
 		  equator_plugin.cpp

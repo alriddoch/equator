@@ -146,6 +146,7 @@ bool Server::poll(Glib::IOCondition)
 {
     //connection.poll();
     Eris::PollDefault::poll();
+    return true;
 }
 
 void Server::worldEntityCreate(Eris::Entity *r)

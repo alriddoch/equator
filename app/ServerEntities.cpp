@@ -942,7 +942,6 @@ void ServerEntities::animate(GlView & view)
 
 void ServerEntities::draw(GlView & view)
 {
-    float winsize = std::max(view.get_width(), view.get_height());
     m_antTexture = view.getAnts();
 
     m_renderMode = view.getRenderMode(m_name);
