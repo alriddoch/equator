@@ -11,6 +11,8 @@
 #include <Eris/Entity.h>
 #include <Eris/PollDefault.h>
 
+#include <wfmath/atlasconv.h>
+
 #include <Atlas/Objects/Entity/GameEntity.h>
 #include <Atlas/Objects/Operation/Move.h>
 #include <Atlas/Objects/Operation/Create.h>
@@ -25,6 +27,7 @@ using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
+#if 0
 inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
 {
     Atlas::Message::Object::ListType ret(3);
@@ -42,6 +45,7 @@ inline Atlas::Message::Object WFMath::Vector<3>::toAtlas() const
     ret[2] = m_elem[2];
     return Atlas::Message::Object(ret);
 }
+#endif
 
 Server::Server() : inGame(false),
                    connection(* new Eris::Connection("equator", true)),
