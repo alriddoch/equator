@@ -32,9 +32,6 @@ void IsoMap::drawMapRegion(CoalRegion & map_region)
             float bx = shape.GetCoord(0).GetX();
             float by = shape.GetCoord(0).GetY();
             float bz = shape.GetCoord(0).GetZ();
-            float tx = shape.GetCoord(1).GetX();
-            float ty = shape.GetCoord(1).GetY();
-            float tz = shape.GetCoord(1).GetZ();
             glTranslatef(bx, by, bz);
             if (tile != NULL) {
                 tile->draw();

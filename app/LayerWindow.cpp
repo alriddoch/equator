@@ -3,6 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "LayerWindow.h"
+#include "MainWindow.h"
 #include "ViewWindow.h"
 #include "GlView.h"
 #include "Layer.h"
@@ -16,6 +17,7 @@
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/button.h>
 #include <gtk--/separator.h>
+#include <gtk--/optionmenu.h>
 
 #include <iostream>
 #include <vector>
@@ -29,8 +31,12 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
     tophbox->pack_start(*(manage( new Gtk::Label("View:") ) ), false, false, 2);
-    m_viewLabel = manage( new Gtk::Label() );
-    tophbox->pack_start(*m_viewLabel, true, false, 2);
+    m_viewMenu = manage( new Gtk::OptionMenu() );
+
+    Gtk::Menu * menu = manage( new Gtk::Menu() );
+
+    m_viewMenu->set_menu(menu);
+    tophbox->pack_start(*m_viewMenu, true, false, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
     vbox->pack_start(*tophbox, false, false, 2);
@@ -52,7 +58,7 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     Gtk::HBox * bothbox = manage( new Gtk::HBox() );
     Gtk::Button * b = manage( new Gtk::Button("New...") );
-    b->clicked.connect(slot(this, &LayerWindow::newLayer));
+    b->clicked.connect(slot(this, &LayerWindow::newLayerRequested));
     bothbox->pack_start(*b, true, true, 0);
     b = manage( new Gtk::Button("Raise") );
     bothbox->pack_start(*b, true, true, 0);
@@ -71,6 +77,9 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     m_newLayerWindow = manage( new NewLayerWindow() );
     // show_all();
+
+    w.modelAdded.connect(SigC::slot(this, &LayerWindow::addModel));
+
 }
 
 void LayerWindow::setView(GlView * view)
@@ -85,7 +94,7 @@ void LayerWindow::setView(GlView * view)
     }
     set_sensitive(true);
 
-    m_viewLabel->set(view->m_viewwindow.getName());
+    // m_viewLabel->set(view->m_viewwindow.getName());
 
     const std::list<Layer *> & layers = view->getLayers();
  
@@ -103,9 +112,19 @@ void LayerWindow::setView(GlView * view)
     cout << "Finished adding to list" << std::endl << std::flush;
 }
 
-void LayerWindow::newLayer()
+void LayerWindow::newLayerRequested()
 {
     m_newLayerWindow->doshow(m_currentView);
+}
+
+void LayerWindow::addModel(ViewWindow * view)
+{
+    cout << "LayerWindow notified of new model" << std::endl << std::flush;
+    Gtk::Menu_Helpers::MenuList& model_menu = m_viewMenu->get_menu()->items();
+    if (model_menu.empty()) {
+        set_sensitive(true);
+    }
+    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
 }
 
 // FIXME How do we get notification of the current view?

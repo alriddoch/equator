@@ -30,6 +30,10 @@ class ViewWindow : public Gtk::Window
         return m_name;
     }
 
+    GlView * getView() const {
+        return m_glarea;
+    }
+
     void setName(const std::string & n);
     void setTitle();
 };

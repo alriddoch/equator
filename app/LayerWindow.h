@@ -9,14 +9,19 @@
 #include <gtk--/clist.h>
 
 class MainWindow;
+class ViewWindow;
 class GlView;;
 class NewLayerWindow;;
+
+namespace Gtk {
+   class OptionMenu;
+}
 
 class LayerWindow : public Gtk::Window
 {
   private:
     Gtk::CList * m_clist;
-    Gtk::Label * m_viewLabel;
+    Gtk::OptionMenu * m_viewMenu;
     GlView * m_currentView;
     NewLayerWindow * m_newLayerWindow;
 
@@ -28,7 +33,9 @@ class LayerWindow : public Gtk::Window
     gint buttonEvent(GdkEventButton*);
 
     void setView(GlView * view);
-    void newLayer();
+    void addModel(ViewWindow * view);
+
+    void newLayerRequested();
 
 };
 

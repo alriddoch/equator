@@ -14,6 +14,7 @@
 #include <gtk--/menubar.h>
 #include <gtk--/button.h>
 #include <gtk--/box.h>
+#include <gtk--/pixmap.h>
 #include <gtk--/table.h>
 
 #include <iostream>
@@ -58,12 +59,16 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     menu_bar->append(*menu_root);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
-    vbox->pack_start(*menu_bar, false, false, 2);
+    vbox->pack_start(*menu_bar, false, false, 0);
 
     Gtk::Table * table = manage( new Gtk::Table(5, 2, true) );
-    Gtk::Button * b = manage( new Gtk::Button("1") );
+    Gtk::Button * b = manage( new Gtk::Button() );
+    Gtk::Pixmap * p = manage( new Gtk::Pixmap("arrow.xpm") );
+    b->add(*p);
     table->attach(*b, 0, 1, 0, 1);
-    b = manage( new Gtk::Button("2") );
+    b = manage( new Gtk::Button() );
+    p = manage( new Gtk::Pixmap("select.xpm") );
+    b->add(*p);
     table->attach(*b, 1, 2, 0, 1);
     b = manage( new Gtk::Button("3") );
     table->attach(*b, 2, 3, 0, 1);
@@ -82,7 +87,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     b = manage( new Gtk::Button("10") );
     table->attach(*b, 4, 5, 1, 2);
 
-    vbox->pack_end(*table, true, true, 2);
+    vbox->pack_end(*table, true, true, 0);
 
     add(*vbox);
 
@@ -109,6 +114,7 @@ void MainWindow::new_view()
     ViewWindow * view = manage( new ViewWindow(*this) );
     view->setName("Untitled");
     m_views.push_back(view);
+    modelAdded.emit(view);
     
     cout << "new view" << endl << flush;
 }

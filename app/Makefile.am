@@ -14,4 +14,4 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  BladeMap.cpp BladeMap.h \
 		  IsoMap.cpp IsoMap.h \
 		  Texture.cpp Texture.h \
-		  equator.cpp
+		  equator_plugin.cpp

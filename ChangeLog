@@ -1,3 +1,22 @@
+2001-12-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/equator_plugin.cpp: New version of main function and
+	  related code which enables equator to be launched as a gimp
+	  extension, and this grant it access to gimps features.
+
+	* app/IsoMap.cpp: Get rid of far corner of tile, as it is of no
+	  relevance.
+
+	* app/LayerWindow.h, app/LayerWindow.cpp: Add an option menu to
+	  select which view this applies to. Connect to mainwindow signal
+	  which informs is when a new view is created, and use this info
+	  to create a menu list.
+
+	* app/MainWindow.cpp, app/MainWindow.h: Added a signal to inform any
+	  who is interested when a new window is created.
+
+	* app/ViewWindow.h: Adde accessor for getting gl widget.
+
 2001-11-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ClientConnection.h, app/ClientConnection.cpp: Connection class

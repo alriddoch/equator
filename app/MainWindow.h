@@ -40,6 +40,7 @@ class MainWindow : public Gtk::Window
     void server_dialog();
     void open_layers(GlView *);
 
+    SigC::Signal1<void, ViewWindow *> modelAdded;
 };
 
 #endif // EQUATOR_APP_MAINWINDOW_H
