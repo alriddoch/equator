@@ -21,6 +21,8 @@
 #include <GL/glu.h>
 
 #include <gtk--/fileselection.h>
+#include <gtk--/frame.h>
+#include <gtk--/radiobutton.h>
 
 #include <fstream>
 
@@ -105,18 +107,40 @@ class ImportOptions : public Gtk::Window
   private:
     
   public:
+    typedef enum import_target { IMPORT_TOPLEVEL, IMPORT_SELECTION } ImportTarget;
+
     Gtk::Button * m_ok;
+    ImportTarget m_target;
 
-    ImportOptions() {
+    ImportOptions() : m_target(IMPORT_TOPLEVEL) {
+        Gtk::VBox * vbox = manage( new Gtk::VBox() );
+
+        Gtk::Frame * frame = manage( new Gtk::Frame("Import entities into..") );
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
+        Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("top level") );
+        rb1->clicked.connect(SigC::bind<ImportTarget>(slot(this, &ImportOptions::setImportTarget),IMPORT_TOPLEVEL));
+        hbox->pack_start(*rb1, false, false, 2);
+        Gtk::RadioButton * rb = manage( new Gtk::RadioButton("selected entity") );
+        rb->set_group(rb1->group());
+        rb->clicked.connect(SigC::bind<ImportTarget>(slot(this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
+        hbox->pack_start(*rb, false, false, 2);
+        
+        frame->add(*hbox);
+        vbox->pack_start(*frame, false, false, 2);
 
+        hbox = manage( new Gtk::HBox() );
         m_ok = manage( new Gtk::Button("OK") );
         hbox->pack_start(*m_ok, false, false, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
         b->clicked.connect(slot(this, &ImportOptions::cancel));
         hbox->pack_start(*b, false, false, 2);
 
-        add(*hbox);
+        vbox->pack_start(*hbox, false, false, 2);
+        add(*vbox);
+    }
+
+    void setImportTarget(ImportTarget it) {
+        m_target = it;
     }
 
     void cancel() {
@@ -129,18 +153,48 @@ class ExportOptions : public Gtk::Window
   private:
     
   public:
+    typedef enum export_target { EXPORT_ALL, EXPORT_VISIBLE, EXPORT_SELECTION, EXPORT_ALL_SELECTED } ExportTarget;
+
     Gtk::Button * m_ok;
+    ExportTarget m_target;
 
-    ExportOptions() {
+    ExportOptions() : m_target(EXPORT_ALL) {
+        Gtk::VBox * vbox = manage( new Gtk::VBox() );
+
+        Gtk::Frame * frame = manage( new Gtk::Frame("Export..") );
+        Gtk::VBox * rbox = manage( new Gtk::VBox() );
+        Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("all entities") );
+        rb1->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_ALL));
+        rbox->pack_start(*rb1, false, false, 2);
+        Gtk::RadioButton * rb = manage( new Gtk::RadioButton("visible entities") );
+        rb->set_group(rb1->group());
+        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_VISIBLE));
+        rbox->pack_start(*rb, false, false, 2);
+        rb = manage( new Gtk::RadioButton("selected entity") );
+        rb->set_group(rb1->group());
+        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_SELECTION));
+        rbox->pack_start(*rb, false, false, 2);
+        rb = manage( new Gtk::RadioButton("all selected entities") );
+        rb->set_group(rb1->group());
+        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
+        rbox->pack_start(*rb, false, false, 2);
+        
+        frame->add(*rbox);
+        vbox->pack_start(*frame, false, false, 2);
+
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
-
         m_ok = manage( new Gtk::Button("OK") );
         hbox->pack_start(*m_ok, false, false, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
         b->clicked.connect(slot(this, &ExportOptions::cancel));
         hbox->pack_start(*b, false, false, 2);
 
-        add(*hbox);
+        vbox->pack_start(*hbox, false, false, 2);
+        add(*vbox);
+    }
+
+    void setExportTarget(ExportTarget et) {
+        m_target = et;
     }
 
     void cancel() {

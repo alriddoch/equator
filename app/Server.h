@@ -70,8 +70,10 @@ class Server : public SigC::Object {
 
     void avatarCreateEntity(const Atlas::Message::Object::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,
+                          const WFMath::Point<3> & pos);
+    void avatarMoveEntity(const std::string &, const std::string &loc,
                           const WFMath::Point<3> & pos,
-                          const WFMath::Vector<3> & vel = WFMath::Vector<3>());
+                          const WFMath::Vector<3> & vel);
 
     const WFMath::Point<3> getAbsCharPos();
 };

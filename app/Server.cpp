@@ -89,6 +89,8 @@ void Server::connect(const std::string & host, int port)
     connection.Disconnected.connect(SigC::slot(this, &Server::netDisconnected));
     Eris::Logged.connect(SigC::slot(this, &Server::connectionLog));
 
+    Eris::setLogLevel(Eris::LOG_DEBUG);
+
     std::cout << host << ":" << port << std::endl << std::flush;
     connection.connect(host, port);
     // connection.connect("localhost", 6767);
@@ -208,8 +210,25 @@ void Server::avatarCreateEntity(const Atlas::Message::Object::MapType & ent)
 
     c.SetArgs(Atlas::Message::Object::ListType(1, ent));
     c.SetFrom(character->getID());
+    c.SetTo(character->getID());
     
     connection.send(c);
+}
+
+void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
+                              const WFMath::Point<3> & pos)
+{
+    Move m = Move::Instantiate();
+
+    Atlas::Message::Object::MapType ent;
+    ent["id"] = id;
+    ent["pos"] = pos.toAtlas();
+    ent["loc"] = loc;
+    m.SetArgs(Atlas::Message::Object::ListType(1, ent));
+    m.SetFrom(character->getID());
+    m.SetTo(id);
+
+    connection.send(m);
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,

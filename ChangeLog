@@ -1,3 +1,12 @@
+2002-05-05  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Server.cpp, app/Server.h: Enable Eris connection logging.
+	  Fix up avatar world manipulation methods so they work a bit
+	  better. Importing entities from file into world now works.
+
+	* app/ServerEntities.cpp: Add functionality to options windows for
+	  importing and exporting data.
+
 2002-05-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp: Added code
