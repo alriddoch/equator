@@ -38,6 +38,9 @@ class CharacterWindow : public Gtk::Dialog
     SigC::Connection m_charlist;
 
     void gotCharacterList();
+    void select_child(Gtk::Widget&);
+    void selection_changed();
+    void unselect_child(Gtk::Widget&);
   public:
     CharacterWindow();
 

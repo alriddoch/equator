@@ -60,6 +60,9 @@ CharacterWindow::CharacterWindow() :
     m_nameEntry = manage( new Gtk::Combo() );
     m_nameEntry->get_entry()->set_max_length(60);
     table->attach(*m_nameEntry, 1, 3, 0, 1);
+    m_nameEntry->get_list()->signal_select_child().connect(slot(*this, &CharacterWindow::select_child));
+    m_nameEntry->get_list()->signal_selection_changed().connect(slot(*this, &CharacterWindow::selection_changed));
+    m_nameEntry->get_list()->signal_unselect_child().connect(slot(*this, &CharacterWindow::unselect_child));
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Type:") )));
@@ -129,6 +132,21 @@ void CharacterWindow::gotCharacterList()
         // listStrings.push_back(ge.getName());
     }
     // m_nameEntry->set_popdown_strings(listStrings);
+}
+
+void CharacterWindow::select_child(Gtk::Widget&)
+{
+    std::cout << "select_child" << std::endl << std::flush;
+}
+
+void CharacterWindow::selection_changed()
+{
+    std::cout << "selection_changed" << std::endl << std::flush;
+}
+
+void CharacterWindow::unselect_child(Gtk::Widget&)
+{
+    std::cout << "unselect_child" << std::endl << std::flush;
 }
 
 void CharacterWindow::create()
