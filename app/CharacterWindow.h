@@ -27,11 +27,13 @@ class CharacterWindow : public Gtk::Dialog
     Gtk::Label * m_serverLabel;
     Gtk::Combo * m_nameEntry;
     Gtk::Entry * m_typeEntry;
+    Gtk::Button * m_takeButton;
     Gtk::Button * m_createButton;
 
     Gtk::Statusbar * m_status;
     int m_statusContext;
     Server * m_server;
+    std::string m_selectedCharacter;
 
     SigC::Connection m_failure;
     SigC::Connection m_created;
@@ -41,6 +43,10 @@ class CharacterWindow : public Gtk::Dialog
     void select_child(Gtk::Widget&);
     void selection_changed();
     void unselect_child(Gtk::Widget&);
+
+    void create();
+    void take();
+
   public:
     CharacterWindow();
 
@@ -52,8 +58,6 @@ class CharacterWindow : public Gtk::Dialog
     void doshow();
 
     void useServer(Server *);
-
-    void create();
 
     void failure(const std::string & msg);
     void created(Eris::Entity *);

@@ -76,9 +76,16 @@ CharacterWindow::CharacterWindow() :
     vbox->pack_start(*hbox);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    m_createButton = manage( new Gtk::Button("_Create", true) );
+    hbox = manage( new Gtk::HBox(false, 6) );
+    m_takeButton = manage( new Gtk::Button("_Take avatar", true) );
+    m_takeButton->signal_clicked().connect(slot(*this, &CharacterWindow::take));
+    m_takeButton->set_sensitive(false);
+    hbox->pack_start(*m_takeButton);
+    m_createButton = manage( new Gtk::Button("_Create avatar", true) );
     m_createButton->signal_clicked().connect(slot(*this, &CharacterWindow::create));
-    a->add(*m_createButton);
+    m_createButton->set_sensitive(false);
+    hbox->pack_start(*m_createButton);
+    a->add(*hbox);
     vbox->pack_start(*a);
 
     m_status = manage( new Gtk::Statusbar() );
@@ -107,6 +114,9 @@ void CharacterWindow::useServer(Server * s)
 
     std::list<Glib::ustring> listStrings;
     m_nameEntry->set_popdown_strings(listStrings);
+    m_selectedCharacter.clear();
+    m_takeButton->set_sensitive(false);
+    m_createButton->set_sensitive(true);
 }
 
 void CharacterWindow::gotCharacterList()
@@ -134,19 +144,50 @@ void CharacterWindow::gotCharacterList()
     // m_nameEntry->set_popdown_strings(listStrings);
 }
 
-void CharacterWindow::select_child(Gtk::Widget&)
+void CharacterWindow::select_child(Gtk::Widget & w)
 {
-    std::cout << "select_child" << std::endl << std::flush;
+    m_selectedCharacter.clear();
+    std::string id = m_nameEntry->get_entry()->get_text();
+    std::cout << "Selected " << id << std::endl << std::flush;
+    Eris::CharacterList chars = m_server->m_player->getCharacters();
+    Eris::CharacterList::iterator I = chars.begin();
+    for(; I != chars.end(); ++I) {
+        Atlas::Objects::Entity::GameEntity & ge = *I;
+        if (id == ge.getId()) {
+            m_selectedCharacter = id;
+            m_nameEntry->get_entry()->set_text(ge.getName());
+            m_typeEntry->set_text(ge.getParents().front().asString());
+            m_typeEntry->set_editable(false);
+            m_takeButton->set_sensitive(true);
+            m_createButton->set_sensitive(false);
+            return;
+        }
+    }
 }
 
 void CharacterWindow::selection_changed()
 {
-    std::cout << "selection_changed" << std::endl << std::flush;
 }
 
 void CharacterWindow::unselect_child(Gtk::Widget&)
 {
-    std::cout << "unselect_child" << std::endl << std::flush;
+    m_typeEntry->set_editable(true);
+    m_selectedCharacter.clear();
+    m_takeButton->set_sensitive(false);
+    m_createButton->set_sensitive(true);
+}
+
+void CharacterWindow::take()
+{
+    assert(m_server != 0);
+
+    m_nameEntry->get_entry()->set_editable(false);
+    m_typeEntry->set_editable(false);
+    m_createButton->set_sensitive(true);
+
+    m_server->takeCharacter(m_selectedCharacter);
+
+    m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
 }
 
 void CharacterWindow::create()

@@ -66,6 +66,7 @@ LoginWindow::LoginWindow() :
     a->add(*(manage( new Gtk::Label("Password:") )));
     table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_passwdEntry = manage( new Gtk::Entry() );
+    m_passwdEntry->set_visibility(false);
     m_passwdEntry->set_max_length(60);
     table->attach(*m_passwdEntry, 1, 3, 1, 2);
 
