@@ -8,6 +8,7 @@
 #include <gtkmm/dialog.h>
 
 class Server;
+class MainWindow;
 
 namespace Gtk {
   class Entry;
@@ -37,7 +38,9 @@ class ConnectWindow : public Gtk::Dialog
     void setPort(int );
     void setCustomPort();
   public:
-    ConnectWindow();
+    MainWindow & m_mainWindow;
+
+    ConnectWindow(MainWindow &);
 
     bool deleteEvent(GdkEventAny*) {
         hide();

@@ -63,8 +63,6 @@ class CharacterWindow : public Gtk::Dialog
     void created(Eris::Entity *);
 
     void dismiss(int);
-
-    SigC::Signal1<void, Server *> createStart;
 };
 
 #endif // EQUATOR_APP_CHARACTER_WINDOW_H

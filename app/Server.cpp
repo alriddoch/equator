@@ -9,6 +9,7 @@
 #include "ServerEntities.h"
 #include "GameView.h"
 #include "Terrain.h"
+#include "MainWindow.h"
 
 #include "visual/TerrainRenderer.h"
 #include "visual/Renderer.h"
@@ -38,7 +39,8 @@ using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
-Server::Server() : inGame(false), m_model(0),
+Server::Server(MainWindow & mw) : inGame(false), m_model(0),
+                   m_mainWindow(mw),
                    m_renderer(* new Renderer),
                    m_connection(* new Eris::Connection("equator", true)),
                    m_player(NULL), m_lobby(NULL), m_world(NULL),
@@ -66,6 +68,7 @@ void Server::connectWorldSignals()
     m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
     m_world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
+    m_world->CharacterSuccess.connect(SigC::slot(*this,&Server::gotAvatar));
     m_world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
 
     WEFactory * wef = new WEFactory(*m_connection.getTypeService(), m_renderer);
@@ -293,6 +296,13 @@ bool Server::poll(Glib::IOCondition)
 void Server::worldEntityCreate(Eris::Entity *r)
 {
     std::cout << "Created character" << std::endl << std::flush;
+}
+
+void Server::gotAvatar()
+{
+    Model & model = m_mainWindow.newModel();
+    model.setName(getName());
+    takeModel(model);
 }
 
 void Server::worldEnter(Eris::Entity * chr)

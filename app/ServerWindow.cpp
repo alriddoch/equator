@@ -26,7 +26,7 @@
 #include <cassert>
 
 ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
-                                      m_connectWindow(*new ConnectWindow()),
+                                      m_connectWindow(*new ConnectWindow(mw)),
                                       m_loginWindow(*new LoginWindow()),
                                       m_characterWindow(*new CharacterWindow()),
                                       m_mainWindow(mw)
@@ -67,7 +67,6 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(slot(*this, &ServerWindow::loggedIn));
-    m_characterWindow.createStart.connect(slot(*this, &ServerWindow::creatingAvatar));
 }
 
 void ServerWindow::connect()
@@ -101,17 +100,4 @@ void ServerWindow::loggedIn(Server * server)
 
     m_characterWindow.useServer(server);
     m_characterWindow.show_all();
-}
-
-void ServerWindow::creatingAvatar(Server * server)
-{
-    assert(server != 0);
-
-    if (server->getModel() != 0) {
-        return;
-    }
-
-    Model & model = m_mainWindow.newModel();
-    model.setName(server->getName());
-    server->takeModel(model);
 }

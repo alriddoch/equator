@@ -52,7 +52,6 @@ class ServerWindow : public OptionBox
     void newServer(Server *);
     void setServer(Server *);
     void loggedIn(Server *);
-    void creatingAvatar(Server *);
 };
 
 #endif // EQUATOR_APP_SERVERWINDOW_H

@@ -28,6 +28,7 @@ namespace Atlas {
   }
 }
 
+class MainWindow;
 class Model;
 class Terrain;
 class Renderer;
@@ -41,6 +42,7 @@ class Server : public SigC::Object {
     void roomEnter(Eris::Room *r);
 
     void worldEntityCreate(Eris::Entity *r);
+    void gotAvatar();
     void worldEnter(Eris::Entity *r);
 
     void charMoved(const PosType &);
@@ -55,8 +57,9 @@ class Server : public SigC::Object {
     Model * m_model;
 
   public:
-    Server();
+    explicit Server(MainWindow &);
 
+    MainWindow & m_mainWindow;
     Renderer & m_renderer;
 
     Eris::Connection & m_connection;

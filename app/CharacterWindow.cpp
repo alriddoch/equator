@@ -175,14 +175,12 @@ void CharacterWindow::take()
 {
     assert(m_server != 0);
 
+    m_status->push("Taking character...", m_statusContext);
+
     m_nameEntry->get_entry()->set_editable(false);
     m_typeEntry->set_editable(false);
     m_createButton->set_sensitive(true);
 
-    // It would be good if we could delay until we get first notification
-    // of success, as World::Entered is too late to create the render
-    // context.
-    createStart.emit(m_server);
     m_server->takeCharacter(m_selectedCharacter);
 
     m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
@@ -192,17 +190,14 @@ void CharacterWindow::create()
 {
     assert(m_server != 0);
 
-    m_status->push("Logging in...", m_statusContext);
+    m_status->push("Creating character...", m_statusContext);
 
     m_nameEntry->get_entry()->set_editable(false);
     m_typeEntry->set_editable(false);
     m_createButton->set_sensitive(false);
 
-    // It would be good if we could delay until we get first notification
-    // of success, as World::Entered is too late to create the render
-    // context.
-    createStart.emit(m_server);
     m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
+
     m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
 }
 

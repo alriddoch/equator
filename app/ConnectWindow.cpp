@@ -23,11 +23,12 @@
 
 #include <cassert>
 
-ConnectWindow::ConnectWindow() :
+ConnectWindow::ConnectWindow(MainWindow & mw) :
                  Gtk::Dialog("Connect to server", false, true),
                  m_hostEntry(0), m_portChoice(0), m_portSpin(0),
                  m_connectButton(0), m_status(0),
-                 m_customPort(6767), m_portNum(6767), m_server(0)
+                 m_customPort(6767), m_portNum(6767), m_server(0),
+                 m_mainWindow(mw)
 {
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
     signal_response().connect(slot(*this, &ConnectWindow::dismiss));
@@ -115,7 +116,7 @@ void ConnectWindow::createConnection()
 
     m_status->push("Connecting...", m_statusContext);
 
-    m_server = new Server();
+    m_server = new Server(m_mainWindow);
 
     m_hostEntry->set_editable(false);
     m_connectButton->set_sensitive(false);
