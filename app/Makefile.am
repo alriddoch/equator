@@ -8,6 +8,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  InheritanceWindow.cpp InheritanceWindow.h \
 		  ServerWindow.cpp ServerWindow.h \
 		  NewLayerWindow.cpp NewLayerWindow.h \
+		  ConnectWindow.cpp ConnectWindow.h \
 		  NewServerWindow.cpp NewServerWindow.h \
 		  Palette.cpp Palette.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
