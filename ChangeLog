@@ -1,5 +1,11 @@
 2004-10-20  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.cpp, app/ViewWindow.cpp, app/WorldEntity.cpp:
+	  Put in conditional compilation based on sigc++ version
+	  to ensure we work with gtkmm 2.0 and 2.4.
+
+2004-10-20  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/CharacterWindow.cpp, app/ConnectWindow.cpp, app/GlView.cpp,
 	  app/InheritanceWindow.cpp, app/LayerWindow.cpp, app/LoginWindow.cpp,
 	  app/MainWindow.cpp, app/NewLayerWindow.cpp, app/Palette.cpp,

@@ -100,7 +100,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                              Gdk::GL::MODE_DEPTH |
                                              // Gdk::GL::MODE_ACCUM |
                                              Gdk::GL::MODE_DOUBLE);
-#if 0
+#if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     if (glconfig.is_null()) {
         std::cerr << "*** Cannot find the double-buffered visual.\n"
                   << "*** Trying single-buffered visual.\n";
@@ -236,8 +236,8 @@ void GlView::initgl()
     glDepthFunc(GL_LEQUAL);
 
     uint8_t ants[] = { 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0, 0x0,
-                        0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
-                        0xff, 0xff, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff };
+                       0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
+                       0xff, 0xff, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff };
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -352,6 +352,8 @@ void GlView::drawgl()
             }
         }
         glFlush();
+
+#ifdef USE_FRAMESTORE
         if (m_frameStore != 0) {
             if ((m_frameStoreWidth != get_width()) ||
                 (m_frameStoreHeight != get_height())) {
@@ -373,6 +375,7 @@ void GlView::drawgl()
                      GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
         glReadPixels(0, 0, get_width(), get_height(),
                      GL_DEPTH_COMPONENT, GL_FLOAT, m_depthStore);
+#endif
 
         mouseEffects();
         swap_buffers();
@@ -394,6 +397,7 @@ bool GlView::animate()
     }
     m_refreshRequired = false;
 
+#if USE_FRAMESTORE
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
@@ -408,6 +412,7 @@ bool GlView::animate()
                  GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
     glDepthMask(GL_TRUE);
     std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+#endif
 
     m_animCount += 0.02f;
     if (m_animCount > 1.0f) {
@@ -652,7 +657,7 @@ void GlView::mouseEffects()
 
 bool GlView::make_current()
 {
-#if 0
+#if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     Glib::RefPtr<Gdk::GL::Context> glcontext =
       Gtk::GL::Widget::get_gl_context(*this);
 
@@ -675,7 +680,7 @@ bool GlView::make_current()
 void GlView::swap_buffers()
 {
 
-#if 0
+#if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     Glib::RefPtr<Gdk::GL::Window> glwindow =
       Gtk::GL::Widget::get_gl_window(*this);
 #else

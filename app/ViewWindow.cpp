@@ -31,8 +31,13 @@ using Gtk::Menu_Helpers::MenuElem;
 using Gtk::Menu_Helpers::RadioMenuElem;
 using Gtk::Menu_Helpers::TearoffMenuElem;
 using Gtk::Menu_Helpers::StockMenuElem;
-using Gtk::AccelKey;
 using Gtk::Menu_Helpers::MenuList;
+
+#if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
+using Gtk::Menu_Helpers::AccelKey;
+#else
+using Gtk::AccelKey;
+#endif
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
                                                     m_scrollLock(false)
