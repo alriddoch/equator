@@ -35,8 +35,8 @@ void HeightManager::load(Gtk::FileSelection * fsel)
     m_model.m_terrain.setBasePoint(posx + 1, posy,     16.0);
     m_model.m_terrain.setBasePoint(posx,     posy + 1, 20.0);
     m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 40.0);
-    for(int i = posx - 2; i < posx + 3; ++i) {
-        for(int j = posy - 2; j < posy + 3; ++j) {
+    for(int i = posx; i < posx + 2; ++i) {
+        for(int j = posy; j < posy + 2; ++j) {
             m_model.m_terrain.refresh(i, j);
         }
     }
@@ -378,10 +378,80 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
     std::cout << std::endl << std::flush;
 }
 
-typedef std::map<int, std::pair<int, int> > BasepointSelection;
+typedef std::map<int, GroundCoord > BasepointSelection;
 
 void HeightManager::dragStart(GlView & view, int x, int y)
 {
+    if (m_model.m_mainWindow.getMode() != MainWindow::VERTEX) {
+        return;
+    }
+
+    GLuint selectBuf[32768];
+    glSelectBuffer(32768, selectBuf);
+
+    view.setPickProjection(x, y, x + 1, y + 1);
+
+    int nameCount = 0;
+    BasepointSelection nameDict;
+    glPushName(nameCount);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+
+    if (have_GL_EXT_compiled_vertex_array) {
+        glLockArraysEXT(0, arrow_mesh_size);
+    }
+
+    float scale = 0.00625 / view.getScale();
+    
+    const Mercator::Terrain::Pointstore & points = m_model.m_terrain.getPoints();
+    Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+    for(; K != points.end(); ++K) {
+        const Mercator::Terrain::Pointcolumn & col = K->second;
+        Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+        for (; L != col.end(); ++L) {
+            nameDict[++nameCount] = GroundCoord(K->first, L->first);
+            glLoadName(nameCount);
+            glPushMatrix();
+            glTranslatef(K->first * segSize, L->first * segSize, L->second);
+            glScalef(scale, scale, scale);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+            glPopMatrix();
+        }
+    }
+
+    if (have_GL_EXT_compiled_vertex_array) {
+        glUnlockArraysEXT();
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glPopName();
+
+    int hits = glRenderMode(GL_RENDER);
+
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
+    if (hits < 1) { return; }
+
+    GLuint * ptr = &selectBuf[0];
+    for (int i = 0; i < hits; i++) {
+        int names = *(ptr);
+        ptr += 3;
+        for (int j = 0; j < names; j++) {
+            int hitName = *(ptr++);
+            std::cout << "{" << hitName << "}";
+            std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName
+);
+            if (K != nameDict.end()) {
+                const GroundCoord & c = K->second;
+                std::cout << "DRAGGING " << c.first << "," << c.second
+                          << std::endl << std::flush;
+                m_dragPoint = c;
+            } else {
+                std::cout << "UNKNOWN NAME" << std::endl << std::flush;
+            }
+        }
+    }
+
 }
 
 void HeightManager::dragUpdate(GlView & view, float x, float y, float z)
@@ -390,6 +460,13 @@ void HeightManager::dragUpdate(GlView & view, float x, float y, float z)
 
 void HeightManager::dragEnd(GlView & view, float x, float y, float z)
 {
+    float h = 0.f;
+    m_model.m_terrain.getBasePoint(m_dragPoint.first, m_dragPoint.second, h);
+    std::cout << "DRAGGED " << m_dragPoint.first << "," << m_dragPoint.second
+              << " FROM " << h << " TO " << h + z << std::endl << std::flush;
+    h += z; 
+    m_model.m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, h);
+    m_model.m_terrain.refresh(m_dragPoint.first, m_dragPoint.second);
 }
 
 void HeightManager::insert(const WFMath::Point<3> & curs)
@@ -400,9 +477,5 @@ void HeightManager::insert(const WFMath::Point<3> & curs)
               << " to " << curs.z()
               << std::endl << std::flush;
     m_model.m_terrain.setBasePoint(posx,     posy,     curs.z());
-    for(int i = posx - 2; i < posx + 2; ++i) {
-        for(int j = posy - 2; j < posy + 2; ++j) {
-            m_model.m_terrain.refresh(i, j);
-        }
-    }
+    m_model.m_terrain.refresh(posx,     posy);
 }

@@ -24,6 +24,7 @@ class HeightManager : public Layer {
     std::set<Mercator::Segment *> m_selection;
     int m_numLineIndeces;
     unsigned int * const m_lineIndeces;
+    GroundCoord m_dragPoint;
 
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
