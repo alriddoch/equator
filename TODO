@@ -1,4 +1,4 @@
-Add code to handle cursor, using face function to add it blender style.
+Switch to using drag and drop support in gtk-- to handle dragging.
 
 Use the Dreamworks guys walking ants algorithm to show selection.
 
@@ -6,18 +6,9 @@ Connection code, once complete needs custom op handler, which allows
 construction of arbitrary ops. This window should allow selection of
 various server subsystems as FROM of op, and also offer options for TO.
 
-Separate tool (select, area, move, draw) from tool_mode (entity, vertex,
-tile) in main window.
-
-Need to establish a way to extract lists of tiles, entity classes, and
-textures etc. from a given model. Probably handle only by name in
-palette, and let layer sort it what that name means.
-
 Add to the gimp interface.
 
 Look into the possibility of a gimp like client lib for extensions.
-
-Sort out rendering order for layers.
 
 Make a component which creates graphics for 2d client from 3d models.
 

@@ -18,6 +18,8 @@
 
 #include <iostream>
 
+using std::cout;
+
 void BladeMap::drawMapRegion(CoalRegion & map_region)
 {
     int tex_id = -1;

@@ -258,6 +258,7 @@ bool ServerEntities::selectSingleEntity(GlView & view,
     }
     std::cout << std::endl << std::flush;
 
+    return false;
 }
 
 void ServerEntities::newType(Eris::TypeInfo * node)

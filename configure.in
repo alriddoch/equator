@@ -21,7 +21,7 @@ AC_PROG_CXX
 
 CFLAGS='-Wall -g -I/usr/X11R6/include'
 CXXFLAGS='-Wall -g -I/usr/X11R6/include'
-LIBS='-L/usr/X11R6/lib -L/usr/local/lib -L/opt/forge/lib'
+LIBS='-L/usr/X11R6/lib -L/usr/local/lib'
 
 SDL_VERSION=1.2.0
 AM_PATH_SDL($SDL_VERSION)
@@ -72,7 +72,6 @@ dnl AC_CHECK_LIB(ccio,main)
 AC_CHECK_LIB(gtkgl,main)
 AC_CHECK_LIB(gtkglmm,main)
 AC_CHECK_LIB(eris,main)
-dnl AC_CHECK_LIB(efence,main)
 dnl AC_CHECK_LIB(efence,main)
 dnl AC_CHECK_LIB(cyphesis,main)
 

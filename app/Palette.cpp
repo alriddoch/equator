@@ -13,6 +13,7 @@
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/optionmenu.h>
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 

@@ -155,8 +155,8 @@ void NewServerWindow::createConnection()
 
     //Gtk::Main::input.connect(slot(server, &Server::poll), c.getSocket(),
                              //GDK_INPUT_READ);
-    m_server->connect("localhost", 6767);
-    //server->connect(m_hostEntry->get_text(), m_portNum);
+    // m_server->connect("localhost", 6767);
+    m_server->connect(m_hostEntry->get_text(), m_portNum);
 }
 
 void NewServerWindow::loginAccount()

@@ -61,7 +61,7 @@ void ViewWindow::setTitle()
 
 void ViewWindow::cursorMoved(double x, double y, double z)
 {
-    stringstream text;
+    std::stringstream text;
     text << " " << x << "," << y << "," << z << " ";
     m_cursorCoords->pop(m_cursorContext);
     m_cursorCoords->push(m_cursorContext, text.str());

@@ -23,9 +23,9 @@ static const bool pretty = false;
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
                                m_viewNo(m.getViewNo()),
                                m_scale(1.0),
-                               m_declination(60), m_rotation(45),
                                // m_currentLayer(NULL),
                                m_xoff(0), m_yoff(0), m_zoff(0),
+                               m_declination(60), m_rotation(45),
                                m_cursX(0), m_cursY(0), m_cursZ(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
@@ -93,7 +93,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("8:1", SigC::bind<float>(slot(this, &GlView::setScale), 8)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("4:1", SigC::bind<float>(slot(this, &GlView::setScale), 4)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("2:1", SigC::bind<float>(slot(this, &GlView::setScale), 2)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("_1:1", '1', SigC::bind<float>(slot(this, &GlView::setScale), 1)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:1", '1', SigC::bind<float>(slot(this, &GlView::setScale), 1)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:2", SigC::bind<float>(slot(this, &GlView::setScale), 0.5f)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:4", SigC::bind<float>(slot(this, &GlView::setScale), 0.25f)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:8", SigC::bind<float>(slot(this, &GlView::setScale), 0.125f)));
@@ -120,12 +120,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& face_popup = menu_sub_sub->items();
     face_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Isometric", SigC::bind<float, float>(slot(this, &GlView::setFace), 60, 45)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("North", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Isometric", "KP_5", SigC::bind<float, float>(slot(this, &GlView::setFace), 60, 45)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("North", "KP_1", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 0)));
     face_popup.push_back(Gtk::Menu_Helpers::MenuElem("South", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 180)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("West", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, -90)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("West", "KP_3", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, -90)));
     face_popup.push_back(Gtk::Menu_Helpers::MenuElem("East", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 90)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", SigC::bind<float, float>(slot(this, &GlView::setFace), 0, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", "KP_7", SigC::bind<float, float>(slot(this, &GlView::setFace), 0, 0)));
     face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Up", SigC::bind<float, float>(slot(this, &GlView::setFace), 180, 0)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Face..", *menu_sub_sub));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());

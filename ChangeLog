@@ -1,3 +1,15 @@
+2002-01-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/Palette.cpp, app/ServerEntities.cpp,
+	  app/Vector3D.h, app/Vector3D.cpp, app/ViewWindow.cpp:
+	  gcc v3 fixes contributed by Malcolm Walker.
+
+	* app/GlView.cpp: Implemented blender style view control using
+	  numeric keypad.
+
+	* app/NewServerWindow.cpp: Switch to using hostname entry for server,
+	  though this still causes segfaults occasionally.
+
 2002-01-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.h, app/EntityLayer.h, app/GlView.cpp,

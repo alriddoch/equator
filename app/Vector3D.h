@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <iosfwd>
 
 using std::cos;
 using std::sin;
@@ -201,17 +202,5 @@ class Vector3D : protected Eris::Coord {
     friend std::ostream & operator<<(std::ostream& s, const Eris::Coord& v);
     friend std::ostream & operator<<(std::ostream& s, const Vector3D& v);
 };
-
-inline std::ostream & operator<<(std::ostream& s, const Eris::Coord& v) {
-    return s << "[" << v.x << "," << v.y << "," << v.z << "]";
-}
-
-inline std::ostream & operator<<(std::ostream& s, const Vector3D& v) {
-    if (!v._set) {
-        return s << "[NS]";
-    }
-    return s << "[" << v.x << "," << v.y << "," << v.z << "]";
-}
-
 
 #endif // VECTOR_3D_H
