@@ -69,7 +69,8 @@ class Server : public SigC::Object {
     void moveCharacter(const Vector3D & pos);
 
     void avatarCreateEntity(const Atlas::Message::Object::MapType &);
-    void avatarMoveEntity(const std::string &, const Vector3D & pos,
+    void avatarMoveEntity(const std::string &, const std::string &loc,
+                          const Vector3D & pos,
                           const Vector3D & vel = Vector3D());
 
     const Vector3D getAbsCharPos();

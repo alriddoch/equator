@@ -377,6 +377,7 @@ void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
         std::cout << "MOVING " << m_selection->getID() << " to " << x
                   << ":" << y << ":" << z << std::endl << std::flush;
         m_serverConnection.avatarMoveEntity(m_selection->getID(),
+                   m_selection->getContainer()->getID(),
                    Vector3D(m_selection->getPosition()) + Vector3D(x, y, z));
     }
     m_validDrag = true;

@@ -1,5 +1,10 @@
 2002-02-08  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp, app/Server.h, app/Server.cpp:
+	  Set loc on move operations, so it works for privileged avatars.
+
+2002-02-08  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/ServerEntities.h, app/ServerEntities.cpp:
 	  Implemented dragging to move entities.
 
