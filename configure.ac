@@ -49,6 +49,8 @@ AC_REQUIRE_CPP
 SDL_VERSION=1.2.0
 WF_CHECK_SDL_IMAGE($SDL_VERSION)
 
+AC_LANG_PUSH(C)
+
 AC_CHECK_LIB(GL,glViewport, [ LIBS="$LIBS -lGL" ],
     AC_CHECK_LIB(opengl32,glViewport, [ LIBS="$LIBS -lopengl32" ],
       AC_MSG_ERROR(Could not find OpenGL library)
@@ -59,6 +61,8 @@ AC_CHECK_LIB(GLU,gluPerspective, [ LIBS="$LIBS -lGLU" ],
         AC_MSG_ERROR(Could not find OpenGL U library)
     )
 )
+
+AC_LANG_POP(C)
 
 PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 varconf-1.0 sage ,
     [

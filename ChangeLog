@@ -1,3 +1,7 @@
+2004-02-14  Ron Steinke  <rsteinke@w-link.net>
+
+	* configure.ac: GL test for mingw32, take 3.
+
 2004-02-14  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* Cleanup Makefile.am
