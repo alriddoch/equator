@@ -40,7 +40,7 @@ class MainWindow : public Gtk::Window
     } ToolMode;
 
     typedef enum {
-        PAN, PIVOT, ZOOM
+        PAN, ORBIT, ZOOM
     } NavMode;
 
   private:
@@ -59,7 +59,7 @@ class MainWindow : public Gtk::Window
     Gtk::ToggleButton * vertex_mode;
 
     Gtk::ToggleButton * pan_mode;
-    Gtk::ToggleButton * pivot_mode;
+    Gtk::ToggleButton * orbit_mode;
     Gtk::ToggleButton * zoom_mode;
 
     bool destroy_handler(GdkEventAny*);

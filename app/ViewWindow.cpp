@@ -352,8 +352,8 @@ void ViewWindow::glViewChanged()
     float winy = m_glarea->get_height() / (40.0f * m_glarea->getScale());
     float worldSize = hypot(wx, wy);
 
-    debug(std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
-              << std::endl << std::flush;);
+    debug(std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize
+                    << ") " << std::endl << std::flush;);
 
     m_hAdjust->set_lower(-worldSize);
     m_vAdjust->set_lower(-worldSize);

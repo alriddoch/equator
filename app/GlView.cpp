@@ -531,8 +531,8 @@ void GlView::midClickOn(int x, int y)
         case MainWindow::PAN:
             m_dragType = GlView::PAN;
             break;
-        case MainWindow::PIVOT:
-            m_dragType = GlView::PIVOT;
+        case MainWindow::ORBIT:
+            m_dragType = GlView::ORBIT;
             break;
         case MainWindow::ZOOM:
             m_dragType = GlView::ZOOM;
@@ -561,7 +561,7 @@ void GlView::midClickOff(int x, int y)
             setYoff(getYoff() + (ty - dragy) );
             setZoff(getZoff() + (tz - dragz) );
             break;
-        case MainWindow::PIVOT:
+        case MainWindow::ORBIT:
             {
                 float rot = getRotation() + (dx * 360.f) / get_width();
                 float dec = getDeclination() - (dy * 180.f) / get_height();
@@ -680,7 +680,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
             setYoff(getYoff() + (ty - dragy) );
             setZoff(getZoff() + (tz - dragz) );
             break;
-        case GlView::PIVOT:
+        case GlView::ORBIT:
             {
                 float rot = getRotation() + (dx * 360.f) / get_width();
                 float dec = getDeclination() - (dy * 180.f) / get_height();

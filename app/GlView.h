@@ -24,7 +24,7 @@ class Renderer;
 class GlView : public Gtk::DrawingArea {
   public:
     typedef enum view { ORTHO, PERSP } projection_t;
-    typedef enum drag { NONE, SELECT, MOVE, PAN, PIVOT, ZOOM } drag_t;
+    typedef enum drag { NONE, SELECT, MOVE, PAN, ORBIT, ZOOM } drag_t;
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     bool m_redrawRequired;

@@ -126,14 +126,14 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 0, 1);
-    t->set_tip(*b, "Select Area");
+    t->set_tip(*b, "Select Multiple Items");
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 0, 1);
-    t->set_tip(*b, "Insert");
+    t->set_tip(*b, "Insert Item");
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
@@ -141,7 +141,7 @@ MainWindow::MainWindow() :
     b->add_pixmap(p, pixmask);
     b->set_sensitive(false);
     table->attach(*b, 3, 4, 0, 1);
-    t->set_tip(*b, "Rotate");
+    t->set_tip(*b, "Rotate Item");
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
@@ -149,14 +149,14 @@ MainWindow::MainWindow() :
     b->add_pixmap(p, pixmask);
     b->set_sensitive(false);
     table->attach(*b, 4, 5, 0, 1);
-    t->set_tip(*b, "Scale");
+    t->set_tip(*b, "Scale Item");
 
     b = move_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 1, 2);
-    t->set_tip(*b, "Translate");
+    t->set_tip(*b, "Move Item");
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
@@ -164,14 +164,14 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 2, 3);
-    t->set_tip(*b, "Entity Mode");
+    t->set_tip(*b, "Entity Edit Mode");
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 2, 3);
-    t->set_tip(*b, "Vertex Mode");
+    t->set_tip(*b, "Vertex Edit Mode");
 
     b = pan_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
@@ -179,18 +179,21 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_move_16_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 3, 4);
+    t->set_tip(*b, "Pan Camera");
 
-    b = pivot_mode = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::PIVOT));
+    b = orbit_mode = manage( new Gtk::ToggleButton() );
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::ORBIT));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_rotate_16_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 3, 4);
+    t->set_tip(*b, "Orbit Camera");
 
     b = zoom_mode = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::ZOOM));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_zoom_16_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 3, 4);
+    t->set_tip(*b, "Zoom Camera");
 
     b = manage( new Gtk::ToggleButton("10") );
     b->set_sensitive(false);
@@ -345,7 +348,7 @@ void MainWindow::navSelect(MainWindow::NavMode mode)
         changing = true;
         m_navMode = mode;
         pan_mode->set_active(mode==MainWindow::PAN);
-        pivot_mode->set_active(mode==MainWindow::PIVOT);
+        orbit_mode->set_active(mode==MainWindow::ORBIT);
         zoom_mode->set_active(mode==MainWindow::ZOOM);
         changing = false;
         navChanged.emit();
