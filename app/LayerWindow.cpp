@@ -82,7 +82,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : m_currentModel(0)
     vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::PACK_SHRINK);
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
-    scrolled_window->set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolled_window->set_size_request(250,150);
     scrolled_window->add(*m_treeView);
 

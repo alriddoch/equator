@@ -53,7 +53,7 @@ ServerWindow::ServerWindow(MainWindow & mw) :
     // m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &ServerWindow::selectionChanged) );
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
-    scrolled_window->set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     scrolled_window->set_size_request(250,150);
     scrolled_window->add(*m_treeView);
 
