@@ -1,5 +1,10 @@
 2002-04-30  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp: Made selection verification in the
+	  case of multiple selected entities behave more sanely.
+
+2002-04-30  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/ServerEntities.cpp, app/ServerEntities.h: Implemented
 	  rubberband selection of server entities, and highlighting
 	  multiple selected entities.

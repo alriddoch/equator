@@ -349,7 +349,7 @@ bool ServerEntities::selectEntities(GlView & view,
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
     if (hits < 1) { return false; }
 
-    if (check && (m_selection == NULL)) { return false; }
+    if (check && m_selectionList.empty()) { return false; }
 
     GLuint * ptr = &selectBuf[0];
     for (int i = 0; i < hits; i++) {
@@ -361,8 +361,12 @@ bool ServerEntities::selectEntities(GlView & view,
             std::cout << "{" << hitName << "}";
             entname_t::const_iterator I = m_nameDict.find(hitName);
             if (check) {
-                if (m_selection == I->second) {
+                if (m_selectionList.find(I->second) != m_selectionList.end()) {
                     std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
+                    std::cout << "Setting primart selection from "
+                              << m_selection->getID() << " to "
+                              << I->second->getID() << std::endl << std::flush;
+                    m_selection = I->second;
                     return true;
                 }
             } else {
