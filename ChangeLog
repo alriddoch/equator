@@ -1,5 +1,9 @@
 2003-01-28  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/HeightManager.cpp: Fix dependencies of heightmap segments.
+
+2003-01-28  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.cpp: Improve colours for underwater terrain.
 
 	* app/GL.h: Fix function pointer types for gl headers without

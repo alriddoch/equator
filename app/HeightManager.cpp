@@ -30,10 +30,11 @@ void HeightManager::load(Gtk::FileSelection * fsel)
     m_model.m_terrain.setBasePoint(posx + 1, posy,     16.0);
     m_model.m_terrain.setBasePoint(posx,     posy + 1, 20.0);
     m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 40.0);
-    m_model.m_terrain.refresh(posx,     posy);
-    m_model.m_terrain.refresh(posx + 1, posy);
-    m_model.m_terrain.refresh(posx,     posy + 1);
-    m_model.m_terrain.refresh(posx + 1, posy + 1);
+    for(int i = posx - 2; i < posx + 3; ++i) {
+        for(int j = posy - 2; j < posy + 3; ++j) {
+            m_model.m_terrain.refresh(i, j);
+        }
+    }
     // m_model.m_heightData.load(fsel->get_filename(),posx,posy);
     // FIXME Handle error conditions from height loader
 
