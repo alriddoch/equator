@@ -477,7 +477,7 @@ void GlView::clickOff(int x, int y)
                 double tx, ty, tz;
                 worldPoint(x, y, dragDepth, &tx, &ty, &tz);
                 // Send move thingy to layer
-                m_model.getCurrentLayer()->dragEnd(*this, tx - dragx, ty - dragy, tz - dragz);
+                m_model.getCurrentLayer()->dragEnd(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
                 m_dragType = GlView::NONE;
             }
             break;
@@ -572,7 +572,6 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
     if (clickx != 0) {
         startAnimation();
         switch (m_mainWindow.getTool()) {
-                break;
             case MainWindow::MOVE:
             case MainWindow::ROTATE:
             case MainWindow::SCALE:
@@ -580,7 +579,7 @@ bool GlView::motionNotifyEvent(GdkEventMotion*event)
                     double tx, ty, tz;
                     worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
                     // Send move thingy to layer
-                    m_model.getCurrentLayer()->dragUpdate(*this, tx - dragx, ty - dragy, tz - dragz);
+                    m_model.getCurrentLayer()->dragUpdate(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
                 }
                 break;
             case MainWindow::SELECT:

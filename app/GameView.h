@@ -44,8 +44,8 @@ class GameView : public Layer {
     virtual void pushSelection();
     virtual void popSelection();
     virtual void dragStart(GlView & view, int x, int y);
-    virtual void dragUpdate(GlView & view, float x, float y, float z);
-    virtual void dragEnd(GlView & view, float x, float y, float z);
+    virtual void dragUpdate(GlView & view, const WFMath::Vector<3> &);
+    virtual void dragEnd(GlView & view, const WFMath::Vector<3> &);
     virtual void insert(const PosType &);
     virtual void align(Alignment);
 

@@ -42,8 +42,8 @@ class Layer : public SigC::Object {
     virtual void pushSelection() = 0;
     virtual void popSelection() = 0;
     virtual void dragStart(GlView & view, int x, int y) = 0;
-    virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
-    virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
+    virtual void dragUpdate(GlView & view, const WFMath::Vector<3> &) = 0;
+    virtual void dragEnd(GlView & view, const WFMath::Vector<3> &) = 0;
     virtual void insert(const PosType &) = 0;
     virtual void align(Alignment) = 0;
 

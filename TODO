@@ -1,3 +1,5 @@
+Use return value of dragStart to indicate if drag works.
+
 Add a right click context menu.
 
 Modify cursor placement so it uses depth value if depth value is not infinite.

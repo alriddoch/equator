@@ -183,12 +183,12 @@ void GameView::dragStart(GlView & view, int x, int y)
     // Nothing
 }
 
-void GameView::dragUpdate(GlView & view, float x, float y, float z)
+void GameView::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 {
     // Nothing
 }
 
-void GameView::dragEnd(GlView & view, float x, float y, float z)
+void GameView::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
     // Nothing
 }

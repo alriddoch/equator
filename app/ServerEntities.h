@@ -10,6 +10,8 @@
 
 #include <Atlas/Message/Element.h>
 
+#include <wfmath/vector.h>
+
 #include <set>
 
 class Server;
@@ -54,7 +56,7 @@ class ServerEntities : public Layer {
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
     bool m_validDrag;
-    float m_dragX, m_dragY, m_dragZ;
+    WFMath::Vector<3> m_dragPoint;
 
     int m_nameCount;
     entname_t m_nameDict;
@@ -116,8 +118,8 @@ class ServerEntities : public Layer {
     void pushSelection();
     void popSelection();
     void dragStart(GlView & view, int x, int y);
-    void dragUpdate(GlView & view, float x, float y, float z);
-    void dragEnd(GlView & view, float x, float y, float z);
+    void dragUpdate(GlView & view, const WFMath::Vector<3> &);
+    void dragEnd(GlView & view, const WFMath::Vector<3> &);
     void insert(const PosType &);
     void align(Alignment );
     

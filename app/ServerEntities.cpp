@@ -854,19 +854,19 @@ void ServerEntities::dragStart(GlView & view, int x, int y)
     }
 }
 
-void ServerEntities::dragUpdate(GlView & view, float x, float y, float z)
+void ServerEntities::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 {
-    m_dragX = x; m_dragY = y; m_dragZ = z;
+    m_dragPoint = v;
 }
 
-void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
+void ServerEntities::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
     if (m_validDrag) {
-        std::cout << "MOVING " << m_selection->getID() << " to " << x
-                  << ":" << y << ":" << z << std::endl << std::flush;
+        std::cout << "MOVING " << m_selection->getID() << " to " << v
+                  << std::endl << std::flush;
         m_serverConnection.avatarMoveEntity(m_selection->getID(),
                    m_selection->getContainer()->getID(),
-                   m_selection->getPosition() + VelType(x, y, z));
+                   m_selection->getPosition() + v);
     }
     m_validDrag = false;
 }

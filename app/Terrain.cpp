@@ -489,11 +489,11 @@ void Terrain::dragStart(GlView & view, int x, int y)
 
 }
 
-void Terrain::dragUpdate(GlView & view, float x, float y, float z)
+void Terrain::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 {
 }
 
-void Terrain::dragEnd(GlView & view, float x, float y, float z)
+void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
     Mercator::BasePoint ref;
     if (!m_terrain.getBasePoint(m_dragPoint.first,
@@ -502,9 +502,9 @@ void Terrain::dragEnd(GlView & view, float x, float y, float z)
     }
     std::cout << "DRAGGED " << m_dragPoint.first << "," << m_dragPoint.second
               << " FROM " << ref.height()
-              << " TO " << ref.height() + z
+              << " TO " << ref.height() + v.z()
               << std::endl << std::flush;
-    ref.height() += z; 
+    ref.height() += v.z(); 
     m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, ref);
 }
 
