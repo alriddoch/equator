@@ -832,6 +832,7 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
         m_model.m_terrain.setBasePoint(x, y, bp);
     }
  
+#if 0
     //============HACKED TO TEST MERCATOR
 
     const WFMath::Ball<2> circ2(WFMath::Point<2>(0.0,0.0), 12.0);
@@ -845,6 +846,7 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
     m_model.m_terrain.addMod(mod3);
 
     //==================================== 
+#endif
 
 
 }

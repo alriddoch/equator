@@ -1,5 +1,9 @@
 2003-07-06  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp: Comment out terrain mod tests for now.
+
+2003-07-06  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.cpp: Fixes to use latest Mercator API changes.
 
 2003-06-27  Al Riddoch  <alriddoch@zepler.org>
