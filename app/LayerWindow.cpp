@@ -137,7 +137,7 @@ void LayerWindow::updateLayers()
 void LayerWindow::addModel(Model * model)
 {
     Gtk::Menu * menu = m_modelMenu->get_menu();
-    stringstream ident;
+    std::stringstream ident;
     ident << model->getName() << "-" << model->getModelNo();
     if (menu == NULL) {
         menu = manage( new Gtk::Menu() );

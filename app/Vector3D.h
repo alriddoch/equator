@@ -8,8 +8,8 @@
 #include <Atlas/Message/Object.h>
 #include <Eris/Types.h>
 
-#include <math.h>
-#include <algo.h>
+#include <cmath>
+#include <algorithm>
 
 using std::cos;
 using std::sin;
@@ -198,15 +198,15 @@ class Vector3D : protected Eris::Coord {
     }
 
 
-    friend ostream & operator<<(ostream& s, const Eris::Coord& v);
-    friend ostream & operator<<(ostream& s, const Vector3D& v);
+    friend std::ostream & operator<<(std::ostream& s, const Eris::Coord& v);
+    friend std::ostream & operator<<(std::ostream& s, const Vector3D& v);
 };
 
-inline ostream & operator<<(ostream& s, const Eris::Coord& v) {
+inline std::ostream & operator<<(std::ostream& s, const Eris::Coord& v) {
     return s << "[" << v.x << "," << v.y << "," << v.z << "]";
 }
 
-inline ostream & operator<<(ostream& s, const Vector3D& v) {
+inline std::ostream & operator<<(std::ostream& s, const Vector3D& v) {
     if (!v._set) {
         return s << "[NS]";
     }

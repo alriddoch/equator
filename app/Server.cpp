@@ -74,7 +74,7 @@ void Server::connect(const std::string & host, int port)
     // connection.connect("localhost", 6767);
 
     inputHandler = Gtk::Main::input.connect(slot(this, &Server::poll),
-                                            connection.getSocket(),
+                                            connection.getFileDescriptor(),
                                             GDK_INPUT_READ);
 }
 

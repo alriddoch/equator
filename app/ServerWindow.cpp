@@ -43,7 +43,7 @@ ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 void ServerWindow::newServer(Server * server)
 {
     Gtk::Menu * menu = m_serverMenu->get_menu();
-    stringstream ident;
+    std::stringstream ident;
     ident << /* server->getName() << */ "FIXME" /* << server->getModelNo() */;
     if (menu == NULL) {
         menu = manage( new Gtk::Menu() );
