@@ -20,8 +20,8 @@ namespace Gtk {
    class Menu;
 };
 
-typedef enum comp_type { COMP_MESH, COMP_MATERIAL, COMP_SKELETON, COMP_ACTION,
-                         COMP_ANIMATION, COMP_NONE } ComponentType;
+typedef enum comp_type { COMP_NONE, COMP_MESH, COMP_MATERIAL, COMP_SKELETON,
+                         COMP_ACTION, COMP_ANIMATION, } ComponentType;
 
 class Cal3dStoreOptions : public OptionBox
 {

@@ -149,7 +149,6 @@ bool Cal3dStore::animate(GlView & view)
 {
     Glib::TimeVal delta = m_model.m_mainWindow.time();
     delta.subtract(m_lastUpdate);
-    std::cout << "Cal3dStore::animate" << delta.as_double() << std::endl << std::flush;
     m_lastUpdate = m_model.m_mainWindow.time();
     m_cal3dModel.onUpdate(delta.as_double());
     return true;

@@ -1,5 +1,15 @@
 2005-02-10  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* gui/gtkmm/Cal3dStoreOptions.h: Re-order component type enumeration
+	  so default is none.
+
+	* gui/gtkmm/Cal3dStoreOptions.cpp: Implement turning on and off
+	  animations.
+
+	* app/Cal3dStore.cpp: Remove excess debug output.
+
+2005-02-10  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/MainWindow.h, app/MainWindow.cpp: Add a time member, accessors
 	  and a way to update the time.
 

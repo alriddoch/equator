@@ -170,8 +170,20 @@ void Cal3dStoreOptions::enableToggled(const Glib::ustring& path_string)
           row[*m_selectColumn] = !enabled;
           m_cal3dStore.model().updated.emit();
         }
-        default:
-            break;
+        break;
+      case COMP_ANIMATION:
+        {
+          if (enabled) {
+            model.getCalModel().getMixer()->blendCycle(id, 0.f, 0.f);
+          } else {
+            model.getCalModel().getMixer()->blendCycle(id, 1.f, 0.f);
+          }
+          row[*m_selectColumn] = !enabled;
+          m_cal3dStore.model().updated.emit();
+        }
+        break;
+      default:
+        break;
     };
     // /* do something with the value */
     // visible = layer->toggleVisible();
