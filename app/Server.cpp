@@ -83,10 +83,7 @@ void Server::connectWorldSignals()
     // m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
     // m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
-    m_view->EntityCreated.connect(SigC::slot(*this,&Server::worldEntityCreate));
-
-    m_avatar->InGame.connect(SigC::slot(*this,&Server::gotAvatar));
-    m_avatar->GotCharacterEntity.connect(SigC::slot(*this,&Server::worldEnter));
+    m_account->AvatarSuccess.connect(SigC::slot(*this,&Server::gotAvatar));
 
     WEFactory * wef = new WEFactory(*m_connection.getTypeService(), m_renderer);
     wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
@@ -95,8 +92,7 @@ void Server::connectWorldSignals()
 
 void Server::takeCharacter(const std::string & id)
 {
-    m_avatar = m_account->takeCharacter(id);
-    m_view = m_avatar->getView();
+    m_account->takeCharacter(id);
 
     connectWorldSignals();
 }
@@ -109,8 +105,7 @@ void Server::createCharacter(const std::string & name, const std::string & type)
     chrcter->setName(name);
     chrcter->setAttr("description", "an equator avatar");
     // chrcter.setAttr("sex", "female");
-    m_avatar = m_account->createCharacter(chrcter);
-    m_view = m_avatar->getView();
+    m_account->createCharacter(chrcter);
 
     connectWorldSignals();
 }
@@ -243,8 +238,15 @@ void Server::worldEntityCreate(Eris::Entity *r)
     std::cout << "Created character" << std::endl << std::flush;
 }
 
-void Server::gotAvatar(Eris::Avatar *)
+void Server::gotAvatar(Eris::Avatar * av)
 {
+    // FIXME Is it necessary to store the Avatar pointer
+    m_avatar = av;
+    m_avatar->GotCharacterEntity.connect(SigC::slot(*this,&Server::worldEnter));
+
+    m_view = m_avatar->getView();
+    m_view->EntityCreated.connect(SigC::slot(*this,&Server::worldEntityCreate));
+
     Model & model = m_mainWindow.newModel();
     model.setName(getName());
     takeModel(model);

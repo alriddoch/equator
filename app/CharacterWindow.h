@@ -18,7 +18,7 @@ namespace Gtk {
 }
 
 namespace Eris {
-  class Entity;
+  class Avatar;
 }
 
 class CharacterWindow : public Gtk::Dialog
@@ -36,7 +36,7 @@ class CharacterWindow : public Gtk::Dialog
     std::string m_selectedCharacter;
 
     SigC::Connection m_failure;
-    SigC::Connection m_created;
+    SigC::Connection m_success;
     SigC::Connection m_charlist;
 
     void gotCharacterList();
@@ -60,7 +60,7 @@ class CharacterWindow : public Gtk::Dialog
     void useServer(Server *);
 
     void failure(const std::string & msg);
-    void created(Eris::Entity *);
+    void success(Eris::Avatar *);
 
     void dismiss(int);
 };

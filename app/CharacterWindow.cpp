@@ -189,7 +189,7 @@ void CharacterWindow::take()
 
     m_server->takeCharacter(m_selectedCharacter);
 
-    m_created = m_server->m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &CharacterWindow::created));
+    m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
 }
 
 void CharacterWindow::create()
@@ -204,7 +204,7 @@ void CharacterWindow::create()
 
     m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
 
-    m_created = m_server->m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &CharacterWindow::created));
+    m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
 }
 
 void CharacterWindow::failure(const std::string & msg)
@@ -218,7 +218,7 @@ void CharacterWindow::failure(const std::string & msg)
     m_status->push("Connection failed", m_statusContext);
 
     m_failure.disconnect();
-    m_created.disconnect();
+    m_success.disconnect();
     m_charlist.disconnect();
 
     m_nameEntry->get_entry()->set_editable(true);
@@ -226,7 +226,7 @@ void CharacterWindow::failure(const std::string & msg)
     m_createButton->set_sensitive(true);
 }
 
-void CharacterWindow::created(Eris::Entity *)
+void CharacterWindow::success(Eris::Avatar *)
 {
     assert(m_server != 0);
 
@@ -243,7 +243,7 @@ void CharacterWindow::created(Eris::Entity *)
               << std::flush;
 
     m_failure.disconnect();
-    m_created.disconnect();
+    m_success.disconnect();
     m_charlist.disconnect();
 
     hide();
@@ -252,7 +252,7 @@ void CharacterWindow::created(Eris::Entity *)
 void CharacterWindow::dismiss(int response)
 {
     m_failure.disconnect();
-    m_created.disconnect();
+    m_success.disconnect();
     m_charlist.disconnect();
     hide();
 }

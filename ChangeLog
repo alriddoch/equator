@@ -1,3 +1,8 @@
+2005-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/Server.cpp, app/CharacterWindow.cpp, app/CharacterWindow.h:
+	  Update to take account of new clearer Eris API.
+
 2005-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/Server.cpp, app/Server.h: Give Server a propper destructor.
