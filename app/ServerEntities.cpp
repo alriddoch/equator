@@ -12,6 +12,8 @@
 #include "WorldEntity.h"
 #include "Terrain.h"
 
+#include "arrow_mesh.h"
+
 #include "gui/gtkmm/EntityExportOptions.h"
 #include "gui/gtkmm/EntityImportOptions.h"
 
@@ -196,6 +198,31 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
     view.disableAnts();
 }
 
+void ServerEntities::drawSelectableCorners(GlView & view,
+                                           const WFMath::AxisBox<3> & box)
+{
+    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+    glColor3f(1.f, 0.f, 1.f);
+
+    float scale = 0.00625 / view.getScale();
+
+    glPushMatrix();
+    glTranslatef(box.lowCorner().x(),
+                 box.lowCorner().y(),
+                 box.lowCorner().z());
+    glScalef(scale, scale, scale);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(box.highCorner().x(),
+                 box.highCorner().y(),
+                 box.highCorner().z());
+    glScalef(scale, scale, scale);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+    glPopMatrix();
+}
+
 void ServerEntities::orient(const WFMath::Quaternion & orientation)
 {
     if (!orientation.isValid()) {
@@ -249,7 +276,13 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
         }
         if ((ent == m_selection) ||
             (m_selectionList.find(ent) != m_selectionList.end())) {
-            draw3DSelectedBox(view, ent->getBBox());
+            if (m_model.getCurrentLayer() == this) {
+                if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+                    drawSelectableCorners(view, ent->getBBox());
+                } else {
+                    draw3DSelectedBox(view, ent->getBBox());
+                }
+            }
         }
     } // else draw it without using its bbox FIXME how ?
 
@@ -769,19 +802,41 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
 
 bool ServerEntities::animate(GlView & view)
 {
-    if (m_selection == NULL) {
+    if (m_model.getCurrentLayer() != this) {
         return false;
     }
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
-    glPushMatrix();
-    moveTo(m_selection, root);
-    if (m_validDrag) {
-        std::cout << "Dragging " << m_dragPoint << std::endl << std::flush;
-        glTranslatef(m_dragPoint.x(), m_dragPoint.y(), m_dragPoint.z());
+
+    if (m_selectionList.empty()) {
+        return false;
     }
-    draw3DSelectedBox(view, m_selection->getBBox());
-    glPopMatrix();
-    return true;
+
+    // FIXME Need to animate all selected entities
+    bool running = false;
+    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    entlist_t::const_iterator I = m_selectionList.begin();
+    for (; I != m_selectionList.end(); ++I) {
+        glPushMatrix();
+        moveTo(*I, root);
+        // FIXME Need to check whether this the right thing. Does a drag
+        // effect all entities?
+        if (m_validDrag) {
+            std::cout << "Dragging " << m_dragPoint << std::endl << std::flush;
+            glTranslatef(m_dragPoint.x(), m_dragPoint.y(), m_dragPoint.z());
+        }
+        if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+            if (!m_lowSelectionList.empty()) {
+                // Do summit
+            }
+            if (!m_highSelectionList.empty()) {
+                // Do summit
+            }
+        } else {
+            draw3DSelectedBox(view, (*I)->getBBox());
+            running = true;
+        }
+        glPopMatrix();
+    }
+    return running;
 }
 
 void ServerEntities::draw(GlView & view)

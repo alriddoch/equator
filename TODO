@@ -1,3 +1,9 @@
+We should probably onlu animate the current layer, thus avoiding a check
+in the current layer itself.
+
+Must make sure deleted Eris::Entity pointers are removed from ServerEntities
+selection.
+
 Make mouse wheel zoom.
 
 Enable resizing of bboxes.

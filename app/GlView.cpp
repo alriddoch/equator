@@ -397,9 +397,9 @@ bool GlView::animate()
     glRasterPos2i(0,0);
     glDepthMask(GL_FALSE);
     glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                 GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
-    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
                  GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+    glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                 GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
     glDepthMask(GL_TRUE);
     std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
 

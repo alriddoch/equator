@@ -55,6 +55,8 @@ class ServerEntities : public Layer {
     Eris::Entity * m_selection; 
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
+    entlist_t m_lowSelectionList;
+    entlist_t m_highSelectionList;
     bool m_validDrag;
     WFMath::Vector<3> m_dragPoint;
 
@@ -71,6 +73,7 @@ class ServerEntities : public Layer {
 
     void draw3DCube(const WFMath::AxisBox<3> & bbox, bool open = false);
     void draw3DSelectedBox(GlView & view, const WFMath::AxisBox<3> & bbox);
+    void drawSelectableCorners(GlView & view, const WFMath::AxisBox<3> & bbox);
     void draw3DBox(const WFMath::AxisBox<3> & bbox);
     void drawEntity(GlView &, Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
     void drawWorld(GlView &, Eris::Entity * wrld);

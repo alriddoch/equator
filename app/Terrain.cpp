@@ -158,23 +158,103 @@ void Terrain::exportFile()
 
 void Terrain::selectInvert()
 {
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        GroundCoordSet oldVertexSelection = m_vertexSelection;
+        m_vertexSelection.clear();
+
+        const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
+        Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+        for(; K != points.end(); ++K) {
+            const Mercator::Terrain::Pointcolumn & col = K->second;
+            Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+            for (; L != col.end(); ++L) {
+                if ((m_selection.find(GroundCoord(K->first, L->first))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first - 1))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first, L->first - 1))
+                                                    == m_selection.end())) {
+                    continue;
+                }
+                GroundCoord gc(K->first, L->first);
+                if (oldVertexSelection.find(gc) == oldVertexSelection.end()) {
+                    m_vertexSelection.insert(gc);
+                }
+            }
+        }
+    } else {
+        GroundCoordSet oldSelection = m_selection;
+        m_selection.clear();
+        m_vertexSelection.clear();
+
+        const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
+        Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+        for (; I != segs.end(); ++I) {
+            const Mercator::Terrain::Segmentcolumn & col = I->second;
+            Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+            for (; J != col.end(); ++J) {
+                GroundCoord gc(I->first, J->first);
+                if (oldSelection.find(gc) == oldSelection.end()) {
+                    m_selection.insert(gc);
+                }
+            }
+        }
+    }
 }
 
 void Terrain::selectAll()
 {
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
+        Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+        for(; K != points.end(); ++K) {
+            const Mercator::Terrain::Pointcolumn & col = K->second;
+            Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+            for (; L != col.end(); ++L) {
+                if ((m_selection.find(GroundCoord(K->first, L->first))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first - 1))
+                                                    == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first, L->first - 1))
+                                                    == m_selection.end())) {
+                    continue;
+                }
+                m_vertexSelection.insert(GroundCoord(K->first, L->first));
+            }
+        }
+    } else {
+        const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
+        Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+        for (; I != segs.end(); ++I) {
+            const Mercator::Terrain::Segmentcolumn & col = I->second;
+            Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+            for (; J != col.end(); ++J) {
+                m_selection.insert(GroundCoord(I->first, J->first));
+            }
+        }
+    }
 }
 
 void Terrain::selectNone()
 {
-    m_selection.clear();
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        m_vertexSelection.clear();
+    } else {
+        m_selection.clear();
+        m_vertexSelection.clear();
+    }
 }
 
 void Terrain::selectRegion(Mercator::Segment & map)
 {
     int size = map.getResolution();
     float vertices[size * 4 * 3 + 1];
-    vertices[0] = vertices[1] = size / 2.f;
-    vertices[2] = 0.f;
+    vertices[0] = vertices[1] = size / 2;
+    vertices[2] = map.get(size / 2, size / 2);
 
     for (int i = 0; i < size; ++i) {
         vertices[3 * i + 1] = i;
@@ -433,7 +513,6 @@ bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool
     glPushName(nameCount);
 
     const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
-
     Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
     for (; I != segs.end(); ++I) {
         const Mercator::Terrain::Segmentcolumn & col = I->second;
@@ -453,6 +532,7 @@ bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool
 
     if (!check) {
         m_selection.clear();
+        m_vertexSelection.clear();
     }
 
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
