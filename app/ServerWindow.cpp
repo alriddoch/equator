@@ -17,8 +17,8 @@
 #include <sstream>
 #include <vector>
 
-ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                           m_mainWindow(w)
+ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                              m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );

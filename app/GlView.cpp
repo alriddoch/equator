@@ -108,6 +108,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     Gtk::RadioMenuItem::Group render_group;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Line", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),LINE)));
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Solid", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SOLID)));
+    static_cast<Gtk::RadioMenuItem*>(view_popup.back())->set_active();
+    m_renderMode = GlView::SOLID;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Shaded", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SHADED)));
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),TEXTURE)));
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SHADETEXT)));
@@ -119,7 +121,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
     layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<Model*>(slot(&m_mainWindow, &MainWindow::open_layers),&m_model)));
+    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(&m_mainWindow, &MainWindow::openLayers)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
@@ -213,15 +215,21 @@ void GlView::setupgl()
 
 void GlView::origin()
 {
-    if (make_current()) {
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glTranslatef(0.0f, 0.0f, -10.0f);
-        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        glScalef(m_scale, m_scale, m_scale);
-        glTranslatef(m_xoff, m_yoff, m_zoff);
-    }
+    // Not safe to call when make_current() has not been called
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.0f, 0.0f, -10.0f);
+    glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+    glScalef(m_scale, m_scale, m_scale);
+    glTranslatef(m_xoff, m_yoff, m_zoff);
+}
+
+void GlView::face()
+{
+    glScalef(1.0f/m_scale, 1.0f/m_scale, 1.0f/m_scale);
+    glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);
+    glRotatef(60.0f, 1.0f, 0.0f, 0.0f);
 }
 
 void GlView::drawgl()
@@ -412,6 +420,7 @@ int GlView::button_press_event_impl(GdkEventButton * event)
             midClickOn(event->x, event->y);
             break;
         case 3:
+            m_mainWindow.setCurrentModel(&m_model);
             m_popup->popup(event->button,event->time);
             break;
         default:

@@ -1,3 +1,7 @@
+Add code to handle cursor, using face function to add it blender style.
+
+Use the Dreamworks guys walking ants algorithm to show selection.
+
 Connection code, once complete needs custom op handler, which allows
 construction of arbitrary ops. This window should allow selection of
 various server subsystems as FROM of op, and also offer options for TO.
@@ -5,7 +9,9 @@ various server subsystems as FROM of op, and also offer options for TO.
 Separate tool (select, area, move, draw) from tool_mode (entity, vertex,
 tile) in main window.
 
-Create a palette notebook with panes for tiles, entities etc.
+Need to establish a way to extract lists of tiles, entity classes, and
+textures etc. from a given model. Probably handle only by name in
+palette, and let layer sort it what that name means.
 
 Add to the gimp interface.
 

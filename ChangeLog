@@ -1,5 +1,29 @@
 2002-01-16  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/GlView.cpp: Added face() method which reorients the modelview
+	  so that things can be drawn with constant rotation with respect
+	  to the camera. Precent origin() from calling make_current(), as
+	  it is always called from within drawing code.
+
+	* app/GlView.cpp, app/LayerWindow.cpp, app/MainWindow.cpp,
+	  app/MainWindow.h, app/Model.h, 
+	  Added a signal which indicates that the users current model has
+	  changed. Removed arguments and features elsewhere in the code which
+	  used other techniques to track the same information.
+
+	* app/InheritanceWindow.cpp, app/LayerWindow.cpp, app/MainWindow.cpp,
+	  app/MainWindow.h, app/NewServerWindow.cpp, app/ServerWindow.cpp,
+	  app/equator_plugin.cpp:
+	  Switched all top level windows to being stored as references
+	  so that they can be made public without fear of tampering.
+	  No longer necessary to pass reference to Gtk::Main to the
+	  MainWindow constructor.
+
+	* app/Palette.cpp, app/Palette.h:
+	  Implemented notebook palette interface.
+
+2002-01-16  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/Model.h, app/Model.cpp: Add update method, so other code can
 	  notify that the models data has changed, and cause Model to emit
 	  a signal.

@@ -27,8 +27,8 @@
 #include "../eye.xpm"
 #include "../null.xpm"
 
-LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                           m_currentModel(NULL) // , m_mainWindow(w)
+LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                            m_currentModel(NULL)
 {
     // destroy.connect(slot(this, &LayerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
@@ -101,7 +101,8 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_newLayerWindow = manage( new NewLayerWindow() );
     // show_all();
 
-    w.modelAdded.connect(SigC::slot(this, &LayerWindow::addModel));
+    mw.modelAdded.connect(SigC::slot(this, &LayerWindow::addModel));
+    mw.currentModelChanged.connect(SigC::slot(this, &LayerWindow::setModel));
 
 }
 

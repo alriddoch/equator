@@ -57,6 +57,7 @@ class Model : public SigC::Object {
     void setName(const std::string & n);
     // const std::string details() const;
     void addLayer(Layer *);
+    void makeCurrent();
     void update();
 
     void raiseCurrentLayer();

@@ -43,6 +43,7 @@ class GlView : public Gtk::GLArea {
     void initgl();
     void setupgl();
     void origin();
+    void face();
     void drawgl();
 
     void clickOn(int x, int y);

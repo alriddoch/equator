@@ -21,8 +21,9 @@
 
 using Atlas::Message::Object;
 
-InheritanceWindow::InheritanceWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                           m_mainWindow(w)
+InheritanceWindow::InheritanceWindow(MainWindow & mw) :
+                                     Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                     m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &InheritanceWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );

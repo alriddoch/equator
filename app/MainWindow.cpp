@@ -27,9 +27,14 @@
 
 #include <iostream>
 
-MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                        m_main(m), m_tool(MainWindow::SELECT),
-                                        m_toolMode(MainWindow::ENTITY)
+MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                        m_tool(MainWindow::SELECT),
+                                        m_toolMode(MainWindow::ENTITY),
+    m_layerwindow (*manage( new LayerWindow(*this) )),
+    m_inheritancewindow (*manage( new InheritanceWindow(*this) )),
+    m_serverwindow (*manage( new ServerWindow(*this) )),
+    m_newServerwindow (*manage( new NewServerWindow(*this) )),
+    m_palettewindow (*manage( new Palette(*this) ))
 {
     destroy.connect(slot(this, &MainWindow::destroy_handler));
 
@@ -47,7 +52,7 @@ MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
     dialog_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<Model*>(slot(this, &MainWindow::open_layers),NULL)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(this, &MainWindow::openLayers)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(this, &MainWindow::palette)));
@@ -145,11 +150,6 @@ MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     show_all();
 
-    m_layerwindow = manage( new LayerWindow(*this) );
-    m_inheritancewindow = manage( new InheritanceWindow(*this) );
-    m_serverwindow = manage( new ServerWindow(*this) );
-    m_newServerwindow = manage( new NewServerWindow(*this) );
-    m_palettewindow = manage( new Palette(*this) );
 }
 
 gint MainWindow::quit(GdkEventAny *)
@@ -188,30 +188,27 @@ void MainWindow::menu_quit()
 
 void MainWindow::inheritance_dialog()
 {
-    m_inheritancewindow->show_all();
+    m_inheritancewindow.show_all();
 }
 
 void MainWindow::server_dialog()
 {
-    m_serverwindow->show_all();
+    m_serverwindow.show_all();
 }
 
 void MainWindow::palette()
 {
-    m_palettewindow->show_all();
+    m_palettewindow.show_all();
 }
 
 void MainWindow::new_server_dialog()
 {
-    m_newServerwindow->show_all();
+    m_newServerwindow.show_all();
 }
 
-void MainWindow::open_layers(Model * model)
+void MainWindow::openLayers()
 {
-    if (model != NULL) {
-        m_layerwindow->setModel(model);
-    }
-    m_layerwindow->show_all();
+    m_layerwindow.show_all();
 }
 
 void MainWindow::toolSelect(MainWindow::toolType tool)
@@ -240,4 +237,9 @@ void MainWindow::modeSelect(MainWindow::toolMode mode)
         vertex_mode->set_active(mode==MainWindow::VERTEX);
         changing = false;
     }
+}
+
+void MainWindow::setCurrentModel(Model * m)
+{
+    currentModelChanged.emit(m);
 }

@@ -30,11 +30,6 @@ class MainWindow : public Gtk::Window
     //Gtk::Menu * m_menu;
     std::list<ViewWindow*> m_views;
     std::list<Model*> m_models;
-    LayerWindow * m_layerwindow;
-    InheritanceWindow * m_inheritancewindow;
-    ServerWindow * m_serverwindow;
-    NewServerWindow * m_newServerwindow;
-    Palette * m_palettewindow;
 
   public:
     typedef enum {
@@ -61,13 +56,19 @@ class MainWindow : public Gtk::Window
 
     void destroy_handler();
   public:
-    Gtk::Main & m_main;
+    // THese signals absolutely must be constructed before the other window
+    // references, so that the other windows can connect in their constructors
+    SigC::Signal1<void, Model *> modelAdded;
+    SigC::Signal1<void, Server *> serverAdded;
+    SigC::Signal1<void, Model *> currentModelChanged;
 
-    MainWindow(Gtk::Main &);
+    LayerWindow & m_layerwindow;
+    InheritanceWindow & m_inheritancewindow;
+    ServerWindow & m_serverwindow;
+    NewServerWindow & m_newServerwindow;
+    Palette & m_palettewindow;
 
-    LayerWindow * getLayerWindow() {
-        return m_layerwindow;
-    }
+    MainWindow();
 
     const toolType getTool() {
         return m_tool;
@@ -85,13 +86,10 @@ class MainWindow : public Gtk::Window
     void server_dialog();
     void palette();
     void new_server_dialog();
-    void open_layers(Model *);
+    void openLayers();
     void toolSelect(toolType);
     void modeSelect(toolMode);
-
-    SigC::Signal1<void, Model *> modelAdded;
-    SigC::Signal1<void, Server *> serverAdded;
-    SigC::Signal1<void, Model *> currentModelChanged;
+    void setCurrentModel(Model *);
 };
 
 #endif // EQUATOR_APP_MAINWINDOW_H

@@ -22,8 +22,8 @@
 #include <gtk--/main.h>
 #include <gtk--/statusbar.h>
 
-NewServerWindow::NewServerWindow(MainWindow &m) :
-                 Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(m),
+NewServerWindow::NewServerWindow(MainWindow & mw) :
+                 Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(mw),
                  m_hostEntry(NULL), m_portChoice(NULL),
                  m_portSpin(NULL), m_connectButton(NULL),
                  m_customPort(6767), m_portNum(6767),

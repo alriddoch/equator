@@ -62,7 +62,7 @@ extern "C" void run(gchar * name,
                     GimpParam **return_vals)
 {
 
-    MainWindow * window = new MainWindow(*kit);
+    MainWindow * window = new MainWindow();
 
     kit->run();
     return;
@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
     if (type == 1) { // We are not being invoked as a plugin
         std::cout << "Dropping back to running as an application instead"
                   << std::endl << std::flush;
-        MainWindow * window = new MainWindow(*kit);
+        MainWindow * window = new MainWindow();
 
         kit->run();
     }
@@ -90,7 +90,7 @@ int main(int argc, char ** argv)
 {
     kit = new Gtk::Main(argc, argv);
 
-    MainWindow * window = new MainWindow(*kit);
+    MainWindow * window = new MainWindow();
 
     kit->run();
 
