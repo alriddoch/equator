@@ -89,10 +89,14 @@ AM_PATH_ERIS(0.9.0,
 dnl AC_CHECK_LIB(efence,main)
 dnl AC_CHECK_LIB(cyphesis,main)
 
-AM_PATH_GIMP(1.2.0,AC_DEFINE(BUILD_AS_GIMP_PLUGIN),AC_MSG_ERROR(Gimp library not found. Equator will be build as a stand alone app only, and no imaging editing features will be available))
-CPPFLAGS="$CPPFLAGS $GIMP_CFLAGS"
-CXXFLAGS="$CXXFLAGS $GIMP_CFLAGS"
-LIBS="$LIBS $GIMP_LIBS"
+AM_PATH_GIMP(1.2.0,
+    [
+        AC_DEFINE(BUILD_AS_GIMP_PLUGIN)
+        CPPFLAGS="$CPPFLAGS $GIMP_CFLAGS"
+        CXXFLAGS="$CXXFLAGS $GIMP_CFLAGS"
+        LIBS="$LIBS $GIMP_LIBS"
+    ],
+    AC_MSG_RESULT(Gimp library not found. Equator will be build as a stand alone app only, and no imaging editing features will be available))
 AC_SUBST(GIMP_PLUGIN_DIR)
 
 dnl Generate files

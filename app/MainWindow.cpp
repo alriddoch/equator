@@ -22,14 +22,19 @@
 #include <gtk--/pixmap.h>
 #include <gtk--/table.h>
 
-#warning Should probably use this trick with all of them
 #include "../arrow.xpm"
+#include "../select.xpm"
+#include "../draw.xpm"
+#include "../rotate.xpm"
+#include "../scale.xpm"
+#include "../move.xpm"
+#include "../entity.xpm"
+#include "../vertex.xpm"
 
 #include <iostream>
 
 MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                        m_tool(MainWindow::SELECT),
-                                        m_toolMode(MainWindow::ENTITY),
+    m_tool(MainWindow::SELECT), m_toolMode(MainWindow::ENTITY),
     m_layerwindow (*manage( new LayerWindow(*this) )),
     m_inheritancewindow (*manage( new InheritanceWindow(*this) )),
     m_serverwindow (*manage( new ServerWindow(*this) )),
@@ -92,44 +97,44 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     b = area_tool = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::AREA));
-    p = manage( new Gtk::Pixmap("select.xpm") );
+    p = manage( new Gtk::Pixmap(select_xpm) );
     b->add(*p);
     table->attach(*b, 1, 2, 0, 1);
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::DRAW));
-    p = manage( new Gtk::Pixmap("draw.xpm") );
+    p = manage( new Gtk::Pixmap(draw_xpm) );
     b->add(*p);
     table->attach(*b, 2, 3, 0, 1);
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::ROTATE));
-    p = manage( new Gtk::Pixmap("rotate.xpm") );
+    p = manage( new Gtk::Pixmap(rotate_xpm) );
     b->add(*p);
     table->attach(*b, 3, 4, 0, 1);
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::SCALE));
-    p = manage( new Gtk::Pixmap("scale.xpm") );
+    p = manage( new Gtk::Pixmap(scale_xpm) );
     b->add(*p);
     table->attach(*b, 4, 5, 0, 1);
 
     b = move_tool = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::MOVE));
-    p = manage( new Gtk::Pixmap("move.xpm") );
+    p = manage( new Gtk::Pixmap(move_xpm) );
     b->add(*p);
     table->attach(*b, 0, 1, 1, 2);
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
     b->clicked.connect(bind(slot(this,&MainWindow::modeSelect),MainWindow::ENTITY));
-    p = manage( new Gtk::Pixmap("entity.xpm") );
+    p = manage( new Gtk::Pixmap(entity_xpm) );
     b->add(*p);
     table->attach(*b, 0, 1, 2, 3);
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
     b->clicked.connect(bind(slot(this,&MainWindow::modeSelect),MainWindow::VERTEX));
-    p = manage( new Gtk::Pixmap("vertex.xpm") );
+    p = manage( new Gtk::Pixmap(vertex_xpm) );
     b->add(*p);
     table->attach(*b, 1, 2, 2, 3);
 

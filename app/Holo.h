@@ -19,6 +19,7 @@ class Holo : public Layer {
     explicit Holo(Model &);
 
     void importFile() { }
+    void exportFile() { }
     void draw(GlView & view);
     void animate(GlView & view) { }
     void select(GlView & view, int x, int y) { }

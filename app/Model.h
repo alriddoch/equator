@@ -13,6 +13,7 @@
 class Layer;
 class Server;
 class MainWindow;
+class HeightData;
 
 class Model : public SigC::Object {
   private:
@@ -27,6 +28,7 @@ class Model : public SigC::Object {
 
   public:
     MainWindow & m_mainWindow;
+    HeightData & m_heightData;
 
     explicit Model(MainWindow & m);
 
@@ -63,6 +65,7 @@ class Model : public SigC::Object {
     }
 
     void importFile();
+    void exportFile();
 
     void setName(const std::string & n);
     void addLayer(Layer *);

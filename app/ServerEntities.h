@@ -62,6 +62,7 @@ class ServerEntities : public Layer {
   public:
     ServerEntities(Model &, Server &);
     void importFile() { }
+    void exportFile() { }
     void draw(GlView & view);
     void animate(GlView & view);
     void select(GlView & view, int x, int y);

@@ -3,6 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "Texture.h"
+#include "HeightData.h"
 
 #include <SDL_image.h>
 #include <GL/gl.h>
@@ -134,7 +135,7 @@ Tile * Tile::get(const std::string & filename)
         return tiles()[filename];
     }
     // std::cout << "Loading new tile " << filename << std::endl << std::flush;
-    Tile * t = new Tile();
+    Tile * t = new Tile(filename);
     t->load(filename);
 
     if (!t->loaded()) {
@@ -235,6 +236,47 @@ void Tile::draw()
     glTexCoord2f(0, m_ph/2); glVertex3f(0.0f, tileSize, 0.0f);
     glEnd();
     glDisable(GL_TEXTURE_2D);
+}
+
+void Tile::draw(const HeightData & h, int x, int y)
+{
+    if (tex_id == -1) { return; }
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBegin(GL_TRIANGLE_STRIP);
+    float dw = m_pw / (2 * tileSize);
+    float dh = m_ph / (2 * tileSize);
+    for(int i = 0; i < tileSize; ++i) {
+         for(int j = 0; j <= tileSize; ++j) {
+            glTexCoord2d(m_pw/2 + dw * (i - j), dh * (i + j)); glVertex3f(i, j, h.get(x + i, y + j) / 32.0f);
+            glTexCoord2d(m_pw/2 + dw * (i - j + 1), dh * (i + j + 1)); glVertex3f(i + 1, j, h.get(x + i + 1, y + j) / 32.0f);
+         }
+         if (++i == tileSize) { break; }
+         for(int j = tileSize; j > -1; --j) {
+            glTexCoord2d(m_pw/2 + dw * (i - j + 1), dh * (i + j + 1)); glVertex3f(i + 1, j, h.get(x + i + 1, y + j) / 32.0f);
+            glTexCoord2d(m_pw/2 + dw * (i - j), dh * (i + j)); glVertex3f(i, j, h.get(x + i, y + j) / 32.0f);
+         }
+    }
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
+
+void Tile::outline(float offset)
+{
+    glBegin(GL_LINES);
+    glColor3f(0.0f, 0.0f, 0.5f);
+    glTexCoord1f(offset); glVertex3f(0.0f, 0.0f, 0.0f);
+    glTexCoord1f(offset + tileSize); glVertex3f(tileSize, 0.0f, 0.0f);
+    glTexCoord1f(offset + tileSize); glVertex3f(tileSize, 0.0f, 0.0f);
+    glTexCoord1f(offset); glVertex3f(tileSize, tileSize, 0.0f);
+    glTexCoord1f(offset); glVertex3f(tileSize, tileSize, 0.0f);
+    glTexCoord1f(offset + tileSize); glVertex3f(0.0f, tileSize, 0.0f);
+    glTexCoord1f(offset + tileSize); glVertex3f(0.0f, tileSize, 0.0f);
+    glTexCoord1f(offset); glVertex3f(0.0f, 0.0f, 0.0f);
+    glEnd();
+
 }
 
 void Tile::select()

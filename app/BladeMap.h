@@ -33,6 +33,7 @@ class BladeMap : public Layer {
   public:
     explicit BladeMap(Model &);
     void importFile();
+    void exportFile() { }
     void draw(GlView & view);
     void animate(GlView & view) { }
     void select(GlView & view, int x, int y);

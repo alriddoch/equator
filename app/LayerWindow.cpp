@@ -26,6 +26,11 @@
 
 #include "../eye.xpm"
 #include "../null.xpm"
+#include "../newlayer.xpm"
+#include "../raise.xpm"
+#include "../lower.xpm"
+#include "../duplicate.xpm"
+#include "../delete.xpm"
 
 LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
                                             m_currentModel(NULL)
@@ -63,26 +68,26 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     Gtk::HBox * bothbox = manage( new Gtk::HBox() );
     Gtk::Button * b = manage( new Gtk::Button() );
-    Gtk::Pixmap * p = manage( new Gtk::Pixmap("newlayer.xpm") );
+    Gtk::Pixmap * p = manage( new Gtk::Pixmap(newlayer_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::newLayerRequested));
     bothbox->pack_start(*b, true, true, 0);
     b = manage( new Gtk::Button() );
-    p = manage( new Gtk::Pixmap("raise.xpm") );
+    p = manage( new Gtk::Pixmap(raise_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::raiseLayer));
     bothbox->pack_start(*b, true, true, 0);
     b = manage( new Gtk::Button() );
-    p = manage( new Gtk::Pixmap("lower.xpm") );
+    p = manage( new Gtk::Pixmap(lower_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::lowerLayer));
     bothbox->pack_start(*b, true, true, 0);
     b = manage( new Gtk::Button() );
-    p = manage( new Gtk::Pixmap("duplicate.xpm") );
+    p = manage( new Gtk::Pixmap(duplicate_xpm) );
     b->add(*p);
     bothbox->pack_start(*b, true, true, 0);
     b = manage( new Gtk::Button() );
-    p = manage( new Gtk::Pixmap("delete.xpm") );
+    p = manage( new Gtk::Pixmap(delete_xpm) );
     b->add(*p);
     bothbox->pack_start(*b, true, true, 0);
 

@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "Holo.h"
+#include "HeightData.h"
 
 #include <GL/glu.h>
 
@@ -15,7 +16,8 @@ static const bool pretty = false;
 int Model::modelCount = 0;
 
 Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
-                                m_server(NULL), m_mainWindow(mw)
+                                m_server(NULL), m_mainWindow(mw),
+                                m_heightData(* new HeightData())
 {
     m_currentLayer = new Holo(*this);
     m_layers.push_front( m_currentLayer );
@@ -25,6 +27,13 @@ void Model::importFile()
 {
     if (m_currentLayer != NULL) {
         m_currentLayer->importFile();
+    }
+}
+
+void Model::exportFile()
+{
+    if (m_currentLayer != NULL) {
+        m_currentLayer->exportFile();
     }
 }
 

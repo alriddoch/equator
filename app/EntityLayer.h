@@ -14,6 +14,7 @@ namespace Gtk {
 class EntityLayer : public Layer {
   private:
     void importFile() { }
+    void exportFile() { }
     void load(Gtk::FileSelection *) { }
     void cancel(Gtk::FileSelection *) { }
   public:

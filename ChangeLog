@@ -1,3 +1,46 @@
+2002-04-03  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Texture.h, app/Texture.cpp: Give tiles a name, add support for
+	  rendering them on a heightmap, and outlining them.
+
+	* app/ServerEntities.h, app/Model.h, app/Model.cpp, app/Layer.h,
+	  app/IsoMap.h, app/Holo.h, app/EntityLayer.h, app/BladeMap.h:
+	  Add new export method to layer interface.
+
+	* app/NewLayerWindow.cpp, app/Model.h, app/Model.cpp,
+	  HeightData.cpp, HeightData.h, HeightMap.cpp, HeightMap.h,
+	  app/HeightManager.cpp, app/HeightManager.h:
+	  Add heightdata class which is bound to a model, and stores
+	  height data associated with that model. Add new heightmanager
+	  layer, which is used to manipulate the height data attached to
+	  the model.
+
+	* app/MainWindow.cpp, app/LayerWindow.cpp: Include pixmaps at compile
+	  time instead of loading them at runtime.
+
+	* app/IsoMap.h, app/IsoMap.cpp, app/TileMap.h, app/TileMap.cpp,
+	  app/types.h: Switch to storing tiles in
+	  a TileMap class for efficiency, and add support for selecting
+	  tiles, and displaying them highlighted using marching ants.
+	  Add header file for some typedefs used in this code, for
+	  reuse elsewhere.
+
+	* app/Holo.cpp: Tweak background grid so it switches to lower
+	  density if zoomed out too far.
+
+	* app/GlView.h: Add accessors so an idea of the view size can be
+	  obtained when rendering.
+
+	* app/GlView.cpp: Set up GL context to have an accumulation buffer,
+	  and use it to store rendered scene, so that animated effects
+	  like marching ants can be done without having to re-render the
+	  whole scene every frame. Use accumulation buffer for updating
+	  cursor effects like drag selection. Add new tool submenus for
+	  adding extra tools.
+
+	* configure.in: Fix building as a standalone app, if gimp is not
+	  available.
+
 2002-03-14  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.h, app/GlView.cpp, app/GlView.h, app/Holo.h,

@@ -21,9 +21,18 @@
 
 #include <inttypes.h>
 
-static const bool pretty = false;
+int attrlist[] = {
+    GDK_GL_RGBA,
+    GDK_GL_DOUBLEBUFFER,
+    GDK_GL_DEPTH_SIZE, 1,
+    GDK_GL_ACCUM_RED_SIZE, 1,
+    GDK_GL_NONE
+};
 
-GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
+static const bool pretty = true;
+
+GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
+                               m_popup(NULL),
                                m_viewNo(m.getViewNo()),
                                m_scale(1.0),
                                // m_currentLayer(NULL),
@@ -32,10 +41,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
                                m_cursX(0), m_cursY(0), m_cursZ(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
+                               m_animCount(0.0),
                                m_dragType(NONE),
                                m_mainWindow(mw),
                                m_viewWindow(vw),
-                               m_model(m), m_animCount(0.0)
+                               m_model(m)
 {
     m.updated.connect(slot(this, &GlView::redraw));
 
@@ -55,6 +65,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save As..."));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", SigC::slot(&m_model, &Model::importFile)));
+    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Export...", SigC::slot(&m_model, &Model::exportFile)));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Close"));
 
@@ -146,6 +157,37 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
     menu_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& tools_popup = menu_sub->items();
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& generic_tools_popup = menu_sub_sub->items();
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select single", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select area", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Insert", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Rotate", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Scale", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Translate", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
+    tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Generic", *menu_sub_sub));
+
+    list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Tools",*menu_sub));
+
+    menu_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& filters_popup = menu_sub->items();
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& entity_filters_popup = menu_sub_sub->items();
+    entity_filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("Align to heightmap"));
+    filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("Entity", *menu_sub_sub));
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& tile_filters_popup = menu_sub_sub->items();
+    tile_filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("Do tily thing"));
+    filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("Tile", *menu_sub_sub));
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& height_filters_popup = menu_sub_sub->items();
+    height_filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("Match edges"));
+    filters_popup.push_back(Gtk::Menu_Helpers::MenuElem("HeightMap", *menu_sub_sub));
+
+    list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Filters",*menu_sub));
+
+    menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& net_popup = menu_sub->items();
     net_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     net_popup.push_back(Gtk::Menu_Helpers::MenuElem("Connect.."));
@@ -232,12 +274,12 @@ void GlView::initgl()
         std::cerr << "Failed to create ants" << std::endl << std::flush;
     }
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-
+    glEnable(GL_ACCUM);
 }
 
 void GlView::setupgl()
@@ -381,24 +423,26 @@ void GlView::drawgl()
         }
     }
     glFlush();
-    glAccum(GL_LOAD, 1.0f);
     swap_buffers();
+    glAccum(GL_LOAD, 1.0f);
 }
 
 gint GlView::animate()
 {
-    m_animCount += 0.1f;
+    m_animCount += 0.02f;
     if (m_animCount > 1.0f) { m_animCount = 0.0f; }
     if (make_current()) {
         setupgl();
         origin();
+        // glClear( GL_COLOR_BUFFER_BIT );
         glAccum(GL_RETURN, 1.0f);
-        cursor();
+        // cursor();
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
         for(I = layers.begin(); I != layers.end(); I++) {
             if ((*I)->isVisible()) { (*I)->animate(*this); }
         }
+        mouseEffects();
         swap_buffers();
     }
     return 1;
@@ -554,9 +598,66 @@ void GlView::realize_impl()
 gint GlView::motion_notify_event_impl(GdkEventMotion*event)
 {
     mousex = event->x; mousey = event->y; 
+    if (clickx != 0) {
+        if (make_current()) {
+            glAccum(GL_RETURN, 1.0f);
+            mouseEffects();
+            swap_buffers();
+        }
+    }
+}
+
+void GlView::mouseEffects()
+{
     // We may want to be a little smarter about this
     if (clickx != 0) {
-        redraw();
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
+        // glClear( GL_COLOR_BUFFER_BIT );
+        glTranslatef(clickx, height() - clicky, 100.0f);
+        float x = mousex - clickx;
+        float y = clicky - mousey;
+        std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
+        if (pretty) {
+            glEnable(GL_BLEND);
+            glDisable(GL_DEPTH_TEST);
+            glBegin(GL_LINES);
+            glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glVertex3f(x, 0.0f, 0.0f);
+            glVertex3f(x, 0.0f, 0.0f);
+            glVertex3f(x, y, 0.0f);
+            glVertex3f(x, y, 0.0f);
+            glVertex3f(0.0f, y, 0.0f);
+            glVertex3f(0.0f, y, 0.0f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glEnd();
+            glBegin(GL_QUADS);
+            glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glVertex3f(x, 0.0f, 0.0f);
+            glVertex3f(x, y, 0.0f);
+            glVertex3f(0.0f, y, 0.0f);
+            glEnd();
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
+        } else {
+            glBegin(GL_LINES);
+            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glVertex3f(x, 0.0f, 0.0f);
+            glVertex3f(x, 0.0f, 0.0f);
+            glVertex3f(x, y, 0.0f);
+            glVertex3f(x, y, 0.0f);
+            glVertex3f(0.0f, y, 0.0f);
+            glVertex3f(0.0f, y, 0.0f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glEnd();
+        }
     }
 }
 
@@ -646,6 +747,13 @@ void GlView::setPickProjection()
     glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
     glTranslatef(m_xoff, m_yoff, m_zoff);
+}
+
+float GlView::getViewSize()
+{
+    float winsize = std::sqrt(width() * width() + height() * height());
+
+    return (winsize / (40.0f * getScale()) + 1);
 }
 
 const float GlView::getZ(int x, int y) const

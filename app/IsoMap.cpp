@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "MainWindow.h"
 #include "Palette.h"
+#include "TileMap.h"
 
 #include <coal/database.h>
 #include <coal/isoloader.h>
@@ -18,91 +19,80 @@
 
 #include <gtk--/fileselection.h>
 
-#include <iostream>
+#include <fstream>
 
 class Palette;
 
-void IsoMap::drawMapRegion(CoalRegion & map_region)
+void IsoMap::buildTileMap(CoalDatabase & map_base)
 {
-    Tile * tile = NULL;
-    CoalFill * fill = map_region.GetFill();
-    if (fill != NULL) {
-        if ((fill->graphic != NULL) && (fill->graphic->filename.size() != 0)) {
-            tile = Tile::get(fill->graphic->filename);
-        }
-        glNormal3f(0, 0, 1);
-        CoalShape & shape = map_region;
-        if (shape.GetCoordCount() != 2) {
-            std::cout << "This don't look like a tile" << std::endl << std::flush;
-        } else {
-            //for (unsigned int i = 0; i < shape.GetCoordCount (); i++) {
-            glPushMatrix();
+    m_tileMap = new TileMap();
+    int count = map_base.GetRegionCount();
+    for (int i = 0; i < count; i++) {
+        CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
+        if (region) {
+            CoalFill * fill = region->GetFill();
+            if ((fill == NULL) || (fill->graphic == NULL) ||
+                (fill->graphic->filename.size() == 0)) {
+                continue;
+            }
+            Tile * tile = Tile::get(fill->graphic->filename);
+            if (tile == NULL) {
+                continue;
+            }
+            CoalShape & shape = *region;
             const CoalCoord & coord = shape.GetCoord(0);
             float bx = coord.GetX();
             float by = coord.GetY();
-            float bz = coord.GetZ();
-            glTranslatef(bx, by, bz);
-            if (tile != NULL) {
-                tile->draw();
-            } else {
-                CoalGraphic * fillGraphic = fill->graphic;
-                float r = fillGraphic->bkgdcolor.red;
-                float g = fillGraphic->bkgdcolor.green;
-                float b = fillGraphic->bkgdcolor.blue;
-                glBegin(GL_QUADS);                // start drawing a polygon
-                glColor3f(r/100, g/100, b/100);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 1.0f, 0.0f);
-                glVertex3f(0.0f, 1.0f, 0.0f);
-                glEnd();
-            }
-            if (m_selection.find(&map_region) != m_selection.end()) {
-                glBegin(GL_LINES);
-                glColor3f(0.0f, 0.0f, 0.5f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 1.0f, 0.0f);
-                glVertex3f(1.0f, 1.0f, 0.0f);
-                glVertex3f(0.0f, 1.0f, 0.0f);
-                glVertex3f(0.0f, 1.0f, 0.0f);
-                glVertex3f(0.0f, 0.0f, 0.0f);
-                glEnd();
-            }
+            m_tileMap->add((int)bx, (int)by, tile);
+        }
+    }
+}
+
+void IsoMap::drawMap(GlView & view)
+// This version uses the TileMap
+{
+    // Insert tile code at this point
+    int size = (int)view.getViewSize() / 2;
+
+    for(int i = -size; i < size; i++) {
+        for(int j = -size; j < size; j++) {
+            int x = (int) - view.getXoff() + i;
+            int y = (int) - view.getXoff() + j;
+            Tile * t = m_tileMap->get(x, y);
+            if (t == NULL) { continue; }
+            glPushMatrix();
+            glTranslatef(x, y, 0);
+            // t->draw(map_height, x, y);
+            t->draw(m_model.m_heightData, x, y);
             glPopMatrix();
         }
     }
 }
 
-void IsoMap::drawMapObject(CoalObject & map_object)
+void IsoMap::animateMap(GlView & view, float count)
 {
-    
-}
+    // Insert tile code at this point
+    int size = (int)view.getViewSize() / 2;
 
-void IsoMap::drawMap(CoalDatabase & map_base)
-{
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glDepthMask(GL_FALSE);
-    // glDisable(GL_DEPTH_TEST);
-    int count = map_base.GetRegionCount();
-    for (int i = 0; i < count; i++) {
-        CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
-        if (region) {
-            drawMapRegion(*region);
+    for(int i = -size; i < size; i++) {
+        for(int j = -size; j < size; j++) {
+            int x = (int) - view.getXoff() + i;
+            int y = (int) - view.getXoff() + j;
+            Tile * t = m_tileMap->get(x, y);
+            if (t == NULL) { continue; }
+            glPushMatrix();
+            glTranslatef(x, y, 0);
+            if (m_selection.find(GroundCoord(x,y)) != m_selection.end()) {
+                glDisable(GL_DEPTH_TEST);
+                glEnable(GL_TEXTURE_1D);
+                glBindTexture(GL_TEXTURE_1D, m_antTexture);
+                t->outline(count);
+                glEnable(GL_DEPTH_TEST);
+                glDisable(GL_TEXTURE_1D);
+            }
+            glPopMatrix();
         }
     }
-    // glDepthMask(GL_TRUE);
-    // glEnable(GL_DEPTH_TEST);
-
-    count = map_base.GetObjectCount();
-    for (int i = 0; i < count; i++) {
-        CoalObject * object = (CoalObject*)map_base.GetObject(i);
-        if (object) {
-            drawMapObject(*object);
-        }
-    }
-
 }
 
 bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
@@ -121,7 +111,11 @@ bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
     std::cout << "PICK " << nx << " " << ny << " " << fx - nx << " " << fy - ny << std::endl << std::flush;
-    gluPickMatrix(nx, ny, fx - nx, fy - ny, viewport);
+    int sWidth = abs(fx - nx);
+    int sHeight = abs(fy - ny);
+    int sXCentre = (fx > nx) ? (nx + sWidth / 2) : (fx + sWidth / 2);
+    int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
+    gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
 
     view.setPickProjection(); // Sets the projection, sets up names
                                   // and sets up the modelview
@@ -129,32 +123,27 @@ bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
     glTranslatef(m_xoff, m_yoff, m_zoff);
 
     int nameCount = 0;
-    std::map<int, CoalRegion *> nameDict;
-    int count = map_base.GetRegionCount();
+    std::map<int, GroundCoord> nameDict;
     glPushName(nameCount);
-    for (int i = 0; i < count; i++) {
-        CoalRegion * shape = (CoalRegion*)map_base.GetRegion(i);
 
-        if (shape == NULL) { continue; }
-        CoalFill * fill = shape->GetFill();
-        if ((fill == NULL) || (fill->graphic == NULL) ||
-            (fill->graphic->filename.size() == 0)) {
-            continue;
+    int size = (int)view.getViewSize() / 2;
+
+    for(int i = -size; i < size; i++) {
+        for(int j = -size; j < size; j++) {
+            int x = (int) - view.getXoff() + i;
+            int y = (int) - view.getXoff() + j;
+            Tile * t = m_tileMap->get(x, y);
+            if (t == NULL) { continue; }
+            nameDict[++nameCount] = GroundCoord(x,y);
+            glLoadName(nameCount);
+            glPushMatrix();
+            glTranslatef(x, y, 0);
+            // t->draw(map_height, x, y);
+            t->draw();
+            glPopMatrix();
         }
-        Tile * tile = Tile::get(fill->graphic->filename);
-        if (tile == NULL) { continue; }
-        nameDict[++nameCount] = shape;
-        glLoadName(nameCount);
-        // drawMapRegion(*region);
-        const CoalCoord & coord = shape->GetCoord(0);
-        float bx = coord.GetX();
-        float by = coord.GetY();
-        float bz = coord.GetZ();
-        glPushMatrix();
-        glTranslatef(bx, by, bz);
-        tile->select();
-        glPopMatrix();
     }
+
     glPopName();
 
     int hits = glRenderMode(GL_RENDER);
@@ -175,7 +164,7 @@ bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
             std::cout << "{" << hitName << "}";
-            std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
+            std::map<int, GroundCoord>::const_iterator I = nameDict.find(hitName);
             if (check) {
                 if (m_selection.find(I->second) != m_selection.end()) {
                     return true;
@@ -183,7 +172,7 @@ bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
                 }
             } else {
                 if (I != nameDict.end()) {
-                    m_selection[I->second] = 0;
+                    m_selection.insert(I->second);
                 } else {
                     std::cout << "UNKNOWN NAME" << std::endl << std::flush;
                 }
@@ -209,10 +198,65 @@ void IsoMap::load(Gtk::FileSelection * fsel)
     }
  
     installTiles();
+    buildTileMap(m_database);
 
     delete fsel;
 
     m_model.updated.emit();
+}
+
+void IsoMap::save(Gtk::FileSelection * fsel)
+{
+    std::string filename = fsel->get_filename();
+
+    delete fsel;
+
+    std::ofstream exportFile(filename.c_str());
+
+    if (!exportFile.is_open()) {
+        std::cerr << "ERROR: Could not open file " << filename
+                  << " for export" << std::endl << std::flush;
+        return;
+    }
+    exportFile << "Map: 200 200 70 36 map" << std::endl;
+    
+    std::set<Tile *> tileSet;
+    const int mapwidth = 200;
+
+    for(int i = mapwidth - 1; i >= 0; --i) {
+        for(int j = mapwidth - 1; j >= 0; --j) {
+            Tile * t = m_tileMap->get(i, j);
+            if (t == NULL) { continue; }
+            if (tileSet.find(t) != tileSet.end()) { continue; }
+            tileSet.insert(t);
+        }
+    }
+
+    exportFile << "TileList: " << tileSet.size() << std::endl;
+
+    std::map<Tile *, int> usedTiles;
+    int tileNo = -1;
+
+    std::set<Tile *>::const_iterator I = tileSet.begin();
+    for(; I != tileSet.end(); I++) {
+            usedTiles[*I] = ++tileNo;
+            exportFile << "TileGfx: " << tileNo << " 0 0 " << (*I)->m_name
+                       << std::endl;
+    }
+
+    for(int i = mapwidth - 1; i >= 0; --i) {
+        for(int j = mapwidth - 1; j >= 0; --j) {
+            Tile * t = m_tileMap->get(i, j);
+            std::map<Tile*, int>::const_iterator J = usedTiles.find(t);
+            if (J == usedTiles.end()) {
+                std::cerr << "ERROR: Tile map changed unexpectedly"
+                          << std::endl << std::flush;
+                continue;
+            }
+            tileNo = J->second;
+            exportFile << "Tile: 1 " << tileNo << " 0 0 0" << std::endl;
+        }
+    }
 }
 
 void IsoMap::cancel(Gtk::FileSelection * fsel)
@@ -236,7 +280,8 @@ void IsoMap::installTiles()
 
 IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),
                                         m_database(*new CoalDatabase()),
-                                        m_validDrag(false)
+                                        m_validDrag(false),
+                                        m_tileMap(NULL)
 {
 }
 
@@ -248,21 +293,51 @@ void IsoMap::importFile()
     fsel->show();
 }
 
-void IsoMap::draw(GlView &)
+void IsoMap::exportFile()
 {
+    Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Iso Map File");
+    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::save),fsel));
+    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::cancel),fsel));
+    fsel->show();
+}
+
+void IsoMap::draw(GlView & view)
+{
+    if (m_tileMap == NULL) {
+        return;
+    }
+    m_antTexture = view.getAnts();
     glPushMatrix();
     glTranslatef(m_xoff, m_yoff, m_zoff);
-    drawMap(m_database);
+    drawMap(view);
+    glPopMatrix();
+}
+
+void IsoMap::animate(GlView & view)
+{
+    if (m_tileMap == NULL) {
+        return;
+    }
+    m_antTexture = view.getAnts();
+    glPushMatrix();
+    glTranslatef(m_xoff, m_yoff, m_zoff);
+    animateMap(view, view.getAnimCount());
     glPopMatrix();
 }
 
 void IsoMap::select(GlView & view, int x, int y)
 {
+    if (m_tileMap == NULL) {
+        return;
+    }
     select(view, x, y, x + 1, y + 1);
 }
 
 void IsoMap::select(GlView & view, int nx, int ny, int fx, int fy)
 {
+    if (m_tileMap == NULL) {
+        return;
+    }
     selectMap(view, m_database, nx, ny, fx, fy);
 }
 

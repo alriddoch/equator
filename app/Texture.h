@@ -29,6 +29,8 @@ class Texture {
     static int get(const std::string & filename);
 };
 
+class HeightData;
+
 class Tile {
   private:
     static unsigned int twoN(unsigned int);
@@ -48,11 +50,15 @@ class Tile {
   public:
     static Tile * get(const std::string & filename);
 
-    Tile() : tex_id(-1), m_pw(0), m_ph(0) { }
+    const std::string m_name;
+
+    Tile(const std::string & n) : tex_id(-1), m_pw(0), m_ph(0), m_name(n) { }
 
     bool load(const std::string & filename);
     void draw();
+    void draw(const HeightData &, int, int);
     void select();
+    void outline(float);
 
     bool loaded() const { return (tex_id != -1); }
     float pw() { return m_pw; }

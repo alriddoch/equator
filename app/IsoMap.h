@@ -7,7 +7,7 @@
 
 #include "Layer.h"
 
-#include <map>
+#include <set>
 
 class CoalRegion;
 class CoalObject;
@@ -17,26 +17,38 @@ namespace Gtk {
   class FileSelection;
 }
 
+class TileMap;
+
 class IsoMap : public Layer {
   private:
     CoalDatabase & m_database;
-    std::map<CoalRegion *,int> m_selection;
+    //std::map<CoalRegion *,int> m_selection;
+    std::set<std::pair<int, int> > m_selection;
     bool m_validDrag;
+    int m_antTexture;
+    TileMap * m_tileMap;
 
-    void drawMapRegion(CoalRegion & map_region);
-    void drawMapObject(CoalObject & map_object);
-    void drawMap(CoalDatabase & map_base);
+    void buildTileMap(CoalDatabase & map_base);
+
+    // void animateMapRegion(CoalRegion & map_region, float);
+    void animateMap(GlView & , float);
+
+    // void drawMapRegion(CoalRegion & map_region);
+    // void drawMapObject(CoalObject & map_object);
+    void drawMap(GlView & view);
 
     bool selectMap(GlView & view, CoalDatabase & map_base, int, int, int, int, bool check = false);
 
     void load(Gtk::FileSelection *);
+    void save(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
     void installTiles();
   public:
     explicit IsoMap(Model &);
     void importFile();
+    void exportFile();
     void draw(GlView & view);
-    void animate(GlView & view) { } 
+    void animate(GlView & view);
     void select(GlView & view, int x, int y);
     void select(GlView & view, int x, int y, int w, int h);
     void pushSelection() { }

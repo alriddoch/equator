@@ -1,3 +1,19 @@
+Sort out windows so they are not deleted when the user clicks on close.
+
+What NOW!?
+
+No ideas. Semantic maps? tile maps? concentrate on apogee?
+Is this all a bunch of arse?
+
+Prabably best to try and get an editor which can edit and produce decent
+tile maps, heightmaps, and entity maps.
+
+How do we deal with heightmaps?
+Should a heightmap be just another layer? If so, how to link it to
+other layers? Map layers really need a common reference point for HeightMaps.
+This could be a single layer which many heightfields, or a way of agregating
+multiple layers.
+
 Draw walking ant by using 1D texture, lined box, without depth test.
 May have to copy to back buffer.
 
@@ -11,8 +27,6 @@ Pad out manipulation of entities, including moving and deleting. Resizing
 can come later.
 
 Switch to using drag and drop support in gtk-- to handle dragging.
-
-Use the Dreamworks guys walking ants algorithm to show selection.
 
 Connection code, once complete needs custom op handler, which allows
 construction of arbitrary ops. This window should allow selection of

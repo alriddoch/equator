@@ -7,6 +7,7 @@
 #include "BladeMap.h"
 #include "IsoMap.h"
 #include "Model.h"
+#include "HeightManager.h"
 
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/box.h>
@@ -42,6 +43,10 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     factory = new LayerPlant<IsoMap>();
     LayerFactory::factories["IsoMap"] = factory;
     m_list->add(*(manage( new FactoryItem(factory, "IsoMap") )));
+
+    factory = new LayerPlant<HeightManager>();
+    LayerFactory::factories["HeightManager"] = factory;
+    m_list->add(*(manage( new FactoryItem(factory, "HeightManager") )));
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
     scrolled_window->set_usize(250,150);
