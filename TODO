@@ -1,0 +1,14 @@
+GlView is currently a total mess, half way to making a generic way of handling
+all the mouse interactions. Need to generalise the drag calculating code
+and then make sure things are correctly passed through to the layers for
+processing. Drag code now generalised, and depth reading now works. Need
+to make sure depth is not recalculated when finishing drag, as result can
+be spurious at best.
+
+Add to the gimp interface.
+
+Look into the possibility of a gimp like client lib for extensions.
+
+Sort out rendering order for layers.
+
+Make a component which creates graphics for 2d client from 3d models.
