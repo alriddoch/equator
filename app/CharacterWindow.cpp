@@ -114,12 +114,21 @@ void CharacterWindow::gotCharacterList()
 
     Eris::CharacterList chars = m_server->m_player->getCharacters();
     Eris::CharacterList::iterator I = chars.begin();
-    std::list<Glib::ustring> listStrings;
+    // std::list<Glib::ustring> listStrings;
     for(; I != chars.end(); ++I) {
         Atlas::Objects::Entity::GameEntity & ge = *I;
-        listStrings.push_back(ge.getName());
+        Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
+        Gtk::HBox * hbox = manage(new Gtk::HBox(false, 3));
+        Gtk::Label * l = manage(new Gtk::Label());
+        l->set_markup(ge.getName() + " <i>(" + ge.getId() + ")</i>");
+        hbox->pack_start(*l, Gtk::PACK_SHRINK);
+        item->add(*hbox);
+        item->show_all();
+        m_nameEntry->get_list()->children().push_back(*item);
+        m_nameEntry->set_item_string(*item, ge.getId());
+        // listStrings.push_back(ge.getName());
     }
-    m_nameEntry->set_popdown_strings(listStrings);
+    // m_nameEntry->set_popdown_strings(listStrings);
 }
 
 void CharacterWindow::create()
