@@ -49,8 +49,8 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
     file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK, 'n'), SigC::slot(*this, &MainWindow::newModel)));
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'o')));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey('n', Gdk::CONTROL_MASK), SigC::slot(*this, &MainWindow::newModel)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::AccelKey('o',Gdk::CONTROL_MASK)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(*this, &MainWindow::new_server_dialog)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -67,7 +67,7 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'q'), slot(*this, &MainWindow::menu_quit)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::AccelKey('q',Gdk::CONTROL_MASK), slot(*this, &MainWindow::menu_quit)));
 
     menu->accelerate(*this);
     //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );

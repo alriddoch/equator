@@ -107,11 +107,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Undo"));
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Redo"));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'x')));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'c')));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'v')));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut", Gtk::Menu_Helpers::AccelKey('x',Gdk::CONTROL_MASK)));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy", Gtk::Menu_Helpers::AccelKey('c',Gdk::CONTROL_MASK)));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste", Gtk::Menu_Helpers::AccelKey('v',Gdk::CONTROL_MASK)));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Delete", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'d')));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Delete", Gtk::Menu_Helpers::AccelKey('d',Gdk::CONTROL_MASK)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Edit",*menu_sub));
 
@@ -122,8 +122,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("All"));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("None"));
     select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Push", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '>'), slot(m_model, &Model::pushSelection)));
-    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Pop", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '<'), slot(m_model, &Model::popSelection)));
+    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Push", Gtk::Menu_Helpers::AccelKey('>', Gdk::ModifierType(0)), slot(m_model, &Model::pushSelection)));
+    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Pop", Gtk::Menu_Helpers::AccelKey('<', Gdk::ModifierType(0)), slot(m_model, &Model::popSelection)));
     select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
@@ -138,8 +138,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& view_popup = menu_sub->items();
     view_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '='), slot(*this, &GlView::zoomIn)));
-    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '-'), slot(*this, &GlView::zoomOut)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", Gtk::Menu_Helpers::AccelKey('=', Gdk::ModifierType(0)), slot(*this, &GlView::zoomIn)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", Gtk::Menu_Helpers::AccelKey('-', Gdk::ModifierType(0)), slot(*this, &GlView::zoomOut)));
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& zoom_popup = menu_sub_sub->items();
     zoom_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
@@ -147,7 +147,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("8:1", SigC::bind<float>(slot(*this, &GlView::setScale), 8)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("4:1", SigC::bind<float>(slot(*this, &GlView::setScale), 4)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("2:1", SigC::bind<float>(slot(*this, &GlView::setScale), 2)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:1", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '1'), SigC::bind<float>(slot(*this, &GlView::setScale), 1)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:1", Gtk::Menu_Helpers::AccelKey('1', Gdk::ModifierType(0)), SigC::bind<float>(slot(*this, &GlView::setScale), 1)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:2", SigC::bind<float>(slot(*this, &GlView::setScale), 0.5f)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:4", SigC::bind<float>(slot(*this, &GlView::setScale), 0.25f)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:8", SigC::bind<float>(slot(*this, &GlView::setScale), 0.125f)));
@@ -241,6 +241,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
 
     m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
                                            &ViewWindow::cursorMoved));
+    signal_realize().connect(SigC::slot(*this, &GlView::realize));
+    signal_configure_event().connect(SigC::slot(*this, &GlView::configureEvent));
+    signal_expose_event().connect(SigC::slot(*this, &GlView::exposeEvent));
+    signal_button_press_event().connect(SigC::slot(*this, &GlView::buttonPressEvent));
+    signal_button_release_event().connect(SigC::slot(*this, &GlView::buttonReleaseEvent));
 }
 
 void GlView::setOrthographic()
@@ -297,9 +302,11 @@ void GlView::zoomOut()
 
 void GlView::initgl()
 {
-    if (make_current()) {
-        setupgl();
+    if (!make_current()) {
+        return;
     }
+
+    setupgl();
 
     uint8_t ants[] = { 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0, 0x0,
                         0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
@@ -649,13 +656,12 @@ void GlView::screenPoint(double x, double y, double z,
     }
 }
 
-void GlView::realize_impl()
+void GlView::realize()
 {
-    Gtk::DrawingArea::realize_impl();
     initgl();
 }
 
-gint GlView::motion_notify_event_impl(GdkEventMotion*event)
+bool GlView::motionNotifyEvent(GdkEventMotion*event)
 {
     mousex = event->x; mousey = event->y;
     if (clickx != 0) {
@@ -721,7 +727,33 @@ void GlView::mouseEffects()
     }
 }
 
-int GlView::button_press_event_impl(GdkEventButton * event)
+bool GlView::make_current()
+{
+    Glib::RefPtr<Gdk::GL::Context> glcontext =
+      Gtk::GL::Widget::get_gl_context(*this);
+
+    Glib::RefPtr<Gdk::GL::Window> glwindow =
+      Gtk::GL::Widget::get_gl_window(*this);
+
+    if (!glwindow->make_current(glcontext)) {
+        return false;
+    }
+    return true;
+}
+
+void GlView::swap_buffers()
+{
+
+    Glib::RefPtr<Gdk::GL::Window> glwindow =
+      Gtk::GL::Widget::get_gl_window(*this);
+
+    if (glwindow->is_double_buffered()) {
+        glwindow->swap_buffers();
+    }
+
+}
+
+bool GlView::buttonPressEvent(GdkEventButton * event)
 {
     std::cout << "BUTTON" << event->button << std::endl << std::flush;
     switch (event->button) {
@@ -733,7 +765,7 @@ int GlView::button_press_event_impl(GdkEventButton * event)
             break;
         case 3:
             m_mainWindow.setCurrentModel(&m_model);
-            m_popup->popup(event->button,event->time);
+            m_popup->popup(event->button, event->time);
             break;
         default:
             break;
@@ -741,7 +773,7 @@ int GlView::button_press_event_impl(GdkEventButton * event)
     return TRUE;
 }
 
-int GlView::button_release_event_impl(GdkEventButton * event)
+bool GlView::buttonReleaseEvent(GdkEventButton * event)
 {
     switch (event->button) {
         case 1:
@@ -757,7 +789,7 @@ int GlView::button_release_event_impl(GdkEventButton * event)
     return TRUE;
 }
 
-int GlView::expose_event_impl(GdkEventExpose * event)
+bool GlView::exposeEvent(GdkEventExpose * event)
 {
     if (event->count>0)
         return 0;
@@ -765,7 +797,7 @@ int GlView::expose_event_impl(GdkEventExpose * event)
     return TRUE;
 }
 
-int GlView::configure_event_impl(GdkEventConfigure*)
+bool GlView::configureEvent(GdkEventConfigure*)
 {
     setupgl();
     return TRUE;

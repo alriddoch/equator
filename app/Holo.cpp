@@ -13,7 +13,7 @@ Holo::Holo(Model & model) : Layer(model, "background", "HoloWorld")
 
 void Holo::draw(GlView & view)
 {
-    float winsize = std::max(view.width(), view.height());
+    float winsize = std::max(view.get_width(), view.get_height());
 
     float winscale = view.getScale();
     int numlines = winsize / (40.0f * winscale) + 1;

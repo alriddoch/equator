@@ -43,8 +43,8 @@ void HeightManager::importFile()
 {
 
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Height Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &HeightManager::load),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &HeightManager::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &HeightManager::load),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &HeightManager::cancel),fsel));
     fsel->show();
 
 }

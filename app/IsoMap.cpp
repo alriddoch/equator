@@ -290,16 +290,16 @@ IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),
 void IsoMap::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Iso Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::load),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &IsoMap::load),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &IsoMap::cancel),fsel));
     fsel->show();
 }
 
 void IsoMap::exportFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Iso Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::save),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &IsoMap::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &IsoMap::save),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &IsoMap::cancel),fsel));
     fsel->show();
 }
 

@@ -69,11 +69,11 @@ void Server::createCharacter(const std::string & name,
     // chrcter.SetAttr("sex", "female");
     world = player->createCharacter(chrcter);
 
-    lobby->Talk.connect(SigC::slot(this,&Server::lobbyTalk));
-    lobby->Entered.connect(SigC::slot(this,&Server::roomEnter));
+    lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
+    lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
-    world->EntityCreate.connect(SigC::slot(this,&Server::worldEntityCreate));
-    world->Entered.connect(SigC::slot(this,&Server::worldEnter));
+    world->EntityCreate.connect(SigC::slot(*this,&Server::worldEntityCreate));
+    world->Entered.connect(SigC::slot(*this,&Server::worldEnter));
 
 }
 
@@ -84,10 +84,10 @@ void Server::roomEnter(Eris::Room *r)
 
 void Server::connect(const std::string & host, int port)
 {
-    connection.Failure.connect(SigC::slot(this, &Server::netFailure));
-    connection.Connected.connect(SigC::slot(this, &Server::netConnected));
-    connection.Disconnected.connect(SigC::slot(this, &Server::netDisconnected));
-    Eris::Logged.connect(SigC::slot(this, &Server::connectionLog));
+    connection.Failure.connect(SigC::slot(*this, &Server::netFailure));
+    connection.Connected.connect(SigC::slot(*this, &Server::netConnected));
+    connection.Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
+    Eris::Logged.connect(SigC::slot(*this, &Server::connectionLog));
 
     Eris::setLogLevel(Eris::LOG_DEBUG);
 
@@ -95,9 +95,10 @@ void Server::connect(const std::string & host, int port)
     connection.connect(host, port);
     // connection.connect("localhost", 6767);
 
-    inputHandler = Gtk::Main::input.connect(slot(this, &Server::poll),
-                                            connection.getFileDescriptor(),
-                                            GDK_INPUT_READ);
+#warning Handle the socket input FIXME
+    // inputHandler = Gtk::Main::input.connect(slot(*this, &Server::poll),
+                                            // connection.getFileDescriptor(),
+                                            // GDK_INPUT_READ);
 }
 
 void Server::netFailure(const std::string & msg)
@@ -122,7 +123,7 @@ void Server::login(const std::string & name, const std::string & password)
     player = new Eris::Player(&connection);
     player->login(name, password);
     lobby = connection.getLobby();
-    lobby->LoggedIn.connect(SigC::slot(this, &Server::loginComplete));
+    lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::createAccount(const std::string& name, const std::string& password)
@@ -130,7 +131,7 @@ void Server::createAccount(const std::string& name, const std::string& password)
     player = new Eris::Player(&connection);
     player->createAccount(name, name, password);
     lobby = connection.getLobby();
-    lobby->LoggedIn.connect(SigC::slot(this, &Server::loginComplete));
+    lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::netDisconnected()
@@ -153,7 +154,7 @@ void Server::worldEnter(Eris::Entity * chr)
 {
     std::cout << "Enter world" << std::endl << std::flush;
     inGame = true;
-    chr->Moved.connect(SigC::slot(this, &Server::charMoved));
+    chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
     character = chr;
 
 }

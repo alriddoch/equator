@@ -121,11 +121,11 @@ class ImportOptions : public Gtk::Window
         Gtk::Frame * frame = manage( new Gtk::Frame("Import entities into..") );
         Gtk::HBox * hbox = manage( new Gtk::HBox() );
         Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("top level") );
-        rb1->clicked.connect(SigC::bind<ImportTarget>(slot(this, &ImportOptions::setImportTarget),IMPORT_TOPLEVEL));
+        rb1->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_TOPLEVEL));
         hbox->pack_start(*rb1, false, false, 2);
-        Gtk::RadioButton * rb = manage( new Gtk::RadioButton("selected entity") );
-        rb->set_group(rb1->group());
-        rb->clicked.connect(SigC::bind<ImportTarget>(slot(this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
+        Gtk::RadioButton::Group rgp = rb1->get_group();
+        Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
+        rb->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &ImportOptions::setImportTarget),IMPORT_SELECTION));
         hbox->pack_start(*rb, false, false, 2);
         frame->add(*hbox);
         vbox->pack_start(*frame, false, false, 2);
@@ -134,7 +134,7 @@ class ImportOptions : public Gtk::Window
         m_ok = manage( new Gtk::Button("OK") );
         hbox->pack_start(*m_ok, true, true, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
-        b->clicked.connect(slot(this, &ImportOptions::cancel));
+        b->signal_clicked().connect(slot(*this, &ImportOptions::cancel));
         hbox->pack_start(*b, true, true, 2);
         vbox->pack_end(*hbox, false, false, 2);
         add(*vbox);
@@ -171,19 +171,17 @@ class ExportOptions : public Gtk::Window
         Gtk::Frame * frame = manage( new Gtk::Frame("Export..") );
         Gtk::VBox * rbox = manage( new Gtk::VBox() );
         Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("all entities") );
-        rb1->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_ALL));
+        rb1->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL));
         rbox->pack_start(*rb1, false, false, 2);
-        Gtk::RadioButton * rb = manage( new Gtk::RadioButton("visible entities") );
-        rb->set_group(rb1->group());
-        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_VISIBLE));
+        Gtk::RadioButton::Group rgp = rb1->get_group();
+        Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "visible entities") );
+        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_VISIBLE));
         rbox->pack_start(*rb, false, false, 2);
-        rb = manage( new Gtk::RadioButton("selected entity") );
-        rb->set_group(rb1->group());
-        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_SELECTION));
+        rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
+        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_SELECTION));
         rbox->pack_start(*rb, false, false, 2);
-        rb = manage( new Gtk::RadioButton("all selected entities") );
-        rb->set_group(rb1->group());
-        rb->clicked.connect(SigC::bind<ExportTarget>(slot(this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
+        rb = manage( new Gtk::RadioButton(rgp, "all selected entities") );
+        rb->signal_clicked().connect(SigC::bind<ExportTarget>(slot(*this, &ExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
         rbox->pack_start(*rb, false, false, 2);
         m_charCheck = manage( new Gtk::CheckButton("Remove characters") );
         rbox->pack_start(*m_charCheck, false, false, 0);
@@ -220,7 +218,7 @@ class ExportOptions : public Gtk::Window
         m_ok = manage( new Gtk::Button("OK") );
         hbox->pack_start(*m_ok, true, true, 2);
         Gtk::Button * b = manage( new Gtk::Button("Cancel") );
-        b->clicked.connect(slot(this, &ExportOptions::cancel));
+        b->signal_clicked().connect(slot(*this, &ExportOptions::cancel));
         hbox->pack_start(*b, true, true, 2);
 
         vbox->pack_start(*hbox, false, false, 2);
@@ -657,13 +655,13 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
 void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 {
     m_loadOptionsDone.disconnect();
-    m_loadOptionsDone = m_importOptions->m_ok->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::load), fsel));
+    m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::load), fsel));
     m_importOptions->show_all();
 }
 
 void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 {
-    m_saveOptionsDone = m_exportOptions->m_ok->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::save), fsel));
+    m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::save), fsel));
     m_exportOptions->show_all();
 }
 
@@ -862,7 +860,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
                                m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
-    m_serverConnection.connection.getTypeInfoEngine()->BoundType.connect(SigC::slot(this, &ServerEntities::newType));
+    m_serverConnection.connection.getTypeInfoEngine()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
     m_gameEntityType = m_serverConnection.connection.getTypeInfoEngine()->findSafe("game_entity");
     assert(m_gameEntityType != NULL);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
@@ -876,7 +874,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */
     m_serverConnection.world->EntityCreate.connect(
-	SigC::slot(this, &ServerEntities::gotNewEntity)
+	SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
 
     if (m_importOptions == NULL) {
@@ -887,16 +885,16 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 void ServerEntities::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::loadOptions),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::loadOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 
 void ServerEntities::exportFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Atlas Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::saveOptions),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::saveOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 
@@ -926,7 +924,7 @@ void ServerEntities::animate(GlView & view)
 
 void ServerEntities::draw(GlView & view)
 {
-    float winsize = std::max(view.width(), view.height());
+    float winsize = std::max(view.get_width(), view.get_height());
     m_antTexture = view.getAnts();
 
     m_renderMode = view.getRenderMode();
@@ -1011,9 +1009,9 @@ void ServerEntities::align(Alignment a)
 void ServerEntities::gotNewEntity(Eris::Entity *ent)
 {
     ent->Changed.connect(SigC::bind(
-	SigC::slot(this, &ServerEntities::entityChanged),
+	SigC::slot(*this, &ServerEntities::entityChanged),
 	ent));
-    ent->Moved.connect(SigC::slot(this, &ServerEntities::entityMoved));
+    ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
     m_model.update(); // cause a re-draw
 }
 

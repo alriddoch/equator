@@ -311,8 +311,8 @@ BladeMap::BladeMap(Model & model) : Layer(model, "map", "BladeMap"),
 void BladeMap::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Blade Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &BladeMap::load),fsel));
-    fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &BladeMap::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &BladeMap::load),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &BladeMap::cancel),fsel));
     fsel->show();
 }
 

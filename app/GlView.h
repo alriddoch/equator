@@ -55,6 +55,8 @@ class GlView : public Gtk::DrawingArea {
     void drawgl();
     gint animate();
     void mouseEffects();
+    bool make_current();
+    void swap_buffers();
 
     void clickOn(int x, int y);
     void clickOff(int x, int y);
@@ -66,12 +68,12 @@ class GlView : public Gtk::DrawingArea {
     void screenPoint(double x, double y, double z,
                      int & sx, int & sy, double & sz);
 
-    virtual void realize_impl();
-    virtual gint motion_notify_event_impl(GdkEventMotion*); 
-    virtual gint button_press_event_impl(GdkEventButton*); 
-    virtual gint button_release_event_impl(GdkEventButton*); 
-    virtual gint expose_event_impl(GdkEventExpose* expose);
-    virtual gint configure_event_impl(GdkEventConfigure *event);
+    void realize();
+    bool motionNotifyEvent(GdkEventMotion*); 
+    bool buttonPressEvent(GdkEventButton*); 
+    bool buttonReleaseEvent(GdkEventButton*); 
+    bool exposeEvent(GdkEventExpose* expose);
+    bool configureEvent(GdkEventConfigure *event);
   public:
     MainWindow & m_mainWindow;
     ViewWindow & m_viewWindow;
