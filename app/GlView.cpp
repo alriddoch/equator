@@ -10,6 +10,9 @@
 #include "ViewWindow.h"
 #include "Layer.h"
 
+#include "gui/gtkmm/CameraControl.h"
+#include "gui/gtkmm/DockWindow.h"
+
 #include "visual/Renderer.h"
 
 #include <wfmath/point.h>
@@ -74,41 +77,6 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
                                       -0.4f, 0.0f, 0.0f,
                                       -0.3464f, 0.2f, 0.0f,
                                       -0.2f, 0.3464f, 0.0f };
-
-class CameraControl : public Gtk::Window
-{
-  private:
-    Gtk::Adjustment * m_dAdjust;
-    Gtk::Adjustment * m_rAdjust;
-  public:
-    GlView & view;
-
-    CameraControl(GlView & v) : view(v) {
-        Gtk::VBox * vbox = manage( new Gtk::VBox() );
-
-        m_dAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 359) );
-        m_dAdjust->signal_value_changed().connect(slot(*this, &CameraControl::dChange));
-        m_rAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 359) );
-        m_rAdjust->signal_value_changed().connect(slot(*this, &CameraControl::rChange));
-
-        vbox->pack_start( * manage( new Gtk::HScrollbar(*m_dAdjust) ) );
-        vbox->pack_start( * manage( new Gtk::HScrollbar(*m_rAdjust) ) );
-
-        set_title(view.m_model.getName() + " Camera");
-
-        add(*vbox);
-    }
-
-    void dChange() {
-        view.setDeclination(m_dAdjust->get_value());
-        view.redraw();
-    }
-
-    void rChange() {
-        view.setRotation(m_rAdjust->get_value());
-        view.redraw();
-    }
-};
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                m_viewNo(m.getViewNo()),
@@ -224,8 +192,9 @@ void GlView::zoomOut()
 void GlView::showCameraControl()
 {
     CameraControl * c = new CameraControl(*this);
+    DockWindow * dw = new DockWindow(*c);
 
-    c->show_all();
+    dw->show_all();
 }
 
 bool GlView::extensionsInitialised = 0;

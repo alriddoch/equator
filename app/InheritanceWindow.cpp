@@ -112,6 +112,7 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
 
     // add(*vbox);
     // set_title("Inheritance");
+    set_sensitive(false);
 
     mw.serverAdded.connect(SigC::slot(*this, &InheritanceWindow::serverAdded));
 
@@ -139,8 +140,16 @@ void InheritanceWindow::descendTypeTree(Eris::TypeInfo * node,
 
 void InheritanceWindow::currentServerChanged(Server * s)
 {
+    if (s == m_currentServer) {
+        return;
+    }
+
     m_currentServer = s;
     m_treeModel->clear();
+
+    if (m_currentServer == 0) {
+        set_sensitive(false);
+    }
 
     Eris::TypeService * ts = s->m_connection.getTypeService();
 
@@ -157,6 +166,8 @@ void InheritanceWindow::currentServerChanged(Server * s)
     }
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     descendTypeTree(root, row);
+
+    set_sensitive(true);
 }
 
 void InheritanceWindow::serverAdded(Server * s)

@@ -156,10 +156,10 @@ void LayerWindow::currentModelChanged(Model * model)
     }
 
     m_currentModel = model;
+    m_treeModel->clear();
 
     if (m_currentModel == NULL) {
         set_sensitive(false);
-        m_treeModel->clear();
         return;
     }
 
