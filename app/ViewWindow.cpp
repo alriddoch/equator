@@ -180,7 +180,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     view_menu.push_back(MenuElem("Face..", *menu_sub_sub));
     view_menu.push_back(MenuElem("Camera Control..", SigC::slot(*m_glarea, &GlView::showCameraControl)));
     view_menu.push_back(SeparatorElem());
-    view_menu.push_back(MenuElem("New View", SigC::bind<Model*>(SigC::slot(m_mainWindow, &MainWindow::newView),&m_model)));
+    view_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::NEW), SigC::bind<Model*>(SigC::slot(m_mainWindow, &MainWindow::newView),&m_model)));
 
     menuitem = manage( new Gtk::MenuItem("View") );
     menuitem->set_submenu(*menu_sub);
