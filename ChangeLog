@@ -1,5 +1,12 @@
 2002-05-02  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.h, app/ServerEntities.cpp: Add windows for
+	  import and export options.
+
+	* app/ViewWindow.h: Remove unnecessary debugging output.
+
+2002-05-02  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/InheritanceWindow.h, app/LayerWindow.h, app/NewLayerWindow.h,
 	  app/NewServerWindow.h, app/Palette.h, app/ServerWindow.h,
 	  app/ViewWindow.h: Added handler for attempt to close window,

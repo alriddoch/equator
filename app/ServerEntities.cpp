@@ -28,6 +28,10 @@ static const bool debug_flag = false;
 
 using Atlas::Message::Object;
 
+ImportOptions * ServerEntities::m_importOptions = NULL;
+ExportOptions * ServerEntities::m_exportOptions = NULL;
+
+
 class DummyDecoder : public Atlas::Message::DecoderBase {
   private:
     virtual void ObjectArrived(const Atlas::Message::Object&) { }
@@ -84,6 +88,54 @@ class FileDecoder : public Atlas::Message::DecoderBase {
         if (m_topLevelId.empty()) {
             std::cerr << "WARNING: No TLE found" << std::endl << std::flush;
         }
+    }
+};
+
+class ImportOptions : public Gtk::Window
+{
+  private:
+    
+  public:
+    Gtk::Button * m_ok;
+
+    ImportOptions() {
+        Gtk::HBox * hbox = manage( new Gtk::HBox() );
+
+        m_ok = manage( new Gtk::Button("OK") );
+        hbox->pack_start(*m_ok, false, false, 2);
+        Gtk::Button * b = manage( new Gtk::Button("Cancel") );
+        b->clicked.connect(slot(this, &ImportOptions::cancel));
+        hbox->pack_start(*b, false, false, 2);
+
+        add(*hbox);
+    }
+
+    void cancel() {
+        hide();
+    }
+};
+
+class ExportOptions : public Gtk::Window
+{
+  private:
+    
+  public:
+    Gtk::Button * m_ok;
+
+    ExportOptions() {
+        Gtk::HBox * hbox = manage( new Gtk::HBox() );
+
+        m_ok = manage( new Gtk::Button("OK") );
+        hbox->pack_start(*m_ok, false, false, 2);
+        Gtk::Button * b = manage( new Gtk::Button("Cancel") );
+        b->clicked.connect(slot(this, &ExportOptions::cancel));
+        hbox->pack_start(*b, false, false, 2);
+
+        add(*hbox);
+    }
+
+    void cancel() {
+        hide();
     }
 };
 
@@ -514,8 +566,23 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
     }
 }
 
+void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
+{
+    m_loadOptionsDone = m_importOptions->m_ok->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::load), fsel));
+    m_importOptions->show_all();
+}
+
+void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
+{
+    m_saveOptionsDone = m_exportOptions->m_ok->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::save), fsel));
+    m_exportOptions->show_all();
+}
+
 void ServerEntities::load(Gtk::FileSelection * fsel)
 {
+    m_loadOptionsDone.disconnect();
+    m_importOptions->hide();
+
     std::string filename = fsel->get_filename();
     delete fsel;
 
@@ -524,6 +591,9 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
 
 void ServerEntities::save(Gtk::FileSelection * fsel)
 {
+    m_saveOptionsDone.disconnect();
+    m_exportOptions->hide();
+
     std::string filename = fsel->get_filename();
     delete fsel;
 
@@ -538,6 +608,12 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
 void ServerEntities::cancel(Gtk::FileSelection * fsel)
 {
     delete fsel;
+}
+
+void ServerEntities::createOptionsWindows()
+{
+    m_importOptions = new ImportOptions();
+    m_exportOptions = new ExportOptions();
 }
 
 ServerEntities::ServerEntities(Model & model, Server & server) :
@@ -562,12 +638,16 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     Eris::World::Instance()->EntityCreate.connect(
 	SigC::slot(this, &ServerEntities::gotNewEntity)
     );
+
+    if (m_importOptions == NULL) {
+        createOptionsWindows();
+    }
 }
 
 void ServerEntities::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::load),fsel));
+    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::loadOptions),fsel));
     fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
@@ -575,7 +655,7 @@ void ServerEntities::importFile()
 void ServerEntities::exportFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Atlas Map File");
-    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::save),fsel));
+    fsel->get_ok_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::saveOptions),fsel));
     fsel->get_cancel_button()->clicked.connect(SigC::bind<Gtk::FileSelection*>(slot(this, &ServerEntities::cancel),fsel));
     fsel->show();
 }

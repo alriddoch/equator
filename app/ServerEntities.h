@@ -13,6 +13,8 @@
 #include <set>
 
 class Server;
+class ImportOptions;
+class ExportOptions;
 
 namespace WFMath {
   template<const int dim> class AxisBox;
@@ -25,6 +27,10 @@ namespace Eris {
   
   // typedef StringSet -- doesn't work
   typedef std::set<std::string> StringSet;
+}
+
+namespace Gtk {
+  class FileSelection;
 }
 
 class ServerEntities : public Layer {
@@ -43,6 +49,12 @@ class ServerEntities : public Layer {
     int m_nameCount;
     entname_t m_nameDict;
     unsigned int m_antTexture;
+
+    static ImportOptions * m_importOptions;
+    static ExportOptions * m_exportOptions;
+
+    SigC::Connection m_loadOptionsDone;
+    SigC::Connection m_saveOptionsDone;
 
     Eris::TypeInfo * m_gameEntityType;
 
@@ -63,9 +75,15 @@ class ServerEntities : public Layer {
     void descendTypeTree(Eris::TypeInfo*);
     void alignEntityHeight(Eris::Entity * ent, const WFMath::Point<3> & o);
 
+    void loadOptions(Gtk::FileSelection *);
+    void saveOptions(Gtk::FileSelection *);
+
     void load(Gtk::FileSelection *);
     void save(Gtk::FileSelection *);
+
     void cancel(Gtk::FileSelection *);
+
+    void createOptionsWindows();
   public:
     ServerEntities(Model &, Server &);
     void importFile();
