@@ -1,3 +1,16 @@
+2002-01-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Palette.h, app/Palette.cpp: Implemented storing lists
+	  of items of the diferent types, registration of these types
+	  by layers, and display of these lists according to the
+	  model being worked on.
+
+	* app/Model.h, app/Model.cpp: Add reference to main window, to
+	  allow model code to register things with other windows.
+
+	* app/IsoMap.h, app/IsoMap.cpp, app/BladeMap.h, app/BladeMap.cpp:
+	  Register tile and texture types with the palette.
+
 2002-01-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp: Added face() method which reorients the modelview

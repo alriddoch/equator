@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "GlView.h"
 #include "Model.h"
+#include "MainWindow.h"
+#include "Palette.h"
 
 #include <coal/database.h>
 #include <coal/isoloader.h>
@@ -17,6 +19,8 @@
 #include <gtk--/fileselection.h>
 
 #include <iostream>
+
+class Palette;
 
 void IsoMap::drawMapRegion(CoalRegion & map_region)
 {
@@ -204,6 +208,7 @@ void IsoMap::load(Gtk::FileSelection * fsel)
         m_name = filename.substr(i+1);
     }
  
+    installTiles();
 
     delete fsel;
 
@@ -213,6 +218,19 @@ void IsoMap::load(Gtk::FileSelection * fsel)
 void IsoMap::cancel(Gtk::FileSelection * fsel)
 {
     delete fsel;
+}
+
+void IsoMap::installTiles()
+{
+    Palette & p = m_model.m_mainWindow.m_palettewindow;
+
+    int c = m_database.GetGraphicCount(); 
+    for (int i = 0; i < c; i++) {
+        CoalGraphic * g = m_database.GetGraphic(i);
+        p.addTileEntry(&m_model, g->filename);
+#warning TODO Add code to coal to add short names for tiles
+    }
+    // p.addTileEntry();
 }
 
 IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),

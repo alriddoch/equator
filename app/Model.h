@@ -24,7 +24,7 @@ class Model : public SigC::Object {
     std::string m_name;
 
   public:
-    // MainWindow & m_mainWindow;
+    MainWindow & m_mainWindow;
 
     explicit Model(MainWindow & m);
 

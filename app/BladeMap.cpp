@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "GlView.h"
 #include "Model.h"
+#include "MainWindow.h"
+#include "Palette.h"
 
 #include <coal/database.h>
 #include <coal/bladeloader.h>
@@ -201,6 +203,8 @@ void BladeMap::load(Gtk::FileSelection * fsel)
         m_name = filename.substr(i+1);
     }
 
+    installTextures();
+
     delete fsel;
 
     m_model.updated.emit();
@@ -209,6 +213,21 @@ void BladeMap::load(Gtk::FileSelection * fsel)
 void BladeMap::cancel(Gtk::FileSelection * fsel)
 {
     delete fsel;
+}
+
+void BladeMap::installTextures()
+{
+    Palette & p = m_model.m_mainWindow.m_palettewindow;
+
+    int c = m_database.GetGraphicCount(); 
+    for (int i = 0; i < c; i++) {
+        CoalGraphic * g = m_database.GetGraphic(i);
+        cout << "GRAPHIC: " << g->name << ":" << g->filename
+             << std::endl << std::flush;
+        p.addTextureEntry(&m_model, g->name);
+#warning TODO Add code to coal to add short names for tiles
+    }
+    // p.addTileEntry();
 }
 
 BladeMap::BladeMap(Model & model) : Layer(model, "map", "BladeMap"),

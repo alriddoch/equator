@@ -29,6 +29,7 @@ class BladeMap : public Layer {
     bool selectMap(GlView &, CoalDatabase & map_base,int,int,int,int, bool check = false);
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
+    void installTextures();
   public:
     explicit BladeMap(Model &);
     void importFile();

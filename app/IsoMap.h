@@ -31,6 +31,7 @@ class IsoMap : public Layer {
 
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
+    void installTiles();
   public:
     explicit IsoMap(Model &);
     void importFile();
