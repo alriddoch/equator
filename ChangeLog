@@ -1,3 +1,17 @@
+2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* gui/gtkmm/OptionBox.h, gui/gtkmm/OptionBox.cpp,
+	  gui/gtkmm/DockWindow.h, gui/gtkmm/DockWindow.cpp: Add base for
+	  dockable option windows, and class to act as a general purpose
+	  dock.
+
+	* app/ServerWindow.h, app/ServerWindow.cpp,
+	  app/Palette.h, app/Palette.cpp,
+	  app/LayerWindow.h, app/LayerWindow.cpp,
+	  app/InheritanceWindow.h, app/InheritanceWindow.cpp,
+	  app/MainWindow.cpp: Convert various windows to use new
+	  dockable class.
+
 2004-01-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/LayerWindow.cpp, app/ServerWindow.cpp: Fix ScrolledWindow

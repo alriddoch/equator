@@ -25,14 +25,15 @@
 
 #include <cassert>
 
-ServerWindow::ServerWindow(MainWindow & mw) :
+ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
                                       m_connectWindow(*new ConnectWindow()),
                                       m_loginWindow(*new LoginWindow()),
                                       m_characterWindow(*new CharacterWindow()),
                                       m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
-    Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    // Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    Gtk::VBox * vbox = this;
 
     m_columns = new Gtk::TreeModelColumnRecord();
     m_hostnameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
@@ -59,8 +60,8 @@ ServerWindow::ServerWindow(MainWindow & mw) :
 
     vbox->pack_start(*scrolled_window);
 
-    add(*vbox);
-    set_title("Servers");
+    // add(*vbox);
+    // set_title("Servers");
 
     // show_all();
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));

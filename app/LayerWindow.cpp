@@ -34,10 +34,12 @@
 #include "../duplicate.xpm"
 #include "../delete.xpm"
 
-LayerWindow::LayerWindow(MainWindow & mw) : m_currentModel(0)
+LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
+                                            m_currentModel(0)
 {
     // destroy.connect(slot(this, &LayerWindow::destroy_handler));
-    Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    // Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    Gtk::VBox * vbox = this;
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
@@ -123,8 +125,8 @@ LayerWindow::LayerWindow(MainWindow & mw) : m_currentModel(0)
 
     vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
 
-    add(*vbox);
-    set_title("Layers");
+    // add(*vbox);
+    // set_title("Layers");
     set_sensitive(false);
 
 #warning Organise the xpms

@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_INHERITANCEWINDOW_H
 #define EQUATOR_APP_INHERITANCEWINDOW_H
 
-#include <gtkmm/window.h>
+#include "gui/gtkmm/OptionBox.h"
 
 class MainWindow;
 class AtlasMapWidget;
@@ -17,7 +17,7 @@ namespace Gtk {
    class TreeView;
 };
 
-class InheritanceWindow : public Gtk::Window
+class InheritanceWindow : public OptionBox
 {
   private:
     Gtk::Label * m_connectionLabel;

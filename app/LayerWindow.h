@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_LAYERWINDOW_H
 #define EQUATOR_APP_LAYERWINDOW_H
 
-#include <gtkmm/window.h>
+#include "gui/gtkmm/OptionBox.h"
 
 class MainWindow;
 class NewLayerWindow;;
@@ -21,7 +21,7 @@ namespace Gtk {
    class TreeSelection;
 }
 
-class LayerWindow : public Gtk::Window
+class LayerWindow : public OptionBox
 {
   private:
     Glib::RefPtr<Gtk::ListStore> m_treeModel;

@@ -19,10 +19,12 @@
 
 using Atlas::Message::Element;
 
-InheritanceWindow::InheritanceWindow(MainWindow & mw) : m_mainWindow(mw)
+InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
+                                                       m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &InheritanceWindow::destroy_handler));
-    Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    // Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
+    Gtk::VBox * vbox = this;
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
@@ -84,8 +86,8 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw) : m_mainWindow(mw)
 
     vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 2);
 
-    add(*vbox);
-    set_title("Inheritance");
+    // add(*vbox);
+    // set_title("Inheritance");
 
     // show_all();
     signal_delete_event().connect(slot(*this, &InheritanceWindow::deleteEvent));

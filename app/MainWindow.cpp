@@ -10,6 +10,8 @@
 #include "Model.h"
 #include "Palette.h"
 
+#include "gui/gtkmm/DockWindow.h"
+
 #include <gtkmm/main.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/menuitem.h>
@@ -104,7 +106,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 0, 1);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Select Area");
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
@@ -112,7 +113,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 0, 1);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Insert");
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
@@ -120,7 +120,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 3, 4, 0, 1);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Rotate");
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
@@ -128,7 +127,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 4, 5, 0, 1);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Scale");
 
     b = move_tool = manage( new Gtk::ToggleButton() );
@@ -136,7 +134,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 1, 2);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Translate");
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
@@ -145,7 +142,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 2, 3);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Entity Mode");
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
@@ -153,7 +149,6 @@ MainWindow::MainWindow() :
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 2, 3);
-    t = manage( new Gtk::Tooltips() );
     t->set_tip(*b, "Vertex Mode");
 
     b = manage( new Gtk::ToggleButton("7") );
@@ -225,28 +220,32 @@ void MainWindow::menu_quit()
 
 void MainWindow::inheritance_window()
 {
-    m_inheritancewindow.show_all();
+    DockWindow * dw = new DockWindow(m_inheritancewindow);
+    dw->show_all();
 }
 
 void MainWindow::server_window()
 {
-    m_serverwindow.show_all();
+    DockWindow * dw = new DockWindow(m_serverwindow);
+    dw->show_all();
 }
 
 void MainWindow::palette_window()
 {
-    m_palettewindow.show_all();
+    DockWindow * dw = new DockWindow(m_palettewindow);
+    dw->show_all();
+}
+
+void MainWindow::layer_window()
+{
+    DockWindow * dw = new DockWindow(m_layerwindow);
+    dw->show_all();
 }
 
 void MainWindow::new_server_dialog()
 {
     m_serverwindow.show_all();
     m_serverwindow.connect();
-}
-
-void MainWindow::layer_window()
-{
-    m_layerwindow.show_all();
 }
 
 void MainWindow::toolSelect(MainWindow::toolType tool)

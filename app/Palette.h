@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_PALETTE_H
 #define EQUATOR_APP_PALETTE_H
 
-#include <gtkmm/window.h>
+#include "gui/gtkmm/OptionBox.h"
 
 #include <map>
 #include <list>
@@ -24,7 +24,7 @@ namespace Gtk {
    class TreeSelection;
 }
 
-class Palette : public Gtk::Window
+class Palette : public OptionBox
 {
   private:
     Gtk::Notebook * m_notebook;

@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_SERVERWINDOW_H
 #define EQUATOR_APP_SERVERWINDOW_H
 
-#include <gtkmm/window.h>
+#include "gui/gtkmm/OptionBox.h"
 
 class MainWindow;
 class Server;
@@ -21,7 +21,7 @@ namespace Gtk {
    class TreeSelection;
 };
 
-class ServerWindow : public Gtk::Window
+class ServerWindow : public OptionBox
 {
   private:
     Glib::RefPtr<Gtk::ListStore> m_treeModel;

@@ -126,4 +126,6 @@ AC_OUTPUT([
 	common/Makefile
 	visual/Makefile
 	app/Makefile
+	gui/Makefile
+	gui/gtkmm/Makefile
 ])

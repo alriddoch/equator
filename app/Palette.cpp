@@ -20,9 +20,12 @@
 #include <sstream>
 #include <vector>
 
-Palette::Palette(MainWindow & mw) : m_currentModel(0), m_mainWindow(mw)
+Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
+                                    m_currentModel(0),
+                                    m_mainWindow(mw)
 {
-    Gtk::VBox * vbox = manage( new Gtk::VBox() );
+    // Gtk::VBox * vbox = manage( new Gtk::VBox() );
+    Gtk::VBox * vbox = this;
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
@@ -110,9 +113,9 @@ Palette::Palette(MainWindow & mw) : m_currentModel(0), m_mainWindow(mw)
 
     vbox->pack_start(*m_notebook, Gtk::PACK_EXPAND_WIDGET, 2);
 
-    add(*vbox);
+    // add(*vbox);
+    // set_title("Palette");
     set_sensitive(false);
-    set_title("Palette");
 
     mw.modelAdded.connect(SigC::slot(*this, &Palette::addModel));
     mw.currentModelChanged.connect(SigC::slot(*this, &Palette::setModel));
