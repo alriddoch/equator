@@ -102,7 +102,7 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
 
 void GameView::drawWorld(GlView & view, Eris::Entity * wrld)
 {
-    PosType camPos(view.getXoff(), view.getYoff(), view.getZoff());
+    PosType camPos(-view.getXoff(), -view.getYoff(), -view.getZoff());
 
     drawEntity(view, wrld, 0, camPos);
 }
