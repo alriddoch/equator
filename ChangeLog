@@ -1,5 +1,15 @@
 2004-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.h: Add missing scale adjustment accessor.
+
+	* gui/gtkmm/CameraControl.cpp: Modify sliders so they now hook
+	  directly into the adjustments for the view.
+
+	* app/GlView.cpp: Connect up signals so view is automactically
+	  redrawn if any of the view controlling adjustments are changed.
+
+2004-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* gui/gtkmm/OptionBox.cpp: Add an event box for handling drag source.
 
 	* app/GlView.h: Add accessors for the adjustments.

@@ -102,6 +102,10 @@ class GlView : public Gtk::DrawingArea {
 
     explicit GlView(MainWindow &, ViewWindow&, Model&);
 
+    Gtk::Adjustment & getScaleAdjustment() {
+        return m_scaleAdj;
+    }
+
     Gtk::Adjustment & getXAdjustment() {
         return m_xAdj;
     }

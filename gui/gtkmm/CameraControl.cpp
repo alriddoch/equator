@@ -16,13 +16,14 @@ CameraControl::CameraControl(GlView & v) : OptionBox(v.m_model.getName() + " Cam
 {
     Gtk::VBox * vbox = this;
 
-    m_dAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 360) );
-    m_dAdjust->signal_value_changed().connect(slot(*this, &CameraControl::dChange));
-    m_rAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 360) );
-    m_rAdjust->signal_value_changed().connect(slot(*this, &CameraControl::rChange));
+    // m_dAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 360) );
+    // m_dAdjust->signal_value_changed().connect(slot(*this, &CameraControl::dChange));
+    // m_rAdjust = manage( new Gtk::Adjustment(view.getDeclination(), 0, 360) );
+    // m_rAdjust->signal_value_changed().connect(slot(*this, &CameraControl::rChange));
 
-    vbox->pack_start( * manage( new Gtk::HScrollbar(*m_dAdjust) ) );
-    vbox->pack_start( * manage( new Gtk::HScrollbar(*m_rAdjust) ) );
+    vbox->pack_start(* manage( new Gtk::HScrollbar(v.getRotationAdjustment())));
+    vbox->pack_start(* manage( new Gtk::HScrollbar(v.getDeclinationAdjustment())));
+    vbox->pack_start(* manage( new Gtk::HScrollbar(v.getScaleAdjustment())));
 }
 
 void CameraControl::dChange()

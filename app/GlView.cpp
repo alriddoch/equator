@@ -31,16 +31,6 @@
 #include <cassert>
 #include <cmath>
 
-int attrlist[] = {
-    Gdk::GL::RGBA,
-    Gdk::GL::DOUBLEBUFFER,
-    Gdk::GL::DEPTH_SIZE, 1,
-    // GDK_GL_ACCUM_RED_SIZE, 1,
-    // GDK_GL_ACCUM_GREEN_SIZE, 1,
-    // GDK_GL_ACCUM_BLUE_SIZE, 1,
-    Gdk::GL::NONE
-};
-
 static const bool pretty = true;
 
 static const float Deg2Rad = M_PI / 180.0f;
@@ -89,6 +79,13 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_model(m),
            m_renderer(* new Renderer)
 {
+    m_scaleAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_xAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_yAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_zAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_declAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_rotaAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME
 
