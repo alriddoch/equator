@@ -115,17 +115,25 @@ void Terrain::readTerrain(const Eris::Entity & ent)
         }
         int x = (int)point[0].asNum();
         int y = (int)point[1].asNum();
+        float z = point[2].asNum();
+        Mercator::BasePoint bp;
+        if (m_terrain.getBasePoint(x, y, bp) && (z == bp.height())) {
+            std::cout << "Layer point [" << x << "," << y << " unchanged"
+                      << std::endl << std::flush;
+            continue;
+        }
         xmin = std::min(xmin, x);
         xmax = std::max(xmax, x);
         ymin = std::min(ymin, y);
         ymax = std::max(ymax, y);
-        Mercator::BasePoint bp(point[2].asNum());
-        if (point.size() > 3) {
-            bp.roughness()=point[3].asNum();
-            if (point.size() > 4) {
-                bp.falloff()=point[4].asNum();
-            }
-        }
+        bp.height() = z;
+        // FIXME THis really should be enabled for roughness and falloff
+        // if (point.size() > 3) {
+            // bp.roughness()=point[3].asNum();
+            // if (point.size() > 4) {
+                // bp.falloff()=point[4].asNum();
+            // }
+        // }
         m_terrain.setBasePoint(x, y, bp);
     }
 }
@@ -600,6 +608,7 @@ void Terrain::alterBasepoint(const GroundCoord & pt, float diff)
 
 void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
+    std::cout << "Terrain::dragEnd()" << std::endl << std::flush;
     if (!m_validDrag) {
         return;
     }
@@ -607,9 +616,11 @@ void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
         (m_model.m_mainWindow.getMode() == MainWindow::VERTEX)
         ?  m_vertexSelection : m_selection;
     GroundCoordSet::const_iterator I = selection.begin();
+    bool changed = false;
     for(; I != selection.end(); ++I) {
         const GroundCoord & coord = *I;
         alterBasepoint(coord, v.z());
+        changed = true;
         if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
             continue;
         }
@@ -617,9 +628,12 @@ void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
         alterBasepoint(GroundCoord(coord.first + 1, coord.second), v.z());
         alterBasepoint(GroundCoord(coord.first, coord.second + 1), v.z());
         alterBasepoint(GroundCoord(coord.first + 1, coord.second + 1), v.z());
-
     }
     m_validDrag = false;
+    if (changed) {
+        std::cout << "Terrain::TerrainModified::emit()" << std::endl << std::flush;
+        TerrainModified.emit();
+    }
 }
 
 void Terrain::insert(const PosType & curs)
@@ -630,4 +644,5 @@ void Terrain::insert(const PosType & curs)
               << " to " << curs.z()
               << std::endl << std::flush;
     m_terrain.setBasePoint(posx,     posy,     curs.z());
+    TerrainModified.emit();
 }

@@ -9,6 +9,8 @@
 
 #include <wfmath/vector.h>
 
+#include <sigc++/signal.h>
+
 #include <set>
 
 namespace Gtk {
@@ -80,6 +82,8 @@ class Terrain : public Layer {
     virtual void dragEnd(GlView & view, const WFMath::Vector<3> &);
     virtual void insert(const PosType &);
     virtual void align(Alignment ) { }
+
+    SigC::Signal0<void> TerrainModified;
 };
 
 #endif // EQUATOR_TERRAIN_H

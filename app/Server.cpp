@@ -31,11 +31,16 @@
 
 #include <sigc++/object_slot.h>
 
+#include <sstream>
+
 #include <cassert>
 
 using Atlas::Message::Element;
+using Atlas::Message::MapType;
+using Atlas::Message::ListType;
 
 using Atlas::Objects::Operation::Move;
+using Atlas::Objects::Operation::Set;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
@@ -92,7 +97,7 @@ void Server::createCharacter(const std::string & name,
 {
 
     GameEntity chrcter;
-    chrcter.setParents(Atlas::Message::Element::ListType(1,type));
+    chrcter.setParents(ListType(1,type));
     chrcter.setName(name);
     chrcter.setAttr("description", "an equator avatar");
     // chrcter.setAttr("sex", "female");
@@ -150,6 +155,7 @@ void Server::createTerrainLayer(TerrainEntity * tent)
         if (tr != 0) {
             Terrain * layer = new Terrain(*m_model, tr->m_terrain);
             layer->readTerrain(*tent);
+            layer->TerrainModified.connect(SigC::bind<Terrain*, TerrainEntity *>(SigC::slot(*this, &Server::modifyTerrain), layer, tent));
             m_model->addLayer(layer);
         }
     }
@@ -259,16 +265,54 @@ void Server::moveCharacter(const PosType & pos)
     
     Move m;
 
-    Atlas::Message::Element::MapType marg;
+    MapType marg;
     marg["id"] = m_character->getID();
     marg["loc"] = m_character->getContainer()->getID();
     marg["pos"] = pos.toAtlas();
     marg["velocity"] = VelType(1,0,0).toAtlas();
-    m.setArgs(Atlas::Message::Element::ListType(1, marg));
+    m.setArgs(ListType(1, marg));
     m.setFrom(m_character->getID());
 
     m_connection.send(m);
     
+}
+
+void Server::modifyTerrain(Terrain * layer, TerrainEntity * tent)
+{
+    std::cerr << "Server::modifyTerrain()" << std::endl << std::flush;
+    if (m_character == NULL) {
+        return;
+    }
+    
+    Set s;
+
+    MapType sarg;
+    sarg["id"] = tent->getID();
+    MapType & terrain = (sarg["terrain"] = MapType()).asMap();
+
+    Element::MapType & pointMap = (terrain["points"] = Element::MapType()).asMap();
+
+    const Mercator::Terrain::Pointstore & points = layer->m_terrain.getPoints();
+    Mercator::Terrain::Pointstore::const_iterator I = points.begin();
+    for(; I != points.end(); ++I) {
+        const Mercator::Terrain::Pointcolumn & pointcol = I->second;
+        Mercator::Terrain::Pointcolumn::const_iterator J = pointcol.begin();
+        for (; J != pointcol.end(); ++J) {
+            std::stringstream key;
+            key << I->first << "x" << J->first;
+            Element::ListType & point =
+                    (pointMap[key.str()] = Element::ListType(3)).asList();
+            point[0] = (Element::FloatType)(I->first);
+            point[1] = (Element::FloatType)(J->first);
+            point[2] = (Element::FloatType)(J->second.height());
+        }
+    }
+
+    s.setArgs(ListType(1, sarg));
+    s.setFrom(m_character->getID());
+
+    m_connection.send(s);
+    std::cerr << "Sent set op to server" << std::endl << std::flush;
 }
 
 const PosType Server::getAbsCharPos()
@@ -286,11 +330,11 @@ const PosType Server::getAbsCharPos()
     return pos;
 }
 
-void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
+void Server::avatarCreateEntity(const MapType & ent)
 {
     Create c;
 
-    c.setArgs(Atlas::Message::Element::ListType(1, ent));
+    c.setArgs(ListType(1, ent));
     c.setFrom(m_character->getID());
     c.setTo(m_character->getID());
     
@@ -302,11 +346,11 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
 {
     Move m;
 
-    Atlas::Message::Element::MapType ent;
+    MapType ent;
     ent["id"] = id;
     ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
-    m.setArgs(Atlas::Message::Element::ListType(1, ent));
+    m.setArgs(ListType(1, ent));
     m.setFrom(m_character->getID());
     m.setTo(id);
 
@@ -319,12 +363,12 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
 {
     Move m;
 
-    Atlas::Message::Element::MapType ent;
+    MapType ent;
     ent["id"] = id;
     ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
     ent["velocity"] = vel.toAtlas();
-    m.setArgs(Atlas::Message::Element::ListType(1, ent));
+    m.setArgs(ListType(1, ent));
     m.setFrom(m_character->getID());
     m.setTo(id);
 

@@ -32,6 +32,7 @@ class MainWindow;
 class Model;
 class Renderer;
 class TerrainEntity;
+class Terrain;
 
 class Server : public SigC::Object {
   private:
@@ -105,6 +106,7 @@ class Server : public SigC::Object {
     void createTerrainLayer(TerrainEntity *);
 
     void moveCharacter(const PosType & pos);
+    void modifyTerrain(Terrain * layer, TerrainEntity * entity);
 
     void avatarCreateEntity(const Atlas::Message::Element::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,

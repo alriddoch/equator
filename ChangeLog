@@ -1,5 +1,15 @@
 2004-03-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Server.cpp, app/Server.h: Implement code for sending updated
+	  terrain info to the server.
+
+	* app/Terrain.cpp, app/Terrain.h: Add signal to indicate when user
+	  has edited terrain. Hook it up to server code. Clean up
+	  updating the terrain, so that points are only modified if they
+	  have changed.
+
+2004-03-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.cpp: Simplify handling terrain layer, removing duplicated
 	  code.
 
