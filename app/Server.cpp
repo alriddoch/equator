@@ -154,6 +154,7 @@ void Server::createTerrainLayer(TerrainEntity * tent)
         TerrainRenderer * tr = dynamic_cast<TerrainRenderer *>(er);
         if (tr != 0) {
             Terrain * layer = new Terrain(*m_model, tr->m_terrain);
+            // readTerrain(*layer, ent); FIXME Perhaps we should do this here?
             layer->readTerrain(*tent);
             layer->TerrainModified.connect(SigC::bind<Terrain*, TerrainEntity *>(SigC::slot(*this, &Server::modifyTerrain), layer, tent));
             m_model->addLayer(layer);

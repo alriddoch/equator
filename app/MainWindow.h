@@ -64,6 +64,8 @@ class MainWindow : public Gtk::Window
     SigC::Signal1<void, Model *> modelAdded;
     SigC::Signal1<void, Model *> currentModelChanged;
     SigC::Signal1<void, Server *> serverAdded;
+    SigC::Signal0<void> modeChanged;
+    SigC::Signal0<void> toolChanged;
 
     LayerWindow & m_layerwindow;
     InheritanceWindow & m_inheritancewindow;

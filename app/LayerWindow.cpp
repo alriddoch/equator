@@ -246,6 +246,7 @@ void LayerWindow::selectionChanged()
     Layer * layer = row[*m_ptrColumn];
 
     m_currentModel->setCurrentLayer(layer);
+    m_currentModel->updated.emit();
 
     std::cout << layer->getName() << " is now current" << std::endl << std::flush;
 }

@@ -124,6 +124,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
 
     Glib::signal_timeout().connect(slot(*this, &GlView::animate), 100);
 
+    mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
                                            &ViewWindow::cursorMoved));
     signal_realize().connect(SigC::slot(*this, &GlView::realize));

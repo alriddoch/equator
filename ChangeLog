@@ -1,5 +1,15 @@
 2004-03-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/MainWindow.cpp, app/MainWindow.h: Provide signals for
+	  notifying when tool or mode change.
+
+	* app/LayerWindow.cpp, app/GlView.cpp: Schedule a refresh when
+	  the tool or mode are changed, or if the current layer is changed.
+
+	* app/Server.cpp: Add a FIXME note about a possible future change.
+
+2004-03-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.cpp, app/Server.h: Implement code for sending updated
 	  terrain info to the server.
 

@@ -298,6 +298,7 @@ void MainWindow::toolSelect(MainWindow::ToolType tool)
         scale_tool->set_active(tool==MainWindow::SCALE);
         move_tool->set_active(tool==MainWindow::MOVE);
         changing = false;
+        toolChanged.emit();
     }
 }
 
@@ -310,6 +311,7 @@ void MainWindow::modeSelect(MainWindow::ToolMode mode)
         entity_mode->set_active(mode==MainWindow::ENTITY);
         vertex_mode->set_active(mode==MainWindow::VERTEX);
         changing = false;
+        modeChanged.emit();
     }
 }
 
