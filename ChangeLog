@@ -1,5 +1,10 @@
 2003-09-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/NewServerWindow.h, app/NewServerWindow.cpp: More work in
+	  progress adding new features.
+
+2003-09-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/NewServerWindow.h, app/NewServerWindow.cpp: Work in
 	  progress adding new features.
 

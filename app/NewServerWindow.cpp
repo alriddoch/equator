@@ -11,6 +11,7 @@
 #include <Eris/Connection.h>
 #include <Eris/Lobby.h>
 #include <Eris/World.h>
+#include <Eris/Player.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
@@ -133,14 +134,17 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     table = manage( new Gtk::Table(3, 2) );
     table->set_row_spacings(6);
     table->set_col_spacings(12);
-    m_portChoice = manage( new Gtk::OptionMenu() );
-    Gtk::Menu * portMenu = manage( new Gtk::Menu() );
-    Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6767)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6768)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCustomPort)));
-    m_portChoice->set_menu(*portMenu);
-    table->attach(*m_portChoice, 1, 2, 1, 2);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Available Avatars:") )));
+    table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
+    m_characterChoice = manage( new Gtk::OptionMenu() );
+    Gtk::Menu * characterMenu = manage( new Gtk::Menu() );
+    // Gtk::Menu_Helpers::MenuList& characterEntries = characterMenu->items();
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(*this, &NewServerWindow::setCharacter), 6767)));
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setCharacter), 6768)));
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCharacter)));
+    m_characterChoice->set_menu(*characterMenu);
+    table->attach(*m_characterChoice, 1, 2, 0, 1);
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Avatar Name:") )));
     table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
@@ -161,7 +165,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     m_takeAvatarButton = manage( new Gtk::Button("Take Avatar") );
     m_takeAvatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::takeAvatar));
     m_takeAvatarButton->set_sensitive(false);
-    v2box->pack_start(*m_avatarButton);
+    v2box->pack_start(*m_takeAvatarButton);
     m_avatarButton = manage( new Gtk::Button("Create Avatar") );
     m_avatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
@@ -180,7 +184,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));
 }
 
-void NewServerWindow::setSelectCharacter(std::string charId)
+void NewServerWindow::setSelectedCharacter(std::string charId)
 {
     m_selectedCharacterId = charId;
 
@@ -250,6 +254,10 @@ void NewServerWindow::createAccount()
     m_loggedIn = m_server->m_connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
 }
 
+void NewServerWindow::takeAvatar()
+{
+}
+
 void NewServerWindow::createAvatar()
 {
     assert(m_server != NULL);
@@ -305,6 +313,9 @@ void NewServerWindow::loginComplete(const Atlas::Objects::Entity::Player &)
 {
     assert(m_server != NULL);
 
+    m_server->m_player->GotAllCharacters.connect(slot(*this, &NewServerWindow::gotCharacterList));
+    m_server->m_player->refreshCharacterInfo();
+
     m_status->pop(m_statusContext);
     m_status->push("Logged in", m_statusContext);
 
@@ -313,6 +324,23 @@ void NewServerWindow::loginComplete(const Atlas::Objects::Entity::Player &)
     m_loginButton->set_sensitive(false);
     m_createButton->set_sensitive(false);
     m_avatarButton->set_sensitive(true);
+}
+
+void NewServerWindow::gotCharacterList()
+{
+    std::cout << "GOT CHARACTER LIST" << std::endl << std::flush;
+    Eris::CharacterList chars = m_server->m_player->getCharacters();
+    Gtk::Menu * characterMenu = m_characterChoice->get_menu();
+    Gtk::Menu_Helpers::MenuList& characterEntries = characterMenu->items();
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "FOO")));
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "BAR")));
+    // characterEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), "BAZ")));
+    Eris::CharacterList::iterator I = chars.begin();
+    for(; I != chars.end(); ++I) {
+        Atlas::Objects::Entity::GameEntity & ge = *I;
+        characterEntries.push_back(Gtk::Menu_Helpers::MenuElem(ge.getId(), SigC::bind<std::string>(slot(*this, &NewServerWindow::setSelectedCharacter), ge.getId())));
+        
+    }
 }
 
 void NewServerWindow::worldEnter(Eris::Entity*)

@@ -47,6 +47,7 @@ class NewServerWindow : public Gtk::Dialog
     Gtk::Entry * m_avatarTypeEntry;
     Gtk::Button * m_loginButton;
     Gtk::Button * m_createButton;
+    Gtk::Button * m_takeAvatarButton;
     Gtk::Button * m_avatarButton;
     Gtk::Button * m_viewButton;
     Gtk::Statusbar * m_status;
@@ -85,6 +86,7 @@ class NewServerWindow : public Gtk::Dialog
     void failure(const std::string & msg);
     void connected();
     void loginComplete(const Atlas::Objects::Entity::Player &);
+    void gotCharacterList();
     void worldEnter(Eris::Entity*);
 
     void dismiss(int);
