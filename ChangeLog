@@ -1,3 +1,7 @@
+2004-02-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* common/system.cpp: Default to "." as the media path for windows
+
 2004-02-15  Ron Steinke  <rsteinke@w-link.net>
 
 	* configure.ac: GL test for mingw32, take 4.

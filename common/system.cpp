@@ -7,7 +7,8 @@
 const std::string getMediaPath()
 {
 #if defined(_WIN32)
-    #error I dont know what to put here yet.
+    #warning I dont know what to put here yet.
+    return std::string(".");
 #else
     return std::string(SHAREDIR);
 #endif
