@@ -6,8 +6,6 @@ echo aclocal...
     exit 1
 }
 
-libtoolize --force --copy
-
 aclocal $ACLOCAL_FLAGS
 
 autoheader
