@@ -9,6 +9,8 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
 
+#include <cassert>
+
 OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
     m_targetList(1, Gtk::TargetEntry("application/x-equator-toolbar", 0, 0))
 {

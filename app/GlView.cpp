@@ -10,6 +10,8 @@
 #include "ViewWindow.h"
 #include "Layer.h"
 
+#include "visual/Renderer.h"
+
 #include <wfmath/point.h>
 
 #include <GL/glu.h>
@@ -120,7 +122,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                m_dragType(NONE),
                                m_mainWindow(mw),
                                m_viewWindow(vw),
-                               m_model(m)
+                               m_model(m),
+                               m_renderer(* new Renderer)
 {
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME

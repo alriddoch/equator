@@ -18,6 +18,7 @@ class Layer;
 class ViewWindow;
 class MainWindow;
 class Model;
+class Renderer;
 
 class GlView : public Gtk::DrawingArea {
   public:
@@ -88,6 +89,7 @@ class GlView : public Gtk::DrawingArea {
     MainWindow & m_mainWindow;
     ViewWindow & m_viewWindow;
     Model & m_model;
+    Renderer & m_renderer;
 
     explicit GlView(MainWindow &, ViewWindow&, Model&);
 

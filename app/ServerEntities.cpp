@@ -864,6 +864,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
                                m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
+    // FIXME This stuff populates palette, but does not belong here.
+    // It probably belongs in server.
     m_serverConnection.m_connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
     m_gameEntityType = m_serverConnection.m_connection.getTypeService()->getTypeByName("game_entity");
     assert(m_gameEntityType != NULL);
@@ -879,8 +881,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 
     connectEntity(worldRoot);
 
-    /* observve the Eris world (in the future, we will need to get World* from
-    the server object, when Eris supports multiple world objects */
+    // observe the Eris world (in the future, we will need to get World* from
+    // the server object, when Eris supports multiple world objects
     m_serverConnection.m_world->EntityCreate.connect(
         SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
