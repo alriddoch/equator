@@ -39,6 +39,7 @@ CharacterWindow::CharacterWindow() :
     m_createButton = add_button("_Create Avatar", Gtk::RESPONSE_YES);
     m_createButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+    set_default_response(Gtk::RESPONSE_YES);
     signal_response().connect(SigC::slot(*this, &CharacterWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
@@ -65,6 +66,7 @@ CharacterWindow::CharacterWindow() :
     table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_nameEntry = manage( new Gtk::Combo() );
     m_nameEntry->get_entry()->set_max_length(60);
+    m_nameEntry->get_entry()->set_activates_default();
     table->attach(*m_nameEntry, 1, 3, 0, 1);
     m_nameEntry->get_list()->signal_select_child().connect(SigC::slot(*this, &CharacterWindow::select_child));
     m_nameEntry->get_list()->signal_selection_changed().connect(SigC::slot(*this, &CharacterWindow::selection_changed));
@@ -75,6 +77,7 @@ CharacterWindow::CharacterWindow() :
     table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_typeEntry = manage( new Gtk::Entry() );
     m_typeEntry->set_max_length(60);
+    m_typeEntry->set_activates_default();
     table->attach(*m_typeEntry, 1, 3, 1, 2);
 
     hbox->pack_start(*table);
@@ -154,6 +157,7 @@ void CharacterWindow::select_child(Gtk::Widget & w)
     m_typeEntry->set_text(ge->getParents().front());
     m_typeEntry->set_editable(false);
     m_takeButton->set_sensitive(true);
+    set_default_response(Gtk::RESPONSE_ACCEPT);
     m_createButton->set_sensitive(false);
     return;
 }
@@ -168,6 +172,7 @@ void CharacterWindow::unselect_child(Gtk::Widget&)
     m_selectedCharacter.clear();
     m_takeButton->set_sensitive(false);
     m_createButton->set_sensitive(true);
+    set_default_response(Gtk::RESPONSE_YES);
 }
 
 void CharacterWindow::take()

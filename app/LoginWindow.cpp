@@ -36,6 +36,7 @@ LoginWindow::LoginWindow() :
     m_loginButton = add_button("_Login", Gtk::RESPONSE_ACCEPT);
     m_loginButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+    set_default_response(Gtk::RESPONSE_ACCEPT);
     signal_response().connect(SigC::slot(*this, &LoginWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
@@ -62,6 +63,7 @@ LoginWindow::LoginWindow() :
     table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_userEntry = manage( new Gtk::Combo() );
     m_userEntry->get_entry()->set_max_length(60);
+    m_userEntry->get_entry()->set_activates_default();
     table->attach(*m_userEntry, 1, 3, 0, 1);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
@@ -70,6 +72,7 @@ LoginWindow::LoginWindow() :
     m_passwdEntry = manage( new Gtk::Entry() );
     m_passwdEntry->set_visibility(false);
     m_passwdEntry->set_max_length(60);
+    m_passwdEntry->set_activates_default();
     table->attach(*m_passwdEntry, 1, 3, 1, 2);
 
     hbox->pack_start(*table);

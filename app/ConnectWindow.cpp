@@ -39,6 +39,7 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     m_connectButton = add_button("Con_nect", Gtk::RESPONSE_ACCEPT);
     m_connectButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+    set_default_response(Gtk::RESPONSE_ACCEPT);
     signal_response().connect(SigC::slot(*this, &ConnectWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
@@ -64,6 +65,7 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     m_hostEntry = manage( new Gtk::Entry() );
     m_hostEntry->set_text("localhost");
     m_hostEntry->set_max_length(60);
+    m_hostEntry->set_activates_default();
     table->attach(*m_hostEntry, 1, 3, 0, 1);
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Port:") )));

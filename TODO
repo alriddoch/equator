@@ -1,3 +1,6 @@
+Clean up state handling in Character create/take dialogue. Buttons should
+be made sensitive/insensitive and default more cleanly.
+
 Check that mouse coordinates are inside the window before doing any transforms
 or Z queries with them.
 
