@@ -16,9 +16,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/label.h>
-#include <gtkmm/optionmenu.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/spinbutton.h>
+#include <gtkmm/combo.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/main.h>
 #include <gtkmm/statusbar.h>
@@ -29,7 +27,7 @@
 #include <cassert>
 
 CharacterWindow::CharacterWindow() :
-                 Gtk::Dialog("Connect to server", false, true),
+                 Gtk::Dialog("Create avatar on server", false, true),
                  m_nameEntry(0), m_typeEntry(0),
                  m_createButton(0), m_status(0),
                  m_server(0)
@@ -46,7 +44,8 @@ CharacterWindow::CharacterWindow() :
     hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 12);
 
     Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-    a->add(*(manage(new Gtk::Label("Create Character:"))));
+    m_serverLabel = manage( new Gtk::Label("Create avatar on XXX:"));
+    a->add(*m_serverLabel);
     vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
@@ -58,8 +57,8 @@ CharacterWindow::CharacterWindow() :
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Name:") )));
     table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
-    m_nameEntry = manage( new Gtk::Entry() );
-    m_nameEntry->set_max_length(60);
+    m_nameEntry = manage( new Gtk::Combo() );
+    m_nameEntry->get_entry()->set_max_length(60);
     table->attach(*m_nameEntry, 1, 3, 0, 1);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
@@ -88,7 +87,7 @@ CharacterWindow::CharacterWindow() :
 
 void CharacterWindow::doshow()
 {
-    m_nameEntry->set_editable(true);
+    m_nameEntry->get_entry()->set_editable(true);
     m_typeEntry->set_editable(true);
     m_createButton->set_sensitive(true);
     show_all();
@@ -99,6 +98,7 @@ void CharacterWindow::useServer(Server * s)
     assert(s != 0);
 
     m_server = s;
+    m_serverLabel->set_text(std::string("Create avatar on ") + m_server->getName() + ":");
 }
 
 void CharacterWindow::create()
@@ -107,20 +107,11 @@ void CharacterWindow::create()
 
     m_status->push("Logging in...", m_statusContext);
 
-    m_nameEntry->set_editable(false);
+    m_nameEntry->get_entry()->set_editable(false);
     m_typeEntry->set_editable(false);
     m_createButton->set_sensitive(false);
 
-    // m_failure = m_server->m_connection.Failure.connect(SigC::slot(*this, &CharacterWindow::failure));
-
-    //std::cout << m_hostEntry->get_text() << ": " << m_portNum
-              //<< std::endl << std::flush;
-    // c.connect(m_hostEntry->get_text(), m_portNum);
-
-    //Gtk::Main::input.connect(slot(server, &Server::poll), c.getSocket(),
-                             //GDK_INPUT_READ);
-    // m_server->connect("localhost", 6767);
-    m_server->createCharacter(m_nameEntry->get_text(), m_typeEntry->get_text());
+    m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
     m_created = m_server->m_world->Entered.connect(SigC::slot(*this, &CharacterWindow::created));
 }
 
@@ -137,7 +128,7 @@ void CharacterWindow::failure(const std::string & msg)
     m_failure.disconnect();
     m_created.disconnect();
 
-    m_nameEntry->set_editable(true);
+    m_nameEntry->get_entry()->set_editable(true);
     m_typeEntry->set_editable(true);
     m_createButton->set_sensitive(true);
 }
@@ -153,7 +144,7 @@ void CharacterWindow::created(Eris::Entity *)
 
     m_server = 0;
 
-    m_nameEntry->set_editable(true);
+    m_nameEntry->get_entry()->set_editable(true);
     m_typeEntry->set_editable(true);
     m_createButton->set_sensitive(true);
 

@@ -11,10 +11,10 @@ class Server;
 
 namespace Gtk {
   class Entry;
-  class OptionMenu;
-  class SpinButton;
+  class Combo;
   class Button;
   class Statusbar;
+  class Label;
 }
 
 namespace Eris {
@@ -24,7 +24,8 @@ namespace Eris {
 class CharacterWindow : public Gtk::Dialog
 {
   private:
-    Gtk::Entry * m_nameEntry;
+    Gtk::Label * m_serverLabel;
+    Gtk::Combo * m_nameEntry;
     Gtk::Entry * m_typeEntry;
     Gtk::Button * m_createButton;
 

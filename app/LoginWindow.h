@@ -11,10 +11,10 @@ class Server;
 
 namespace Gtk {
   class Entry;
-  class OptionMenu;
-  class SpinButton;
+  class Combo;
   class Button;
   class Statusbar;
+  class Label;
 }
 
 namespace Atlas {
@@ -28,7 +28,8 @@ namespace Atlas {
 class LoginWindow : public Gtk::Dialog
 {
   private:
-    Gtk::Entry * m_userEntry;
+    Gtk::Label * m_serverLabel;
+    Gtk::Combo * m_userEntry;
     Gtk::Entry * m_passwdEntry;
     Gtk::Button * m_loginButton;
 

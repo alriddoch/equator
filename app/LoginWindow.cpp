@@ -16,9 +16,8 @@
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/label.h>
-#include <gtkmm/optionmenu.h>
+#include <gtkmm/combo.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/spinbutton.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/main.h>
 #include <gtkmm/statusbar.h>
@@ -29,7 +28,7 @@
 #include <cassert>
 
 LoginWindow::LoginWindow() :
-                 Gtk::Dialog("Connect to server", false, true),
+                 Gtk::Dialog("Login to server", false, true),
                  m_userEntry(0), m_passwdEntry(0),
                  m_loginButton(0), m_status(0),
                  m_server(0)
@@ -46,7 +45,8 @@ LoginWindow::LoginWindow() :
     hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 12);
 
     Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
-    a->add(*(manage(new Gtk::Label("Login:"))));
+    m_serverLabel = manage( new Gtk::Label("Login to XXX:"));
+    a->add(*m_serverLabel);
     vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
@@ -58,8 +58,8 @@ LoginWindow::LoginWindow() :
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Username:") )));
     table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
-    m_userEntry = manage( new Gtk::Entry() );
-    m_userEntry->set_max_length(60);
+    m_userEntry = manage( new Gtk::Combo() );
+    m_userEntry->get_entry()->set_max_length(60);
     table->attach(*m_userEntry, 1, 3, 0, 1);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
@@ -88,7 +88,7 @@ LoginWindow::LoginWindow() :
 
 void LoginWindow::doshow()
 {
-    m_userEntry->set_editable(true);
+    m_userEntry->get_entry()->set_editable(true);
     m_passwdEntry->set_editable(true);
     m_loginButton->set_sensitive(true);
     show_all();
@@ -99,6 +99,7 @@ void LoginWindow::useServer(Server * s)
     assert(s != 0);
 
     m_server = s;
+    m_serverLabel->set_text(std::string("Login to ") + m_server->getName() + ":");
 }
 
 void LoginWindow::login()
@@ -107,21 +108,13 @@ void LoginWindow::login()
 
     m_status->push("Logging in...", m_statusContext);
 
-    m_userEntry->set_editable(false);
+    m_userEntry->get_entry()->set_editable(false);
     m_passwdEntry->set_editable(false);
     m_loginButton->set_sensitive(false);
 
-    // m_failure = m_server->m_connection.Failure.connect(SigC::slot(*this, &LoginWindow::failure));
     m_loggedIn = m_server->m_connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &LoginWindow::loggedIn));
 
-    //std::cout << m_hostEntry->get_text() << ": " << m_portNum
-              //<< std::endl << std::flush;
-    // c.connect(m_hostEntry->get_text(), m_portNum);
-
-    //Gtk::Main::input.connect(slot(server, &Server::poll), c.getSocket(),
-                             //GDK_INPUT_READ);
-    // m_server->connect("localhost", 6767);
-    m_server->login(m_userEntry->get_text(), m_passwdEntry->get_text());
+    m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
 }
 
 void LoginWindow::failure(const std::string & msg)
@@ -137,7 +130,7 @@ void LoginWindow::failure(const std::string & msg)
     m_failure.disconnect();
     m_loggedIn.disconnect();
 
-    m_userEntry->set_editable(true);
+    m_userEntry->get_entry()->set_editable(true);
     m_passwdEntry->set_editable(true);
     m_loginButton->set_sensitive(true);
 }
@@ -153,7 +146,7 @@ void LoginWindow::loggedIn(const Atlas::Objects::Entity::Player &)
 
     m_server = 0;
 
-    m_userEntry->set_editable(true);
+    m_userEntry->get_entry()->set_editable(true);
     m_passwdEntry->set_editable(true);
     m_loginButton->set_sensitive(true);
 
