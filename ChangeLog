@@ -1,3 +1,7 @@
+2003-12-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* Make configre bail if required libraries are missing.
+
 2003-11-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/Vector3D.h: Switch back to Eris, and use Point<3> for
