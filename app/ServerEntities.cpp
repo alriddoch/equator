@@ -36,8 +36,8 @@
 
 static const bool debug_flag = false;
 
-using Atlas::Message::Object;
-typedef Atlas::Message::Object Element;
+using Atlas::Message::Element;
+typedef Atlas::Message::Element Element;
 
 ImportOptions * ServerEntities::m_importOptions = NULL;
 ExportOptions * ServerEntities::m_exportOptions = NULL;
@@ -45,7 +45,7 @@ ExportOptions * ServerEntities::m_exportOptions = NULL;
 
 class DummyDecoder : public Atlas::Message::DecoderBase {
   private:
-    virtual void ObjectArrived(const Atlas::Message::Object&) { }
+    virtual void objectArrived(const Atlas::Message::Element&) { }
   public:
     DummyDecoder() { }
 };
@@ -54,22 +54,22 @@ class FileDecoder : public Atlas::Message::DecoderBase {
   private:
     std::fstream m_file;
     Atlas::Codecs::XML m_codec;
-    Object::MapType m_entities;
+    Element::MapType m_entities;
     int m_count;
     std::string m_topLevelId;
 
-    virtual void ObjectArrived(const Object & obj) {
-        const Object::MapType & omap = obj.AsMap();
-        Object::MapType::const_iterator I;
+    virtual void objectArrived(const Element & obj) {
+        const Element::MapType & omap = obj.asMap();
+        Element::MapType::const_iterator I;
         if (((I = omap.find("id")) == omap.end()) ||
-            (!I->second.IsString()) || (I->second.AsString().empty())) {
+            (!I->second.isString()) || (I->second.asString().empty())) {
             std::cerr << "WARNING: Object in file has no id. Not stored."
                       << std::endl << std::flush;
             return;
         }
-        const std::string & id = I->second.AsString();
+        const std::string & id = I->second.asString();
         if (((I = omap.find("loc")) == omap.end()) ||
-            (!I->second.IsString()) || (I->second.AsString().empty())) {
+            (!I->second.isString()) || (I->second.asString().empty())) {
             // Entity with loc attribute must be the root entity
             if (!m_topLevelId.empty()) {
                 std::cerr << "ERROR: File contained TLE with id = "
@@ -90,7 +90,7 @@ class FileDecoder : public Atlas::Message::DecoderBase {
 
     void read() {
         while (!m_file.eof()) {
-            m_codec.Poll();
+            m_codec.poll();
         }
     }
 
@@ -102,7 +102,7 @@ class FileDecoder : public Atlas::Message::DecoderBase {
         }
     }
 
-    const Object::MapType & getEntities() const {
+    const Element::MapType & getEntities() const {
         return m_entities;
     }
 
@@ -585,20 +585,20 @@ void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 }
 
 void ServerEntities::insertEntityContents(const std::string & container,
-                     const Atlas::Message::Object::MapType & ent,
-                     const Atlas::Message::Object::MapType & entities)
+                     const Atlas::Message::Element::MapType & ent,
+                     const Atlas::Message::Element::MapType & entities)
 {
-    Atlas::Message::Object::MapType::const_iterator I = ent.find("contains");
-    if ((I == ent.end()) || !I->second.IsList() || I->second.AsList().empty()) {
+    Atlas::Message::Element::MapType::const_iterator I = ent.find("contains");
+    if ((I == ent.end()) || !I->second.isList() || I->second.asList().empty()) {
         return;
     }
-    const Atlas::Message::Object::ListType & contents = I->second.AsList();
-    Atlas::Message::Object::ListType::const_iterator J = contents.begin();
+    const Atlas::Message::Element::ListType & contents = I->second.asList();
+    Atlas::Message::Element::ListType::const_iterator J = contents.begin();
     for(; J != contents.end(); ++J) {
-        if (!J->IsString()) { continue; }
-        Atlas::Message::Object::MapType::const_iterator K = entities.find(J->AsString());
+        if (!J->isString()) { continue; }
+        Atlas::Message::Element::MapType::const_iterator K = entities.find(J->asString());
         if (K == entities.end()) { continue; }
-        Atlas::Message::Object::MapType newEnt = K->second.AsMap();
+        Atlas::Message::Element::MapType newEnt = K->second.asMap();
         newEnt["loc"] = container;
         newEnt.erase("id");
         m_serverConnection.avatarCreateEntity(newEnt);
@@ -619,9 +619,9 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
     FileDecoder fd(filename);
     fd.read();
     fd.report();
-    const Atlas::Message::Object::MapType & fileEnts = fd.getEntities();
+    const Atlas::Message::Element::MapType & fileEnts = fd.getEntities();
     const std::string & topId = fd.getTopLevel();
-    Atlas::Message::Object::MapType::const_iterator I = fileEnts.find(topId);
+    Atlas::Message::Element::MapType::const_iterator I = fileEnts.find(topId);
     if (I == fileEnts.end()) {
         std::cerr << "ERROR: Failed to find top level entity " << topId << " in file"
                   << std::endl << std::flush;
@@ -632,14 +632,14 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
     }
     if (m_importOptions->m_target == ImportOptions::IMPORT_TOPLEVEL) {
         insertEntityContents(m_serverConnection.world->getRootEntity()->getID(),
-                             I->second.AsMap(), fileEnts);
+                             I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
         if (m_selection == NULL) {
             std::cerr << "ERROR: Can't import into selection, as nothing is selected. Tell the user" << std::endl << std::flush;
             return;
         }
         insertEntityContents(m_selection->getID(),
-                             I->second.AsMap(), fileEnts);
+                             I->second.asMap(), fileEnts);
     }
     // m_model.updated.emit();
 }
@@ -648,8 +648,8 @@ void ServerEntities::exportEntity(const std::string & id,
                                   Atlas::Message::Encoder & e,
                                   Eris::Entity * ee)
 {
-    Atlas::Message::Object::MapType ent;
-    Atlas::Message::Object::ListType contents;
+    Atlas::Message::Element::MapType ent;
+    Atlas::Message::Element::ListType contents;
     ent["id"] = id;
     unsigned int numEnts = ee->getNumMembers();
     for(unsigned int i = 0; i < numEnts; ++i) {
@@ -674,7 +674,7 @@ void ServerEntities::exportEntity(const std::string & id,
     ent["bbox"] = ee->getBBox().toAtlas();
     ent["orientation"] = ee->getOrientation().toAtlas();
     ent["name"] = ee->getName();
-    ent["parents"] = Atlas::Message::Object::ListType(1, *ee->getInherits().begin());
+    ent["parents"] = Atlas::Message::Element::ListType(1, *ee->getInherits().begin());
     Eris::Entity * loc = ee->getContainer();
     if (loc != NULL) {
         // FIXME AJR 2002-07-15
@@ -683,7 +683,7 @@ void ServerEntities::exportEntity(const std::string & id,
         // that, otherwise it might need the suffix appended
         ent["loc"] = loc->getID();
     }
-    e.StreamMessage(ent);
+    e.streamMessage(ent);
 }
 
 void ServerEntities::save(Gtk::FileSelection * fsel)
@@ -717,7 +717,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     Atlas::Codecs::XML codec(ios, &d);
     Atlas::Message::Encoder e(&codec);
 
-    codec.StreamBegin();
+    codec.streamBegin();
 
     std::string exportedRootId;
     if (m_exportOptions->m_setRootCheck->get_active()) {
@@ -730,12 +730,12 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     }
 
     if (m_exportOptions->m_charCheck->get_active()) {
-        m_exportOptions->m_charType = m_serverConnection.connection.getTypeInfoEngine()->findSafe("character");
+        m_exportOptions->m_charType = m_serverConnection.connection.getTypeService()->getTypeByName("character");
     }
 
     if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
-        Atlas::Message::Object::MapType ent;
-        Atlas::Message::Object::ListType contents;
+        Atlas::Message::Element::MapType ent;
+        Atlas::Message::Element::ListType contents;
         ent["id"] = exportedRootId;
         unsigned int numEnts = export_root->getNumMembers();
         for(unsigned int i = 0; i < numEnts; ++i) {
@@ -753,13 +753,13 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
         ent["bbox"] = export_root->getBBox().toAtlas();
         ent["orientation"] = export_root->getOrientation().toAtlas();
         ent["name"] = export_root->getName();
-        ent["parents"] = Atlas::Message::Object::ListType(1, *export_root->getInherits().begin());
-        e.StreamMessage(ent);
+        ent["parents"] = Atlas::Message::Element::ListType(1, *export_root->getInherits().begin());
+        e.streamMessage(ent);
     } else {
         exportEntity(exportedRootId, e, export_root);
     }
 
-    codec.StreamEnd();
+    codec.streamEnd();
 }
 
 void ServerEntities::cancel(Gtk::FileSelection * fsel)
@@ -795,38 +795,38 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
         return;
     }
     const Element & terrain = ent->getProperty("terrain");
-    if (!terrain.IsMap()) {
+    if (!terrain.isMap()) {
         std::cerr << "Terrain is not a map" << std::endl << std::flush;
     }
-    const Element::MapType & tmap = terrain.AsMap();
+    const Element::MapType & tmap = terrain.asMap();
     Element::MapType::const_iterator I = tmap.find("points");
     int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
-    if ((I == tmap.end()) || !I->second.IsList()) {
+    if ((I == tmap.end()) || !I->second.isList()) {
         std::cerr << "No terrain points" << std::endl << std::flush;
     }
-    const Element::ListType & plist = I->second.AsList();
+    const Element::ListType & plist = I->second.asList();
     Element::ListType::const_iterator J = plist.begin();
     for(; J != plist.end(); ++J) {
-        if (!J->IsList()) {
+        if (!J->isList()) {
             std::cout << "Non list in points" << std::endl << std::flush;
             continue;
         }
-        const Element::ListType & point = J->AsList();
+        const Element::ListType & point = J->asList();
         if (point.size() < 3) {
             std::cout << "point without 3 nums" << std::endl << std::flush;
             continue;
         }
-        int x = (int)point[0].AsNum();
-        int y = (int)point[1].AsNum();
+        int x = (int)point[0].asNum();
+        int y = (int)point[1].asNum();
         xmin = std::min(xmin, x);
         xmax = std::max(xmax, x);
         ymin = std::min(ymin, y);
         ymax = std::max(ymax, y);
-        Mercator::BasePoint bp(point[2].AsNum());
+        Mercator::BasePoint bp(point[2].asNum());
         if (point.size() > 3) {
-            bp.roughness()=point[3].AsNum();
+            bp.roughness()=point[3].asNum();
             if (point.size() > 4) {
-                bp.falloff()=point[4].AsNum();
+                bp.falloff()=point[4].asNum();
             }
         }
         m_model.m_terrain.setBasePoint(x, y, bp);
@@ -858,8 +858,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
                                m_selection(NULL), m_validDrag(false),
                                m_gameEntityType(NULL)
 {
-    m_serverConnection.connection.getTypeInfoEngine()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
-    m_gameEntityType = m_serverConnection.connection.getTypeInfoEngine()->findSafe("game_entity");
+    m_serverConnection.connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
+    m_gameEntityType = m_serverConnection.connection.getTypeService()->getTypeByName("game_entity");
     assert(m_gameEntityType != NULL);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
     if (m_gameEntityType->isBound()) {
@@ -992,9 +992,9 @@ void ServerEntities::insert(const WFMath::Point<3> & pos)
     const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
     std::cout << "INSERTING " << type << std::endl << std::flush;
 
-    Atlas::Message::Object::MapType ent;
+    Atlas::Message::Element::MapType ent;
     ent["objtype"] = "object";
-    ent["parents"] = Atlas::Message::Object::ListType(1, type);
+    ent["parents"] = Atlas::Message::Element::ListType(1, type);
     ent["loc"] = m_serverConnection.world->getRootEntity()->getID();
     ent["pos"] = pos.toAtlas();
     

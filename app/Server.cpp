@@ -21,29 +21,29 @@
 
 #include <sigc++/object_slot.h>
 
-using Atlas::Message::Object;
+using Atlas::Message::Element;
 
 using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
 #if 0
-inline Atlas::Message::Object WFMath::Point<3>::toAtlas() const
+inline Atlas::Message::Element WFMath::Point<3>::toAtlas() const
 {
-    Atlas::Message::Object::ListType ret(3);
+    Atlas::Message::Element::ListType ret(3);
     ret[0] = m_elem[0];
     ret[1] = m_elem[1];
     ret[2] = m_elem[2];
-    return Atlas::Message::Object(ret);
+    return Atlas::Message::Element(ret);
 }
 
-inline Atlas::Message::Object WFMath::Vector<3>::toAtlas() const
+inline Atlas::Message::Element WFMath::Vector<3>::toAtlas() const
 {
-    Atlas::Message::Object::ListType ret(3);
+    Atlas::Message::Element::ListType ret(3);
     ret[0] = m_elem[0];
     ret[1] = m_elem[1];
     ret[2] = m_elem[2];
-    return Atlas::Message::Object(ret);
+    return Atlas::Message::Element(ret);
 }
 #endif
 
@@ -70,10 +70,10 @@ void Server::createCharacter(const std::string & name,
 {
 
     GameEntity chrcter(GameEntity::Instantiate());
-    chrcter.SetParents(Atlas::Message::Object::ListType(1,type));
-    chrcter.SetName(name);
-    chrcter.SetAttr("description", "an equator avatar");
-    // chrcter.SetAttr("sex", "female");
+    chrcter.setParents(Atlas::Message::Element::ListType(1,type));
+    chrcter.setName(name);
+    chrcter.setAttr("description", "an equator avatar");
+    // chrcter.setAttr("sex", "female");
     world = player->createCharacter(chrcter)->getWorld();
 
     lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
@@ -180,13 +180,13 @@ void Server::moveCharacter(const WFMath::Point<3> & pos)
     
     Move m(Move::Instantiate());
 
-    Atlas::Message::Object::MapType marg;
+    Atlas::Message::Element::MapType marg;
     marg["id"] = character->getID();
     marg["loc"] = character->getContainer()->getID();
     marg["pos"] = pos.toAtlas();
     marg["velocity"] = WFMath::Point<3>(1,0,0).toAtlas();
-    m.SetArgs(Atlas::Message::Object::ListType(1, marg));
-    m.SetFrom(character->getID());
+    m.setArgs(Atlas::Message::Element::ListType(1, marg));
+    m.setFrom(character->getID());
 
     connection.send(m);
     
@@ -213,13 +213,13 @@ const WFMath::Point<3> Server::getAbsCharPos()
     return pos;
 }
 
-void Server::avatarCreateEntity(const Atlas::Message::Object::MapType & ent)
+void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
 {
     Create c = Create::Instantiate();
 
-    c.SetArgs(Atlas::Message::Object::ListType(1, ent));
-    c.SetFrom(character->getID());
-    c.SetTo(character->getID());
+    c.setArgs(Atlas::Message::Element::ListType(1, ent));
+    c.setFrom(character->getID());
+    c.setTo(character->getID());
     
     connection.send(c);
 }
@@ -229,13 +229,13 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
 {
     Move m = Move::Instantiate();
 
-    Atlas::Message::Object::MapType ent;
+    Atlas::Message::Element::MapType ent;
     ent["id"] = id;
     ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
-    m.SetArgs(Atlas::Message::Object::ListType(1, ent));
-    m.SetFrom(character->getID());
-    m.SetTo(id);
+    m.setArgs(Atlas::Message::Element::ListType(1, ent));
+    m.setFrom(character->getID());
+    m.setTo(id);
 
     connection.send(m);
 }
@@ -246,14 +246,14 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
 {
     Move m = Move::Instantiate();
 
-    Atlas::Message::Object::MapType ent;
+    Atlas::Message::Element::MapType ent;
     ent["id"] = id;
     ent["pos"] = pos.toAtlas();
     ent["loc"] = loc;
     ent["velocity"] = vel.toAtlas();
-    m.SetArgs(Atlas::Message::Object::ListType(1, ent));
-    m.SetFrom(character->getID());
-    m.SetTo(id);
+    m.setArgs(Atlas::Message::Element::ListType(1, ent));
+    m.setFrom(character->getID());
+    m.setTo(id);
 
     connection.send(m);
 }

@@ -15,7 +15,7 @@
 using std::cos;
 using std::sin;
 
-using Atlas::Message::Object;
+using Atlas::Message::Element;
 
 class Vector3D : protected Eris::Coord {
     // double x,y,z;
@@ -29,7 +29,7 @@ class Vector3D : protected Eris::Coord {
     Vector3D(double size) : Coord(size, size, size), _set(true) { }
     Vector3D(double x, double y, double z) : Coord(x, y, z), _set(true) { }
     Vector3D(const Eris::Coord & coord) : Coord(coord), _set(true) { }
-    Vector3D(const Object::ListType & vector) : Coord(vector), _set(true) { }
+    Vector3D(const Element::ListType & vector) : Coord(vector), _set(true) { }
 
     double X() const { return x; }
     double Y() const { return y; }
@@ -191,7 +191,7 @@ class Vector3D : protected Eris::Coord {
     }
 
     const Object asObject() const {
-        Object::ListType coords;
+        Element::ListType coords;
         coords.push_back(Object(x));
         coords.push_back(Object(y));
         coords.push_back(Object(z));

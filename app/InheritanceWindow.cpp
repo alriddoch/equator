@@ -20,7 +20,7 @@
 #include <iostream>
 #include <vector>
 
-using Atlas::Message::Object;
+using Atlas::Message::Element;
 
 InheritanceWindow::InheritanceWindow(MainWindow & mw) :
                                      Gtk::Window(Gtk::WINDOW_TOPLEVEL),
@@ -63,8 +63,8 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw) :
     vbox->pack_start(*scrolled_window, true, true, 2);
 
     static const gchar *titles[] = { "Name", "Attribute", NULL };
-    Atlas::Message::Object::MapType test;
-    test["Footle"] = Atlas::Message::Object::ListType(1, "foo");
+    Atlas::Message::Element::MapType test;
+    test["Footle"] = Atlas::Message::Element::ListType(1, "foo");
     test["foo"] = 23;
     test["bar"] = 0.1;
     test["baz"] = "hello";

@@ -15,7 +15,7 @@
 
 static bool debug_flag = false;
 
-using Atlas::Message::Object;
+using Atlas::Message::Element;
 
 ClientConnection::ClientConnection() :
     client_fd(-1), encoder(NULL), serialNo(512)
@@ -32,7 +32,7 @@ ClientConnection::~ClientConnection()
 void ClientConnection::operation(const RootOperation & op)
 {
 #if 0
-    const std::string & from = op.GetFrom();
+    const std::string & from = op.getFrom();
     if (from.empty()) {
         cerr << "ERROR: Operation with no destination" << endl << flush;
         return;
@@ -45,30 +45,30 @@ void ClientConnection::operation(const RootOperation & op)
     oplist res = I->second->message(op);
     oplist::iterator J = res.begin();
     for(J = res.begin(); J != res.end(); ++J) {
-        (*J)->SetFrom(I->first);
+        (*J)->setFrom(I->first);
         send(*(*J));
     }
 #endif
 }
 
-void ClientConnection::ObjectArrived(const Error&op)
+void ClientConnection::objectArrived(const Error&op)
 {
     debug(cout << "ERROR" << endl << flush;);
     push(op);
     error_flag = true;
 }
 
-void ClientConnection::ObjectArrived(const Info & op)
+void ClientConnection::objectArrived(const Info & op)
 {
     debug(cout << "INFO" << endl << flush;);
-    const std::string & from = op.GetFrom();
+    const std::string & from = op.getFrom();
     if (from.empty()) {
         reply_flag = true;
         error_flag = false;
         try {
-            Object ac = op.GetArgs().front();
-            reply = ac.AsMap();
-            // const std::string & acid = reply["id"].AsString();
+            Object ac = op.getArgs().front();
+            reply = ac.asMap();
+            // const std::string & acid = reply["id"].asString();
             // objects[acid] = new ClientAccount(acid, *this);
         }
         catch (...) {
@@ -79,139 +79,139 @@ void ClientConnection::ObjectArrived(const Info & op)
     }
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Action& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Action& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Appearance& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Appearance& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Combine& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Combine& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Communicate& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Communicate& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Create& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Create& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Delete& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Delete& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Disappearance& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Disappearance& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Divide& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Divide& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Feel& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Feel& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Get& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Get& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Imaginary& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Imaginary& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Listen& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Listen& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Login& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Login& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Logout& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Logout& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Look& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Look& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Move& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Move& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Perceive& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Perceive& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Perception& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Perception& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::RootOperation& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::RootOperation& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Set& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Set& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Sight& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Sight& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Smell& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Smell& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Sniff& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Sniff& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Sound& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Sound& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Talk& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Talk& op)
 {
     push(op);
 }
 
-void ClientConnection::ObjectArrived(const Atlas::Objects::Operation::Touch& op)
+void ClientConnection::objectArrived(const Atlas::Objects::Operation::Touch& op)
 {
     push(op);
 }
 
 int ClientConnection::read() {
     if (ios.is_open()) {
-        codec->Poll();
+        codec->poll();
         return 0;
     } else {
         return -1;
@@ -233,21 +233,21 @@ bool ClientConnection::connect(const std::string & server)
     Atlas::Net::StreamConnect conn("cyphesis_aiclient", ios, this);
 
     debug(cout << "Negotiating... " << flush;);
-    while (conn.GetState() == Atlas::Net::StreamConnect::IN_PROGRESS) {
-      conn.Poll();
+    while (conn.getState() == Atlas::Net::StreamConnect::IN_PROGRESS) {
+      conn.poll();
     }
     debug(cout << "done" << endl;);
   
-    if (conn.GetState() == Atlas::Net::StreamConnect::FAILED) {
+    if (conn.getState() == Atlas::Net::StreamConnect::FAILED) {
         cerr << "Failed to negotiate" << endl;
         return false;
     }
 
-    codec = conn.GetCodec();
+    codec = conn.getCodec();
 
     encoder = new Atlas::Objects::Encoder(codec);
 
-    codec->StreamBegin();
+    codec->streamBegin();
 
     return true;
 }
@@ -256,11 +256,11 @@ bool ClientConnection::login(const std::string & account,
                              const std::string & password)
 {
     Atlas::Objects::Operation::Login l = Atlas::Objects::Operation::Login::Instantiate();
-    Object::MapType acmap;
+    Element::MapType acmap;
     acmap["id"] = account;
     acmap["password"] = password;
 
-    l.SetArgs(Object::ListType(1,Object(acmap)));
+    l.setArgs(Element::ListType(1,Object(acmap)));
 
     reply_flag = false;
     error_flag = false;
@@ -272,11 +272,11 @@ bool ClientConnection::create(const std::string & account,
                               const std::string & password)
 {
     Atlas::Objects::Operation::Create c = Atlas::Objects::Operation::Create::Instantiate();
-    Object::MapType acmap;
+    Element::MapType acmap;
     acmap["id"] = account;
     acmap["password"] = password;
 
-    c.SetArgs(Object::ListType(1,Object(acmap)));
+    c.setArgs(Element::ListType(1,Object(acmap)));
 
     reply_flag = false;
     error_flag = false;
@@ -291,7 +291,7 @@ bool ClientConnection::wait()
    error_flag = false;
    reply_flag = false;
    while (!reply_flag) {
-      codec->Poll();
+      codec->poll();
    }
    return error_flag;
 }
@@ -301,12 +301,12 @@ void ClientConnection::send(Atlas::Objects::Operation::RootOperation & op)
     debug(std::fstream f(1);
           Atlas::Codecs::XML c(f, (Atlas::Bridge*)this);
           Atlas::Objects::Encoder enc(&c);
-          enc.StreamMessage(&op);
+          enc.streamMessage(&op);
           std::cout << std::endl << flush;);
     
 
-    op.SetSerialno(++serialNo);
-    encoder->StreamMessage(&op);
+    op.setSerialno(++serialNo);
+    encoder->streamMessage(&op);
     ios << flush;
 }
 
@@ -329,7 +329,7 @@ void ClientConnection::poll()
             std::cerr << "Server disconnected" << std::endl << std::flush;
             return;
         }
-        codec->Poll();
+        codec->poll();
         return;
     }
     return;

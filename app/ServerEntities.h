@@ -8,7 +8,7 @@
 #include "Layer.h"
 #include "GlView.h"
 
-#include <Atlas/Message/Object.h>
+#include <Atlas/Message/Element.h>
 
 #include <set>
 
@@ -88,8 +88,8 @@ class ServerEntities : public Layer {
     void saveOptions(Gtk::FileSelection *);
 
     void insertEntityContents(const std::string & container,
-                              const Atlas::Message::Object::MapType & ent,
-                              const Atlas::Message::Object::MapType & entities);
+                              const Atlas::Message::Element::MapType & ent,
+                              const Atlas::Message::Element::MapType & entities);
     void exportEntity(const std::string & id,
                       Atlas::Message::Encoder & e, Eris::Entity *);
 

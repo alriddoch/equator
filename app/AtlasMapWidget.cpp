@@ -10,19 +10,19 @@
 
 #include <sstream>
 
-typedef Atlas::Message::Object AObject;
+using Atlas::Message::Element;
 
-std::ostream & operator<<(std::ostream& s, const Atlas::Message::Object& v)
+std::ostream & operator<<(std::ostream& s, const Atlas::Message::Element& v)
 {
-    switch(v.GetType()) {
-        case AObject::TYPE_INT:
-            s << v.AsInt();
+    switch(v.getType()) {
+        case Element::TYPE_INT:
+            s << v.asInt();
             break;
-        case AObject::TYPE_FLOAT:
-            s << v.AsFloat();
+        case Element::TYPE_FLOAT:
+            s << v.asFloat();
             break;
-        case AObject::TYPE_STRING:
-            s << v.AsString();
+        case Element::TYPE_STRING:
+            s << v.asString();
             break;
         default:
             s << "INVALID";
@@ -32,13 +32,13 @@ std::ostream & operator<<(std::ostream& s, const Atlas::Message::Object& v)
 
 void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
                          const std::string & name,
-                         const AObject & o)
+                         const Element & o)
 {
 #warning Fix the AtlasMapWidget class FIXME
 #if 0
     std::vector<const char*> item(2);
     item[0] = name.c_str();
-    if (!o.IsList() && !o.IsMap()) {
+    if (!o.isList() && !o.isMap()) {
         std::stringstream data;
         data << o;
         item[1] = data.str().c_str();
@@ -47,15 +47,15 @@ void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
         item[1] = "";
         rowList.push_back(Gtk::CTree_Helpers::Element(item));
         Gtk::CTree_Helpers::RowList::iterator i = --rowList.end();
-        if (o.IsList()) {
-            const AObject::ListType & olist = o.AsList();
-            AObject::ListType::const_iterator I = olist.begin();
+        if (o.isList()) {
+            const Element::ListType & olist = o.asList();
+            Element::ListType::const_iterator I = olist.begin();
             for (;I != olist.end(); I++) {
                 add(i->subtree(), "", *I);
             }
-        } else if (o.IsMap()) {
-            const AObject::MapType & omap = o.AsMap();
-            AObject::MapType::const_iterator I = omap.begin();
+        } else if (o.isMap()) {
+            const Element::MapType & omap = o.asMap();
+            Element::MapType::const_iterator I = omap.begin();
             for (;I != omap.end(); I++) {
                 add(i->subtree(), I->first, I->second);
             }
@@ -67,14 +67,14 @@ void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
 void AtlasMapWidget::update()
 {
     // clear();
-    AObject::MapType::const_iterator I = m_contents.begin();
+    Element::MapType::const_iterator I = m_contents.begin();
     for (;I != m_contents.end(); I++) {
         add(/* rows(),*/ I->first, I->second);
     }
 }
 
 AtlasMapWidget::AtlasMapWidget(/* const Gtk::SArray & t, */
-                               const Atlas::Message::Object::MapType & m) :
+                               const Atlas::Message::Element::MapType & m) :
                                m_contents(m)
 {
     m_columns = new Gtk::TreeModelColumnRecord();
@@ -96,13 +96,13 @@ AtlasMapWidget::AtlasMapWidget(/* const Gtk::SArray & t, */
     }
 }
 
-void AtlasMapWidget::setContents(const Atlas::Message::Object::MapType & m)
+void AtlasMapWidget::setContents(const Atlas::Message::Element::MapType & m)
 {
     m_contents = m;
     update();
 }
 
-void AtlasMapWidget::setAttr(const std::string & n, const Atlas::Message::Object & o)
+void AtlasMapWidget::setAttr(const std::string & n, const Atlas::Message::Element & o)
 {
     m_contents[n] = o;
     // Probably don't need to do a full update, but its quicker for now.

@@ -1,3 +1,7 @@
+2003-08-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* Port codebase to Atlas-C++ 0.5 transitional, and eris 1.2 API.
+
 2003-07-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Server.cpp: Use wfmath Atlas conversions correctly.

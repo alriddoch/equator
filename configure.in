@@ -39,8 +39,7 @@ AM_PATH_SDL($SDL_VERSION)
 CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
 LIBS="$LIBS $SDL_LIBS"
 
-PKG_CHECK_MODULES(WF, wfmath-0.2 >= 0.2.10 skstream-0.2 >= 0.2.4 \
-                      atlascpp-0.4 >= 0.4.5 mercator-0.2 eris-1.0 \
+PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 \
                       coal-0.4 coal-blade-0.4 coal-iso-0.4 \
                           ,
     [

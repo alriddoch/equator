@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_ATLASMAPWIDGET_H
 #define EQUATOR_APP_ATLASMAPWIDGET_H
 
-#include <Atlas/Message/Object.h>
+#include <Atlas/Message/Element.h>
 #include <gtkmm/treeview.h>
 
 namespace Gtk {
@@ -21,17 +21,17 @@ class AtlasMapWidget : public Gtk::TreeView
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
     Gtk::TreeModelColumn<Glib::ustring> * m_valueColumn;
     Gtk::TreeModelColumnRecord * m_columns;
-    Atlas::Message::Object::MapType m_contents;
+    Atlas::Message::Element::MapType m_contents;
 
     void add(/* Gtk::CTree_Helpers::RowList,*/ const std::string&,
-             const Atlas::Message::Object &);
+             const Atlas::Message::Element &);
     void update();
   public:
     AtlasMapWidget(/* const Gtk::SArray &, */
-                   const Atlas::Message::Object::MapType &);
+                   const Atlas::Message::Element::MapType &);
 
-    void setContents(const Atlas::Message::Object::MapType &);
-    void setAttr(const std::string &, const Atlas::Message::Object &);
+    void setContents(const Atlas::Message::Element::MapType &);
+    void setAttr(const std::string &, const Atlas::Message::Element &);
 
 };
 
