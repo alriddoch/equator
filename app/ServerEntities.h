@@ -68,10 +68,11 @@ class ServerEntities : public Layer {
     Eris::TypeInfo * m_gameEntityType;
 
     void draw3DCube(const WFMath::AxisBox<3> & bbox, bool open = false);
-    void draw3DSelectedBox(const WFMath::AxisBox<3> & bbox, float phase = 0);
+    void draw3DSelectedBox(GlView & view, const WFMath::AxisBox<3> & bbox,
+                           float phase = 0);
     void draw3DBox(const WFMath::AxisBox<3> & bbox);
-    void drawEntity(Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
-    void drawWorld(Eris::Entity * wrld);
+    void drawEntity(GlView &, Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
+    void drawWorld(GlView &, Eris::Entity * wrld);
     void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
     void selectEntity(Eris::Entity*,Eris::Entity *, entstack_t::const_iterator);
     bool selectEntities(GlView & view, int nx, int ny, int fx, int fy,

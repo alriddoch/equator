@@ -173,18 +173,22 @@ void ServerEntities::draw3DBox(const WFMath::AxisBox<3> & bbox)
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
 }
 
-void ServerEntities::draw3DSelectedBox(const WFMath::AxisBox<3> & bbox,
+void ServerEntities::draw3DSelectedBox(GlView & view,
+                                       const WFMath::AxisBox<3> & bbox,
                                        float phase)
 {
-    glDisable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);
+    glDepthFunc(GL_LEQUAL);
+
+    GLfloat scale = 0.5f * view.getScale();
+    GLfloat sx[] = { scale, scale, scale, 0 };
 
     glEnable(GL_TEXTURE_1D);
     glBindTexture(GL_TEXTURE_1D, m_antTexture);
-    float xlen = phase + bbox.highCorner().x() - bbox.lowCorner().x();
-    float ylen = phase + bbox.highCorner().y() - bbox.lowCorner().y();
-    float zlen = phase + bbox.highCorner().z() - bbox.lowCorner().z();
-
+    glColor3f(1.f, 1.f, 1.f);
+    glEnable(GL_TEXTURE_GEN_S);
+    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
+    
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
         bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -197,19 +201,14 @@ void ServerEntities::draw3DSelectedBox(const WFMath::AxisBox<3> & bbox,
     };
     static const GLushort indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
                                         3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
-    // FIXME THis is all wrong
-    GLfloat texcoords[] = { phase, xlen, xlen + ylen, ylen, zlen, xlen + zlen,
-                            xlen + ylen + zlen, ylen + zlen };
-
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+    glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_1D);
 
-    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 }
 
 void ServerEntities::orient(const WFMath::Quaternion & orientation)
@@ -230,7 +229,7 @@ void ServerEntities::orient(const WFMath::Quaternion & orientation)
 }
 
 
-void ServerEntities::drawEntity(Eris::Entity* ent,
+void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
                                 Eris::Entity* pe,
                                 entstack_t::const_iterator I)
 {
@@ -265,7 +264,7 @@ void ServerEntities::drawEntity(Eris::Entity* ent,
         }
         if ((ent == m_selection) ||
             (m_selectionList.find(ent) != m_selectionList.end())) {
-            draw3DSelectedBox(ent->getBBox());
+            draw3DSelectedBox(view, ent->getBBox());
         }
     } // else draw it without using its bbox FIXME how ?
 
@@ -281,20 +280,20 @@ void ServerEntities::drawEntity(Eris::Entity* ent,
             Eris::Entity * e = ent->getMember(i);
             assert(e != NULL);
 
-            drawEntity(e, 0, J);
+            drawEntity(view, e, 0, J);
         }
     }
 
     glPopMatrix();
 }
 
-void ServerEntities::drawWorld(Eris::Entity * wrld)
+void ServerEntities::drawWorld(GlView & view, Eris::Entity * wrld)
 {
     assert(wrld != NULL);
 
     m_world = wrld;
 
-    drawEntity(wrld, 0, m_selectionStack.begin());
+    drawEntity(view, wrld, 0, m_selectionStack.begin());
 }
 
 void ServerEntities::selectEntity(Eris::Entity * wrld,
@@ -789,7 +788,7 @@ void ServerEntities::animate(GlView & view)
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
     moveTo(m_selection->getContainer(), root);
-    draw3DSelectedBox(m_selection->getBBox(),
+    draw3DSelectedBox(view, m_selection->getBBox(),
                       view.getAnimCount());
     glPopMatrix();
 }
@@ -800,7 +799,7 @@ void ServerEntities::draw(GlView & view)
 
     m_renderMode = view.getRenderMode(m_name);
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
-    drawWorld(root);
+    drawWorld(view, root);
 }
 
 void ServerEntities::select(GlView & view, int x, int y)
