@@ -675,7 +675,7 @@ void GlView::midClickOn(int x, int y)
     if (m_mainWindow.getTool() == MainWindow::DRAW) {
         float cx, cy, cz;
         m_model.getCursor(cx, cy, cz);
-        m_model.getCurrentLayer()->insert(WFMath::Vector<3>(cx, cy, cz));
+        m_model.getCurrentLayer()->insert(PosType(cx, cy, cz));
     }
 }
 

@@ -1,3 +1,15 @@
+2003-11-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/Vector3D.h: Switch back to Eris, and use Point<3> for
+	  POS attribute again. Add file with typedefs for POS and
+	  VELOCITY.
+
+	* app/Terrain.cpp, app/ServerEntities.h, app/ServerEntities.cpp,
+	  app/Server.h, app/Server.cpp, app/Layer.h, app/IsoMap.h,
+	  app/Holo.h, app/GlView.cpp, app/EntityLayer.h,
+	  app/BladeMap.h: Use correct typedefs for all positions
+	  and velocities.
+
 2003-11-26  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/BladeMap.h, app/EntityLayer.h, app/GlView.cpp, app/Holo.h,

@@ -497,7 +497,7 @@ void Terrain::dragEnd(GlView & view, float x, float y, float z)
     m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, ref);
 }
 
-void Terrain::insert(const WFMath::Vector<3> & curs)
+void Terrain::insert(const PosType & curs)
 {
     int posx = (int)::round(curs.x() / segSize);
     int posy = (int)::round(curs.y() / segSize);

@@ -54,7 +54,7 @@ class Terrain : public Layer {
     virtual void dragStart(GlView & view, int x, int y);
     virtual void dragUpdate(GlView & view, float x, float y, float z);
     virtual void dragEnd(GlView & view, float x, float y, float z);
-    virtual void insert(const WFMath::Vector<3> &);
+    virtual void insert(const PosType &);
     virtual void align(Alignment ) { }
 };
 

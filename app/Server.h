@@ -5,6 +5,8 @@
 #ifndef EQUATOR_SERVER_H
 #define EQUATOR_SERVER_H
 
+#include "Vector3D.h"
+
 #include <Eris/Connection.h>
 #include <Eris/Log.h>
 
@@ -16,10 +18,6 @@ namespace Eris {
   class World;
   class Room;
   class Entity;
-}
-
-namespace WFMath {
-  template<const int dim> class Vector;
 }
 
 namespace Atlas {
@@ -43,7 +41,7 @@ class Server : public SigC::Object {
     void worldEntityCreate(Eris::Entity *r);
     void worldEnter(Eris::Entity *r);
 
-    void charMoved(const WFMath::Vector<3> &);
+    void charMoved(const PosType &);
 
     void checkEntityForNewLayers(Eris::Entity & ent);
     void readTerrain(Terrain & t, Eris::Entity & ent);
@@ -77,16 +75,16 @@ class Server : public SigC::Object {
     void createCharacter(const std::string &, const std::string &);
     void createLayers(Model & model);
 
-    void moveCharacter(const WFMath::Vector<3> & pos);
+    void moveCharacter(const PosType & pos);
 
     void avatarCreateEntity(const Atlas::Message::Element::MapType &);
     void avatarMoveEntity(const std::string &, const std::string &loc,
-                          const WFMath::Vector<3> & pos);
+                          const PosType & pos);
     void avatarMoveEntity(const std::string &, const std::string &loc,
-                          const WFMath::Vector<3> & pos,
-                          const WFMath::Vector<3> & vel);
+                          const PosType & pos,
+                          const VelType & vel);
 
-    const WFMath::Vector<3> getAbsCharPos();
+    const PosType getAbsCharPos();
 };
 
 #endif // EQUATOR_SERVER_H

@@ -265,12 +265,12 @@ void Server::worldEnter(Eris::Entity * chr)
 
 }
 
-void Server::charMoved(const WFMath::Vector<3> &)
+void Server::charMoved(const PosType &)
 {
     std::cout << "Char moved" << std::endl << std::flush;
 }
 
-void Server::moveCharacter(const WFMath::Vector<3> & pos)
+void Server::moveCharacter(const PosType & pos)
 {
     if (m_character == NULL) {
         return;
@@ -282,7 +282,7 @@ void Server::moveCharacter(const WFMath::Vector<3> & pos)
     marg["id"] = m_character->getID();
     marg["loc"] = m_character->getContainer()->getID();
     marg["pos"] = pos.toAtlas();
-    marg["velocity"] = WFMath::Vector<3>(1,0,0).toAtlas();
+    marg["velocity"] = VelType(1,0,0).toAtlas();
     m.setArgs(Atlas::Message::Element::ListType(1, marg));
     m.setFrom(m_character->getID());
 
@@ -290,17 +290,17 @@ void Server::moveCharacter(const WFMath::Vector<3> & pos)
     
 }
 
-const WFMath::Vector<3> Server::getAbsCharPos()
+const PosType Server::getAbsCharPos()
 {
     if (!inGame) {
-        return WFMath::Vector<3>();
+        return PosType();
     }
-    WFMath::Vector<3> pos = m_character->getPosition();
+    PosType pos = m_character->getPosition();
     Eris::Entity * root = m_world->getRootEntity();
     for(Eris::Entity * ref = m_character->getContainer();
         ref != NULL && ref != root;
         ref = ref->getContainer()) {
-        pos = pos + ref->getPosition();
+        pos = pos.toParentCoords(ref->getPosition());
     }
     return pos;
 }
@@ -317,7 +317,7 @@ void Server::avatarCreateEntity(const Atlas::Message::Element::MapType & ent)
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
-                              const WFMath::Vector<3> & pos)
+                              const PosType & pos)
 {
     Move m = Move::Instantiate();
 
@@ -333,8 +333,8 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
-                              const WFMath::Vector<3> & pos,
-                              const WFMath::Vector<3> & vel)
+                              const PosType & pos,
+                              const VelType & vel)
 {
     Move m = Move::Instantiate();
 

@@ -44,7 +44,7 @@ class BladeMap : public Layer {
     void dragStart(GlView & view, int x, int y);
     void dragUpdate(GlView & view, float x, float y, float z);
     void dragEnd(GlView & view, float x, float y, float z);
-    void insert(const WFMath::Vector<3> &) { }
+    void insert(const PosType &) { }
     void align(Alignment ) { }
 };
 

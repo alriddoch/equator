@@ -372,7 +372,7 @@ void ServerEntities::drawEntity(Eris::Entity* world,
 {
     assert(ent != NULL);
 
-    WFMath::Vector<3> pos = ent->getPosition();
+    PosType pos = ent->getPosition();
 
     // This is where code would go to adjust position for velocity etc.
 
@@ -433,7 +433,7 @@ void ServerEntities::selectEntity(Eris::Entity * wrld,
 {
     assert(ent != NULL);
 
-    WFMath::Vector<3> pos = ent->getPosition();
+    PosType pos = ent->getPosition();
 
     glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
@@ -571,7 +571,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
         if (tparent != 0) {
             std::cout << "Terrain ... " << std::endl << std::flush;
             if (tparent->m_terrain != 0) {
-                WFMath::Vector<3> pos = ent->getPosition();
+                PosType pos = ent->getPosition();
                 float height = tparent->m_terrain->m_terrain.get(pos.x(),
                                                                  pos.y());
                 std::cout << ent->getID() << " had height of " << pos.z()
@@ -579,21 +579,21 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
                 pos.z() = height;
                 m_serverConnection.avatarMoveEntity(ent->getID(),
                                             ent->getContainer()->getID(),
-                                            pos, WFMath::Vector<3>(0,0,0));
+                                            pos, VelType(0,0,0));
                 
             } else {
                 std::cout << "No terrain ... " << std::endl << std::flush;
             }
         } else {
             std::cout << "Not terrain ... " << std::endl << std::flush;
-            WFMath::Vector<3> pos = ent->getPosition();
+            PosType pos = ent->getPosition();
             float height = 0.f;
             std::cout << ent->getID() << " had height of " << pos.z()
                       << " and we change it to zero " << height << std::endl << std::flush;
             pos.z() = height;
             m_serverConnection.avatarMoveEntity(ent->getID(),
                                         ent->getContainer()->getID(),
-                                        pos, WFMath::Vector<3>(0,0,0));
+                                        pos, VelType(0,0,0));
         }
 #warning FIXME - get the server object to handle the adjustment.
         // The server object knows about what data we have available.
@@ -880,7 +880,7 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     }
     Eris::Entity * cont = ent->getContainer();
     moveTo(cont, world);
-    WFMath::Vector<3> pos = ent->getPosition();
+    PosType pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
 }
 
@@ -952,12 +952,12 @@ void ServerEntities::dragEnd(GlView & view, float x, float y, float z)
                   << ":" << y << ":" << z << std::endl << std::flush;
         m_serverConnection.avatarMoveEntity(m_selection->getID(),
                    m_selection->getContainer()->getID(),
-                   m_selection->getPosition() + WFMath::Vector<3>(x, y, z));
+                   m_selection->getPosition() + VelType(x, y, z));
     }
     m_validDrag = false;
 }
 
-void ServerEntities::insert(const WFMath::Vector<3> & pos)
+void ServerEntities::insert(const PosType & pos)
 {
     const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
     std::cout << "INSERTING " << type << std::endl << std::flush;
@@ -994,7 +994,7 @@ void ServerEntities::entityChanged(const Eris::StringSet &attrs, Eris::Entity *e
     m_model.update();   // a bit excessive I suppose
 }
 
-void ServerEntities::entityMoved(const WFMath::Vector<3> &)
+void ServerEntities::entityMoved(const PosType &)
 {
     m_model.update();   // a bit excessive I suppose
 }
