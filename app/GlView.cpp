@@ -29,13 +29,7 @@
 #include <inttypes.h>
 
 #include <cassert>
-
-#ifndef GL_EXT_compiled_vertex_array
-PFNGLLOCKARRAYSEXTPROC glLockArraysExt = 0;
-PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysExt = 0;
-#endif // GL_EXT_compiled_vertex_array
-
-bool have_GL_EXT_compiled_vertex_array = false;
+#include <cmath>
 
 int attrlist[] = {
     Gdk::GL::RGBA,
@@ -79,19 +73,21 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
                                       -0.2f, 0.3464f, 0.0f };
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
-                               m_viewNo(m.getViewNo()),
-                               m_scale(1.0),
-                               // m_currentLayer(NULL),
-                               m_xoff(0), m_yoff(0), m_zoff(0),
-                               m_declination(60), m_rotation(45),
-                               clickx(0), clicky(0),
-                               dragx(0.0), dragy(0.0), dragz(0.0),
-                               m_animCount(0.0),
-                               m_dragType(NONE),
-                               m_mainWindow(mw),
-                               m_viewWindow(vw),
-                               m_model(m),
-                               m_renderer(* new Renderer)
+           m_viewNo(m.getViewNo()),
+           m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
+           m_xAdj(*manage( new Gtk::Adjustment(0., -500., 500.) )),
+           m_yAdj(*manage( new Gtk::Adjustment(0., -500., 500.) )),
+           m_zAdj(*manage( new Gtk::Adjustment(0., -500., 500.) )),
+           m_declAdj(*manage( new Gtk::Adjustment(60., 0., 360.) )),
+           m_rotaAdj(*manage( new Gtk::Adjustment(45., 0., 360.) )),
+           clickx(0), clicky(0),
+           dragx(0.0), dragy(0.0), dragz(0.0),
+           m_animCount(0.0),
+           m_dragType(NONE),
+           m_mainWindow(mw),
+           m_viewWindow(vw),
+           m_model(m),
+           m_renderer(* new Renderer)
 {
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME
@@ -151,9 +147,16 @@ void GlView::setPerspective()
     m_viewWindow.setTitle();
 }
 
+float GlView::getScale() const
+{
+    return pow(2, m_scaleAdj.get_value());
+}
+
 void GlView::setScale(GLfloat s)
 {
-    m_scale = s;
+    // Representation of the scale inside the adjustment is
+    // log2 of the scale factor, to give the user a sane scale
+    m_scaleAdj.set_value(log2(s));
     redraw();
     m_viewWindow.setTitle();
     viewChanged.emit();
@@ -161,30 +164,30 @@ void GlView::setScale(GLfloat s)
 
 void GlView::setFace(GLfloat d, GLfloat r)
 {
-    m_declination = d;
-    m_rotation = r;
+    m_declAdj.set_value(d);
+    m_rotaAdj.set_value(r);
     redraw();
     viewChanged.emit();
 }
 
 void GlView::zoomIn()
 {
-    float new_scale = m_scale * 2.0f;
-    if (new_scale > 16.0f) {
-        new_scale = 16.0f;
+    float new_scale = getScale() * 2.f;
+    if (new_scale > 16.f) {
+        new_scale = 16.f;
     }
-    if (m_scale != new_scale) {
+    if (getScale() != new_scale) {
         setScale(new_scale);
     }
 }
 
 void GlView::zoomOut()
 {
-    float new_scale = m_scale / 2;
+    float new_scale = getScale() / 2;
     if (new_scale < 0.0078125f) {
         new_scale = 0.0078125f;
     }
-    if (m_scale != new_scale) {
+    if (getScale() != new_scale) {
         setScale(new_scale);
     }
 }
@@ -201,16 +204,6 @@ bool GlView::extensionsInitialised = 0;
 
 void GlView::initExtensions()
 {
-    if (Gdk::GL::query_gl_extension("GL_EXT_compiled_vertex_array")) {
-        std::cout << "GL EXTENSION GL_EXT_compiled_vertex_array"
-            << std::endl << std::flush;
-#ifndef GL_EXT_compiled_vertex_array
-        glLockArraysExt = (PFNGLLOCKARRAYSEXTPROC)Gdk::GL::Query::get_proc_address("glLockArraysExt");
-        glUnlockArraysExt = (PFNGLUNLOCKARRAYSEXTPROC)Gdk::GL::Query::get_proc_address("glUnlockArraysExt");
-        assert(glLockArraysEXT != 0 && glUnlockArraysEXT != 0);
-#endif // GL_EXT_compiled_vertex_array
-        have_GL_EXT_compiled_vertex_array = true;
-    }
     extensionsInitialised = true;
 }
 
@@ -289,17 +282,19 @@ void GlView::origin()
     if (m_projection == GlView::PERSP) {
         glTranslatef(0.0f, 0.0f, -10.0f);
     }
-    glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
-    glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
-    glScalef(m_scale, m_scale, m_scale);
-    glTranslatef(m_xoff, m_yoff, m_zoff);
+    glRotatef(-getDeclination(), 1.0f, 0.0f, 0.0f);
+    glRotatef(getRotation(), 0.0f, 0.0f, 1.0f);
+    float scale = getScale();
+    glScalef(scale, scale, scale);
+    glTranslatef(getXoff(), getYoff(), getZoff());
 }
 
 void GlView::face()
 {
-    glScalef(1.0f/m_scale, 1.0f/m_scale, 1.0f/m_scale);
-    glRotatef(-m_rotation, 0.0f, 0.0f, 1.0f);
-    glRotatef(m_declination, 1.0f, 0.0f, 0.0f);
+    float scale = getScale();
+    glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
+    glRotatef(-getRotation(), 0.0f, 0.0f, 1.0f);
+    glRotatef(getDeclination(), 1.0f, 0.0f, 0.0f);
 }
 
 void GlView::cursor()
@@ -495,9 +490,9 @@ void GlView::midClickOff(int x, int y)
 {
     double tx, ty, tz;
     worldPoint(x, y, dragDepth, &tx, &ty, &tz);
-    m_xoff += (tx - dragx);
-    m_yoff += (ty - dragy);
-    m_zoff += (tz - dragz);
+    setXoff(getXoff() + (tx - dragx) );
+    setYoff(getYoff() + (ty - dragy) );
+    setZoff(getZoff() + (tz - dragz) );
     m_dragType = GlView::NONE;
     redraw();
 }
@@ -687,7 +682,7 @@ const std::string GlView::details() const
 {
     std::stringstream dets;
     const char * view = (m_projection == ORTHO) ? "Orthographic" : "Perspective";
-    dets << "-" << m_model.getModelNo() << "." << m_viewNo << " (" << view << ") " << (int)(m_scale * 100) << "%";
+    dets << "-" << m_model.getModelNo() << "." << m_viewNo << " (" << view << ") " << (int)(getScale() * 100) << "%";
     return dets.str();
 }
 
@@ -738,18 +733,19 @@ void GlView::setPickProjection(int nx, int ny, int fx, int fy)
     if (m_projection == GlView::PERSP) {
         glTranslatef(0.0f, 0.0f, -10.0f);
     }
-    glRotatef(-m_declination, 1.0f, 0.0f, 0.0f);
-    glRotatef(m_rotation, 0.0f, 0.0f, 1.0f);
-    glScalef(m_scale, m_scale, m_scale);
-    glTranslatef(m_xoff, m_yoff, m_zoff);
+    glRotatef(-getDeclination(), 1.0f, 0.0f, 0.0f);
+    glRotatef(getRotation(), 0.0f, 0.0f, 1.0f);
+    float scale = getScale();
+    glScalef(scale, scale, scale);
+    glTranslatef(getXoff(), getYoff(), getZoff());
 }
 
 void GlView::getViewOffset(float & h, float & v, float & d)
 {
-    WFMath::Vector<3> vo(m_xoff, m_yoff, m_zoff);
-    vo.rotateZ(deg2Rad(m_rotation));
-    vo.rotateX(-deg2Rad(m_declination));
-    // vo.rotateZ(-m_rotation);
+    WFMath::Vector<3> vo(getXoff(), getYoff(), getZoff());
+    vo.rotateZ(deg2Rad(getRotation()));
+    vo.rotateX(-deg2Rad(getDeclination()));
+    // vo.rotateZ(-getRotation());
     // vo.rotateX(m_declination);
 
     h = vo.x();
@@ -757,19 +753,19 @@ void GlView::getViewOffset(float & h, float & v, float & d)
     d = vo.z();
 
     std::cout << "Getting getViewOffset " << h << ":" << v << ":" << d
-              << " " << m_xoff << ":" << m_yoff << ":" << m_zoff
+              << " " << getXoff() << ":" << getYoff() << ":" << getZoff()
               << std::endl << std::flush;
 }
 
 void GlView::setViewOffset(float h, float v, float d)
 {
     WFMath::Vector<3> vo(h, v, d);
-    vo.rotateX(deg2Rad(m_declination));
-    vo.rotateZ(-deg2Rad(m_rotation));
+    vo.rotateX(deg2Rad(getDeclination()));
+    vo.rotateZ(-deg2Rad(getRotation()));
 
-    m_xoff = vo.x();
-    m_yoff = vo.y();
-    m_zoff = vo.z();
+    setXoff(vo.x());
+    setYoff(vo.y());
+    setZoff(vo.z());
 
     redraw();
 }

@@ -8,6 +8,7 @@
 #include "visual/GL.h"
 
 #include <gtkmm/drawingarea.h>
+#include <gtkmm/adjustment.h>
 
 #include <gtkglmm.h>
 
@@ -27,10 +28,16 @@ class GlView : public Gtk::DrawingArea {
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   public:
     const int m_viewNo;
-    float m_scale;
-    float m_xoff, m_yoff, m_zoff;
-    float m_declination;           // From vertically down
-    float m_rotation;              // From due north
+    Gtk::Adjustment & m_scaleAdj;
+    Gtk::Adjustment & m_xAdj;
+    Gtk::Adjustment & m_yAdj;
+    Gtk::Adjustment & m_zAdj;
+    Gtk::Adjustment & m_declAdj;
+    Gtk::Adjustment & m_rotaAdj;
+    // float m_scale;
+    // float m_xoff, m_yoff, m_zoff;
+    // float m_declination;           // From vertically down
+    // float m_rotation;              // From due north
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
@@ -49,7 +56,9 @@ class GlView : public Gtk::DrawingArea {
     void setOrthographic();
     void setPerspective();
 
+    float getScale() const;
     void setScale(float s);
+
     void setFace(float d, float r);
     void zoomIn();
     void zoomOut();
@@ -93,48 +102,44 @@ class GlView : public Gtk::DrawingArea {
 
     explicit GlView(MainWindow &, ViewWindow&, Model&);
 
-    float getScale() const {
-        return m_scale;
-    }
-
     float getXoff() const {
-        return m_xoff;
+        return m_xAdj.get_value();
     }
 
     void setXoff(float x) {
-        m_xoff = x;
+        m_xAdj.set_value(x);
     }
 
     float getYoff() const {
-        return m_yoff;
+        return m_yAdj.get_value();
     }
 
     void setYoff(float y) {
-        m_yoff = y;
+        m_yAdj.set_value(y);
     }
 
     float getZoff() const {
-        return m_zoff;
+        return m_zAdj.get_value();
     }
 
     void setZoff(float z) {
-        m_zoff = z;
+        m_zAdj.set_value(z);
     }
 
     float getDeclination() const {
-        return m_declination;
+        return m_declAdj.get_value();
     }
 
     void setDeclination(float d) {
-        m_declination = d;
+        m_declAdj.set_value(d);
     }
 
     float getRotation() const {
-        return m_rotation;
+        return m_rotaAdj.get_value();
     }
 
     void setRotation(float r) {
-        m_rotation = r;
+        m_rotaAdj.set_value(r);
     }
 
     rmode_t getDefaultRenderMode() const {
