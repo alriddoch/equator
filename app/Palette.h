@@ -34,6 +34,14 @@ class Palette : public Gtk::Window
     std::map<Model *, std::list<std::string> > m_tiles;
     std::map<Model *, std::list<std::string> > m_entities;
     std::map<Model *, std::list<std::string> > m_textures;
+
+    std::string m_currentTile;
+    std::string m_currentEntity;
+    std::string m_currentTexture;
+
+    void setCurrentTile(int row, int column, GdkEvent *);
+    void setCurrentEntity(int row, int column, GdkEvent *);
+    void setCurrentTexture(int row, int column, GdkEvent *);
   public:
     MainWindow & m_mainWindow;
 
@@ -46,6 +54,19 @@ class Palette : public Gtk::Window
     void addTileEntry(Model *, const std::string &);
     void addEntityEntry(Model *, const std::string &);
     void addTextureEntry(Model *, const std::string &);
+
+    const std::string & getCurrentTile() const {
+        return m_currentTile;
+    }
+
+    const std::string & getCurrentEntity() const {
+        return m_currentEntity;
+    }
+
+    const std::string & getCurrentTexture() const {
+        return m_currentTexture;
+    }
+
 };
 
 #endif // EQUATOR_APP_PALETTE_H

@@ -7,6 +7,7 @@
 #include "MainWindow.h"
 #include "ViewWindow.h"
 #include "Layer.h"
+#include "Vector3D.h"
 
 #include <GL/glu.h>
 
@@ -433,6 +434,9 @@ void GlView::midClickOn(int x, int y)
     dragDepth = -2;
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
     m_dragType = GlView::MOVE;
+    if (m_mainWindow.getTool() == MainWindow::DRAW) {
+        m_model.getCurrentLayer()->insert(Vector3D(m_cursX, m_cursY, m_cursZ));
+    }
 }
 
 void GlView::midClickOff(int x, int y)

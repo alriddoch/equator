@@ -55,6 +55,7 @@ class ServerEntities : public Layer {
     void dragStart(GlView & view, int x, int y) { }
     void dragUpdate(GlView & view, float x, float y, float z) { }
     void dragEnd(GlView & view, float x, float y, float z) { }
+    void insert(const Vector3D &);
 };
 
 #endif // EQUATOR_APP_SERVERENTITIES_H

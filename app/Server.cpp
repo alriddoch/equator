@@ -12,12 +12,14 @@
 
 #include <Atlas/Objects/Entity/GameEntity.h>
 #include <Atlas/Objects/Operation/Move.h>
+#include <Atlas/Objects/Operation/Create.h>
 
 #include <sigc++/object_slot.h>
 
 using Atlas::Message::Object;
 
 using Atlas::Objects::Operation::Move;
+using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
 Server::Server() : inGame(false),
@@ -173,4 +175,14 @@ const Vector3D Server::getAbsCharPos()
         pos = pos + Vector3D(ref->getPosition());
     }
     return pos;
+}
+
+void Server::agentCreateEntity(const Atlas::Message::Object::MapType & ent)
+{
+    Create c = Create::Instantiate();
+
+    c.SetArgs(Atlas::Message::Object::ListType(1, ent));
+    c.SetFrom(character->getID());
+    
+    connection.send(c);
 }

@@ -38,6 +38,7 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_tile_clist = manage( new Gtk::CList(titles) );
     m_tile_clist->set_column_width(0, 200);
     m_tile_clist->set_column_width(1, 50);
+    m_tile_clist->select_row.connect(SigC::slot(this, &Palette::setCurrentTile));
     Gtk::ScrolledWindow * sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     sw->set_usize(300,150);
@@ -48,6 +49,7 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_entity_clist = manage( new Gtk::CList(entity_titles) );
     m_entity_clist->set_column_width(0, 200);
     m_entity_clist->set_column_width(1, 50);
+    m_entity_clist->select_row.connect(SigC::slot(this, &Palette::setCurrentEntity));
     sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     sw->set_usize(300,150);
@@ -58,6 +60,7 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_texture_clist = manage( new Gtk::CList(texture_titles) );
     m_texture_clist->set_column_width(0, 200);
     m_texture_clist->set_column_width(1, 50);
+    m_texture_clist->select_row.connect(SigC::slot(this, &Palette::setCurrentTexture));
     sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     sw->set_usize(300,200);
@@ -72,6 +75,21 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     mw.modelAdded.connect(SigC::slot(this, &Palette::addModel));
     mw.currentModelChanged.connect(SigC::slot(this, &Palette::setModel));
+}
+
+void Palette::setCurrentTile(int row, int column, GdkEvent *)
+{
+    m_currentTile = m_tile_clist->cell(row,0).get_text();
+}
+
+void Palette::setCurrentEntity(int row, int column, GdkEvent *)
+{
+    m_currentEntity = m_entity_clist->cell(row,0).get_text();
+}
+
+void Palette::setCurrentTexture(int row, int column, GdkEvent *)
+{
+    m_currentTexture = m_texture_clist->cell(row,0).get_text();
 }
 
 void Palette::addModel(Model * model)

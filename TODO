@@ -20,3 +20,5 @@ Look into the possibility of a gimp like client lib for extensions.
 Sort out rendering order for layers.
 
 Make a component which creates graphics for 2d client from 3d models.
+
+Implement proper X dnd and selection using X primary selection and clipboard.

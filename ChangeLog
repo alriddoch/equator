@@ -1,3 +1,21 @@
+2002-01-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.h, app/EntityLayer.h, app/GlView.cpp,
+	  app/Holo.h, app/IsoMap.h, app/Layer.h, app/ServerEntities.h:
+	  Added insert method, which inserts a new object into the layer
+	  at the given position.
+
+	* app/Palette.cpp, app/Palette.h: Added code to store, set and
+	  retreive current selection.
+
+	* app/Server.h, app/Server.cpp: Added method to create new
+	  entity in game world, using current character. Made callbacks
+	  used only within this class private, so it is clear they
+	  should not be called from elsewhere.
+
+	* app/ServerEntities.cpp: Implemented inserting an object of type
+	  selected in the palette, at the postion of the cursor.
+
 2002-01-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp, app/GlView.h: Added new view submenu to control

@@ -29,6 +29,16 @@ namespace Atlas {
 class Vector3D;
 
 class Server : public SigC::Object {
+  private:
+    void lobbyTalk(Eris::Room *r, const std::string& nm, const std::string& t);
+    void loginComplete(const Atlas::Objects::Entity::Player &p);
+
+    void roomEnter(Eris::Room *r);
+
+    void worldEntityCreate(Eris::Entity *r);
+    void worldEnter(Eris::Entity *r);
+
+    void charMoved(const Eris::Coord &);
   protected:
     bool inGame;
   public:
@@ -54,17 +64,10 @@ class Server : public SigC::Object {
     void createAccount(const std::string &, const std::string &);
     void createCharacter(const std::string &, const std::string &);
 
-    void lobbyTalk(Eris::Room *r, const std::string& nm, const std::string& t);
-    void loginComplete(const Atlas::Objects::Entity::Player &p);
-
-    void roomEnter(Eris::Room *r);
-
-    void worldEntityCreate(Eris::Entity *r);
-    void worldEnter(Eris::Entity *r);
-
-    void charMoved(const Eris::Coord &);
-
     void moveCharacter(const Vector3D & pos);
+
+    void agentCreateEntity(const Atlas::Message::Object::MapType &);
+
     const Vector3D getAbsCharPos();
 };
 

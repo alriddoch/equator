@@ -20,6 +20,8 @@
 
 static const bool debug_flag = false;
 
+using Atlas::Message::Object;
+
 void ServerEntities::draw3DCube(const Vector3D & coords,
                                 const Eris::BBox & bbox, bool open)
 {
@@ -321,4 +323,18 @@ void ServerEntities::pushSelection()
 
 void ServerEntities::popSelection()
 {
+}
+
+void ServerEntities::insert(const Vector3D & pos)
+{
+    const std::string & type = m_model.m_mainWindow.m_palettewindow.getCurrentEntity();
+    std::cout << "INSERTING " << type << std::endl << std::flush;
+
+    Atlas::Message::Object::MapType ent;
+    ent["objtype"] = "object";
+    ent["parents"] = Atlas::Message::Object::ListType(1, type);
+    ent["loc"] = m_serverConnection.world->getRootEntity()->getID();
+    ent["pos"] = pos.asObject();
+    
+    m_serverConnection.agentCreateEntity(ent);
 }
