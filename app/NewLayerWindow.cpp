@@ -15,6 +15,8 @@
 #include <gtkmm/treeselection.h>
 #include <gtkmm/stock.h>
 
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 
 std::map<std::string, LayerFactory *> LayerFactory::factories;
@@ -54,9 +56,9 @@ NewLayerWindow::NewLayerWindow()
     get_vbox()->pack_start(*scrolled_window);
 
     Gtk::Button * b = add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
-    b->signal_clicked().connect(slot(*this, &NewLayerWindow::cancel));
+    b->signal_clicked().connect(SigC::slot(*this, &NewLayerWindow::cancel));
     b = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
-    b->signal_clicked().connect(slot(*this, &NewLayerWindow::okay));
+    b->signal_clicked().connect(SigC::slot(*this, &NewLayerWindow::okay));
 }
 
 void NewLayerWindow::doshow(Model * model)

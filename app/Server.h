@@ -13,6 +13,8 @@
 
 #include <glibmm/main.h>
 
+#include <sigc++/object.h>
+
 namespace Eris {
   class Connection;
   class Account;

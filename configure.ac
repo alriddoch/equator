@@ -73,13 +73,20 @@ AC_CHECK_LIB(cal3d, main,
 
 dnl Versions required
 
-PKG_CHECK_MODULES(GTK, gtkglextmm-1.0 ,
+PKG_CHECK_MODULES(GTK, gtkglextmm-1.2 ,
     [
         CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
         LIBS="$LIBS $GTK_LIBS"
     ],
     [
-        AC_MSG_ERROR(Couldn't find GTK libs.)
+        PKG_CHECK_MODULES(GTK, gtkglextmm-1.0 ,
+            [
+                CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
+                LIBS="$LIBS $GTK_LIBS"
+            ],
+            [
+                AC_MSG_ERROR(Couldn't find GTK libs.)
+            ])
     ])
 
 AC_MSG_CHECKING([for round in libm])

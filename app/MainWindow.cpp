@@ -39,6 +39,9 @@
 #include "../entity.xpm"
 #include "../vertex.xpm"
 
+#include <sigc++/bind.h>
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 
 MainWindow::MainWindow() :
@@ -49,7 +52,7 @@ MainWindow::MainWindow() :
     m_palettewindow (*new Palette(*this) ),
     m_entitytreewindow (*new EntityTree(*this) )
 {
-    signal_delete_event().connect(slot(*this, &MainWindow::destroy_handler));
+    signal_delete_event().connect(SigC::slot(*this, &MainWindow::destroy_handler));
 
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
@@ -58,7 +61,7 @@ MainWindow::MainWindow() :
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::OPEN)));
     file_menu.back().set_sensitive(false);
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(*this, &MainWindow::new_server_dialog)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", SigC::slot(*this, &MainWindow::new_server_dialog)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::StockID(Gtk::Stock::PREFERENCES)));
     file_menu.back().set_sensitive(false);
@@ -67,11 +70,11 @@ MainWindow::MainWindow() :
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& window_sub = menu_sub->items();
     window_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(*this, &MainWindow::layer_window)));
-    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(*this, &MainWindow::inheritance_window)));
-    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(*this, &MainWindow::server_window)));
-    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(*this, &MainWindow::palette_window)));
-    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity tree...", slot(*this, &MainWindow::entity_tree_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::slot(*this, &MainWindow::layer_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", SigC::slot(*this, &MainWindow::inheritance_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", SigC::slot(*this, &MainWindow::server_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", SigC::slot(*this, &MainWindow::palette_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity tree...", SigC::slot(*this, &MainWindow::entity_tree_window)));
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Windows", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -80,7 +83,7 @@ MainWindow::MainWindow() :
     menu->accelerate(*this);
     //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
     //menu->append(*menu_items);
-    //menu_items->activate.connect(slot(this, &MainWindow::newModel));
+    //menu_items->activate.connect(SigC::slot(this, &MainWindow::newModel));
 
     //menu_items = manage( new Gtk::MenuItem("Load...") );
     //menu->append(*menu_items);
@@ -100,7 +103,7 @@ MainWindow::MainWindow() :
 
     Gtk::ToggleButton * b = select_tool = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SELECT));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::SELECT));
     Glib::RefPtr<Gdk::Bitmap> pixmask;
     Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, arrow_xpm);
     b->add_pixmap(p, pixmask);
@@ -109,21 +112,21 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Select Item");
 
     b = area_tool = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::AREA));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::AREA));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 0, 1);
     t->set_tip(*b, "Select Area");
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 0, 1);
     t->set_tip(*b, "Insert");
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
     b->add_pixmap(p, pixmask);
     b->set_sensitive(false);
@@ -131,7 +134,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Rotate");
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
     b->add_pixmap(p, pixmask);
     b->set_sensitive(false);
@@ -139,7 +142,7 @@ MainWindow::MainWindow() :
     t->set_tip(*b, "Scale");
 
     b = move_tool = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 1, 2);
@@ -147,14 +150,14 @@ MainWindow::MainWindow() :
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::modeSelect),MainWindow::ENTITY));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::modeSelect),MainWindow::ENTITY));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 2, 3);
     t->set_tip(*b, "Entity Mode");
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
-    b->signal_clicked().connect(bind(slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 2, 3);
@@ -179,7 +182,7 @@ MainWindow::MainWindow() :
 
     set_title("Equator");
 
-    // Gtk::Main::timeout.connect(slot(this, &MainWindow::idle), 1000);
+    // Gtk::Main::timeout.connect(SigC::slot(this, &MainWindow::idle), 1000);
 
     show_all();
 

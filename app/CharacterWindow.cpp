@@ -21,6 +21,8 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 #include <cassert>
 
@@ -31,7 +33,7 @@ CharacterWindow::CharacterWindow() :
                  m_server(0)
 {
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-    signal_response().connect(slot(*this, &CharacterWindow::dismiss));
+    signal_response().connect(SigC::slot(*this, &CharacterWindow::dismiss));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -58,9 +60,9 @@ CharacterWindow::CharacterWindow() :
     m_nameEntry = manage( new Gtk::Combo() );
     m_nameEntry->get_entry()->set_max_length(60);
     table->attach(*m_nameEntry, 1, 3, 0, 1);
-    m_nameEntry->get_list()->signal_select_child().connect(slot(*this, &CharacterWindow::select_child));
-    m_nameEntry->get_list()->signal_selection_changed().connect(slot(*this, &CharacterWindow::selection_changed));
-    m_nameEntry->get_list()->signal_unselect_child().connect(slot(*this, &CharacterWindow::unselect_child));
+    m_nameEntry->get_list()->signal_select_child().connect(SigC::slot(*this, &CharacterWindow::select_child));
+    m_nameEntry->get_list()->signal_selection_changed().connect(SigC::slot(*this, &CharacterWindow::selection_changed));
+    m_nameEntry->get_list()->signal_unselect_child().connect(SigC::slot(*this, &CharacterWindow::unselect_child));
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Type:") )));
@@ -76,11 +78,11 @@ CharacterWindow::CharacterWindow() :
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     hbox = manage( new Gtk::HBox(false, 6) );
     m_takeButton = manage( new Gtk::Button("_Take avatar", true) );
-    m_takeButton->signal_clicked().connect(slot(*this, &CharacterWindow::take));
+    m_takeButton->signal_clicked().connect(SigC::slot(*this, &CharacterWindow::take));
     m_takeButton->set_sensitive(false);
     hbox->pack_start(*m_takeButton);
     m_createButton = manage( new Gtk::Button("_Create avatar", true) );
-    m_createButton->signal_clicked().connect(slot(*this, &CharacterWindow::create));
+    m_createButton->signal_clicked().connect(SigC::slot(*this, &CharacterWindow::create));
     m_createButton->set_sensitive(false);
     hbox->pack_start(*m_createButton);
     a->add(*hbox);
@@ -90,7 +92,7 @@ CharacterWindow::CharacterWindow() :
     m_statusContext = m_status->get_context_id("Login status");
     // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
-    signal_delete_event().connect(slot(*this, &CharacterWindow::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &CharacterWindow::deleteEvent));
 }
 
 void CharacterWindow::doshow()
@@ -107,7 +109,7 @@ void CharacterWindow::useServer(Server * s)
 
     m_server = s;
     m_serverLabel->set_text(std::string("Create avatar on ") + m_server->getName() + ":");
-    m_charlist = m_server->m_account->GotAllCharacters.connect(slot(*this, &CharacterWindow::gotCharacterList));
+    m_charlist = m_server->m_account->GotAllCharacters.connect(SigC::slot(*this, &CharacterWindow::gotCharacterList));
     m_server->m_account->refreshCharacterInfo();
 
     std::list<Glib::ustring> listStrings;

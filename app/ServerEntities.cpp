@@ -39,6 +39,9 @@
 
 #include <gtkmm/fileselection.h>
 
+#include <sigc++/object_slot.h>
+#include <sigc++/bind.h>
+
 #include <fstream>
 
 #include <cassert>
@@ -667,7 +670,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
 void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 {
     m_loadOptionsDone.disconnect();
-    m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::load), fsel));
+    m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::load), fsel));
     m_importOptions->show_all();
     fsel->hide();
 }
@@ -675,7 +678,7 @@ void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 {
     m_saveOptionsDone.disconnect();
-    m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::save), fsel));
+    m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::save), fsel));
     m_exportOptions->show_all();
     fsel->hide();
 }
@@ -923,16 +926,16 @@ void ServerEntities::options()
 void ServerEntities::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::loadOptions),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::loadOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 
 void ServerEntities::exportFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Atlas Map File");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::saveOptions),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(slot(*this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::saveOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 

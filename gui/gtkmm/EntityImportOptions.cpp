@@ -9,6 +9,9 @@
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/stock.h>
 
+#include <sigc++/bind.h>
+#include <sigc++/object_slot.h>
+
 EntityImportOptions::EntityImportOptions() : m_target(IMPORT_TOPLEVEL)
 {
     Gtk::VBox * vbox = get_vbox();
@@ -31,17 +34,17 @@ EntityImportOptions::EntityImportOptions() : m_target(IMPORT_TOPLEVEL)
     hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
 
     Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("top level") );
-    rb1->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &EntityImportOptions::setImportTarget),IMPORT_TOPLEVEL));
+    rb1->signal_clicked().connect(SigC::bind<ImportTarget>(SigC::slot(*this, &EntityImportOptions::setImportTarget),IMPORT_TOPLEVEL));
     vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
     Gtk::RadioButton::Group rgp = rb1->get_group();
     Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
-    rb->signal_clicked().connect(SigC::bind<ImportTarget>(slot(*this, &EntityImportOptions::setImportTarget),IMPORT_SELECTION));
+    rb->signal_clicked().connect(SigC::bind<ImportTarget>(SigC::slot(*this, &EntityImportOptions::setImportTarget),IMPORT_SELECTION));
     vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
 
     add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
     m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
 
-    signal_response().connect(slot(*this, &EntityImportOptions::response));
+    signal_response().connect(SigC::slot(*this, &EntityImportOptions::response));
 }
 
 void EntityImportOptions::setImportTarget(ImportTarget it)

@@ -153,21 +153,19 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
     // Eris::TypeInfoPtr type = v->getConnection()->getTypeService()->getTypeForAtlas(ge);
     if (type->isA(autonomousType)) {
         AutonomousEntity * ae = new AutonomousEntity(ge, type, v);
-        slot = SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(),
-                                              ae);
+        slot = (SigC::Slot0<void>&)SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(), ae);
         re = ae;
     } else if (type->isA(terrainType)) {
         TerrainEntity * te = new TerrainEntity(ge, type, v);
-        slot = SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
+        slot = (SigC::Slot0<void>&)SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
         re = te;
     } else if (type->isA(treeType)) {
         TreeEntity * te = new TreeEntity(ge, type, v);
-        slot = SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
+        slot = (SigC::Slot0<void>&)SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
         re = te;
     } else {
         re = new RenderableEntity(ge, type, v);
-        slot = SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(),
-                                              re);
+        slot = (SigC::Slot0<void>&)SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(), re);
     }
     if (re->m_drawer == 0) {
         RendererMap::const_iterator I = m_renderFactories.find(type);

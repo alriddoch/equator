@@ -24,6 +24,8 @@
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/main.h>
 
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -83,12 +85,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_model(m),
            m_renderer(* new Renderer)
 {
-    m_scaleAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
-    m_xAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
-    m_yAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
-    m_zAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
-    m_declAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
-    m_rotaAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_scaleAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_xAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_yAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_zAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_declAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_rotaAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
 
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME
@@ -98,6 +100,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                                              Gdk::GL::MODE_DEPTH |
                                              // Gdk::GL::MODE_ACCUM |
                                              Gdk::GL::MODE_DOUBLE);
+#if 0
     if (glconfig.is_null()) {
         std::cerr << "*** Cannot find the double-buffered visual.\n"
                   << "*** Trying single-buffered visual.\n";
@@ -114,15 +117,18 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     if (!glconfig.is_null()) {
         Gtk::GL::Widget::set_gl_capability(*this, glconfig);
     }
+#else
+    Gtk::GL::widget_set_gl_capability(*this, glconfig);
+#endif
 
-    m.updated.connect(slot(*this, &GlView::scheduleRedraw));
+    m.updated.connect(SigC::slot(*this, &GlView::scheduleRedraw));
 
     set_events(Gdk::POINTER_MOTION_MASK|
                Gdk::EXPOSURE_MASK|
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    Glib::signal_timeout().connect(slot(*this, &GlView::animate), 100);
+    Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 100);
 
     mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
@@ -646,11 +652,19 @@ void GlView::mouseEffects()
 
 bool GlView::make_current()
 {
+#if 0
     Glib::RefPtr<Gdk::GL::Context> glcontext =
       Gtk::GL::Widget::get_gl_context(*this);
 
     Glib::RefPtr<Gdk::GL::Window> glwindow =
       Gtk::GL::Widget::get_gl_window(*this);
+#else
+    Glib::RefPtr<Gdk::GL::Context> glcontext =
+      Gtk::GL::widget_get_gl_context(*this);
+
+    Glib::RefPtr<Gdk::GL::Window> glwindow =
+      Gtk::GL::widget_get_gl_window(*this);
+#endif
 
     if (!glwindow->make_current(glcontext)) {
         return false;
@@ -661,8 +675,13 @@ bool GlView::make_current()
 void GlView::swap_buffers()
 {
 
+#if 0
     Glib::RefPtr<Gdk::GL::Window> glwindow =
       Gtk::GL::Widget::get_gl_window(*this);
+#else
+    Glib::RefPtr<Gdk::GL::Window> glwindow =
+      Gtk::GL::widget_get_gl_window(*this);
+#endif
 
     if (glwindow->is_double_buffered()) {
         glwindow->swap_buffers();

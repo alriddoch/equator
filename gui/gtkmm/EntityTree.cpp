@@ -126,7 +126,7 @@ EntityTree::EntityTree(MainWindow & mw): OptionBox("Entity Tree"),
 
     mw.modelAdded.connect(SigC::slot(*this, &EntityTree::modelAdded));
 
-    signal_delete_event().connect(slot(*this, &EntityTree::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &EntityTree::deleteEvent));
 }
 
 void EntityTree::descendEntityTree(Eris::Entity * node,

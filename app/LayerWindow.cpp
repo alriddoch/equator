@@ -21,6 +21,9 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeselection.h>
 
+#include <sigc++/object_slot.h>
+#include <sigc++/bind.h>
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -98,19 +101,19 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, newlayer_xpm);
     b->add_pixmap(p, pixmask);
 
-    b->signal_clicked().connect(slot(*this, &LayerWindow::newLayerRequested));
+    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::newLayerRequested));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, raise_xpm);
     b->add_pixmap(p, pixmask);
-    b->signal_clicked().connect(slot(*this, &LayerWindow::raiseLayer));
+    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::raiseLayer));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, lower_xpm);
     b->add_pixmap(p, pixmask);
-    b->signal_clicked().connect(slot(*this, &LayerWindow::lowerLayer));
+    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::lowerLayer));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
@@ -142,7 +145,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::modelAdded));
     mw.currentModelChanged.connect(SigC::slot(*this, &LayerWindow::currentModelChanged));
 
-    signal_delete_event().connect(slot(*this, &LayerWindow::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &LayerWindow::deleteEvent));
 }
 
 void LayerWindow::currentModelChanged(Model * model)
@@ -163,7 +166,7 @@ void LayerWindow::currentModelChanged(Model * model)
         return;
     }
 
-    m_updateSignal = m_currentModel->layersChanged.connect(slot(*this, &LayerWindow::layersChanged));
+    m_updateSignal = m_currentModel->layersChanged.connect(SigC::slot(*this, &LayerWindow::layersChanged));
     layersChanged();
 
     set_sensitive(true);
@@ -204,7 +207,7 @@ void LayerWindow::modelAdded(Model * model)
     Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
     std::stringstream ident;
     ident << model->getName() << "-" << model->getModelNo();
-    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &LayerWindow::currentModelChanged),model)));
+    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &LayerWindow::currentModelChanged),model)));
     if (newMenu) {
         m_modelMenu->set_history(0);
         currentModelChanged(model);

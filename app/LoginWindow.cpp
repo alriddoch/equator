@@ -18,6 +18,8 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 #include <cassert>
 
@@ -28,7 +30,7 @@ LoginWindow::LoginWindow() :
                  m_server(0)
 {
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-    signal_response().connect(slot(*this, &LoginWindow::dismiss));
+    signal_response().connect(SigC::slot(*this, &LoginWindow::dismiss));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -70,7 +72,7 @@ LoginWindow::LoginWindow() :
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     m_loginButton = manage( new Gtk::Button("_Login", true) );
-    m_loginButton->signal_clicked().connect(slot(*this, &LoginWindow::login));
+    m_loginButton->signal_clicked().connect(SigC::slot(*this, &LoginWindow::login));
     a->add(*m_loginButton);
     vbox->pack_start(*a);
 
@@ -78,7 +80,7 @@ LoginWindow::LoginWindow() :
     m_statusContext = m_status->get_context_id("Login status");
     // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
-    signal_delete_event().connect(slot(*this, &LoginWindow::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &LoginWindow::deleteEvent));
 }
 
 void LoginWindow::doshow()

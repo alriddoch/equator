@@ -13,7 +13,7 @@
 #include <cassert>
 
 OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
-    m_targetList(1, Gtk::TargetEntry("application/x-equator-toolbar", 0, 0))
+    m_targetList(1, Gtk::TargetEntry("application/x-equator-toolbar"))
 {
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
     pack_start(*tophbox, Gtk::PACK_SHRINK, 6);

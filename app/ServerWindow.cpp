@@ -20,6 +20,8 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeselection.h>
 
+#include <sigc++/object_slot.h>
+
 #include <iostream>
 #include <vector>
 
@@ -31,7 +33,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
                                       m_characterWindow(*new CharacterWindow()),
                                       m_mainWindow(mw)
 {
-    // destroy.connect(slot(this, &ServerWindow::destroy_handler));
+    // destroy.connect(SigC::slot(this, &ServerWindow::destroy_handler));
     // Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
     Gtk::VBox * vbox = this;
 
@@ -64,9 +66,9 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     // set_title("Servers");
 
     // show_all();
-    signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
-    m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
-    m_loginWindow.loginSuccess.connect(slot(*this, &ServerWindow::loggedIn));
+    signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
+    m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
+    m_loginWindow.loginSuccess.connect(SigC::slot(*this, &ServerWindow::loggedIn));
 }
 
 void ServerWindow::connect()

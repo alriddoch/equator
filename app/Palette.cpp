@@ -16,6 +16,9 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 
+#include <sigc++/object_slot.h>
+#include <sigc++/bind.h>
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -119,7 +122,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     mw.modelAdded.connect(SigC::slot(*this, &Palette::addModel));
     mw.currentModelChanged.connect(SigC::slot(*this, &Palette::setModel));
-    signal_delete_event().connect(slot(*this, &Palette::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &Palette::deleteEvent));
 }
 
 void Palette::setCurrentTile()
@@ -170,13 +173,13 @@ void Palette::addModel(Model * model)
         menu = manage( new Gtk::Menu() );
         
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &Palette::setModel),model)));
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &Palette::setModel),model)));
         m_modelMenu->set_menu(*menu);
         set_sensitive(true);
         setModel(model);
     } else {
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &Palette::setModel),model)));
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &Palette::setModel),model)));
     }
 }
 
@@ -191,7 +194,7 @@ void Palette::setModel(Model * model)
     }
     syncModel(model);
 
-    m_typeMonitor = model->typesAdded.connect(bind(SigC::slot(*this, &Palette::syncModel), model));
+    m_typeMonitor = model->typesAdded.connect(SigC::bind(SigC::slot(*this, &Palette::syncModel), model));
 }
 
 void Palette::syncModel(Model * model)

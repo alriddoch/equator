@@ -116,7 +116,7 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
 
     mw.serverAdded.connect(SigC::slot(*this, &InheritanceWindow::serverAdded));
 
-    signal_delete_event().connect(slot(*this, &InheritanceWindow::deleteEvent));
+    signal_delete_event().connect(SigC::slot(*this, &InheritanceWindow::deleteEvent));
 }
 
 void InheritanceWindow::descendTypeTree(Eris::TypeInfo * node,
