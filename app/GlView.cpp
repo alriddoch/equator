@@ -22,6 +22,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/scrollbar.h>
+#include <gtkmm/main.h>
 
 #include <iostream>
 #include <sstream>
@@ -64,6 +65,7 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_redrawLock(0),
+           m_redrawRequired(true),
            m_viewNo(m.getViewNo()),
            m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
            m_xAdj(*manage( new Gtk::Adjustment(0., -500., 500.) )),
@@ -80,12 +82,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_model(m),
            m_renderer(* new Renderer)
 {
-    m_scaleAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
-    m_xAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
-    m_yAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
-    m_zAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
-    m_declAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
-    m_rotaAdj.signal_value_changed().connect(slot(*this, &GlView::redraw));
+    m_scaleAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_xAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_yAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_zAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_declAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
+    m_rotaAdj.signal_value_changed().connect(slot(*this, &GlView::scheduleRedraw));
 
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME
@@ -112,14 +114,14 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
         Gtk::GL::Widget::set_gl_capability(*this, glconfig);
     }
 
-    m.updated.connect(slot(*this, &GlView::redraw));
+    m.updated.connect(slot(*this, &GlView::scheduleRedraw));
 
     set_events(Gdk::POINTER_MOTION_MASK|
                Gdk::EXPOSURE_MASK|
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    // Gtk::Main::timeout.connect(slot(*this, &GlView::animate), 100);
+    Glib::signal_timeout().connect(slot(*this, &GlView::animate), 100);
 
     m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
                                            &ViewWindow::cursorMoved));
@@ -377,8 +379,13 @@ void GlView::drawgl()
     }
 }
 
-gint GlView::animate()
+bool GlView::animate()
 {
+    if (m_redrawRequired) {
+        redraw();
+        m_redrawRequired = false;
+    }
+#if 0
     m_animCount += 0.02f;
     if (m_animCount > 1.0f) {
         m_animCount = 0.0f;
@@ -399,7 +406,8 @@ gint GlView::animate()
         mouseEffects();
         swap_buffers();
     }
-    return 1;
+#endif
+    return true;
 }
 
 void GlView::clickOn(int x, int y)
@@ -439,7 +447,7 @@ void GlView::clickOn(int x, int y)
         default:
             break;
     }
-    redraw();
+    scheduleRedraw();
 }
 
 void GlView::clickOff(int x, int y)
@@ -471,7 +479,7 @@ void GlView::clickOff(int x, int y)
             break;
     }
     clickx = 0; clicky = 0;
-    redraw();
+    scheduleRedraw();
 }
 
 void GlView::midClickOn(int x, int y)
@@ -668,7 +676,7 @@ bool GlView::exposeEvent(GdkEventExpose * event)
     if (event->count > 0) {
         return 0;
     }
-    redraw();
+    scheduleRedraw();
     return TRUE;
 }
 

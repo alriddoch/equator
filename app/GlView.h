@@ -35,7 +35,7 @@ class GlView : public Gtk::DrawingArea {
          }
          ~RedrawLock() {
              if (--view.m_redrawLock == 0) {
-                 view.redraw();
+                 view.scheduleRedraw();
              }
          }
     };
@@ -45,6 +45,9 @@ class GlView : public Gtk::DrawingArea {
     typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     int m_redrawLock;
+    bool m_redrawRequired;
+
+    void redraw();
   public:
     const int m_viewNo;
     Gtk::Adjustment & m_scaleAdj;
@@ -90,7 +93,7 @@ class GlView : public Gtk::DrawingArea {
     void face();
     void cursor();
     void drawgl();
-    gint animate();
+    bool animate();
     void mouseEffects();
     bool make_current();
     void swap_buffers();
@@ -213,6 +216,10 @@ class GlView : public Gtk::DrawingArea {
         m_hiddenLayers.erase(l);
     }
 
+    void scheduleRedraw() {
+        m_redrawRequired = true;
+    }
+
     const std::string details() const;
 
     void setPickProjection(int nx, int ny, int fx, int fy);
@@ -221,7 +228,6 @@ class GlView : public Gtk::DrawingArea {
     float getViewSize();
     rmode_t getRenderMode(const std::string & layer) const;
     void setLayerRenderMode(rmode_t m);
-    void redraw();
 
     const float getZ(int x, int y) const;
 };

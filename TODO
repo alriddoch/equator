@@ -1,3 +1,6 @@
+Fix nasty loop caused because view sliders are now re-calced when
+x,y and z adjustments are changed.
+
 ASAP fix update code in GlView so that redraw is scheduled, not forced when
 a change occurs.
 

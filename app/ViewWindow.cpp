@@ -263,6 +263,10 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0)
     m_glarea->getDeclinationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     m_glarea->getRotationAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     m_glarea->getScaleAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
+    // Dargh! looping evil!
+    m_glarea->getXAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
+    m_glarea->getYAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
+    m_glarea->getZAdjustment().signal_value_changed().connect(slot(*this, &ViewWindow::glViewChanged));
     glViewChanged();
     signal_delete_event().connect(slot(*this, &ViewWindow::deleteEvent));
 }

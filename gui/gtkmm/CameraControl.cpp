@@ -29,11 +29,11 @@ CameraControl::CameraControl(GlView & v) : OptionBox(v.m_model.getName() + " Cam
 void CameraControl::dChange()
 {
     view.setDeclination(m_dAdjust->get_value());
-    view.redraw();
+    view.scheduleRedraw();
 }
 
 void CameraControl::rChange()
 {
     view.setRotation(m_rAdjust->get_value());
-    view.redraw();
+    view.scheduleRedraw();
 }

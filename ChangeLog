@@ -1,3 +1,12 @@
+2004-01-23  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GlView.cpp, app/GlView.h, gui/gtkmm/CameraControl.cpp:
+	  Modify redraw code is it is only invoked from a timeout callback,
+	  so that many events requiring a redraw only cause one redraw.
+
+	* app/ViewWindow.cpp: Hook x, y and z offset to cause a recalc
+	  of h and v adjustments. Now there is a loop. Needs to be fixed.
+
 2004-01-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/CharacterWindow.cpp: Tweak required headers, due to changes
