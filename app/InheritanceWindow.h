@@ -7,27 +7,41 @@
 
 #include "gui/gtkmm/OptionBox.h"
 
+#include <gtkmm/treestore.h>
+
 class MainWindow;
+class Server;
 class AtlasMapWidget;
 
+namespace Eris {
+  class TypeInfo;
+}
+
 namespace Gtk {
-   class TreeStore;
-   template <class T> class TreeModelColumn;
-   class TreeModelColumnRecord;
-   class TreeView;
-};
+  class OptionMenu;
+  class TreeStore;
+  template <class T> class TreeModelColumn;
+  class TreeModelColumnRecord;
+  class TreeView;
+  class TreeSelection;
+}
 
 class InheritanceWindow : public OptionBox
 {
   private:
-    Gtk::Label * m_connectionLabel;
+    Gtk::OptionMenu * m_serverMenu;
+
     Glib::RefPtr<Gtk::TreeStore> m_treeModel;
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
-    Gtk::TreeModelColumn<Glib::ustring> * m_valueColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
+
     AtlasMapWidget * m_attributeTree;
 
+    Server * m_currentServer;
+
+    void descendTypeTree(Eris::TypeInfo *, Gtk::TreeModel::Row & row);
   public:
     MainWindow & m_mainWindow;
 
@@ -37,6 +51,9 @@ class InheritanceWindow : public OptionBox
         hide();
         return 1;
     }
+
+    void currentServerChanged(Server *);
+    void serverAdded(Server *);
 
     gint buttonEvent(GdkEventButton*);
 

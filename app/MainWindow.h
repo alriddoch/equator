@@ -82,7 +82,7 @@ class MainWindow : public Gtk::Window
     gint quit( GdkEventAny *);
     Model & newModel();
     void newView(Model *);
-    Server & newServer();
+    Server & newServer(const std::string & name);
 
     void menu_quit();
     void inheritance_window();

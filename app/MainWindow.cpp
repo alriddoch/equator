@@ -214,9 +214,9 @@ void MainWindow::newView(Model * model)
     view->setTitle();
 }
 
-Server & MainWindow::newServer()
+Server & MainWindow::newServer(const std::string & name)
 {
-    Server * server = new Server(*this);
+    Server * server = new Server(*this, name);
 
     m_servers.push_back(server);
     serverAdded.emit(server);

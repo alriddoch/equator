@@ -1,3 +1,8 @@
+Modify cursor placement so it uses depth value if depth value is not infinite.
+Add option to snap view to something or other, probably in camera control
+window. Camera control needs to become an OptionBox, and needs to be
+coordinated by the core object (currently called MainWindow).
+
 Need to modify WEFactory so we can get a signal when a terrain entity is
 created.
 

@@ -139,13 +139,13 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     m_newLayerWindow = new NewLayerWindow();
     // show_all();
 
-    mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::addModel));
-    mw.currentModelChanged.connect(SigC::slot(*this, &LayerWindow::setModel));
+    mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::modelAdded));
+    mw.currentModelChanged.connect(SigC::slot(*this, &LayerWindow::currentModelChanged));
 
     signal_delete_event().connect(slot(*this, &LayerWindow::deleteEvent));
 }
 
-void LayerWindow::setModel(Model * model)
+void LayerWindow::currentModelChanged(Model * model)
 {
     if (model == m_currentModel) {
         return;
@@ -163,13 +163,13 @@ void LayerWindow::setModel(Model * model)
         return;
     }
 
-    m_updateSignal = m_currentModel->layersChanged.connect(slot(*this, &LayerWindow::updateLayers));
-    updateLayers();
+    m_updateSignal = m_currentModel->layersChanged.connect(slot(*this, &LayerWindow::layersChanged));
+    layersChanged();
 
     set_sensitive(true);
 }
 
-void LayerWindow::updateLayers()
+void LayerWindow::layersChanged()
 {
     std::cout << "Got update layers" << std::endl << std::flush;
     m_treeModel->clear();
@@ -188,25 +188,27 @@ void LayerWindow::updateLayers()
     }
 }
 
-void LayerWindow::addModel(Model * model)
+void LayerWindow::modelAdded(Model * model)
 {
     std::cout << "Got add model" << std::endl << std::flush;
     Gtk::Menu * menu = m_modelMenu->get_menu();
-    std::stringstream ident;
-    ident << model->getName() << "-" << model->getModelNo();
+    bool newMenu = false;
+
     if (menu == NULL) {
+        newMenu = true;
         menu = manage( new Gtk::Menu() );
-        
-        Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &LayerWindow::setModel),model)));
         m_modelMenu->set_menu(*menu);
         set_sensitive(true);
-        setModel(model);
-    } else {
-        Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &LayerWindow::setModel),model)));
     }
-    // m_viewMenu->set_menu(m_viewMenu->get_menu());
+    
+    Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
+    std::stringstream ident;
+    ident << model->getName() << "-" << model->getModelNo();
+    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(*this, &LayerWindow::currentModelChanged),model)));
+    if (newMenu) {
+        m_modelMenu->set_history(0);
+        currentModelChanged(model);
+    }
 }
 
 void LayerWindow::visibleToggled(const Glib::ustring& path_string)

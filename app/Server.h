@@ -36,6 +36,9 @@ class TerrainEntity;
 
 class Server : public SigC::Object {
   private:
+    static unsigned serverCount;
+    const unsigned m_serverNo;
+ 
     void lobbyTalk(Eris::Room *r, const std::string& nm, const std::string& t);
     void loginComplete();
 
@@ -52,12 +55,12 @@ class Server : public SigC::Object {
     void connectWorldSignals();
   protected:
     bool inGame;
-    std::string m_name;
+    const std::string m_name;
 
     Model * m_model;
 
   public:
-    explicit Server(MainWindow &);
+    explicit Server(MainWindow &, const std::string &);
 
     MainWindow & m_mainWindow;
     Renderer & m_renderer;
@@ -69,6 +72,10 @@ class Server : public SigC::Object {
     Eris::Entity * m_character;
 
     SigC::Connection inputHandler;
+
+    const unsigned getServerNo() const {
+        return m_serverNo;
+    }
 
     const std::string & getName() const {
         return m_name;

@@ -1,5 +1,19 @@
 2004-01-05  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ConnectWindow.cpp, app/MainWindow.cpp, app/MainWindow.h,
+	  app/Server.cpp, app/Server.h:
+	  Set name of connection at server object creation time, and add a
+	  unique number to each connection.
+
+	* app/InheritanceWindow.cpp, app/InheritanceWindow.h: Fill out functionality
+	  of this window including OptionMenu to select server, and hierarchy
+	  view.
+
+	* app/LayerWindow.cpp, app/LayerWindow.h: Rename some methods to be more
+	  sane, and fix behavoir of OptionMenu for selecting model.
+
+2004-01-05  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Holo.cpp: Fix deleting array with array version of
 	  operator delete.
 

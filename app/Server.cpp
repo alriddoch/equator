@@ -39,7 +39,11 @@ using Atlas::Objects::Operation::Move;
 using Atlas::Objects::Operation::Create;
 using Atlas::Objects::Entity::GameEntity;
 
-Server::Server(MainWindow & mw) : inGame(false), m_model(0),
+unsigned Server::serverCount = 0;
+
+Server::Server(MainWindow & mw, const std::string & name) :
+                   m_serverNo(serverCount++),
+                   inGame(false), m_name(name), m_model(0),
                    m_mainWindow(mw),
                    m_renderer(* new Renderer),
                    m_connection(* new Eris::Connection("equator", true)),
@@ -238,7 +242,6 @@ void Server::connect(const std::string & host, int port)
     Eris::setLogLevel(Eris::LOG_DEBUG);
 
     std::cout << host << ":" << port << std::endl << std::flush;
-    m_name = host;
     m_connection.connect(host, port);
     // m_connection.connect("localhost", 6767);
 

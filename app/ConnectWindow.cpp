@@ -117,7 +117,7 @@ void ConnectWindow::createConnection()
 
     m_status->push("Connecting...", m_statusContext);
 
-    m_server = &m_mainWindow.newServer();
+    m_server = &m_mainWindow.newServer(m_hostEntry->get_text());
 
     m_hostEntry->set_editable(false);
     m_connectButton->set_sensitive(false);

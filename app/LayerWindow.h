@@ -55,9 +55,9 @@ class LayerWindow : public OptionBox
         return 1;
     }
 
-    void setModel(Model * model);
-    void updateLayers();
-    void addModel(Model * view);
+    void currentModelChanged(Model * model);
+    void layersChanged();
+    void modelAdded(Model * view);
 
     void newLayerRequested();
     void raiseLayer();

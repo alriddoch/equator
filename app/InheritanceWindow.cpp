@@ -3,8 +3,15 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "InheritanceWindow.h"
+
+#include "MainWindow.h"
+#include "Server.h"
 #include "AtlasMapWidget.h"
 #include "inheritance.h"
+
+#include <Eris/Connection.h>
+#include <Eris/TypeInfo.h>
+#include <Eris/typeService.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
@@ -13,13 +20,21 @@
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
+#include <gtkmm/optionmenu.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/menuitem.h>
+
+#include <sigc++/bind.h>
+#include <sigc++/object_slot.h>
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 using Atlas::Message::Element;
 
 InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
+                                                       m_currentServer(0),
                                                        m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &InheritanceWindow::destroy_handler));
@@ -29,8 +44,8 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
     tophbox->pack_start(*(manage( new Gtk::Label("Inheritance tree:") ) ), Gtk::PACK_SHRINK, 2);
-    m_connectionLabel = manage( new Gtk::Label("-unconnected-") );
-    tophbox->pack_start(*m_connectionLabel, Gtk::PACK_EXPAND_WIDGET, 2);
+    m_serverMenu = manage( new Gtk::OptionMenu() );
+    tophbox->pack_start(*m_serverMenu, Gtk::PACK_EXPAND_WIDGET, 2);
     tophbox->pack_start(*(manage( new Gtk::Label("WOOT") ) ), Gtk::PACK_SHRINK, 2);
    
     vbox->pack_start(*tophbox, Gtk::PACK_SHRINK, 2);
@@ -98,6 +113,71 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
     // add(*vbox);
     // set_title("Inheritance");
 
-    // show_all();
+    mw.serverAdded.connect(SigC::slot(*this, &InheritanceWindow::serverAdded));
+
     signal_delete_event().connect(slot(*this, &InheritanceWindow::deleteEvent));
+}
+
+void InheritanceWindow::descendTypeTree(Eris::TypeInfo * node,
+                                        Gtk::TreeModel::Row & row)
+{
+    assert(node != NULL);
+
+    std::cout << "Node " << node->getName() << std::endl << std::flush;
+    row[*m_nameColumn] = node->getName();
+    const Eris::TypeInfoSet & children = node->getChildren();
+    Eris::TypeInfoSet::const_iterator I = children.begin();
+    if (I == children.end()) {
+        return;
+    }
+    for (; I != children.end(); I++) {
+        Gtk::TreeModel::Row childrow = *(m_treeModel->append(row.children()));
+        descendTypeTree(*I, childrow);
+    }
+
+}
+
+void InheritanceWindow::currentServerChanged(Server * s)
+{
+    m_currentServer = s;
+    m_treeModel->clear();
+
+    Eris::TypeService * ts = s->m_connection.getTypeService();
+
+    if (ts == 0) {
+        std::cout << "No type service)" << std::endl << std::flush;
+        return;
+    }
+
+    Eris::TypeInfoPtr root = ts->findTypeByName("root");
+
+    if (root == 0) {
+        std::cout << "No root type)" << std::endl << std::flush;
+        return;
+    }
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+    descendTypeTree(root, row);
+}
+
+void InheritanceWindow::serverAdded(Server * s)
+{
+    std::cout << "SERVER ADDED" << std::endl << std::flush;
+
+    Gtk::Menu * menu = m_serverMenu->get_menu();
+    bool newMenu = false;
+
+    if (menu == 0) {
+        newMenu = true;
+        menu = manage( new Gtk::Menu() );
+        m_serverMenu->set_menu(*menu);
+    }
+    Gtk::Menu_Helpers::MenuList & server_menu = menu->items();
+    std::stringstream ident;
+    ident << s->getName() << "-" << s->getServerNo();
+
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(SigC::slot(*this, &InheritanceWindow::currentServerChanged), s)));
+    if (newMenu) {
+        m_serverMenu->set_history(0);
+        currentServerChanged(s);
+    }
 }
