@@ -154,6 +154,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     view_menu.push_back(RadioMenuElem(render_group, "Textured", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::TEXTURE)));
     view_menu.push_back(RadioMenuElem(render_group, "Lit", SigC::bind<GlView::rmode_t>(slot(*m_glarea, &GlView::setRenderMode),GlView::SHADETEXT)));
     view_menu.push_back(SeparatorElem());
+    view_menu.push_back(StockMenuElem(Gtk::StockID(Gtk::Stock::HOME), SigC::slot(*m_glarea, &GlView::setHome)));
     menu_sub_sub = manage( new Gtk::Menu() );
     MenuList& face_menu = menu_sub_sub->items();
     face_menu.push_back(TearoffMenuElem());

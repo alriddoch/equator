@@ -187,6 +187,13 @@ void GlView::zoomOut()
     }
 }
 
+void GlView::setHome()
+{
+    setXoff(0);
+    setYoff(0);
+    setZoff(0);
+}
+
 void GlView::showCameraControl()
 {
     CameraControl * c = new CameraControl(*this);

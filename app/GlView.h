@@ -71,6 +71,7 @@ class GlView : public Gtk::DrawingArea {
     void setFace(float d, float r);
     void zoomIn();
     void zoomOut();
+    void setHome();
 
     void showCameraControl();
 
