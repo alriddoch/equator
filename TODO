@@ -1,3 +1,12 @@
+Add capabilty to select existing avatar/character in the connection window.
+
+Add way for admin account to make sure it moves its avatar in such a
+way that it gets appearance/disappearance ops.
+
+Implement rubberband selection in ServerEntities.
+
+Make common base for entity based layers.
+
 Sort out windows so they are not deleted when the user clicks on close.
 
 What NOW!?

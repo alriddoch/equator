@@ -5,6 +5,8 @@
 #ifndef EQUATOR_APP_LAYER_H
 #define EQUATOR_APP_LAYER_H
 
+#include "types.h"
+
 #include <string>
 #include <sigc++/object.h>
 
@@ -44,6 +46,7 @@ class Layer : public SigC::Object {
     virtual void dragUpdate(GlView & view, float x, float y, float z) = 0;
     virtual void dragEnd(GlView & view, float x, float y, float z) = 0;
     virtual void insert(const WFMath::Point<3> &) = 0;
+    virtual void align(Alignment) = 0;
 
     const std::string & getType() const {
         return m_type;

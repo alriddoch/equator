@@ -5,6 +5,8 @@
 #ifndef EQUATOR_APP_MODEL_H
 #define EQUATOR_APP_MODEL_H
 
+#include "types.h"
+
 #include <string>
 #include <list>
 #include <sigc++/object.h>
@@ -88,6 +90,8 @@ class Model : public SigC::Object {
 
     void pushSelection();
     void popSelection();
+
+    void alignSelection(Alignment );
 
     SigC::Signal0<void> nameChanged;
     SigC::Signal0<void> updated;

@@ -9,4 +9,6 @@
 
 typedef std::pair<int, int> GroundCoord;
 
+typedef enum align { ALIGN_GRID, ALIGN_HEIGHT } Alignment;
+
 #endif // EQUATOR_TYPES_H

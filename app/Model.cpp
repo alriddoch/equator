@@ -93,6 +93,13 @@ void Model::popSelection()
     m_currentLayer->popSelection();
 }
 
+void Model::alignSelection(Alignment e)
+{
+    assert(m_currentLayer != NULL);
+
+    m_currentLayer->align(e);
+}
+
 void Model::setName(const std::string & n)
 {
     m_name = n;

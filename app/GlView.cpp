@@ -94,6 +94,14 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
     select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Push", '>', slot(&m_model, &Model::pushSelection)));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Pop", '<', slot(&m_model, &Model::popSelection)));
+    select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+
+    Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& align_popup = menu_sub_sub->items();
+    align_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
+    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to heightfield", SigC::bind<Alignment>(slot(&m_model, &Model::alignSelection), ALIGN_HEIGHT)));
+    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to grid", SigC::bind<Alignment>(slot(&m_model, &Model::alignSelection), ALIGN_GRID)));
+    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Align", *menu_sub_sub));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select",*menu_sub));
 
@@ -102,7 +110,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
     view_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", '=', slot(this, &GlView::zoomIn)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", '-', slot(this, &GlView::zoomOut)));
-    Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
+    menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& zoom_popup = menu_sub_sub->items();
     zoom_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("16:1", SigC::bind<float>(slot(this, &GlView::setScale), 16)));

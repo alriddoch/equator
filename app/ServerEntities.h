@@ -16,6 +16,7 @@ class Server;
 
 namespace WFMath {
   template<const int dim> class AxisBox;
+  template<const int dim> class Point;
 }
 
 namespace Eris {
@@ -28,7 +29,7 @@ namespace Eris {
 
 class ServerEntities : public Layer {
   public:
-    typedef std::map<Eris::Entity*,int> entlist_t;
+    typedef std::set<Eris::Entity*> entlist_t;
     typedef std::map<int,Eris::Entity*> entname_t;
     typedef std::vector<Eris::Entity*> entstack_t;
   private:
@@ -59,6 +60,7 @@ class ServerEntities : public Layer {
     bool selectSingleEntity(GlView & view, int nx, int ny, bool check = false);
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
+    void alignEntityHeight(Eris::Entity * ent, const WFMath::Point<3> & o);
   public:
     ServerEntities(Model &, Server &);
     void importFile() { }
@@ -73,6 +75,7 @@ class ServerEntities : public Layer {
     void dragUpdate(GlView & view, float x, float y, float z);
     void dragEnd(GlView & view, float x, float y, float z);
     void insert(const WFMath::Point<3> &);
+    void align(Alignment );
     
     void gotNewEntity(Eris::Entity *ent);
     void entityChanged(const Eris::StringSet &attrs, Eris::Entity *ent);

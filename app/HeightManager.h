@@ -42,6 +42,7 @@ class HeightManager : public Layer {
     void dragUpdate(GlView & view, float x, float y, float z) { }
     void dragEnd(GlView & view, float x, float y, float z) { }
     void insert(const WFMath::Point<3> &) { }
+    void align(Alignment ) { }
 };
 
 #endif // EQUATOR_HEIGHTMANAGER_H

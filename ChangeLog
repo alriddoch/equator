@@ -1,3 +1,15 @@
+2002-04-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.h, app/EntityLayer.h, app/GlView.cpp,
+	  app/HeightManager.h, app/Holo.h, app/IsoMap.h,
+	  app/Layer.h, app/Model.cpp, app/Model.h, app/types.h:
+	  Added general purpose alignment mechanism, so the
+	  selection can be aligned with things like grids, or
+	  heightfields.
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Implemented aligning
+	  with heighfield for selected entity.
+
 2002-04-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/IsoMap.cpp: Modify coal calls to use new

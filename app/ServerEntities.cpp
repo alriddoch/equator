@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "MainWindow.h"
 #include "Palette.h"
+#include "HeightData.h"
 
 #include "debug.h"
 
@@ -258,7 +259,7 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
             if (e == m_selection) {
                 draw3DSelectedBox(e->getPosition(), e->getBBox());
             }
-        } // else { draw it without using its bbox FIXME how ?
+        } // else draw it without using its bbox FIXME how ?
         //draw3DBox(e->getPosition(), e->getBBox());
         if (openEntity) {
             entstack_t::const_iterator J = I;
@@ -360,7 +361,7 @@ bool ServerEntities::selectSingleEntity(GlView & view,
             } else {
                 if (I != m_nameDict.end()) {
                     m_selection = I->second;
-                    m_selectionList[I->second] = 0;
+                    m_selectionList.insert(I->second);
                     // m_selectionStack[I->second] = 0;
                 } else {
                     std::cout << "UNKNOWN NAME" << std::endl << std::flush;
@@ -398,6 +399,42 @@ void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
     Eris::TypeInfoSet::const_iterator I = children.begin();
     for (; I != children.end(); I++) {
         descendTypeTree(*I);
+    }
+}
+
+static const WFMath::Point<3> operator+(const WFMath::Point<3> & lhs,
+                                 const WFMath::Point<3> & rhs)
+{
+    return WFMath::Point<3>(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]);
+}
+
+void ServerEntities::alignEntityHeight(Eris::Entity * ent,
+                                       const WFMath::Point<3> & o)
+{
+    assert(ent != NULL);
+
+    const WFMath::Point<3> & pos = ent->getPosition();
+    WFMath::Point<3> offset = pos + o;
+    if (m_selectionList.find(ent) != m_selectionList.end()) {
+        float x = offset.x();
+        float y = offset.y();
+        float z = o.z();
+        float height = m_model.m_heightData.get(x, y) / 32.0f;
+        std::cout << ent->getID() << " had height of " << offset.z()
+                  << " and we change it to " << height << std::endl << std::flush;
+        WFMath::Point<3> newPos = pos;
+        newPos.z() = height - z;
+        m_serverConnection.avatarMoveEntity(ent->getID(),
+                                            ent->getContainer()->getID(),
+                                            newPos, WFMath::Vector<3>(0,0,0));
+    }
+    int numEnts = ent->getNumMembers();
+    debug(std::cout << ent->getID() << " " << numEnts << " emts"
+                    << std::endl << std::flush;);
+    for (int i = 0; i < numEnts; i++) {
+        Eris::Entity * e = ent->getMember(i);
+        assert(e != NULL);
+        alignEntityHeight(e, offset);
     }
 }
 
@@ -521,6 +558,15 @@ void ServerEntities::insert(const WFMath::Point<3> & pos)
     ent["pos"] = pos.toAtlas();
     
     m_serverConnection.avatarCreateEntity(ent);
+}
+
+void ServerEntities::align(Alignment a)
+{
+    if (a != ALIGN_HEIGHT) { return; }
+
+    Eris::Entity * root = m_serverConnection.world->getRootEntity();
+    alignEntityHeight(root, WFMath::Point<3>(0,0,0));
+
 }
 
 void ServerEntities::gotNewEntity(Eris::Entity *ent)
