@@ -1,3 +1,12 @@
+2002-04-10  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.cpp: Ensure bbox is only drawn if the entity
+	  has one.
+
+	* app/Server.h: Use new Eris Log.h for log definitions.
+
+	* app/Server.cpp: Use Eris::Logged to get log messages.
+
 2002-04-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Texture.h, app/Texture.cpp: Give tiles a name, add support for

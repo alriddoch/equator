@@ -86,7 +86,7 @@ void Server::connect(const std::string & host, int port)
     connection.Failure.connect(SigC::slot(this, &Server::netFailure));
     connection.Connected.connect(SigC::slot(this, &Server::netConnected));
     connection.Disconnected.connect(SigC::slot(this, &Server::netDisconnected));
-    connection.Log.connect(SigC::slot(this, &Server::connectionLog));
+    Eris::Logged.connect(SigC::slot(this, &Server::connectionLog));
 
     std::cout << host << ":" << port << std::endl << std::flush;
     connection.connect(host, port);

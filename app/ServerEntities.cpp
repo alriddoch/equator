@@ -242,21 +242,23 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
                         // << std::endl << std::flush;);
         // if (!e->isVisible()) { continue; }
         bool openEntity = ((I != m_selectionStack.end()) && (*I == e));
-        switch (m_renderMode) {
-            case GlView::LINE:
-                draw3DBox(e->getPosition(), e->getBBox());
-                break;
-            case GlView::SOLID:
-            case GlView::SHADED:
-            case GlView::TEXTURE:
-            case GlView::SHADETEXT:
-            default:
-                draw3DCube(e->getPosition(), e->getBBox(),
-                           openEntity);
-        }
-        if (e == m_selection) {
-            draw3DSelectedBox(e->getPosition(), e->getBBox());
-        }
+        if (e->hasBBox()) {
+            switch (m_renderMode) {
+                case GlView::LINE:
+                    draw3DBox(e->getPosition(), e->getBBox());
+                    break;
+                case GlView::SOLID:
+                case GlView::SHADED:
+                case GlView::TEXTURE:
+                case GlView::SHADETEXT:
+                default:
+                    draw3DCube(e->getPosition(), e->getBBox(),
+                               openEntity);
+            }
+            if (e == m_selection) {
+                draw3DSelectedBox(e->getPosition(), e->getBBox());
+            }
+        } // else { draw it without using its bbox FIXME how ?
         //draw3DBox(e->getPosition(), e->getBBox());
         if (openEntity) {
             entstack_t::const_iterator J = I;
@@ -287,7 +289,9 @@ void ServerEntities::selectEntity(Eris::Entity* ent,entstack_t::const_iterator I
         if (!e->isVisible()) { continue; }
         m_nameDict[++m_nameCount] = e;
         glPushName(m_nameCount);
-        draw3DCube(e->getPosition(), e->getBBox());
+        if (e->hasBBox()) {
+            draw3DCube(e->getPosition(), e->getBBox());
+        }
         if ((I != m_selectionStack.end()) && (*I == e)) {
             entstack_t::const_iterator J = I;
             selectEntity(e, ++J);

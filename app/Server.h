@@ -8,6 +8,7 @@
 #include "Vector3D.h"
 
 #include <Eris/Connection.h>
+#include <Eris/Log.h>
 
 #include <gtk--/main.h>
 
