@@ -1,3 +1,11 @@
+Abstract the stuff that is currently top level windows to be vbox widgets,
+and allow them to be reparented around in generic toolbar windows, or
+the main window, or something else. To make this work, we then really need
+to be able to store the UI configuration a user likes.
+
+Use Window::set_geometry_hints to control resizing of main window,
+then use resizing of tables to make buttons flow like in gimp.
+
 Re-think the way model is handled, getting rid of global terrain. Instead
 think of layers as types of rendering.
 
