@@ -9,6 +9,8 @@
 #include "Model.h"
 #include "GlView.h"
 
+#include <wfmath/point.h>
+
 #include <Mercator/Terrain.h>
 #include <Mercator/Segment.h>
 
@@ -327,4 +329,18 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
         }
     }
     std::cout << std::endl << std::flush;
+}
+
+void HeightManager::insert(const WFMath::Point<3> & curs)
+{
+    int posx = round(curs.x() / segSize);
+    int posy = round(curs.y() / segSize);
+    std::cout << "Setting height at " << posx << "," << posy << " to " << curs.z()
+              << std::endl << std::flush;
+    m_model.m_terrain.setBasePoint(posx,     posy,     curs.z());
+    for(int i = posx - 2; i < posx + 2; ++i) {
+        for(int j = posy - 2; j < posy + 2; ++j) {
+            m_model.m_terrain.refresh(i, j);
+        }
+    }
 }

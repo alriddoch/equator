@@ -1,5 +1,10 @@
 2003-01-28  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/HeightManager.cpp, app/HeightManager.h: Implement insert
+	  operation to manipulate individual height points.
+
+2003-01-28  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.cpp: Fix dependencies of heightmap segments.
 
 2003-01-28  Al Riddoch  <alriddoch@zepler.org>
