@@ -790,72 +790,6 @@ void ServerEntities::connectEntity(Eris::Entity * ent)
     }
 }
 
-void ServerEntities::readTerrain(Eris::Entity * ent)
-{
-    if (!ent->hasProperty("terrain")) {
-        std::cerr << "WOrld has no terrain" << std::endl << std::flush;
-        std::cerr << "World " << ent->getID() << std::endl << std::flush;
-        return;
-    }
-    const Element & terrain = ent->getProperty("terrain");
-    if (!terrain.isMap()) {
-        std::cerr << "Terrain is not a map" << std::endl << std::flush;
-    }
-    const Element::MapType & tmap = terrain.asMap();
-    Element::MapType::const_iterator I = tmap.find("points");
-    int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
-    if ((I == tmap.end()) || !I->second.isList()) {
-        std::cerr << "No terrain points" << std::endl << std::flush;
-    }
-    const Element::ListType & plist = I->second.asList();
-    Element::ListType::const_iterator J = plist.begin();
-    for(; J != plist.end(); ++J) {
-        if (!J->isList()) {
-            std::cout << "Non list in points" << std::endl << std::flush;
-            continue;
-        }
-        const Element::ListType & point = J->asList();
-        if (point.size() < 3) {
-            std::cout << "point without 3 nums" << std::endl << std::flush;
-            continue;
-        }
-        int x = (int)point[0].asNum();
-        int y = (int)point[1].asNum();
-        xmin = std::min(xmin, x);
-        xmax = std::max(xmax, x);
-        ymin = std::min(ymin, y);
-        ymax = std::max(ymax, y);
-        Mercator::BasePoint bp(point[2].asNum());
-        if (point.size() > 3) {
-            bp.roughness()=point[3].asNum();
-            if (point.size() > 4) {
-                bp.falloff()=point[4].asNum();
-            }
-        }
-#warning FIXME Work out where we need to handle the terrain
-        // m_model.m_terrain.setBasePoint(x, y, bp);
-    }
- 
-#if 0
-    //============HACKED TO TEST MERCATOR
-
-    const WFMath::Ball<2> circ2(WFMath::Point<2>(0.0,0.0), 12.0);
-    Mercator::LevelTerrainMod<WFMath::Ball<2> > mod2(10.0f, circ2);
-    m_model.m_terrain.addMod(mod2);
-
-    const WFMath::RotBox<2> rot(WFMath::Point<2>(-80.,-130.) ,
-                                WFMath::Vector<2>(150.0,120.0),
-                                WFMath::RotMatrix<2>().rotation(WFMath::Pi/4));
-    Mercator::LevelTerrainMod<WFMath::RotBox<2> > mod3(10.0f, rot);
-    m_model.m_terrain.addMod(mod3);
-
-    //==================================== 
-#endif
-
-
-}
-
-
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
@@ -876,9 +810,6 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     Eris::Entity * worldRoot = m_serverConnection.m_world->getRootEntity();
 
     connectEntity(worldRoot);
-
-    // FIXME For now we assume the root entity has the terrain
-    readTerrain(worldRoot);
 
     /* observve the Eris world (in the future, we will need to get World* from
     the server object, when Eris supports multiple world objects */

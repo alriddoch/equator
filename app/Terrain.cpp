@@ -164,7 +164,8 @@ void Terrain::heightMapRegion(GlView & view, Mercator::Segment & map)
     delete carray;
 }
 
-void Terrain::drawRegion(GlView & view, Mercator::Segment & map)
+void Terrain::drawRegion(GlView & view, Mercator::Segment & map,
+                         const GroundCoord & gc)
 {
     float * varray = new float[(segSize + 1) * 4 * 3];
     int vdx = -1;
@@ -188,8 +189,7 @@ void Terrain::drawRegion(GlView & view, Mercator::Segment & map)
         varray[++vdx] = i;
         varray[++vdx] = map.get(0, i);
     }
-    // bool selected = (m_selection.find(map) != m_selection.end());
-    bool selected = false;
+    bool selected = (m_selection.find(gc) != m_selection.end());
     if (selected) {
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
@@ -221,7 +221,7 @@ void Terrain::draw(GlView & view)
             if (!s->isValid()) {
                 s->populate();
             }
-            drawRegion(view, *s);
+            drawRegion(view, *s, GroundCoord(I->first, J->first));
             glPopMatrix();
         }
     }
@@ -319,7 +319,7 @@ void Terrain::animate(GlView & view)
             std::cout << "Animating segment at " << I->first << "," << J->first
                       << std::endl << std::flush;
             // FIXME Actually do some animation maybe?
-            drawRegion(view, *J->second);
+            drawRegion(view, *J->second, GroundCoord(I->first, J->first));
             glPopMatrix();
         }
     }

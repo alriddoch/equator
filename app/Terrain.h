@@ -21,8 +21,9 @@ namespace Mercator {
 }
 
 class Terrain : public Layer {
-  private:
+  public:
     Mercator::Terrain & m_terrain;
+  private:
 
     std::set<GroundCoord> m_selection;
     GroundCoord m_dragPoint;
@@ -36,7 +37,8 @@ class Terrain : public Layer {
     void selectRegion(Mercator::Segment & map);
     void outlineLineStrip(float *, unsigned int, float);
     void heightMapRegion(GlView & view, Mercator::Segment & map);
-    void drawRegion(GlView & view, Mercator::Segment & map);
+    void drawRegion(GlView & view, Mercator::Segment & map,
+                    const GroundCoord & gc);
   public:
     static const int segSize = 64;
     explicit Terrain(Model &);

@@ -1,5 +1,18 @@
 2003-08-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/Terrain.h, app/Terrain.cpp:
+	  Make reference to terrain store object public. Modify API
+	  for rendering to it can be verified whether a segment
+	  is selected when it is rendered.
+
+	* app/ServerEntities.h, app/ServerEntities.cpp: Remove obsolete
+	  terrain handling code.
+
+	* app/Server.h, app/Server.cpp: Add code to create and populate
+	  a terrain channel as apropriate.
+
+2003-08-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/WorldEntity.cpp: Debug output.
 
 	* app/Server.h, app/Server.cpp, app/NewServerWindow.cpp,

@@ -31,6 +31,7 @@ namespace Atlas {
 }
 
 class Model;
+class Terrain;
 
 class Server : public SigC::Object {
   private:
@@ -43,6 +44,9 @@ class Server : public SigC::Object {
     void worldEnter(Eris::Entity *r);
 
     void charMoved(const WFMath::Point<3> &);
+
+    void checkEntityForNewLayers(Eris::Entity & ent);
+    void readTerrain(Terrain & t, Eris::Entity & ent);
   protected:
     bool inGame;
 

@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "WorldEntity.h"
 #include "ServerEntities.h"
+#include "Terrain.h"
 
 #include <Eris/Avatar.h>
 #include <Eris/Player.h>
@@ -14,6 +15,8 @@
 #include <Eris/World.h>
 #include <Eris/Entity.h>
 #include <Eris/PollDefault.h>
+
+#include <Mercator/Terrain.h>
 
 #include <wfmath/atlasconv.h>
 
@@ -92,13 +95,97 @@ void Server::createCharacter(const std::string & name,
 
 }
 
+void Server::readTerrain(Terrain & t, Eris::Entity & ent)
+{
+    if (!ent.hasProperty("terrain")) {
+        std::cerr << "Terrain object has no terrain" << std::endl << std::flush;
+        std::cerr << "Terrain " << ent.getID() << std::endl << std::flush;
+        return;
+    }
+    const Element & terrain = ent.getProperty("terrain");
+    if (!terrain.isMap()) {
+        std::cerr << "Terrain is not a map" << std::endl << std::flush;
+    }
+    const Element::MapType & tmap = terrain.asMap();
+    Element::MapType::const_iterator I = tmap.find("points");
+    int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    if ((I == tmap.end()) || !I->second.isList()) {
+        std::cerr << "No terrain points" << std::endl << std::flush;
+    }
+    const Element::ListType & plist = I->second.asList();
+    Element::ListType::const_iterator J = plist.begin();
+    for(; J != plist.end(); ++J) {
+        if (!J->isList()) {
+            std::cout << "Non list in points" << std::endl << std::flush;
+            continue;
+        }
+        const Element::ListType & point = J->asList();
+        if (point.size() < 3) {
+            std::cout << "point without 3 nums" << std::endl << std::flush;
+            continue;
+        }
+        int x = (int)point[0].asNum();
+        int y = (int)point[1].asNum();
+        xmin = std::min(xmin, x);
+        xmax = std::max(xmax, x);
+        ymin = std::min(ymin, y);
+        ymax = std::max(ymax, y);
+        Mercator::BasePoint bp(point[2].asNum());
+        if (point.size() > 3) {
+            bp.roughness()=point[3].asNum();
+            if (point.size() > 4) {
+                bp.falloff()=point[4].asNum();
+            }
+        }
+        t.m_terrain.setBasePoint(x, y, bp);
+    }
+ 
+#if 0
+    //============HACKED TO TEST MERCATOR
+
+    const WFMath::Ball<2> circ2(WFMath::Point<2>(0.0,0.0), 12.0);
+    Mercator::LevelTerrainMod<WFMath::Ball<2> > mod2(10.0f, circ2);
+    m_model.m_terrain.addMod(mod2);
+
+    const WFMath::RotBox<2> rot(WFMath::Point<2>(-80.,-130.) ,
+                                WFMath::Vector<2>(150.0,120.0),
+                                WFMath::RotMatrix<2>().rotation(WFMath::Pi/4));
+    Mercator::LevelTerrainMod<WFMath::RotBox<2> > mod3(10.0f, rot);
+    m_model.m_terrain.addMod(mod3);
+
+    //====================================
+#endif
+
+
+}
+
+void Server::checkEntityForNewLayers(Eris::Entity & ent)
+{
+    if (typeid(ent) == typeid(TerrainEntity)) {
+        std::cout << "Found a terrain entity"
+                  << std::endl << std::flush;
+        Terrain * layer = new Terrain(*m_model);
+        readTerrain(*layer, ent);
+        m_model->addLayer(layer);
+    }
+    
+    int numEnts = ent.getNumMembers();
+    for (int i = 0; i < numEnts; i++) {
+        Eris::Entity * e = ent.getMember(i);
+        checkEntityForNewLayers(*e);
+    }
+}
+
 void Server::createLayers(Model & model)
 {
     m_model = &model;
     Layer * layer = new ServerEntities(model, *this);
     model.addLayer(layer);
 
-#warning FIXME Add terrain layers as required.
+    Eris::Entity * worldRoot = m_world->getRootEntity();
+
+    checkEntityForNewLayers(*worldRoot);
+
 }
 
 void Server::roomEnter(Eris::Room *r)
