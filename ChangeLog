@@ -1,3 +1,8 @@
+2005-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GlView.cpp: Allow manipulation of camera in realtime using
+	  new tools.
+
 2005-01-31  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* stock-tool-move-16.xpm, stock-tool-rotate-16.xpm,

@@ -450,7 +450,7 @@ void GlView::clickOn(int x, int y)
     switch (m_mainWindow.getTool()) {
         case MainWindow::SELECT:
             if (make_current()) {
-                m_model.getCurrentLayer()->select(*this, mousex, get_height() - mousey);
+                m_model.getCurrentLayer()->select(*this, x, get_height() - y);
             }
             break;
         case MainWindow::AREA:
@@ -490,10 +490,10 @@ void GlView::clickOff(int x, int y)
     switch (m_mainWindow.getTool()) {
         case MainWindow::AREA:
             if (make_current()) {
-                if ((clickx == mousex) && (clicky == clicky)) {
-                    m_model.getCurrentLayer()->select(*this, mousex, get_height() - mousey);
+                if ((clickx == x) && (clicky == y)) {
+                    m_model.getCurrentLayer()->select(*this, x, get_height() - y);
                 } else {
-                    m_model.getCurrentLayer()->select(*this, clickx, get_height() - clicky, mousex, get_height() - mousey);
+                    m_model.getCurrentLayer()->select(*this, clickx, get_height() - clicky, x, get_height() - y);
                 }
             }
             m_dragType = GlView::NONE;
@@ -559,12 +559,12 @@ void GlView::midClickOff(int x, int y)
             break;
         case MainWindow::PIVOT:
             {
-                float rot = getRotation() + (dx * 360) / get_width();
-                float dec = getDeclination() - (dy * 180) / get_height();
-                while (rot > 360) { rot -= 360; }
-                while (rot < 0) { rot += 360; }
-                while (dec > 360) { dec -= 360; }
-                while (dec < 0) { dec += 360; }
+                float rot = getRotation() + (dx * 360.f) / get_width();
+                float dec = getDeclination() - (dy * 180.f) / get_height();
+                while (rot > 360.f) { rot -= 360.f; }
+                while (rot < 0.f) { rot += 360.f; }
+                while (dec > 360.f) { dec -= 360.f; }
+                while (dec < 0.f) { dec += 360.f; }
                 setRotation(rot);
                 setDeclination(dec);
             }
@@ -641,25 +641,66 @@ void GlView::realize()
 bool GlView::motionNotifyEvent(GdkEventMotion*event)
 {
     mousex = lrint(event->x); mousey = lrint(event->y);
-    if (clickx != 0) {
-        startAnimation();
-        switch (m_mainWindow.getTool()) {
-            case MainWindow::MOVE:
-            case MainWindow::ROTATE:
-            case MainWindow::SCALE:
-                {
-                    double tx, ty, tz;
-                    worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
-                    // Send move thingy to layer
-                    m_model.getCurrentLayer()->dragUpdate(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
-                }
-                break;
-            case MainWindow::SELECT:
-            case MainWindow::DRAW:
-            case MainWindow::AREA:
-            default:
-                break;
-        }
+    if (clickx == 0) {
+        return true;
+    }
+    double tx, ty, tz;
+    int dx = mousex - clickx,
+        dy = mousey - clicky;
+    worldPoint(mousex, mousey, dragDepth, &tx, &ty, &tz);
+    switch (m_dragType) {
+        case GlView::NONE:
+        case GlView::SELECT:
+        case GlView::MOVE:
+            startAnimation();
+            switch (m_mainWindow.getTool()) {
+                case MainWindow::MOVE:
+                case MainWindow::ROTATE:
+                case MainWindow::SCALE:
+                    {
+                        // Send move thingy to layer
+                        m_model.getCurrentLayer()->dragUpdate(*this, WFMath::Vector<3>(tx - dragx, ty - dragy, tz - dragz));
+                    }
+                    break;
+                case MainWindow::SELECT:
+                case MainWindow::DRAW:
+                case MainWindow::AREA:
+                default:
+                    break;
+            }
+            break;
+        case GlView::PAN:
+            setXoff(getXoff() + (tx - dragx) );
+            setYoff(getYoff() + (ty - dragy) );
+            setZoff(getZoff() + (tz - dragz) );
+            break;
+        case GlView::PIVOT:
+            {
+                float rot = getRotation() + (dx * 360.f) / get_width();
+                float dec = getDeclination() - (dy * 180.f) / get_height();
+                std::cout << "DEC: " << getDeclination() << "," << dec << "," << dy << std::endl << std::flush;
+                while (rot > 360.f) { rot -= 360.f; }
+                while (rot < 0.f) { rot += 360.f; }
+                while (dec > 360.f) { dec -= 360.f; }
+                while (dec < 0.f) { dec += 360.f; }
+                setRotation(rot);
+                setDeclination(dec);
+                clickx = mousex;
+                clicky = mousey;
+            }
+            break;
+        case GlView::ZOOM:
+            {
+                float sc = getLogScale() + (dy * 4.f) / get_height();
+                if (sc > 16.f) { sc = 16.f; }
+                if (sc < -16.f) { sc = -16.f; }
+                setLogScale(sc);
+                clickx = mousex;
+                clicky = mousey;
+            }
+            break;
+        default:
+            break;
     }
     return true;
 }
