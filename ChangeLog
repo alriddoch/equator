@@ -1,5 +1,11 @@
 2004-01-05  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ServerEntities.cpp: Re-write box rendering code so that it
+	  now uses culling to draw the box inside-out when we want to look
+	  inside.
+
+2004-01-05  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GameView.cpp: Flip direction of camara pos when passing
 	  stuff to apogee rendering code.
 
