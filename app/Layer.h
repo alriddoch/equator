@@ -47,6 +47,10 @@ class Layer : public SigC::Object {
     virtual void insert(const PosType &) = 0;
     virtual void align(Alignment) = 0;
 
+    Model & model() {
+        return m_model;
+    }
+
     const std::string & getType() const {
         return m_type;
     }

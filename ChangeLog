@@ -1,5 +1,12 @@
 2005-02-07  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Layer.h: Add accessor for Model.
+
+	* gui/gtkmm/Cal3dStoreOptions.cpp, gui/gtkmm/Cal3dStoreOptions.h:
+	  Implement turning on and off the meshes.
+
+2005-02-07  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/MainWindow.cpp: Disable focus on click on tool buttons.
 
 	* app/ViewWindow.cpp, app/ViewWindow.h: Add necessary calculations

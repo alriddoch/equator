@@ -20,13 +20,17 @@ namespace Gtk {
    class Menu;
 };
 
+typedef enum comp_type { COMP_MESH, COMP_MATERIAL, COMP_SKELETON, COMP_ACTION,
+                         COMP_ANIMATION, COMP_NONE } ComponentType;
+
 class Cal3dStoreOptions : public OptionBox
 {
   private:
     Glib::RefPtr<Gtk::TreeStore> m_treeModel;
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
     Gtk::TreeModelColumn<bool> * m_selectColumn;
-    Gtk::TreeModelColumn<void *> * m_ptrColumn;
+    Gtk::TreeModelColumn<int> * m_idColumn;
+    Gtk::TreeModelColumn<ComponentType> * m_componentColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
@@ -45,6 +49,7 @@ class Cal3dStoreOptions : public OptionBox
     void actionLoaded(const std::string &, int);
     void meshLoaded(const std::string &, int);
     void materialLoaded(const std::string &, int);
+    void enableToggled(const Glib::ustring& path_string);
   public:
     explicit Cal3dStoreOptions(Cal3dStore &);
 

@@ -5,6 +5,9 @@
 #include "Cal3dStoreOptions.h"
 
 #include "app/Cal3dStore.h"
+#include "app/Model.h"
+
+#include "visual/Model.h"
 
 #include <gtkmm/box.h>
 #include <gtkmm/menu.h>
@@ -31,9 +34,12 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
     m_columns = new Gtk::TreeModelColumnRecord();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
     m_selectColumn = new Gtk::TreeModelColumn<bool>();
-    m_ptrColumn = new Gtk::TreeModelColumn<void *>();
+    m_idColumn = new Gtk::TreeModelColumn<int>();
+    m_componentColumn = new Gtk::TreeModelColumn<ComponentType>();
     m_columns->add(*m_nameColumn);
-    m_columns->add(*m_ptrColumn);
+    m_columns->add(*m_selectColumn);
+    m_columns->add(*m_idColumn);
+    m_columns->add(*m_componentColumn);
 
     m_treeModel = Gtk::TreeStore::create(*m_columns);
 
@@ -42,7 +48,13 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
     m_treeView->set_model( m_treeModel );
 
     m_treeView->append_column("Component", *m_nameColumn);
-    m_treeView->append_column("View", *m_selectColumn);
+
+    Gtk::CellRendererToggle * crt = manage( new Gtk::CellRendererToggle() );
+    crt->signal_toggled().connect( SigC::slot(*this, &Cal3dStoreOptions::enableToggled) );
+    int column_no = m_treeView->append_column("View", *crt);
+    Gtk::TreeViewColumn * column = m_treeView->get_column(column_no - 1);
+    column->add_attribute(crt->property_active(), *m_selectColumn);
+    column->set_clickable();
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -89,6 +101,7 @@ void Cal3dStoreOptions::skeletonLoaded(const std::string & s)
     std::cout << "Loaded " << s << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     row[*m_nameColumn] = Glib::ustring(s);
+    row[*m_componentColumn] = COMP_SKELETON;
 }
 
 void Cal3dStoreOptions::animationLoaded(const std::string & s, int id)
@@ -96,6 +109,8 @@ void Cal3dStoreOptions::animationLoaded(const std::string & s, int id)
     std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(animationRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
+    row[*m_idColumn] = id;
+    row[*m_componentColumn] = COMP_ANIMATION;
 }
 
 void Cal3dStoreOptions::actionLoaded(const std::string & s, int id)
@@ -103,13 +118,28 @@ void Cal3dStoreOptions::actionLoaded(const std::string & s, int id)
     std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(actionRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
+    row[*m_idColumn] = id;
+    row[*m_componentColumn] = COMP_ACTION;
 }
 
 void Cal3dStoreOptions::meshLoaded(const std::string & s, int id)
 {
     std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
+    bool enabled = false;
+    if (m_cal3dStore.getModel().enabledMeshes().find(id) !=
+        m_cal3dStore.getModel().enabledMeshes().end()) {
+        enabled = true;
+        std::cout << "Enabled " << std::endl << std::flush;
+    } else {
+        std::cout << "Not Enabled " << std::endl << std::flush;
+    }
+
     Gtk::TreeModel::Row row = *(m_treeModel->append(meshRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
+    row[*m_selectColumn] = enabled;
+    row[*m_idColumn] = id;
+    row[*m_componentColumn] = COMP_MESH;
+
 }
 
 void Cal3dStoreOptions::materialLoaded(const std::string & s, int id)
@@ -117,6 +147,46 @@ void Cal3dStoreOptions::materialLoaded(const std::string & s, int id)
     std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(materialRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
+    row[*m_idColumn] = id;
+    row[*m_componentColumn] = COMP_MATERIAL;
+}
+
+void Cal3dStoreOptions::enableToggled(const Glib::ustring& path_string)
+{
+    GtkTreePath *gpath = gtk_tree_path_new_from_string (path_string.c_str());
+    Gtk::TreePath path(gpath);
+
+    /* get toggled iter */
+    Gtk::TreeRow row = *(m_treeModel->get_iter(path));
+
+    bool enabled = row[*m_selectColumn];
+    int id = row[*m_idColumn];
+    ComponentType ct = row[*m_componentColumn];
+    Cal3dModel & model = m_cal3dStore.getModel();
+
+    switch (ct) {
+      case COMP_MESH:
+        { 
+          if (enabled) {
+              model.enabledMeshes().erase(id);
+          } else {
+              model.enabledMeshes().insert(id);
+          }
+          row[*m_selectColumn] = !enabled;
+          m_cal3dStore.model().updated.emit();
+        }
+        default:
+            break;
+    };
+    // /* do something with the value */
+    // visible = layer->toggleVisible();
+
+    // /* set new value */
+    // row[*m_visColumn] = visible;
+
+    // if (0 != m_currentModel) {
+        // m_currentModel->updated.emit();
+    // }
 }
 
 #if 0
