@@ -30,6 +30,8 @@
 #include <sstream>
 #include <vector>
 
+#include <cassert>
+
 using Atlas::Message::Element;
 
 InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),

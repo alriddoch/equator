@@ -1,3 +1,7 @@
+2004-01-24  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/InheritanceWindow.cpp: Include cassert as required.
+
 2004-01-23  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/GlView.cpp, app/GlView.h, gui/gtkmm/CameraControl.cpp:
