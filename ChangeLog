@@ -1,5 +1,9 @@
 2005-02-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* gui/gtkmm/Cal3dStoreOptions.cpp: Remove some excess debug output.
+
+2005-02-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp, app/GlView.h: Clean up the redraw scheduling code.
 
 2005-02-07  Al Riddoch  <ajr@ecs.soton.ac.uk>

@@ -98,7 +98,6 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
 
 void Cal3dStoreOptions::skeletonLoaded(const std::string & s)
 {
-    std::cout << "Loaded " << s << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     row[*m_nameColumn] = Glib::ustring(s);
     row[*m_componentColumn] = COMP_SKELETON;
@@ -106,7 +105,6 @@ void Cal3dStoreOptions::skeletonLoaded(const std::string & s)
 
 void Cal3dStoreOptions::animationLoaded(const std::string & s, int id)
 {
-    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(animationRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
     row[*m_idColumn] = id;
@@ -115,7 +113,6 @@ void Cal3dStoreOptions::animationLoaded(const std::string & s, int id)
 
 void Cal3dStoreOptions::actionLoaded(const std::string & s, int id)
 {
-    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(actionRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
     row[*m_idColumn] = id;
@@ -124,7 +121,6 @@ void Cal3dStoreOptions::actionLoaded(const std::string & s, int id)
 
 void Cal3dStoreOptions::meshLoaded(const std::string & s, int id)
 {
-    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     bool enabled = false;
     if (m_cal3dStore.getModel().enabledMeshes().find(id) !=
         m_cal3dStore.getModel().enabledMeshes().end()) {
@@ -144,7 +140,6 @@ void Cal3dStoreOptions::meshLoaded(const std::string & s, int id)
 
 void Cal3dStoreOptions::materialLoaded(const std::string & s, int id)
 {
-    std::cout << "Loaded " << s << " " << id << std::endl << std::flush;
     Gtk::TreeModel::Row row = *(m_treeModel->append(materialRow.children()));
     row[*m_nameColumn] = Glib::ustring(s);
     row[*m_idColumn] = id;
