@@ -1,3 +1,8 @@
+2003-06-15  Damien McGinnes
+        * app/HeightManager.cpp: modified to use new Mercator BasePoints
+        * app/ServerEntities.cpp: modified to use new Mercator BasePoints,
+          fixed terrain mod hack (now uses operator new) 
+
 2003-06-06  Damien McGinnes
 
 	* app/ServerEntities.cpp: modified terrain mod hack to use latest

@@ -812,7 +812,7 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
             continue;
         }
         const Element::ListType & point = J->AsList();
-        if (point.size() != 3) {
+        if (point.size() < 3) {
             std::cout << "point without 3 nums" << std::endl << std::flush;
             continue;
         }
@@ -822,8 +822,16 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
         xmax = std::max(xmax, x);
         ymin = std::min(ymin, y);
         ymax = std::max(ymax, y);
-        m_model.m_terrain.setBasePoint(x, y, point[2].AsNum());
+        Mercator::BasePoint bp(point[2].AsNum());
+        if (point.size() > 3) {
+            bp.roughness=point[3].AsNum();
+            if (point.size() > 4) {
+                bp.falloff=point[4].AsNum();
+            }
+        }
+        m_model.m_terrain.setBasePoint(x, y, bp);
     }
+ 
     for(int i = xmin; i < xmax; ++i) {
         for(int j = ymin; j < ymax; ++j) {
             m_model.m_terrain.refresh(i, j);
@@ -835,8 +843,9 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
     // make a circular patch of terrain 12 units in radius
     // at an altitude of 25 units 
     const WFMath::Ball<2> circ(WFMath::Point<2>(28.0,28.0), 12.0);
-    Mercator::SlopeTerrainMod< WFMath::Ball<2> > lCirc(25.0f, 0.2f, -0.3f, circ);
-    m_model.m_terrain.getSegmentSafe(-1,0)->addMod(&lCirc);
+    Mercator::SlopeTerrainMod< WFMath::Ball<2> > *lCirc = 
+	    new Mercator::SlopeTerrainMod< WFMath::Ball<2> >(25.0f, 0.2f, -0.3f, circ);
+    m_model.m_terrain.getSegmentSafe(-1,0)->addMod(lCirc);
     //======================================
 }
 

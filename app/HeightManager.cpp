@@ -271,7 +271,7 @@ void HeightManager::draw(GlView & view)
         Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
         for (; L != col.end(); ++L) {
             glPushMatrix();
-            glTranslatef(K->first * segSize, L->first * segSize, L->second);
+            glTranslatef(K->first * segSize, L->first * segSize, L->second.height);
             glScalef(scale, scale, scale);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
             glPopMatrix();
@@ -436,7 +436,7 @@ void HeightManager::dragStart(GlView & view, int x, int y)
             nameDict[++nameCount] = GroundCoord(K->first, L->first);
             glLoadName(nameCount);
             glPushMatrix();
-            glTranslatef(K->first * segSize, L->first * segSize, L->second);
+            glTranslatef(K->first * segSize, L->first * segSize, L->second.height);
             glScalef(scale, scale, scale);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
             glPopMatrix();
@@ -483,11 +483,12 @@ void HeightManager::dragUpdate(GlView & view, float x, float y, float z)
 void HeightManager::dragEnd(GlView & view, float x, float y, float z)
 {
     float h = 0.f;
-    m_model.m_terrain.getBasePoint(m_dragPoint.first, m_dragPoint.second, h);
+    Mercator::BasePoint bp;
+    m_model.m_terrain.getBasePoint(m_dragPoint.first, m_dragPoint.second, bp);
     std::cout << "DRAGGED " << m_dragPoint.first << "," << m_dragPoint.second
-              << " FROM " << h << " TO " << h + z << std::endl << std::flush;
-    h += z; 
-    m_model.m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, h);
+              << " FROM " << bp.height << " TO " << bp.height + z << std::endl << std::flush;
+    bp.height += z; 
+    m_model.m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, bp);
     m_model.m_terrain.refresh(m_dragPoint.first, m_dragPoint.second);
 }
 
