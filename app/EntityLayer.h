@@ -11,6 +11,7 @@ namespace Gtk {
   class FileSelection;
 }
 
+// template <class ET>
 class EntityLayer : public Layer {
   private:
     void importFile() { }

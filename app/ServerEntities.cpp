@@ -163,8 +163,9 @@ class ExportOptions : public Gtk::Window
     Gtk::CheckButton * m_setRootCheck; 
     Gtk::Entry * m_rootId;
     ExportTarget m_target;
+    Eris::TypeInfoPtr m_charType;
 
-    ExportOptions() : m_target(EXPORT_ALL) {
+    ExportOptions() : m_target(EXPORT_ALL), m_charType(NULL) {
         Gtk::VBox * vbox = manage( new Gtk::VBox() );
 
         Gtk::Frame * frame = manage( new Gtk::Frame("Export..") );
@@ -434,7 +435,7 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
     assert(ent != NULL);
 
     glPushMatrix();
-    const WFMath::Point<3> & pos = ent->getPosition();
+    WFMath::Point<3> pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
     int numEnts = ent->getNumMembers();
     debug(std::cout << ent->getID() << " " << numEnts << " emts"
@@ -486,7 +487,7 @@ void ServerEntities::selectEntity(Eris::Entity* ent,entstack_t::const_iterator I
     assert(ent != NULL);
 
     glPushMatrix();
-    const WFMath::Point<3> & pos = ent->getPosition();
+    WFMath::Point<3> pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
     int numEnts = ent->getNumMembers();
     for (int i = 0; i < numEnts; i++) {
@@ -628,7 +629,7 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
 {
     assert(ent != NULL);
 
-    const WFMath::Point<3> & pos = ent->getPosition();
+    WFMath::Point<3> pos = ent->getPosition();
     WFMath::Point<3> offset = pos + o;
     if (m_selectionList.find(ent) != m_selectionList.end()) {
         float x = offset.x();
@@ -737,6 +738,14 @@ void ServerEntities::exportEntity(const std::string & id,
     for(unsigned int i = 0; i < numEnts; ++i) {
         Eris::Entity * me = ee->getMember(i);
         std::string eid = me->getID();
+        if (m_exportOptions->m_charCheck->get_active() &&
+            m_exportOptions->m_charType != NULL) {
+            Eris::TypeInfoPtr entType = me->getType();
+            if (entType != NULL && entType->isA(m_exportOptions->m_charType)) {
+                std::cout << "Omitting " << eid << std::endl << std::flush;
+                continue;
+            }
+        }
         if (m_exportOptions->m_appendCheck->get_active()) {
             eid += m_exportOptions->m_idSuffix->get_text();
         }
@@ -801,6 +810,10 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
         if (m_exportOptions->m_appendCheck->get_active()) {
             exportedRootId += m_exportOptions->m_idSuffix->get_text();
         }
+    }
+
+    if (m_exportOptions->m_charCheck->get_active()) {
+        m_exportOptions->m_charType = Eris::TypeInfo::findSafe("character");
     }
 
     if (m_exportOptions->m_target == ExportOptions::EXPORT_ALL_SELECTED) {
@@ -894,7 +907,7 @@ void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
     }
     Eris::Entity * cont = ent->getContainer();
     moveTo(cont, world);
-    const WFMath::Point<3> & pos = ent->getPosition();
+    WFMath::Point<3> pos = ent->getPosition();
     glTranslatef(pos.x(), pos.y(), pos.z());
 }
 
