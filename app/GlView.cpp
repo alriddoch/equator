@@ -132,7 +132,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    Glib::signal_idle().connect(SigC::slot(*this, &GlView::animate));
+    Glib::signal_idle().connect(SigC::slot(*this, &GlView::redraw));
 
     mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
@@ -395,11 +395,6 @@ void GlView::drawgl()
 
 bool GlView::animate()
 {
-    if (m_redrawRequired) {
-        redraw();
-        m_redrawRequired = false;
-        return false;
-    }
     if (!m_refreshRequired ||
         (m_frameStoreWidth != get_width()) ||
         (m_frameStoreHeight != get_height()) ||
@@ -865,17 +860,22 @@ const std::string GlView::details() const
     return dets.str();
 }
 
-void GlView::scheduleRedraw() {
+void GlView::scheduleRedraw()
+{
     if (!m_redrawRequired) {
         m_redrawRequired = true;
-        Glib::signal_idle().connect(SigC::slot(*this, &GlView::animate));
+        Glib::signal_idle().connect(SigC::slot(*this, &GlView::redraw));
     }
 }
 
-void GlView::redraw()
+bool GlView::redraw()
 {
-    setupgl();
-    drawgl();
+    if (m_redrawRequired) {
+        m_redrawRequired = false;
+        setupgl();
+        drawgl();
+    }
+    return false;
 }
 
 void GlView::setPickProjection(int nx, int ny, int fx, int fy)

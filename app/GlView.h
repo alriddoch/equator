@@ -34,7 +34,7 @@ class GlView : public Gtk::DrawingArea {
     int m_frameStoreWidth;
     int m_frameStoreHeight;
 
-    void redraw();
+    bool redraw();
   public:
     const int m_viewNo;
     Gtk::Adjustment & m_scaleAdj;
