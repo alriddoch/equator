@@ -232,6 +232,11 @@ void HeightManager::draw(GlView & view)
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0f, 0.f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+
+    if (have_GL_EXT_compiled_vertex_array) {
+        glLockArraysEXT(0, arrow_mesh_size);
+    }
+
     float scale = 0.00625 / view.getScale();
     
     const Mercator::Terrain::Pointstore & points = m_model.m_terrain.getPoints();
@@ -246,6 +251,10 @@ void HeightManager::draw(GlView & view)
             glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
             glPopMatrix();
         }
+    }
+
+    if (have_GL_EXT_compiled_vertex_array) {
+        glUnlockArraysEXT();
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);

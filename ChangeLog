@@ -1,5 +1,9 @@
 2003-02-21  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/HeightManager.cpp: Improve performance of arrows by locking.
+
+2003-02-21  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.h, app/HeightManager.cpp: Change the way
 	  base points are decorated to make editing for feasable.
 
