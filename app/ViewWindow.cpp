@@ -68,8 +68,8 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
 
-    hbox->pack_start(*m_cursorCoords, false, false, 2);
-    hbox->pack_start(*m_viewCoords, false, false, 2);
+    hbox->pack_start(*m_cursorCoords, true, true, 2);
+    hbox->pack_start(*m_viewCoords, true, true, 2);
 
     vbox->pack_start(*hbox, false, false, 0);
 
@@ -119,8 +119,6 @@ void ViewWindow::vAdjustChanged()
 {
     std::cout << "North changed to " << m_vAdjust->get_value()
               << std::endl << std::flush;
-    // m_glarea->setYoff(m_vAdjust->get_value());
-    // m_glarea->redraw();
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
@@ -131,8 +129,6 @@ void ViewWindow::hAdjustChanged()
 {
     std::cout << "East changed to " << m_hAdjust->get_value()
               << std::endl << std::flush;
-    // m_glarea->setXoff(-m_hAdjust->get_value());
-    // m_glarea->redraw();
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
@@ -148,21 +144,17 @@ void ViewWindow::glViewChanged()
     float winx = m_glarea->width() / (40.0f * m_glarea->getScale());
     float winy = m_glarea->height() / (40.0f * m_glarea->getScale());
     float worldSize = hypot(wx, wy);
-    float xrel = winx/worldSize;
-    float yrel = winy/worldSize;
-    if (xrel > 1.0f) { xrel = 1.0f; }
-    if (yrel > 1.0f) { yrel = 1.0f; }
 
     std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
-              << xrel << "," << yrel << std::endl << std::flush;
+              << std::endl << std::flush;
 
     m_hAdjust->set_lower(-worldSize);
     m_vAdjust->set_lower(-worldSize);
-    m_hAdjust->set_upper(worldSize);
-    m_vAdjust->set_upper(worldSize);
+    m_hAdjust->set_upper(worldSize + winx);
+    m_vAdjust->set_upper(worldSize + winx);
     
-    m_hAdjust->set_page_size(xrel);
-    m_vAdjust->set_page_size(yrel);
+    m_hAdjust->set_page_size(winx);
+    m_vAdjust->set_page_size(winx);
 
     m_hAdjust->set_page_increment(winx);
     m_vAdjust->set_page_increment(winy);

@@ -1,5 +1,12 @@
 2002-08-06  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/Holo.cpp: Correct alignment of holo grid when zoomed out.
+
+	* app/ViewWindow.cpp: Clean up status bar, and fix code handling
+	  the page size of the scrollbars.
+
+2002-08-06  Al Riddoch  <alriddoch@zepler.org>
+
 	* configure script for gtk2 and required libs working.
 
 2002-08-05  Al Riddoch  <alriddoch@zepler.org>
