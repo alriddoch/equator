@@ -47,7 +47,7 @@ void Server::createCharacter(const std::string & name,
     GameEntity chrcter(GameEntity::Instantiate());
     chrcter.SetParents(Atlas::Message::Object::ListType(1,type));
     chrcter.SetName(name);
-    chrcter.SetAttr("description", "an equator agent");
+    chrcter.SetAttr("description", "an equator avatar");
     // chrcter.SetAttr("sex", "female");
     world = player->createCharacter(chrcter);
 
@@ -177,7 +177,7 @@ const Vector3D Server::getAbsCharPos()
     return pos;
 }
 
-void Server::agentCreateEntity(const Atlas::Message::Object::MapType & ent)
+void Server::avatarCreateEntity(const Atlas::Message::Object::MapType & ent)
 {
     Create c = Create::Instantiate();
 

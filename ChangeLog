@@ -1,3 +1,21 @@
+2002-01-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp: Modify the projection so there is not so much
+	  wasted depth buffer.
+
+	* app/Model.cpp: Fix popping selection.
+
+	* app/NewServerWindow.cpp, app/NewServerWindow.h, app/Server.cpp,
+	  app/Server.h: Initialise all pointers to ensure they are not
+	  being used un-initialised. Set the deafult host to localhost.
+	  Switch to using term "Avatar" instead of "Agent".
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Modify how selection
+	  is stored into a primary selection, selection list, and stack
+	  of pushed primary selections. Implement selecting single entity
+	  correctly, and pushing it onto the stack. Use stack to view
+	  container contents.
+
 2002-01-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/Palette.cpp, app/ServerEntities.cpp,

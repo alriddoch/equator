@@ -79,7 +79,7 @@ void Model::popSelection()
 {
     assert(m_currentLayer != NULL);
 
-    m_currentLayer->pushSelection();
+    m_currentLayer->popSelection();
 }
 
 void Model::setName(const std::string & n)

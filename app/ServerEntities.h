@@ -8,8 +8,8 @@
 #include "Layer.h"
 #include "GlView.h"
 
-#include <list>
 #include <map>
+#include <vector>
 
 class Server;
 class Vector3D;
@@ -24,11 +24,13 @@ class ServerEntities : public Layer {
   public:
     typedef std::map<Eris::Entity*,int> entlist_t;
     typedef std::map<int,Eris::Entity*> entname_t;
+    typedef std::vector<Eris::Entity*> entstack_t;
   private:
     Server & m_serverConnection;
     GlView::rmode_t m_renderMode;
-    entlist_t m_selection; 
-    entlist_t m_selectionStack; 
+    Eris::Entity * m_selection; 
+    entlist_t m_selectionList; 
+    entstack_t m_selectionStack; 
 
     int m_nameCount;
     entname_t m_nameDict;
@@ -38,10 +40,10 @@ class ServerEntities : public Layer {
     void draw3DCube(const Vector3D & coords, const Eris::BBox & bbox,
                     bool open = false);
     void draw3DBox(const Vector3D & coords, const Eris::BBox & bbox);
-    void drawEntity(Eris::Entity * ent, entlist_t::const_iterator);
+    void drawEntity(Eris::Entity * ent, entstack_t::const_iterator);
     void drawWorld(Eris::Entity * wrld);
-    void selectEntity(Eris::Entity * ent, entlist_t::const_iterator);
-    bool selectSingleEntity(GlView & view, int nx, int ny, int fx, int fy, bool check = false);
+    void selectEntity(Eris::Entity * ent, entstack_t::const_iterator);
+    bool selectSingleEntity(GlView & view, int nx, int ny, bool check = false);
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
   public:

@@ -232,7 +232,7 @@ void GlView::setupgl()
         } else {
             float xsize = width() / 40.0f / 2.0f;
             float ysize = height() / 40.0f / 2.0f;
-            glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
+            glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
         }
     }
 }
@@ -587,7 +587,7 @@ void GlView::setPickProjection()
     } else {
         float xsize = width() / 40.0f / 2.0f;
         float ysize = height() / 40.0f / 2.0f;
-        glOrtho(-xsize, xsize, -ysize, ysize, -1000.0f, 1000.0f);
+        glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
     }
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

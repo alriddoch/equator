@@ -26,6 +26,11 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
                  Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(mw),
                  m_hostEntry(NULL), m_portChoice(NULL),
                  m_portSpin(NULL), m_connectButton(NULL),
+                 m_userEntry(NULL), m_passwdEntry(NULL),
+                 m_avatarNameEntry(NULL), m_avatarTypeEntry(NULL),
+                 m_loginButton(NULL), m_createButton(NULL),
+                 m_avatarButton(NULL), m_viewButton(NULL),
+                 m_status(NULL),
                  m_customPort(6767), m_portNum(6767),
                  m_server(NULL)
 {
@@ -34,6 +39,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
     hbox->pack_start(*(manage( new Gtk::Label("Hostname:") )), false, false, 2);
     m_hostEntry = manage( new Gtk::Entry(60) );
+    m_hostEntry->set_text("localhost");
     hbox->pack_end(*m_hostEntry, false, false, 2);
     vbox->pack_start(*hbox, false, false, 0);
 
@@ -81,24 +87,24 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     hbox->pack_start(*m_createButton, true, true, 0);
     vbox->pack_start(*hbox, false, false, 0);
 
-    vbox->pack_start(*(manage( new Gtk::Label("In Game Agent") )), false, false, 2);
+    vbox->pack_start(*(manage( new Gtk::Label("In Game Avatar") )), false, false, 2);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Agent Name:") )), false, false, 2);
-    m_agentNameEntry = manage( new Gtk::Entry(60) );
-    hbox->pack_end(*m_agentNameEntry, false, false, 2);
+    hbox->pack_start(*(manage( new Gtk::Label("Avatar Name:") )), false, false, 2);
+    m_avatarNameEntry = manage( new Gtk::Entry(60) );
+    hbox->pack_end(*m_avatarNameEntry, false, false, 2);
     vbox->pack_start(*hbox, false, false, 0);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Agent Type:") )), false, false, 2);
-    m_agentTypeEntry = manage( new Gtk::Entry(60) );
-    hbox->pack_end(*m_agentTypeEntry, false, false, 2);
+    hbox->pack_start(*(manage( new Gtk::Label("Avatar Type:") )), false, false, 2);
+    m_avatarTypeEntry = manage( new Gtk::Entry(60) );
+    hbox->pack_end(*m_avatarTypeEntry, false, false, 2);
     vbox->pack_start(*hbox, false, false, 0);
 
-    m_agentButton = manage( new Gtk::Button("Create Agent") );
-    m_agentButton->clicked.connect(slot(this, &NewServerWindow::createAgent));
-    m_agentButton->set_sensitive(false);
-    vbox->pack_start(*m_agentButton, false, false, 0);
+    m_avatarButton = manage( new Gtk::Button("Create Avatar") );
+    m_avatarButton->clicked.connect(slot(this, &NewServerWindow::createAvatar));
+    m_avatarButton->set_sensitive(false);
+    vbox->pack_start(*m_avatarButton, false, false, 0);
 
     m_viewButton = manage( new Gtk::Button("View") );
     m_viewButton->clicked.connect(slot(this, &NewServerWindow::createView));
@@ -181,14 +187,14 @@ void NewServerWindow::createAccount()
     m_loggedIn = Eris::Lobby::instance()->LoggedIn.connect(SigC::slot(this, &NewServerWindow::loginComplete));
 }
 
-void NewServerWindow::createAgent()
+void NewServerWindow::createAvatar()
 {
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Creating agent");
+    m_status->push(m_statusContext, "Creating avatar");
 
-    m_server->createCharacter(m_agentNameEntry->get_text(), m_agentTypeEntry->get_text());
+    m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
 
     m_worldEnter = m_server->world->Entered.connect(SigC::slot(this,&NewServerWindow::worldEnter));
 }
@@ -238,7 +244,7 @@ void NewServerWindow::loginComplete(const Atlas::Objects::Entity::Player &)
     m_passwdEntry->set_text("");
     m_loginButton->set_sensitive(false);
     m_createButton->set_sensitive(false);
-    m_agentButton->set_sensitive(true);
+    m_avatarButton->set_sensitive(true);
 }
 
 void NewServerWindow::worldEnter(Eris::Entity*)
@@ -246,11 +252,11 @@ void NewServerWindow::worldEnter(Eris::Entity*)
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Agent created in world");
+    m_status->push(m_statusContext, "Avatar created in world");
 
-    m_agentNameEntry->set_editable(false);
-    m_agentTypeEntry->set_editable(false);
-    m_agentButton->set_sensitive(false);
+    m_avatarNameEntry->set_editable(false);
+    m_avatarTypeEntry->set_editable(false);
+    m_avatarButton->set_sensitive(false);
     m_viewButton->set_sensitive(true);
 }
 
@@ -277,8 +283,8 @@ void NewServerWindow::dismiss()
     m_status->pop(m_statusContext);
     m_hostEntry->set_editable(true);
     m_userEntry->set_editable(true);
-    m_agentNameEntry->set_editable(true);
-    m_agentTypeEntry->set_editable(true);
+    m_avatarNameEntry->set_editable(true);
+    m_avatarTypeEntry->set_editable(true);
     m_connectButton->set_sensitive(true);
     m_portChoice->set_sensitive(true);
     m_loginButton->set_sensitive(false);

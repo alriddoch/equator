@@ -43,11 +43,11 @@ class NewServerWindow : public Gtk::Window
     Gtk::Button * m_connectButton;
     Gtk::Entry * m_userEntry;
     Gtk::Entry * m_passwdEntry;
-    Gtk::Entry * m_agentNameEntry;
-    Gtk::Entry * m_agentTypeEntry;
+    Gtk::Entry * m_avatarNameEntry;
+    Gtk::Entry * m_avatarTypeEntry;
     Gtk::Button * m_loginButton;
     Gtk::Button * m_createButton;
-    Gtk::Button * m_agentButton;
+    Gtk::Button * m_avatarButton;
     Gtk::Button * m_viewButton;
     Gtk::Statusbar * m_status;
     int m_customPort;
@@ -70,7 +70,7 @@ class NewServerWindow : public Gtk::Window
     void createConnection();
     void loginAccount();
     void createAccount();
-    void createAgent();
+    void createAvatar();
     void createView();
 
     void failure(const std::string & msg);
