@@ -96,6 +96,7 @@ ConnectWindow::ConnectWindow() :
 void ConnectWindow::setPort(int port)
 {
     m_portNum = port;
+    m_portSpin->get_adjustment()->set_value(port);
     m_portSpin->set_sensitive(false);
 }
 
