@@ -253,6 +253,8 @@ void Terrain::draw(GlView & view)
         }
     }
 
+    // Draw the sea - annoying
+#if 0
     glEnable(GL_BLEND);
     I = segs.begin();
     for (; I != segs.end(); ++I) {
@@ -275,6 +277,7 @@ void Terrain::draw(GlView & view)
         }
     }
     glDisable(GL_BLEND);
+#endif
 
     if ((m_model.getCurrentLayer() != this) ||
         (m_model.m_mainWindow.getMode() != MainWindow::VERTEX)) {
@@ -292,6 +295,12 @@ void Terrain::draw(GlView & view)
         const Mercator::Terrain::Pointcolumn & col = K->second;
         Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
         for (; L != col.end(); ++L) {
+            if ((m_selection.find(GroundCoord(K->first, L->first)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first - 1, L->first)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first - 1, L->first - 1)) == m_selection.end()) &&
+                (m_selection.find(GroundCoord(K->first, L->first - 1)) == m_selection.end())) {
+                continue;
+            }
             glPushMatrix();
             glTranslatef(K->first * segSize,
                          L->first * segSize,
@@ -356,20 +365,6 @@ void Terrain::select(GlView & view, int nx, int ny, int fx, int fy)
     GLuint selectBuf[32768];
 
     glSelectBuffer(32768,selectBuf);
-    glRenderMode(GL_SELECT);
-
-    glMatrixMode(GL_PROJECTION);
-    // glPushMatrix();
-    glLoadIdentity();
-
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    std::cout << "PICK " << nx << " " << ny << " " << fx - nx << " " << fy - ny << std::endl << std::flush;
-    int sWidth = abs(fx - nx);
-    int sHeight = abs(fy - ny);
-    int sXCentre = (fx > nx) ? (nx + sWidth / 2) : (fx + sWidth / 2);
-    int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
-    gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
 
     // Sets the projection, sets up names and sets up the modelview
     view.setPickProjection(nx, ny, fx, fy);
@@ -429,6 +424,8 @@ void Terrain::dragStart(GlView & view, int x, int y)
         return;
     }
 
+    m_vertexSelection.clear();
+
     GLuint selectBuf[32768];
     glSelectBuffer(32768, selectBuf);
 
@@ -480,7 +477,7 @@ void Terrain::dragStart(GlView & view, int x, int y)
                 const GroundCoord & c = K->second;
                 std::cout << "DRAGGING " << c.first << "," << c.second
                           << std::endl << std::flush;
-                m_dragPoint = c;
+                m_vertexSelection.insert(c);
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
             }
@@ -495,17 +492,25 @@ void Terrain::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 
 void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
-    Mercator::BasePoint ref;
-    if (!m_terrain.getBasePoint(m_dragPoint.first,
-                                        m_dragPoint.second, ref)) {
-        return;
+    std::set<GroundCoord> & selection = 
+        (m_model.m_mainWindow.getMode() == MainWindow::VERTEX)
+        ?  m_vertexSelection : m_selection;
+    GroundCoordSet::const_iterator I = selection.begin();
+    for(; I != selection.end(); ++I) {
+        const GroundCoord & coord = *I;
+        Mercator::BasePoint ref;
+        if (!m_terrain.getBasePoint(coord.first,
+                                            coord.second, ref)) {
+            return;
+        }
+        std::cout << "DRAGGED " << coord.first
+                  << "," << coord.second
+                  << " FROM " << ref.height()
+                  << " TO " << ref.height() + v.z()
+                  << std::endl << std::flush;
+        ref.height() += v.z(); 
+        m_terrain.setBasePoint(coord.first, coord.second, ref);
     }
-    std::cout << "DRAGGED " << m_dragPoint.first << "," << m_dragPoint.second
-              << " FROM " << ref.height()
-              << " TO " << ref.height() + v.z()
-              << std::endl << std::flush;
-    ref.height() += v.z(); 
-    m_terrain.setBasePoint(m_dragPoint.first, m_dragPoint.second, ref);
 }
 
 void Terrain::insert(const PosType & curs)

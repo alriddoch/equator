@@ -7,6 +7,8 @@
 
 #include "Layer.h"
 
+#include <wfmath/vector.h>
+
 #include <set>
 
 namespace Gtk {
@@ -18,16 +20,21 @@ namespace Mercator {
   class Segment;
 }
 
+typedef std::set<GroundCoord> GroundCoordSet;
+
 class Terrain : public Layer {
   public:
     Mercator::Terrain & m_terrain;
   private:
 
-    std::set<GroundCoord> m_selection;
-    GroundCoord m_dragPoint;
+    GroundCoordSet m_selection;
+    GroundCoordSet m_vertexSelection;
 
     int m_numLineIndeces;
     unsigned int * const m_lineIndeces;
+
+    bool m_validDrag;
+    WFMath::Vector<3> m_dragPoint;
 
     void initIndeces();
 
@@ -39,6 +46,9 @@ class Terrain : public Layer {
     void heightMapRegion(GlView & view, Mercator::Segment & map);
     void drawRegion(GlView & view, Mercator::Segment & map,
                     const GroundCoord & gc);
+
+    bool selectRegions(int nx, int ny, int fx, int fy, bool check = false);
+    bool selectBasepoints(int nx, int ny, int fx, int fy, bool check = false);
   public:
     static const int segSize = 64;
     explicit Terrain(Model &, Mercator::Terrain &);
