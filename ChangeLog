@@ -1,3 +1,7 @@
+2003-11-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* Rename configure.in to configure.ac, and update contents.
+
 2003-10-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp, app/HeightMap.cpp, app/Model.cpp,
