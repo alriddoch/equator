@@ -1,25 +1,28 @@
 
-Equator 0.0.X build notes
--------------------------
+Equator build notes
+-------------------
 
 Required libraries:
 
-	Library			Debian Package
-	----------------------	-----------------
-	Atlas-C++ v0.4.4	libatlas-cpp-dev
-	SigC++ v1.0.2		libsigc++-dev
-	SDL v1.2.		libsdl1.2-dev
-	SDL Mixer v1.2		libsdl-image1.2-dev
-	Gtk v1.2		libgtk-dev
-	GtkGLArea v1.2		gtkglarea5-dev
-	GtkGLArea C++ v1.1	gtkglareamm-dev
-	GIMP v1.2		gimp1.2	
-	GIMP PlugIn v1.2	libgimp-dev
-	Gtk-- v1.1.7		libgtkmm-dev
-	XML v1.8		libxml-dev
-	OpenGL Utility v3	glutg3-dev
+	Atlas-C++ v0.4.4
+	coal 0.2.4
+	SigC++ v1.0.2
+	SDL v1.2.
+	SDL Image v1.2
+	Gtk v1.2
+	Gtk-- v1.1.7
+	GtkGLArea v1.2
+	GtkGLArea-- v1.1
+	libXML v1.8
 
+Optional libraries:
+
+	GIMP v1.2
+	GIMP PlugIn v1.2
 
 created by bear
 24 April 2002
 <bear@code-bear.dyndns.org>
+update by Al Riddoch
+25th April 2002
+<alriddoch@zepler.org>
