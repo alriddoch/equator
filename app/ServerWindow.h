@@ -34,7 +34,7 @@ class ServerWindow : public Gtk::Window
     Server * m_currentServer;
 
     ConnectWindow & m_connectWindow;
-    LoginWindow * m_loginWindow;
+    LoginWindow & m_loginWindow;
     CharacterWindow * m_characterWindow;
 
   public:

@@ -1,5 +1,14 @@
 2003-12-19  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ConnectWindow.h: Fix header guards.
+
+	* app/LoginWindow.cpp, app/LoginWindow.h: Login window for entering
+	  username and password.
+
+	* app/ServerWindow.h, app/ServerWindow.cpp: Use new login window.
+
+2003-12-19  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/ServerWindow.cpp, app/ServerWindow.h: Replace option menu
 	  with treeview for current connections.
 

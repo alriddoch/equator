@@ -4,6 +4,7 @@
 
 #include "ServerWindow.h"
 #include "ConnectWindow.h"
+#include "LoginWindow.h"
 #include "ViewWindow.h"
 #include "GlView.h"
 #include "Layer.h"
@@ -25,6 +26,7 @@
 
 ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
                                        m_connectWindow(*new ConnectWindow()),
+                                       m_loginWindow(*new LoginWindow()),
                                        m_mainWindow(mw)
 {
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
@@ -72,8 +74,13 @@ void ServerWindow::connect()
 
 void ServerWindow::newServer(Server * server)
 {
+    assert(server != 0);
+
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     row[*m_hostnameColumn] = Glib::ustring("hostname");
+
+    m_loginWindow.useServer(server);
+    m_loginWindow.show_all();
 }
 
 void ServerWindow::setServer(Server * server)
