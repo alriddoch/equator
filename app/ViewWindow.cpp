@@ -29,7 +29,8 @@ using Gtk::Menu_Helpers::TearoffMenuElem;
 using Gtk::Menu_Helpers::AccelKey;
 using Gtk::Menu_Helpers::MenuList;
 
-ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0)
+ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
+                                                    m_scrollLock(false)
 {
     MainWindow & m_mainWindow = w;
     Model & m_model = m;
@@ -292,7 +293,7 @@ void ViewWindow::cursorMoved()
 
 void ViewWindow::vAdjustChanged()
 {
-    GlView::RedrawLock rl(*m_glarea);
+    if (m_scrollLock == true) { return; }
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
@@ -301,7 +302,7 @@ void ViewWindow::vAdjustChanged()
 
 void ViewWindow::hAdjustChanged()
 {
-    GlView::RedrawLock rl(*m_glarea);
+    if (m_scrollLock == true) { return; }
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
@@ -310,7 +311,7 @@ void ViewWindow::hAdjustChanged()
 
 void ViewWindow::glViewChanged()
 {
-    GlView::RedrawLock rl(*m_glarea);
+    m_scrollLock = true;
     std::cout << "Changing sliders to take accout of view change"
               << std::endl << std::flush;
     float wx, wy, wz;
@@ -342,6 +343,7 @@ void ViewWindow::glViewChanged()
     m_vAdjust->set_value(tv);
 
     updateRulers();
+    m_scrollLock = false;
 }
 
 void ViewWindow::updateViewCoords()

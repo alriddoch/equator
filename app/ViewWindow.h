@@ -34,6 +34,7 @@ class ViewWindow : public Gtk::Window
     Gtk::Adjustment * m_vAdjust;
     Gtk::Adjustment * m_hAdjust;
     float m_dAdjust;
+    bool m_scrollLock;
 
   public:
     ViewWindow(MainWindow &, Model &);

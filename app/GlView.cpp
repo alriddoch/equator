@@ -64,7 +64,6 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
                                       -0.2f, 0.3464f, 0.0f };
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
-           m_redrawLock(0),
            m_redrawRequired(true),
            m_viewNo(m.getViewNo()),
            m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
@@ -135,16 +134,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
 
 void GlView::setOrthographic()
 {
-    GlView::RedrawLock rl(*this);
-
     m_projection = ORTHO;
     m_viewWindow.setTitle();
 }
 
 void GlView::setPerspective()
 {
-    GlView::RedrawLock rl(*this);
-
     m_projection = PERSP;
     m_viewWindow.setTitle();
 }
@@ -156,8 +151,6 @@ float GlView::getScale() const
 
 void GlView::setScale(GLfloat s)
 {
-    GlView::RedrawLock rl(*this);
-
     // Representation of the scale inside the adjustment is
     // log2 of the scale factor, to give the user a sane scale
     m_scaleAdj.set_value(log2(s));
@@ -166,8 +159,6 @@ void GlView::setScale(GLfloat s)
 
 void GlView::setFace(GLfloat d, GLfloat r)
 {
-    GlView::RedrawLock rl(*this);
-
     m_declAdj.set_value(d);
     m_rotaAdj.set_value(r);
 }
@@ -696,10 +687,6 @@ const std::string GlView::details() const
 
 void GlView::redraw()
 {
-    if (m_redrawLock) {
-        return;
-    }
-
     setupgl();
     drawgl();
 }
