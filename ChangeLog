@@ -1,5 +1,9 @@
 2004-01-25  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/GlView.cpp: Manage OpenGL blend function correctly.
+
+2004-01-25  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp, app/GlView.h: Remove obsolete redraw code.
 
 	* app/ViewWindow.cpp, app/ViewWindow.h: Add a bool lock variable

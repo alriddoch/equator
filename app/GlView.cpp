@@ -240,6 +240,7 @@ void GlView::setupgl()
     if (make_current()) {
         glClearColor(0.0, 0.0, 0.0, 0.0);
         glEnable(GL_DEPTH_TEST);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glViewport(0, 0, (GLint)(get_width()), (GLint)(get_height()));
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -336,9 +337,7 @@ void GlView::drawgl()
         glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
         if ((clickx != 0) && (m_dragType == GlView::SELECT)) {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTranslatef(clickx, get_height() - clicky, 100.0f);
             float x = mousex - clickx;
             float y = clicky - mousey;
@@ -351,6 +350,8 @@ void GlView::drawgl()
 
             glVertexPointer(3, GL_FLOAT, 0, dvertices);
             if (pretty) {
+                // Set The Blending Function For Translucency
+                glBlendFunc(GL_SRC_ALPHA,GL_ONE);
                 glEnable(GL_BLEND);
                 glDisable(GL_DEPTH_TEST);
                 glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
@@ -358,12 +359,12 @@ void GlView::drawgl()
                 glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
                 glDrawArrays(GL_QUADS, 0, 4);
                 glDisable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glEnable(GL_DEPTH_TEST);
             } else {
                 glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
                 glDrawArrays(GL_LINE_STRIP, 0, 5);
             }
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
         glFlush();
         swap_buffers();
@@ -572,7 +573,6 @@ void GlView::mouseEffects()
         glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE); // Set The Blending Function For Translucency
         // glClear( GL_COLOR_BUFFER_BIT);
         glTranslatef(clickx, get_height() - clicky, 100.0f);
         float x = mousex - clickx;
@@ -586,6 +586,8 @@ void GlView::mouseEffects()
 
         glVertexPointer(3, GL_FLOAT, 0, dvertices);
         if (pretty) {
+            // Set The Blending Function For Translucency
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
             glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
@@ -593,6 +595,7 @@ void GlView::mouseEffects()
             glColor4f(1.0f, 0.0f, 0.0f, 0.2f);
             glDrawArrays(GL_QUADS, 0, 4);
             glDisable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_DEPTH_TEST);
         } else {
             glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
