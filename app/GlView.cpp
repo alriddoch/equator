@@ -65,6 +65,7 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_redrawRequired(true),
+           m_refreshRequired(true),
            m_frameStore(0),
            m_viewNo(m.getViewNo()),
            m_scaleAdj(*manage( new Gtk::Adjustment(0.0, -16, 16) )),
@@ -380,13 +381,13 @@ void GlView::drawgl()
             m_frameStoreWidth = get_width();
             m_frameStoreHeight = get_height();
 
-            m_frameStore = new GLubyte[get_width() * get_height() * 3];
+            m_frameStore = new GLubyte[get_width() * get_height() * 4];
             m_depthStore = new GLuint[get_width() * get_height()];
         }
         std::cout << "Frampt " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
         std::cout << "Grimple " << get_width() << " " << get_height() << std::endl << std::flush;
         glReadPixels(0, 0, get_width(), get_height(),
-                     GL_RGB, GL_UNSIGNED_BYTE, m_frameStore);
+                     GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
         glReadPixels(0, 0, get_width(), get_height(),
                      GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
         swap_buffers();
@@ -398,18 +399,20 @@ bool GlView::animate()
     if (m_redrawRequired) {
         redraw();
         m_redrawRequired = false;
-    } else {
-        if ((m_frameStoreWidth == get_width()) &&
-            (m_frameStoreHeight == get_height()) &&
-            (make_current())) {
-            glRasterPos2i(0,0);
-            glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                         GL_RGB, GL_UNSIGNED_BYTE, m_frameStore);
-            glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                         GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
-            std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
-            swap_buffers();
-        }
+        return true;
+    }
+    if (m_refreshRequired &&
+        (m_frameStoreWidth == get_width()) &&
+        (m_frameStoreHeight == get_height()) &&
+        (make_current())) {
+        glRasterPos2i(0,0);
+        glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                     GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
+        glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
+                     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+        std::cout << "Wham " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
+        swap_buffers();
+        m_refreshRequired = false;
     }
 #if 0
     m_animCount += 0.02f;
