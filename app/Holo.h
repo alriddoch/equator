@@ -15,8 +15,12 @@ class Holo : public Layer {
   private:
     void load(Gtk::FileSelection *) { }
     void cancel(Gtk::FileSelection *) { }
+
+    int m_box_radius;
   public:
     explicit Holo(Model &);
+
+    void setBoxSize(int r);
 
     virtual void options() { }
     virtual void importFile() { }

@@ -8,8 +8,14 @@
 #include "visual/StockTexture.h"
 #include "visual/Texture.h"
 
-Holo::Holo(Model & model) : Layer(model, "background", "HoloWorld")
+Holo::Holo(Model & model) : Layer(model, "background", "HoloWorld"),
+                            m_box_radius(0)
 {
+}
+
+void Holo::setBoxSize(int r)
+{
+    m_box_radius = r;
 }
 
 void Holo::draw(GlView & view)
@@ -22,22 +28,38 @@ void Holo::draw(GlView & view)
     int yc = -(int)view.getYoff();
     int zc = -(int)view.getYoff();
 
+    if (m_box_radius > 0) {
+        numlines = m_box_radius;
+    }
+
     // THere is an imprecision here. We need a less unweildy calculation for the
     // number of lines we are going to draw
 
     int plane_varray[] = {
                            xc - numlines, yc - numlines, 0,
-                           xc - numlines, yc + numlines, 0,
-                           xc + numlines, yc + numlines, 0,
                            xc + numlines, yc - numlines, 0,
-                           xc - numlines, 0, zc - numline,
-                           xc - numlines, 0, zc + numlines,
-                           xc + numlines, 0, zc + numlines,
-                           xc + numlines, 0, zc - numline,
-                           0, yc - numlines, zc - numline,
-                           0, yc - numlines, zc + numlines,
-                           0, yc + numlines, zc + numlines,
-                           0, yc + numlines, zc - numline
+                           xc + numlines, yc + numlines, 0,
+                           xc - numlines, yc + numlines, 0,
+
+                           xc - numlines, yc + numlines, zc - 0,
+                           xc + numlines, yc + numlines, zc - 0,
+                           xc + numlines, yc + numlines, zc + numlines,
+                           xc - numlines, yc + numlines, zc + numlines,
+
+                           xc - numlines, yc - numlines, zc - 0,
+                           xc - numlines, yc - numlines, zc + numlines,
+                           xc + numlines, yc - numlines, zc + numlines,
+                           xc + numlines, yc - numlines, zc - 0,
+
+                           xc + numlines, yc - numlines, zc - 0,
+                           xc + numlines, yc - numlines, zc + numlines,
+                           xc + numlines, yc + numlines, zc + numlines,
+                           xc + numlines, yc + numlines, zc - 0,
+
+                           xc - numlines, yc - numlines, zc - 0,
+                           xc - numlines, yc + numlines, zc - 0,
+                           xc - numlines, yc + numlines, zc + numlines,
+                           xc - numlines, yc - numlines, zc + numlines
                          };
 
     static GLfloat x0[] = {1.f, 0.f, 0.f, 0.f};
@@ -60,20 +82,24 @@ void Holo::draw(GlView & view)
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     glDepthMask(GL_FALSE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glColor3f(0.5f, 0.5f, 0.5f);
 
     glVertexPointer(3, GL_INT, 0, plane_varray);
     glDrawArrays(GL_QUADS, 0, 4);
-#if 0
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, x0);
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
-    glDrawArrays(GL_QUADS, 4, 4);
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, y0);
-    glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
-    glDrawArrays(GL_QUADS, 8, 4);
-#endif
+
+    if (m_box_radius > 0) {
+        glTexGenfv(GL_S, GL_OBJECT_PLANE, x0);
+        glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
+        glDrawArrays(GL_QUADS, 4, 8);
+        glTexGenfv(GL_S, GL_OBJECT_PLANE, y0);
+        glTexGenfv(GL_T, GL_OBJECT_PLANE, z0);
+        glDrawArrays(GL_QUADS, 12, 8);
+    }
 
     glDepthMask(GL_TRUE);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);

@@ -76,12 +76,16 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_popupMenu = manage( new Gtk::Menu );
     Gtk::Menu_Helpers::MenuList & server_menu = m_popupMenu->items();
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Login..."));
+    server_menu.back().set_sensitive(false);
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Character..."));
+    server_menu.back().set_sensitive(false);
     server_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Status", SigC::slot(*this, &ServerWindow::statusPressed)));
+    server_menu.back().set_sensitive(false);
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Types", SigC::slot(*this, &ServerWindow::typesPressed)));
     server_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Disconnect..."));
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Disconnect"));
+    server_menu.back().set_sensitive(false);
 
     signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
