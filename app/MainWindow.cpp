@@ -216,6 +216,8 @@ MainWindow::MainWindow() :
 
     add(*vbox);
 
+    updateTime();
+
     // FIXME Leak perhaps, but this cannot be manage()d
     open_dialog = new Gtk::FileChooserDialog("Open...");
     open_dialog->set_transient_for(*this);
@@ -350,6 +352,11 @@ void MainWindow::showOptionBox(OptionBox & ob)
             w->show();
         }
     }
+}
+
+void MainWindow::updateTime()
+{
+    m_time.assign_current_time();
 }
 
 void MainWindow::inheritance_window()

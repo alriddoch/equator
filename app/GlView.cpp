@@ -70,7 +70,7 @@ static const float cursorCircle[] = { 0.0f, 0.4f, 0.0f,
                                       -0.2f, 0.3464f, 0.0f };
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
-           m_redrawRequired(true),
+           m_redrawRequired(false),
            m_animationRequired(false),
            m_frameStore(0),
            m_viewNo(m.getViewNo()),
@@ -141,8 +141,6 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    Glib::signal_idle().connect(SigC::slot(*this, &GlView::redraw));
-
     mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
     m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
@@ -154,6 +152,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     signal_button_release_event().connect(SigC::slot(*this, &GlView::buttonReleaseEvent));
     signal_motion_notify_event().connect(SigC::slot(*this, &GlView::motionNotifyEvent));
 
+    scheduleRedraw();
     startAnimation();
 }
 
@@ -789,7 +788,7 @@ void GlView::startAnimation()
 {
     if (!m_animationRequired) {
         m_animationRequired = true;
-        Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 100);
+        Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 50);
     }
 }
 
@@ -808,8 +807,11 @@ bool GlView::animate()
         m_animCount = 0.0f;
     }
 
+    // FIXME animate() should not do any rendering. setupgl should go after.
     setupgl();
     origin();
+
+    m_mainWindow.updateTime();
 
     const std::list<Layer *> & layers = m_model.getLayers();
     std::list<Layer *>::const_iterator I = layers.begin();

@@ -23,6 +23,8 @@ Cal3dStore::Cal3dStore(Model & model) :
                        Layer(model, "<empty>", "Cal3d animation")
 {
     m_optionsBox = new Cal3dStoreOptions(*this);
+
+    m_lastUpdate.assign_current_time();
 }
 
 void Cal3dStore::loadModel(const std::string & path)
@@ -145,8 +147,11 @@ void Cal3dStore::draw(GlView & view)
 
 bool Cal3dStore::animate(GlView & view)
 {
-    std::cout << "Cal3dStore::animate" << std::endl << std::flush;
-    m_cal3dModel.onUpdate(0.1);
+    Glib::TimeVal delta = m_model.m_mainWindow.time();
+    delta.subtract(m_lastUpdate);
+    std::cout << "Cal3dStore::animate" << delta.as_double() << std::endl << std::flush;
+    m_lastUpdate = m_model.m_mainWindow.time();
+    m_cal3dModel.onUpdate(delta.as_double());
     return true;
 }
 

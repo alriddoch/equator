@@ -27,6 +27,7 @@ class Cal3dStore : public Layer {
     int m_lowVertexSelection;
     int m_highVertexSelection;
     bool m_validDrag;
+    Glib::TimeVal m_lastUpdate;
 
     Cal3dStoreOptions * m_optionsBox;
     // WFMath::Vector<3> m_dragPoint;

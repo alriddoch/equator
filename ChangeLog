@@ -1,5 +1,16 @@
 2005-02-10  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/MainWindow.h, app/MainWindow.cpp: Add a time member, accessors
+	  and a way to update the time.
+
+	* app/GlView.cpp: Tweak animation code so its now designed to use
+	  the MainWindow time for handling updates.
+
+	* app/Cal3dStore.cpp, app/Cal3dStore.h: Store last updated time,
+	  and use it to create time delta for passing time to cal3d.
+
+2005-02-10  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Cal3dStore.cpp, app/GlView.cpp app/GlView.h: Massive cleanup of
 	  the the rendering code, and added proof of concept of the animation
 	  handling.

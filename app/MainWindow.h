@@ -7,9 +7,11 @@
 
 #include <sage/sage.h>
 
+#include <gdkmm/gl/context.h>
+
 #include <gtkmm/window.h>
 
-#include <gdkmm/gl/context.h>
+#include <glibmm/timeval.h>
 
 #include <list>
 
@@ -52,6 +54,8 @@ class MainWindow : public Gtk::Window
     ToolType m_tool;
     ToolMode m_toolMode;
     NavMode m_navMode;
+
+    Glib::TimeVal m_time;
 
     Gtk::ToggleButton * select_tool;
     Gtk::ToggleButton * area_tool;
@@ -107,13 +111,17 @@ class MainWindow : public Gtk::Window
         return m_navMode;
     }
 
+    const Glib::TimeVal & time() const {
+        return m_time;
+    }
+
     gint quit( GdkEventAny *);
     Model & newModel();
     void newView(Model *);
     Server & newServer(const std::string & name);
     void loadFile(const std::string & file);
     void showOptionBox(OptionBox &);
-
+    void updateTime();
     void menu_quit();
     void inheritance_window();
     void server_window();
