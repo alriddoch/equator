@@ -45,7 +45,7 @@ class Inheritance {
         if (I == atlasObjects.end()) {
             throw InheritanceException(parent);
         }
-        Atlas::Message::Element::ListType & children = I->second->getAttr("children").asList();
+        Atlas::Message::ListType & children = I->second->getAttr("children").asList();
         children.push_back(child);
     }
 };

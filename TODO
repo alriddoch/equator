@@ -1,3 +1,6 @@
+Have a media database, and a media mapper, which maps database onto entities.
+This might involve apogee
+
 Make drawing vertex arrows into a display list.
 
 We should probably onlu animate the current layer, thus avoiding a check
