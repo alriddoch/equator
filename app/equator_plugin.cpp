@@ -10,7 +10,7 @@
 
 #include "MainWindow.h"
 
-#include <gtk--/main.h>
+#include <gtkmm/main.h>
 
 Gtk::Main * kit;
 

@@ -5,8 +5,8 @@
 #ifndef EQUATOR_APP_MAINWINDOW_H
 #define EQUATOR_APP_MAINWINDOW_H
 
-#include <gtk--/window.h>
-#include <gtk--/menu.h>
+#include <gtkmm/window.h>
+#include <gtkmm/menu.h>
 
 #include <list>
 
