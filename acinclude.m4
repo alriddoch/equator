@@ -364,6 +364,9 @@ AC_CHECK_LIB(GL,glViewport, ,
     AC_MSG_CHECKING(for glViewport in opengl32)
     LIBS="$LIBS -lopengl32"
     AC_TRY_LINK([
+	#ifdef _WIN32
+	#include <windows.h>
+	#endif /* _WIN32 */
 	#include <GL/gl.h>
     ],[
 	glViewport(0, 0, 0, 0);
@@ -376,9 +379,12 @@ AC_CHECK_LIB(GL,glViewport, ,
 )
 
 AC_CHECK_LIB(GLU,gluPerspective, ,
-    AC_MSG_CHECKING(for gluPerspective in opengl32)
+    AC_MSG_CHECKING(for gluPerspective in glu32)
     LIBS="$LIBS -lglu32"
     AC_TRY_LINK([
+	#ifdef _WIN32
+	#include <windows.h>
+	#endif /* _WIN32 */
 	#include <GL/glu.h>
     ],[
 	gluPerspective(0.0, 0.0, 0.0, 0.0);
