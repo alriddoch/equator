@@ -245,7 +245,6 @@ void Server::connect(const std::string & host, int port)
     m_connection.connect(host, port);
     // m_connection.connect("localhost", 6767);
 
-#warning Handle the socket input FIXME
     inputHandler = Glib::signal_io().connect(slot(*this, &Server::poll),
                                              m_connection.getFileDescriptor(),
                                              Glib::IO_IN);

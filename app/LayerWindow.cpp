@@ -26,8 +26,8 @@
 #include <list>
 #include <sstream>
 
-#include "../eye.xpm"
-#include "../null.xpm"
+// #include "../eye.xpm"
+// #include "../null.xpm"
 #include "../newlayer.xpm"
 #include "../raise.xpm"
 #include "../lower.xpm"
@@ -129,7 +129,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     // set_title("Layers");
     set_sensitive(false);
 
-#warning Organise the xpms
+    // FIXME Organise the xpms
     //m_eye = gdk_pixmap_create_from_xpm_d(m_clist->gtkobj()->clist_window,
             //&m_eyemask, &GTK_WIDGET(m_clist->gtkobj())->style->white, eye_xpm);
 

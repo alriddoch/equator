@@ -1,3 +1,9 @@
+2004-02-25  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* gui/gtkmm/EntityTree.cpp, app/Server.cpp, app/LayerWindow.cpp,
+	  app/InheritanceWindow.cpp: Remove unnecessary #warnings and
+	  unused variables.
+
 2004-02-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* common/system.cpp: Default to "." as the media path for windows

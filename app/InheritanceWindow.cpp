@@ -84,7 +84,6 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
 
     vbox->pack_start(*scrolled_window, Gtk::PACK_EXPAND_WIDGET, 2);
 
-    static const gchar *titles[] = { "Name", "Attribute", NULL };
     Atlas::Message::Element::MapType test;
     test["Footle"] = Atlas::Message::Element::ListType(1, "foo");
     test["foo"] = 23;
