@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_NEWSERVERWINDOW_H
 #define EQUATOR_APP_NEWSERVERWINDOW_H
 
-#include <gtkmm/window.h>
+#include <gtkmm/dialog.h>
 
 class MainWindow;
 class Server;
@@ -31,7 +31,7 @@ namespace Atlas {
   }
 }
 
-class NewServerWindow : public Gtk::Window
+class NewServerWindow : public Gtk::Dialog
 {
   private:
     MainWindow & m_mainWindow;
@@ -82,7 +82,7 @@ class NewServerWindow : public Gtk::Window
     void loginComplete(const Atlas::Objects::Entity::Player &);
     void worldEnter(Eris::Entity*);
 
-    void dismiss();
+    void dismiss(int);
 };
 
 #endif // EQUATOR_APP_NEWSERVERWINDOW_H

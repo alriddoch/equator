@@ -22,53 +22,50 @@
 #include <gtkmm/main.h>
 #include <gtkmm/statusbar.h>
 #include <gtkmm/alignment.h>
-#include <gtkmm/separator.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/table.h>
 
 NewServerWindow::NewServerWindow(MainWindow & mw) :
-                 Gtk::Window(Gtk::WINDOW_TOPLEVEL), m_mainWindow(mw),
-                 m_hostEntry(NULL), m_portChoice(NULL),
-                 m_portSpin(NULL), m_connectButton(NULL),
-                 m_userEntry(NULL), m_passwdEntry(NULL),
-                 m_avatarNameEntry(NULL), m_avatarTypeEntry(NULL),
-                 m_loginButton(NULL), m_createButton(NULL),
-                 m_avatarButton(NULL), m_viewButton(NULL),
-                 m_status(NULL),
-                 m_customPort(6767), m_portNum(6767),
-                 m_server(NULL)
+                 Gtk::Dialog("Connect to server", false, true),
+                 m_mainWindow(mw), m_hostEntry(0),
+                 m_portChoice(0), m_portSpin(0),
+                 m_connectButton(0), m_userEntry(0),
+                 m_passwdEntry(0), m_avatarNameEntry(0),
+                 m_avatarTypeEntry(0), m_loginButton(0),
+                 m_createButton(0), m_avatarButton(0),
+                 m_viewButton(0), m_status(0),
+                 m_customPort(6767), m_portNum(6767), m_server(0)
 {
-    set_border_width(6);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    signal_response().connect(slot(*this, &NewServerWindow::dismiss));
 
-    Gtk::VBox * vbox = manage( new Gtk::VBox() );
+    Gtk::VBox * vbox = get_vbox();
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
-    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 0);
-    vbox->pack_start(*(manage( new Gtk::HSeparator() )), Gtk::PACK_SHRINK, 6);
-    Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    Gtk::Button * b = manage( new Gtk::Button(Gtk::Stock::OK) );
-    b->signal_clicked().connect(slot(*this, &NewServerWindow::dismiss));
-    a->add(*b);
-    vbox->pack_start(*a, Gtk::PACK_SHRINK, 0);
+    vbox->pack_start(*hbox, Gtk::PACK_EXPAND_WIDGET, 6);
 
-    add(*vbox);
+    vbox = manage( new Gtk::VBox(false, 6) );
+    hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 12);
 
-    vbox = manage( new Gtk::VBox() );
-    hbox->pack_start(*vbox, Gtk::PACK_SHRINK, 6);
-
-    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    Gtk::Alignment * a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage(new Gtk::Label("Server:"))));
-    vbox->pack_start(*a, Gtk::PACK_SHRINK, 6);
+    vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Hostname:") )), Gtk::AttachOptions(0), 2);
+
+    Gtk::Table * table = manage( new Gtk::Table(2, 3) );
+    table->set_row_spacings(6);
+    table->set_col_spacings(12);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Hostname:") )));
+    table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_hostEntry = manage( new Gtk::Entry() );
     m_hostEntry->set_text("localhost");
     m_hostEntry->set_max_length(60);
-    hbox->pack_end(*m_hostEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 6);
-
-    hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Port:") )), Gtk::AttachOptions(0), 2);
+    table->attach(*m_hostEntry, 1, 3, 0, 1);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Port:") )));
+    table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_portChoice = manage( new Gtk::OptionMenu() );
     Gtk::Menu * portMenu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
@@ -76,80 +73,98 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6768)));
     portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCustomPort)));
     m_portChoice->set_menu(*portMenu);
-    hbox->pack_start(*m_portChoice, Gtk::AttachOptions(0), 2);
+    table->attach(*m_portChoice, 1, 2, 1, 2);
     Gtk::Adjustment * adj = manage( new Gtk::Adjustment (6767.0, 1.0, 32768.0) );
     m_portSpin = manage( new Gtk::SpinButton(*adj, 1) );
     m_portSpin->set_sensitive(false);
-    hbox->pack_end(*m_portSpin, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::PACK_SHRINK, 6);
+    table->attach(*m_portSpin, 2, 3, 1, 2);
+    hbox->pack_start(*table);
+
+    vbox->pack_start(*hbox);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     m_connectButton = manage( new Gtk::Button("Connect") );
     m_connectButton->signal_clicked().connect(slot(*this, &NewServerWindow::createConnection));
     a->add(*m_connectButton);
-    vbox->pack_start(*a, Gtk::AttachOptions(0), 0);
+    vbox->pack_start(*a);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage(new Gtk::Label("Account:"))));
-    vbox->pack_start(*a, Gtk::AttachOptions(0), 6);
+    vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Username:") )), Gtk::AttachOptions(0), 2);
+    table = manage( new Gtk::Table(2, 2) );
+    table->set_row_spacings(6);
+    table->set_col_spacings(12);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Username:") )));
+    table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_userEntry = manage( new Gtk::Entry() );
     m_userEntry->set_max_length(60);
-    hbox->pack_end(*m_userEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
-
-    hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Password:") )), Gtk::AttachOptions(0), 2);
+    table->attach(*m_userEntry, 1, 2, 0, 1);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Password:") )));
+    table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_passwdEntry = manage( new Gtk::Entry() );
     m_passwdEntry->set_visibility(false);
     m_passwdEntry->set_max_length(60);
-    hbox->pack_end(*m_passwdEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+    table->attach(*m_passwdEntry, 1, 2, 1, 2);
+    hbox->pack_start(*table);
+    vbox->pack_start(*hbox);
 
-    hbox = manage( new Gtk::HBox() );
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
+    Gtk::VBox * v2box = manage( new Gtk::VBox(false, 6) );
     m_loginButton = manage( new Gtk::Button("Login") );
     m_loginButton->signal_clicked().connect(slot(*this, &NewServerWindow::loginAccount));
     m_loginButton->set_sensitive(false);
-    hbox->pack_start(*m_loginButton);
-    m_createButton = manage( new Gtk::Button("Create") );
+    v2box->pack_start(*m_loginButton);
+    m_createButton = manage( new Gtk::Button("Create Account") );
     m_createButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAccount));
     m_createButton->set_sensitive(false);
-    hbox->pack_start(*m_createButton);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+    v2box->pack_start(*m_createButton);
+    a->add(*v2box);
+    vbox->pack_start(*a);
 
-    vbox->pack_start(*(manage( new Gtk::Label("In Game Avatar") )), Gtk::AttachOptions(0), 2);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage(new Gtk::Label("Avatar:"))));
+    vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Avatar Name:") )), Gtk::AttachOptions(0), 2);
+    table = manage( new Gtk::Table(2, 2) );
+    table->set_row_spacings(6);
+    table->set_col_spacings(12);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Avatar Name:") )));
+    table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_avatarNameEntry = manage( new Gtk::Entry() );
     m_avatarNameEntry->set_max_length(60);
-    hbox->pack_end(*m_avatarNameEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
-
-    hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Avatar Type:") )), Gtk::AttachOptions(0), 2);
+    table->attach(*m_avatarNameEntry, 1, 2, 0, 1);
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
+    a->add(*(manage( new Gtk::Label("Avatar Type:") )));
+    table->attach(*a, 1, 2, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_avatarTypeEntry = manage( new Gtk::Entry() );
     m_avatarTypeEntry->set_max_length(60);
-    hbox->pack_end(*m_avatarTypeEntry, Gtk::AttachOptions(0), 2);
-    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+    table->attach(*m_avatarTypeEntry, 1, 2, 1, 2);
+    hbox->pack_start(*table);
+    vbox->pack_start(*hbox);
 
+    a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
+    v2box = manage( new Gtk::VBox(false, 6) );
     m_avatarButton = manage( new Gtk::Button("Create Avatar") );
     m_avatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
-    vbox->pack_start(*m_avatarButton, Gtk::AttachOptions(0), 0);
-
+    v2box->pack_start(*m_avatarButton);
     m_viewButton = manage( new Gtk::Button("View") );
     m_viewButton->signal_clicked().connect(slot(*this, &NewServerWindow::createView));
     m_viewButton->set_sensitive(false);
-    vbox->pack_start(*m_viewButton, Gtk::AttachOptions(0), 0);
+    v2box->pack_start(*m_viewButton);
+    a->add(*v2box);
+    vbox->pack_start(*a);
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Connection status");
-    vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
+    // vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
 
-    set_title("Connect to server");
     signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));
 }
 
@@ -294,7 +309,7 @@ void NewServerWindow::worldEnter(Eris::Entity*)
     m_viewButton->set_sensitive(true);
 }
 
-void NewServerWindow::dismiss()
+void NewServerWindow::dismiss(int response)
 {
     m_failure.disconnect();
     m_connected.disconnect();

@@ -1,5 +1,11 @@
 2003-09-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/NewServerWindow.h, app/NewServerWindow.cpp: Convert to using
+	  Dialog class instead of Window. Finish off work for conformance
+	  with the Gnome HIG.
+
+2003-09-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/NewServerWindow.cpp: Ground work for applying some Human
 	  Interface Guidelines to the gui.
 
