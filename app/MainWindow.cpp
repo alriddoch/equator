@@ -5,6 +5,7 @@
 #include "MainWindow.h"
 #include "ViewWindow.h"
 #include "LayerWindow.h"
+#include "InheritanceWindow.h"
 
 #include <gtk--/main.h>
 #include <gtk--/menu.h>
@@ -21,19 +22,29 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     destroy.connect(slot(this, &MainWindow::destroy_handler));
 
     Gtk::Menu * menu = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::CTL|'n', slot(this, &MainWindow::new_view)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::CTL|'o'));
+    file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Preferences..."));
+    file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
-    menu->append(*menu_items);
-    menu_items->activate.connect(slot(this, &MainWindow::new_view));
+    Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entities..."));
 
-    menu_items = manage( new Gtk::MenuItem("Load...") );
-    menu->append(*menu_items);
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
+    file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::CTL|'q', slot(this, &MainWindow::menu_quit)));
 
-    menu_items = manage( new Gtk::MenuItem("Save") );
-    menu->append(*menu_items);
+    menu->accelerate(*this);
+    //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
+    //menu->append(*menu_items);
+    //menu_items->activate.connect(slot(this, &MainWindow::new_view));
 
-    menu_items = manage( new Gtk::MenuItem("Save As...") );
-    menu->append(*menu_items);
+    //menu_items = manage( new Gtk::MenuItem("Load...") );
+    //menu->append(*menu_items);
 
     Gtk::MenuItem * menu_root = manage( new Gtk::MenuItem("File") );
 
@@ -75,6 +86,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     show_all();
 
     m_layerwindow = manage( new LayerWindow(*this) );
+    m_inheritancewindow = manage( new InheritanceWindow(*this) );
 }
 
 gint MainWindow::quit(GdkEventAny *)
@@ -95,6 +107,16 @@ void MainWindow::new_view()
     m_views.push_back(view);
     
     cout << "new view" << endl << flush;
+}
+
+void MainWindow::menu_quit()
+{
+    Gtk::Main::quit();
+}
+
+void MainWindow::inheritance_dialog()
+{
+    m_inheritancewindow->show_all();
 }
 
 void MainWindow::open_layers(GlView * view)

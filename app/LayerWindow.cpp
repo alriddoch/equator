@@ -74,12 +74,13 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
 void LayerWindow::setView(GlView * view)
 {
-    // if (m_currentView == view) { return; }
-
     m_clist->clear();
-    m_viewLabel->set(view->m_viewwindow.getName());
 
     m_currentView = view;
+
+    if (m_currentView == NULL) { return; }
+
+    m_viewLabel->set(view->m_viewwindow.getName());
 
     const std::list<Layer *> & layers = view->getLayers();
  
