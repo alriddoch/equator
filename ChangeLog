@@ -1,5 +1,16 @@
 2005-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/WorldEntity.cpp: Remove asserts and replace with checks, as
+	  getTypeByName() can return NULL.
+
+	* app/Server.h, app/Server.cpp: Add a flag so connectWorldSignals()
+	  does nothing on subsequent calls.
+
+	* app/CharacterWindow.cpp: Connect up AvatarFailure, and report
+	  when character creation fails.
+
+2005-01-08  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.cpp, app/CharacterWindow.cpp, app/CharacterWindow.h:
 	  Update to take account of new clearer Eris API.
 

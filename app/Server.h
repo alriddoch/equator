@@ -58,6 +58,7 @@ class Server : public SigC::Object {
     void connectWorldSignals();
   protected:
     bool inGame;
+    bool worldSignalsConnected;
     const std::string m_name;
 
     Model * m_model;

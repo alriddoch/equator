@@ -20,8 +20,10 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
+#include <gtkmm/messagedialog.h>
 
 #include <sigc++/object_slot.h>
+#include <sigc++/hide.h>
 
 #include <iostream>
 #include <cassert>
@@ -190,6 +192,7 @@ void CharacterWindow::take()
     m_server->takeCharacter(m_selectedCharacter);
 
     m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
+    m_failure = m_server->m_account->AvatarFailure.connect(SigC::slot(*this, &CharacterWindow::failure));
 }
 
 void CharacterWindow::create()
@@ -205,11 +208,16 @@ void CharacterWindow::create()
     m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
 
     m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
+    m_failure = m_server->m_account->AvatarFailure.connect(SigC::slot(*this, &CharacterWindow::failure));
 }
 
 void CharacterWindow::failure(const std::string & msg)
 {
     assert(m_server != 0);
+
+    Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, msg, false, Gtk::MESSAGE_ERROR);
+    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->show();
 
     std::cout << "CharacterWindow::failure" << std::endl << std::flush;
     std::cout << msg << std::endl << std::flush;

@@ -50,7 +50,8 @@ unsigned Server::serverCount = 0;
 
 Server::Server(MainWindow & mw, const std::string & name) :
                    m_serverNo(serverCount++),
-                   inGame(false), m_name(name), m_model(0),
+                   inGame(false), worldSignalsConnected(false),
+                   m_name(name), m_model(0),
                    m_mainWindow(mw),
                    m_renderer(* new Renderer),
                    m_connection(* new Eris::Connection("equator", true)),
@@ -80,6 +81,9 @@ void Server::loginComplete()
 
 void Server::connectWorldSignals()
 {
+    if (worldSignalsConnected) {
+        return;
+    }
     // m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
     // m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
 
@@ -88,6 +92,8 @@ void Server::connectWorldSignals()
     WEFactory * wef = new WEFactory(*m_connection.getTypeService(), m_renderer);
     wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
     Eris::Factory::registerFactory(wef);
+
+    worldSignalsConnected = true;
 }
 
 void Server::takeCharacter(const std::string & id)
