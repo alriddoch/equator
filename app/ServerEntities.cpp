@@ -8,7 +8,6 @@
 #include "Model.h"
 #include "MainWindow.h"
 #include "Palette.h"
-#include "HeightData.h"
 
 #include "debug.h"
 

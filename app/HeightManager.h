@@ -23,7 +23,7 @@ class HeightManager : public Layer {
   private:
     std::set<Mercator::Segment *> m_selection;
     int m_numLineIndeces;
-    int * const m_lineIndeces;
+    unsigned int * const m_lineIndeces;
 
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);

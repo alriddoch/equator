@@ -5,8 +5,6 @@
 #include "HeightManager.h"
 
 #include "Model.h"
-#include "HeightData.h"
-#include "HeightMap.h"
 #include "GlView.h"
 
 #include <Mercator/Terrain.h>
@@ -22,7 +20,7 @@ void HeightManager::load(Gtk::FileSelection * fsel)
 {
     float x, y, z;
     m_model.getCursor(x, y, z);
-    int posx = x / HeightData::m_gridSize, posy = y / HeightData::m_gridSize;
+    int posx = x / segSize, posy = y / segSize;
     if (x < 0) { posx -= 1; }
     if (y < 0) { posy -= 1; }
     // FIXME Do we even wanna load anymore?
@@ -49,7 +47,7 @@ void HeightManager::cancel(Gtk::FileSelection * fsel)
 
 HeightManager::HeightManager(Model &m) : Layer(m, "heightfield", "HeightField"),
                        m_numLineIndeces(0),
-                       m_lineIndeces(new int[segSize * segSize * 2])
+                       m_lineIndeces(new unsigned int[segSize * segSize * 2])
 {
     int idx = -1;
     for (int i = 0; i < segSize - 1; ++i) {
@@ -168,7 +166,7 @@ void HeightManager::outlineRegion(Mercator::Segment * map, float count)
 
 void HeightManager::heightMapRegion(Mercator::Segment * map)
 {
-#if 1
+#if 0
     int size = map->getSize();
     glBegin(GL_LINE_STRIP);
     glColor3f(0.5f, 0.0f, 0.0f);
@@ -199,10 +197,10 @@ void HeightManager::heightMapRegion(Mercator::Segment * map)
         std::cout << harray[i] << ":";
     }
     std::cout << std::endl << std::flush;
-    glColor3f(0.5f, 0.0f, 0.0f);
     glEnableClientState(GL_VERTEX_ARRAY);
+    glColor3f(0.5f, 0.0f, 0.0f);
     glVertexPointer(3, GL_FLOAT, 0, harray);
-    glDrawElements(GL_LINES, m_numLineIndeces, GL_INT, m_lineIndeces);
+    glDrawElements(GL_LINE_STRIP, m_numLineIndeces, GL_UNSIGNED_INT, m_lineIndeces);
     glDisableClientState(GL_VERTEX_ARRAY);
 #endif
 }

@@ -1,5 +1,13 @@
 2003-01-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/Texture.cpp, app/ServerEntities.cpp, app/Model.cpp: Remove old
+	  heightdata includes.
+
+	* app/HeightManager.h, app/HeightManager.cpp: Fix the type of vertex
+	  array index, and enable vertex array terrain renderer.
+
+2003-01-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/HeightManager.cpp, app/HeightManager.h, app/IsoMap.cpp,
 	  app/Model.cpp, app/Model.h, app/ServerEntities.cpp,
 	  app/Texture.cpp, app/Texture.h: Use Mercator for terrain handling

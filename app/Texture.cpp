@@ -3,7 +3,6 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "Texture.h"
-#include "HeightData.h"
 
 #include <Mercator/Terrain.h>
 
