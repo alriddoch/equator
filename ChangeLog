@@ -1,5 +1,11 @@
 2003-09-13  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp, app/ServerEntities.h: Re-write entity
+	  rendering to do draw order correctly so that orientation works.
+	  Add orientation. Needs cleaning, and entity selection bug sorting.
+
+2003-09-13  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/NewServerWindow.cpp: Add accelerators.
 
 2003-09-12  Al Riddoch  <alriddoch@zepler.org>

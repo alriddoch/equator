@@ -19,6 +19,7 @@ class ExportOptions;
 namespace WFMath {
   template<const int dim> class AxisBox;
   template<const int dim> class Point;
+  class Quaternion;
 }
 
 namespace Eris {
@@ -72,10 +73,10 @@ class ServerEntities : public Layer {
                    const WFMath::AxisBox<3> & bbox, float phase = 0);
     void draw3DBox(const WFMath::Point<3> & coords,
                    const WFMath::AxisBox<3> & bbox);
-    void drawEntity(Eris::Entity * ent, entstack_t::const_iterator);
+    void drawEntity(Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
     void drawWorld(Eris::Entity * wrld);
     void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
-    void selectEntity(Eris::Entity * ent, entstack_t::const_iterator);
+    void selectEntity(Eris::Entity*,Eris::Entity *, entstack_t::const_iterator);
     bool selectEntities(GlView & view, int nx, int ny, int fx, int fy,
                         bool check = false);
     void newType(Eris::TypeInfo*);
@@ -98,6 +99,7 @@ class ServerEntities : public Layer {
     void cancel(Gtk::FileSelection *);
 
     void createOptionsWindows();
+    void orient(const WFMath::Quaternion & orientation);
   public:
     ServerEntities(Model &, Server &);
     void importFile();

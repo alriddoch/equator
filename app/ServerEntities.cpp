@@ -247,9 +247,9 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
                                 const WFMath::AxisBox<3> & bbox, bool open)
 {
     bool shaded = (m_renderMode == GlView::SHADED);
-    glPushMatrix();
+    // glPushMatrix();
 
-    glTranslatef(coords.x(), coords.y(), coords.z());
+    // glTranslatef(coords.x(), coords.y(), coords.z());
 
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -288,15 +288,15 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
     } else {
         glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, west);
     }
-    glPopMatrix();
+    // glPopMatrix();
 }
 
 void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
                                const WFMath::AxisBox<3> & bbox)
 {
-    glPushMatrix();
+    // glPushMatrix();
 
-    glTranslatef(coords.x(), coords.y(), coords.z());
+    // glTranslatef(coords.x(), coords.y(), coords.z());
 
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -314,7 +314,7 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
     glColor3f(0.0f, 0.0f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
-    glPopMatrix();
+    // glPopMatrix();
 
 }
 
@@ -363,48 +363,76 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
     glEnable(GL_DEPTH_TEST);
 }
 
-void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
+void ServerEntities::orient(const WFMath::Quaternion & orientation)
+{
+    if (!orientation.isValid()) {
+        return;
+    }
+    float orient[4][4];
+    WFMath::RotMatrix<3> omatrix(orientation); // .asMatrix(orient);
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 3; j++) {
+            orient[i][j] = omatrix.elem(i,j);
+        }
+    }
+    orient[3][0] = orient[3][1] = orient[3][2] = orient[0][3] = orient[1][3] = orient[2][3] = 0.0f;
+    orient[3][3] = 1.0f;
+    glMultMatrixf(&orient[0][0]);
+}
+
+
+void ServerEntities::drawEntity(Eris::Entity* world,
+                                Eris::Entity* ent,
+                                entstack_t::const_iterator I)
 {
     assert(ent != NULL);
 
-    glPushMatrix();
     WFMath::Point<3> pos = ent->getPosition();
+
+    // This is where code would go to adjust position for velocity etc.
+
+    glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
-    int numEnts = ent->getNumMembers();
-    debug(std::cout << ent->getID() << " " << numEnts << " emts"
-                    << std::endl << std::flush;);
-    for (int i = 0; i < numEnts; i++) {
-        Eris::Entity * e = ent->getMember(i);
-        assert(e != NULL);
-        // debug(std::cout << ":" << e->getID() << e->getPosition() << ":"
-                        // << e->getBBox().u << e->getBBox().v
-                        // << std::endl << std::flush;);
-        // if (!e->isVisible()) { continue; }
-        bool openEntity = ((I != m_selectionStack.end()) && (*I == e));
-        if (e->hasBBox()) {
-            switch (m_renderMode) {
-                case GlView::LINE:
-                    draw3DBox(e->getPosition(), e->getBBox());
-                    break;
-                case GlView::SOLID:
-                case GlView::SHADED:
-                case GlView::TEXTURE:
-                case GlView::SHADETEXT:
-                default:
-                    draw3DCube(e->getPosition(), e->getBBox(),
-                               openEntity);
-            }
-            if ((e == m_selection) ||
-                (m_selectionList.find(e) != m_selectionList.end())) {
-                draw3DSelectedBox(e->getPosition(), e->getBBox());
-            }
-        } // else draw it without using its bbox FIXME how ?
-        //draw3DBox(e->getPosition(), e->getBBox());
-        if (openEntity) {
-            entstack_t::const_iterator J = I;
-            drawEntity(e, ++J);
+    orient(ent->getOrientation());
+
+    bool openEntity = ((ent == world) ||
+                       ((I != m_selectionStack.end()) && (*I == ent)));
+
+    if (ent->hasBBox()) {
+        switch (m_renderMode) {
+            case GlView::LINE:
+                draw3DBox(ent->getPosition(), ent->getBBox());
+                break;
+            case GlView::SOLID:
+            case GlView::SHADED:
+            case GlView::TEXTURE:
+            case GlView::SHADETEXT:
+            default:
+                draw3DCube(ent->getPosition(), ent->getBBox(),
+                           openEntity);
+        }
+        if ((ent == m_selection) ||
+            (m_selectionList.find(ent) != m_selectionList.end())) {
+            draw3DSelectedBox(ent->getPosition(), ent->getBBox());
+        }
+    } // else draw it without using its bbox FIXME how ?
+
+    if (openEntity) {
+        int numEnts = ent->getNumMembers();
+        entstack_t::const_iterator J = I;
+        if (ent != world) {
+            ++J;
+        }
+        debug(std::cout << ent->getID() << " " << numEnts << " emts"
+                        << std::endl << std::flush;);
+        for (int i = 0; i < numEnts; i++) {
+            Eris::Entity * e = ent->getMember(i);
+            assert(e != NULL);
+
+            drawEntity(world, e, J);
         }
     }
+
     glPopMatrix();
 }
 
@@ -412,32 +440,42 @@ void ServerEntities::drawWorld(Eris::Entity * wrld)
 {
     assert(wrld != NULL);
 
-    drawEntity(wrld, m_selectionStack.begin());
+    drawEntity(wrld, wrld, m_selectionStack.begin());
 }
 
-void ServerEntities::selectEntity(Eris::Entity* ent,entstack_t::const_iterator I)
+void ServerEntities::selectEntity(Eris::Entity * wrld,
+                                  Eris::Entity * ent,
+                                  entstack_t::const_iterator I)
 {
     assert(ent != NULL);
 
-    glPushMatrix();
     WFMath::Point<3> pos = ent->getPosition();
+
+    glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
-    int numEnts = ent->getNumMembers();
-    for (int i = 0; i < numEnts; i++) {
-        Eris::Entity * e = ent->getMember(i);
-        assert(e != NULL);
-        if (!e->isVisible()) { continue; }
-        m_nameDict[++m_nameCount] = e;
-        glPushName(m_nameCount);
-        if (e->hasBBox()) {
-            draw3DCube(e->getPosition(), e->getBBox());
-        }
-        if ((I != m_selectionStack.end()) && (*I == e)) {
-            entstack_t::const_iterator J = I;
-            selectEntity(e, ++J);
-        }
-        glPopName();
+    orient(ent->getOrientation());
+
+    if (ent->hasBBox()) {
+        draw3DCube(ent->getPosition(), ent->getBBox());
     }
+
+    if ((ent == wrld) || (I != m_selectionStack.end()) && (*I == ent)) {
+        int numEnts = ent->getNumMembers();
+        entstack_t::const_iterator J = I;
+        if (ent != wrld) {
+            ++J;
+        }
+        for (int i = 0; i < numEnts; i++) {
+            Eris::Entity * e = ent->getMember(i);
+            assert(e != NULL);
+
+            m_nameDict[++m_nameCount] = e;
+            glPushName(m_nameCount);
+            selectEntity(wrld, e, J);
+            glPopName();
+        }
+    }
+    glPopMatrix();
 }
 
 bool ServerEntities::selectEntities(GlView & view,
@@ -459,7 +497,7 @@ bool ServerEntities::selectEntities(GlView & view,
 
     assert(root != NULL);
 
-    selectEntity(root, I);
+    selectEntity(root, root, I);
 
     
     int hits = glRenderMode(GL_RENDER);
