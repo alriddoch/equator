@@ -13,6 +13,8 @@
 
 #include <GL/glu.h>
 
+#include <iostream>
+
 void HeightManager::load(Gtk::FileSelection * fsel)
 {
     float x, y, z;

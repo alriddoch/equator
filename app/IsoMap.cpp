@@ -20,6 +20,7 @@
 #include <gtk--/fileselection.h>
 
 #include <fstream>
+#include <iostream>
 
 class Palette;
 

@@ -5,8 +5,6 @@
 #ifndef EQUATOR_SERVER_H
 #define EQUATOR_SERVER_H
 
-#include "Vector3D.h"
-
 #include <Eris/Connection.h>
 #include <Eris/Log.h>
 
@@ -31,8 +29,6 @@ namespace Atlas {
   }
  }
 }
-
-class Vector3D;
 
 class Server : public SigC::Object {
   private:

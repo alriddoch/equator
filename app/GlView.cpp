@@ -7,7 +7,8 @@
 #include "MainWindow.h"
 #include "ViewWindow.h"
 #include "Layer.h"
-#include "Vector3D.h"
+
+#include <wfmath/point.h>
 
 #include <GL/glu.h>
 
@@ -761,7 +762,7 @@ void GlView::setPickProjection()
 
 float GlView::getViewSize()
 {
-    float winsize = std::sqrt(width() * width() + height() * height());
+    float winsize = std::sqrt((float)(width() * width() + height() * height()));
 
     return (winsize / (40.0f * getScale()) + 1);
 }

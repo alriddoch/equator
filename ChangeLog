@@ -1,3 +1,11 @@
+2002-04-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/Server.h: Removed obsolete code which
+	  still relied on old Eris types.
+
+	* app/IsoMap.cpp, app/HeightManager.cpp, app/GlView.cpp:
+	  gcc 3 fixes.
+
 2002-04-22  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Server.cpp: Fix for new Eris polling interface.
