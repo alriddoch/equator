@@ -15,6 +15,8 @@
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 
+#include <Atlas/Objects/Entity/GameEntity.h>
+
 #include <varconf/Config.h>
 
 #include <sigc++/bind.h>

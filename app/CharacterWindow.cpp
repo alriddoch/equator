@@ -9,6 +9,8 @@
 #include <Eris/World.h>
 #include <Eris/Player.h>
 
+#include <Atlas/Objects/Entity/GameEntity.h>
+
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/label.h>
