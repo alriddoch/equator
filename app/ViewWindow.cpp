@@ -173,7 +173,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     face_menu.push_back(MenuElem("Isometric", AccelKey("KP_5"), SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 60, 45)));
     face_menu.push_back(MenuElem("North", AccelKey("KP_1"), SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 90, 0)));
     face_menu.push_back(MenuElem("South", SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 90, 180)));
-    face_menu.push_back(MenuElem("West", AccelKey("KP_3"), SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 90, -90)));
+    face_menu.push_back(MenuElem("West", AccelKey("KP_3"), SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 90, 270)));
     face_menu.push_back(MenuElem("East", SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 90, 90)));
     face_menu.push_back(MenuElem("Down", AccelKey("KP_7"), SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 0, 0)));
     face_menu.push_back(MenuElem("Up", SigC::bind<float, float>(SigC::slot(*m_glarea, &GlView::setFace), 180, 0)));
