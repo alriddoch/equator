@@ -8,6 +8,7 @@
 #include <Eris/Lobby.h>
 #include <Eris/World.h>
 #include <Eris/Entity.h>
+#include <Eris/PollDefault.h>
 
 #include <Atlas/Objects/Entity/GameEntity.h>
 #include <Atlas/Objects/Operation/Move.h>
@@ -137,7 +138,8 @@ void Server::netDisconnected()
 
 void Server::poll(int, GdkInputCondition)
 {
-    connection.poll();
+    //connection.poll();
+    Eris::PollDefault::poll();
 }
 
 void Server::worldEntityCreate(Eris::Entity *r)

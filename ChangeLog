@@ -1,3 +1,7 @@
+2002-04-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Server.cpp: Fix for new Eris polling interface.
+
 2002-04-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp, app/GlView.h, app/Model.cpp, app/Model.h,
