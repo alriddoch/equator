@@ -4,6 +4,7 @@ INCLUDES = -I$(top_srcdir)
 
 libguigtkmm_a_SOURCES = \
                         CameraControl.cpp CameraControl.h \
+                        EntityTree.cpp EntityTree.h \
                         EntityImportOptions.cpp EntityImportOptions.h \
                         EntityExportOptions.cpp EntityExportOptions.h \
                         OptionBox.cpp OptionBox.h \

@@ -85,6 +85,10 @@ class Server : public SigC::Object {
         return m_model;
     }
 
+    bool isInGame() const {
+        return inGame;
+    }
+
     void connect(const std::string &, int);
     void netConnected();
     void netFailure(const std::string & msg);

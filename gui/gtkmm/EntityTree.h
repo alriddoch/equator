@@ -2,19 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2004 Alistair Riddoch
 
-#ifndef EQUATOR_APP_INHERITANCEWINDOW_H
-#define EQUATOR_APP_INHERITANCEWINDOW_H
+#ifndef EQUATOR_GUI_GTKMM_ENTITY_TREE_H
+#define EQUATOR_GUI_GTKMM_ENTITY_TREE_H
 
-#include "gui/gtkmm/OptionBox.h"
+#include "OptionBox.h"
 
 #include <gtkmm/treestore.h>
 
 class MainWindow;
-class Server;
+class Model;
 class AtlasMapWidget;
 
 namespace Eris {
-  class TypeInfo;
+  class Entity;
 }
 
 namespace Gtk {
@@ -26,12 +26,14 @@ namespace Gtk {
   class TreeSelection;
 }
 
-class InheritanceWindow : public OptionBox
+class EntityTree : public OptionBox
 {
   private:
-    Gtk::OptionMenu * m_serverMenu;
+    Gtk::OptionMenu * m_modelMenu;
 
     Glib::RefPtr<Gtk::TreeStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_idColumn;
+    Gtk::TreeModelColumn<Glib::ustring> * m_typeColumn;
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
@@ -39,24 +41,24 @@ class InheritanceWindow : public OptionBox
 
     AtlasMapWidget * m_attributeTree;
 
-    Server * m_currentServer;
+    Model * m_currentModel;
 
-    void descendTypeTree(Eris::TypeInfo *, Gtk::TreeModel::Row & row);
+    void descendEntityTree(Eris::Entity *, Gtk::TreeModel::Row & row);
   public:
     MainWindow & m_mainWindow;
 
-    explicit InheritanceWindow(MainWindow &);
+    explicit EntityTree(MainWindow &);
 
     bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }
 
-    void currentServerChanged(Server *);
-    void serverAdded(Server *);
+    void currentModelChanged(Model *);
+    void modelAdded(Model *);
 
     gint buttonEvent(GdkEventButton*);
 
 };
 
-#endif // EQUATOR_APP_INHERITANCEWINDOW_H
+#endif // EQUATOR_GUI_GTKMM_ENTITY_TREE_H

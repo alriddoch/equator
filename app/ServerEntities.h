@@ -45,8 +45,9 @@ class ServerEntities : public Layer {
     typedef std::set<Eris::Entity*> entlist_t;
     typedef std::map<int,Eris::Entity*> entname_t;
     typedef std::vector<Eris::Entity*> entstack_t;
-  private:
+
     Server & m_serverConnection;
+  private:
     GlView::rmode_t m_renderMode;
     Eris::Entity * m_world; 
     Eris::Entity * m_selection; 

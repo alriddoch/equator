@@ -11,6 +11,7 @@
 #include "Server.h"
 #include "Palette.h"
 
+#include "gui/gtkmm/EntityTree.h"
 #include "gui/gtkmm/DockWindow.h"
 
 #include <gtkmm/main.h>
@@ -44,7 +45,8 @@ MainWindow::MainWindow() :
     m_layerwindow (*new LayerWindow(*this) ),
     m_inheritancewindow (*new InheritanceWindow(*this) ),
     m_serverwindow (*new ServerWindow(*this) ),
-    m_palettewindow (*new Palette(*this) )
+    m_palettewindow (*new Palette(*this) ),
+    m_entitytreewindow (*new EntityTree(*this) )
 {
     signal_delete_event().connect(slot(*this, &MainWindow::destroy_handler));
 
@@ -66,6 +68,7 @@ MainWindow::MainWindow() :
     window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(*this, &MainWindow::inheritance_window)));
     window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(*this, &MainWindow::server_window)));
     window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(*this, &MainWindow::palette_window)));
+    window_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity tree...", slot(*this, &MainWindow::entity_tree_window)));
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Windows", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -260,6 +263,11 @@ void MainWindow::palette_window()
 void MainWindow::layer_window()
 {
     showOptionBox(m_layerwindow);
+}
+
+void MainWindow::entity_tree_window()
+{
+    showOptionBox(m_entitytreewindow);
 }
 
 void MainWindow::new_server_dialog()

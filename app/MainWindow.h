@@ -17,6 +17,7 @@ class Palette;
 class Model;
 class Server;
 class OptionBox;
+class EntityTree;
 
 namespace Gtk {
   class ToggleButton;
@@ -68,6 +69,7 @@ class MainWindow : public Gtk::Window
     InheritanceWindow & m_inheritancewindow;
     ServerWindow & m_serverwindow;
     Palette & m_palettewindow;
+    EntityTree & m_entitytreewindow;
 
     MainWindow();
 
@@ -90,6 +92,7 @@ class MainWindow : public Gtk::Window
     void palette_window();
     void new_server_dialog();
     void layer_window();
+    void entity_tree_window();
     void toolSelect(toolType);
     void modeSelect(toolMode);
     void setCurrentModel(Model *);

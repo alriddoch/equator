@@ -1,5 +1,19 @@
 2004-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Server.h: Add accessor so we can tell if this server is
+	  in-game.
+
+	* app/MainWindow.h, app/MainWindow.cpp,
+	  gui/gtkmm/EntityTree.h gui/gtkmm/EntityTree.cpp:
+	  Add new window for exploring the entity tree.
+
+	* app/ServerEntities.h: Make Server object accessible.
+
+	* app/InheritanceWindow.cpp, app/InheritanceWindow.h:
+	  Fix copyright dates, and clean up code a little.
+
+2004-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/WorldEntity.cpp: Update to latest version from apogee, including
 	  support for ForestRenderer.
 
