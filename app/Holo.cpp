@@ -27,13 +27,20 @@ void Holo::draw(GlView & view)
         yc = yc - yc % 10;
     }
 
-    // This needs to be divided into two sections, one which generates the vertex
-    // array, and the other which draws it, so we don't have to regenerate the
-    // array every time the screen is refreshed.
+    // This needs to be divided into two sections, one which generates the
+    // vertex array, and the other which draws it, so we don't have to
+    // regenerate the array every time the screen is refreshed.
 
     // THere is an imprecision here. We need a less unweildy calculation for the
     // number of lines we are going to draw
+
+    // Actually this all just sucks - need to take a much more considered
+    // approach to deciding what we draw.
     int numVertices = (numlines + 1) * 2 * 3 * 2 * 2;
+    float origin_varray[] = { xc - numlines, 0.f, 0.f,
+                              xc + numlines, 0.f, 0.f,
+                              0.f, yc - numlines, 0.f,
+                              0.f, yc + numlines, 0.f };
     float * varray = new float[numVertices];
     int vCount = -1;
 
@@ -56,12 +63,13 @@ void Holo::draw(GlView & view)
     // glDepthMask(GL_FALSE);
 
     glEnable(GL_LINE_SMOOTH);
-    glVertexPointer(3, GL_FLOAT, 0, varray);
     // Draw the origin lines.
     glColor3f(0.0f, 1.0f, 0.0f);
-    glDrawArrays(GL_LINES, ((numlines - numlines % incr) * 4) / incr, 4);
+    glVertexPointer(3, GL_FLOAT, 0, origin_varray);
+    glDrawArrays(GL_LINES, 0, 4);
     // Draw the green grid.
     glColor3f(0.0f, 0.3f, 0.0f);
+    glVertexPointer(3, GL_FLOAT, 0, varray);
     glDrawArrays(GL_LINES, 0, (vCount + 1) / 3);
     glDisable(GL_LINE_SMOOTH);
 

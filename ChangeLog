@@ -1,5 +1,10 @@
 2004-01-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Holo.cpp: Fix mis-rendering of the origin lines in the Holo
+	  layer.
+
+2004-01-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/WorldEntity.h, app/WorldEntity.cpp: Implement signals for
 	  each type of entity, ensuring they are emitted after the
 	  renderer has been sorted.
