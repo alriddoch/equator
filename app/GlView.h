@@ -35,6 +35,8 @@ class GlView : public Gtk::DrawingArea {
     unsigned int m_antTexture;
     float m_animCount;
 
+    static bool extensionsInitialised;
+
     projection_t m_projection;
     drag_t m_dragType;
     rmode_t m_renderMode;
@@ -74,6 +76,8 @@ class GlView : public Gtk::DrawingArea {
     bool buttonReleaseEvent(GdkEventButton*); 
     bool exposeEvent(GdkEventExpose* expose);
     bool configureEvent(GdkEventConfigure *event);
+
+    static void initExtensions();
   public:
     MainWindow & m_mainWindow;
     ViewWindow & m_viewWindow;

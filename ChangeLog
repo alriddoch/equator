@@ -1,3 +1,11 @@
+2003-01-27  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ViewWindow.cpp, app/HeightManager.cpp: Remove extraneous debug
+	  output.
+
+	* app/HeightManager.cpp, app/GlView.h, app/GlView.cpp, app/GL.h:
+	  Detect and make use of GL_EXT_compiled_vertex_array extension.
+
 2003-01-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp: Switch to accepting float from Mercator.

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
+#include "GL.h"
+
 #include "GlView.h"
 #include "Model.h"
 #include "MainWindow.h"
@@ -21,6 +23,13 @@
 #include <sstream>
 
 #include <inttypes.h>
+
+#ifndef GL_EXT_compiled_vertex_array
+PFNGLLOCKARRAYSEXTPROC glLockArraysExt = 0;
+PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysExt = 0;
+#endif // GL_EXT_compiled_vertex_array
+
+bool have_GL_EXT_compiled_vertex_array = false;
 
 int attrlist[] = {
     GDK_GL_RGBA,
@@ -324,10 +333,31 @@ void GlView::zoomOut()
     }
 }
 
+bool GlView::extensionsInitialised = 0;
+
+void GlView::initExtensions()
+{
+    if (Gdk::GL::Query::gl_extension("GL_EXT_compiled_vertex_array")) {
+        std::cout << "GL EXTENSION GL_EXT_compiled_vertex_array"
+            << std::endl << std::flush;
+#ifndef GL_EXT_compiled_vertex_array
+        glLockArraysExt = (PFNGLLOCKARRAYSEXTPROC)Gdk::GL::Query::get_proc_address("glLockArraysExt");
+        glUnlockArraysExt = (PFNGLUNLOCKARRAYSEXTPROC)Gdk::GL::Query::get_proc_address("glUnlockArraysExt");
+        assert(glLockArraysEXT != 0 && glUnlockArraysEXT != 0);
+#endif // GL_EXT_compiled_vertex_array
+        have_GL_EXT_compiled_vertex_array = true;
+    }
+    extensionsInitialised = true;
+}
+
 void GlView::initgl()
 {
     if (!make_current()) {
         return;
+    }
+
+    if (!extensionsInitialised) {
+        initExtensions();
     }
 
     setupgl();
@@ -352,6 +382,7 @@ void GlView::initgl()
     glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glEnable(GL_ACCUM);
+
 }
 
 void GlView::setupgl()
@@ -876,9 +907,6 @@ void GlView::setViewOffset(float h, float v, float d)
     m_zoff = vo.z();
 
     redraw();
-    std::cout << "Setting setViewOffset " << h << ":" << v << ":" << d
-              << " " << m_xoff << ":" << m_yoff << ":" << m_zoff
-              << std::endl << std::flush;
 }
 
 float GlView::getViewSize()

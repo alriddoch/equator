@@ -119,8 +119,6 @@ void ViewWindow::viewMoved()
 
 void ViewWindow::vAdjustChanged()
 {
-    std::cout << "North changed to " << m_vAdjust->get_value()
-              << std::endl << std::flush;
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);
@@ -129,8 +127,6 @@ void ViewWindow::vAdjustChanged()
 
 void ViewWindow::hAdjustChanged()
 {
-    std::cout << "East changed to " << m_hAdjust->get_value()
-              << std::endl << std::flush;
     m_glarea->setViewOffset(-m_hAdjust->get_value(),
                             m_vAdjust->get_value(),
                             m_dAdjust);

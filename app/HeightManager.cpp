@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
+#include "GL.h"
+
 #include "HeightManager.h"
 
 #include "Model.h"
@@ -137,8 +139,14 @@ void HeightManager::heightMapRegion(Mercator::Segment * map)
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, harray);
     glColorPointer(3, GL_FLOAT, 0, carray);
+    if (have_GL_EXT_compiled_vertex_array) {
+        glLockArraysEXT(0, segSize * segSize);
+    }
     glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
                    GL_UNSIGNED_INT, m_lineIndeces);
+    if (have_GL_EXT_compiled_vertex_array) {
+        glUnlockArraysEXT();
+    }
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 }
@@ -196,8 +204,6 @@ void HeightManager::draw(GlView & view)
         for (; J != col.end(); ++J) {
             glPushMatrix();
             glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
-            std::cout << "Drawing segment at " << I->first << "," << J->first
-                      << std::endl << std::flush;
             drawRegion(view, J->second);
             glPopMatrix();
         }
