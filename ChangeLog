@@ -1,5 +1,9 @@
 2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* Makefile.am: Add missing xpm to dist.
+
+2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/CharacterWindow.cpp: Fix a couple of issues with the default
 	  response in the Character dialogue.
 
