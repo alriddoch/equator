@@ -1,3 +1,7 @@
+2002-11-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.in: Clean up configure.in.
+
 2002-09-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Holo.cpp: Made holoworld renderer more efficient by using vertex arrays.
