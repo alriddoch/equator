@@ -1,3 +1,7 @@
+2003-09-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/NewServerWindow.cpp: Add accelerators.
+
 2003-09-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/NewServerWindow.cpp: More debugging output.

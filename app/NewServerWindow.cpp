@@ -84,7 +84,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     vbox->pack_start(*hbox);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    m_connectButton = manage( new Gtk::Button("Connect") );
+    m_connectButton = manage( new Gtk::Button("Co_nnect", true) );
     m_connectButton->signal_clicked().connect(slot(*this, &NewServerWindow::createConnection));
     a->add(*m_connectButton);
     vbox->pack_start(*a);
@@ -115,11 +115,11 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     Gtk::HBox * v2box = manage( new Gtk::HBox(false, 6) );
-    m_loginButton = manage( new Gtk::Button("Login") );
+    m_loginButton = manage( new Gtk::Button("_Login", true) );
     m_loginButton->signal_clicked().connect(slot(*this, &NewServerWindow::loginAccount));
     m_loginButton->set_sensitive(false);
     v2box->pack_start(*m_loginButton);
-    m_createButton = manage( new Gtk::Button("Create Account") );
+    m_createButton = manage( new Gtk::Button("Create _Account", true) );
     m_createButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAccount));
     m_createButton->set_sensitive(false);
     v2box->pack_start(*m_createButton);
@@ -162,15 +162,15 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     v2box = manage( new Gtk::HBox(false, 6) );
-    m_takeAvatarButton = manage( new Gtk::Button("Take Avatar") );
+    m_takeAvatarButton = manage( new Gtk::Button("_Take Avatar", true) );
     m_takeAvatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::takeAvatar));
     m_takeAvatarButton->set_sensitive(false);
     v2box->pack_start(*m_takeAvatarButton);
-    m_avatarButton = manage( new Gtk::Button("Create Avatar") );
+    m_avatarButton = manage( new Gtk::Button("C_reate Avatar", true) );
     m_avatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
     v2box->pack_start(*m_avatarButton);
-    m_viewButton = manage( new Gtk::Button("View") );
+    m_viewButton = manage( new Gtk::Button("_View", true) );
     m_viewButton->signal_clicked().connect(slot(*this, &NewServerWindow::createView));
     m_viewButton->set_sensitive(false);
     v2box->pack_start(*m_viewButton);
