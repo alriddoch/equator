@@ -5,7 +5,9 @@
 #include "Model.h"
 #include "Cal3dStore.h"
 
+#include <gtkmm/stock.h>
 #include <gtkmm/fileselection.h>
+#include <gtkmm/filechooserdialog.h>
 
 #include <sigc++/bind.h>
 #include <sigc++/object_slot.h>
@@ -17,15 +19,6 @@ Cal3dStore::Cal3dStore(Model & model) :
                        Layer(model, "<empty>", "Cal3d animation")
 {
 }
-
-void Cal3dStore::load(Gtk::FileSelection * fsel)
-{
-    std::string path = fsel->get_filename();
-    delete fsel;
-
-    loadModel(path);
-}
-
 
 void Cal3dStore::loadModel(const std::string & path)
 {
@@ -54,21 +47,45 @@ void Cal3dStore::loadModel(const std::string & path)
     m_cal3dModel.onUpdate(0.f);
 }
 
-void Cal3dStore::cancel(Gtk::FileSelection * fsel)
-{
-    delete fsel;
-}
-
 void Cal3dStore::options()
 {
 }
 
 void Cal3dStore::importFile()
 {
-    Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Cal3d Model");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &Cal3dStore::load),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &Cal3dStore::cancel),fsel));
-    fsel->show();
+    Gtk::FileChooserDialog fc("");
+    // fc.set_transient_for(*this);
+
+    fc.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    fc.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+
+    Gtk::FileFilter filter_cfg;
+    filter_cfg.set_name("Cal3d Model files");
+    filter_cfg.add_pattern("*.cfg");
+    filter_cfg.add_pattern("*.cal");
+    fc.add_filter(filter_cfg);
+
+    Gtk::FileFilter filter_component;
+    filter_component.set_name("Cal3d Component files");
+    filter_component.add_pattern("*.caf");
+    filter_component.add_pattern("*.cmf");
+    filter_component.add_pattern("*.cmf");
+    fc.add_filter(filter_component);
+
+    int result = fc.run();
+
+    switch (result) {
+        case Gtk::RESPONSE_OK:
+            std::cout << "LOAD: " << fc.get_filename()
+                      << std::endl << std::flush;
+            loadModel(fc.get_filename());
+            break;
+        case Gtk::RESPONSE_CANCEL:
+            break;
+        default:
+            break;
+    }
 }
 
 void Cal3dStore::exportFile()

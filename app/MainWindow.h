@@ -21,6 +21,7 @@ class EntityTree;
 
 namespace Gtk {
   class ToggleButton;
+  class FileChooserDialog;
 }
 
 class MainWindow : public Gtk::Window
@@ -62,12 +63,15 @@ class MainWindow : public Gtk::Window
     Gtk::ToggleButton * orbit_mode;
     Gtk::ToggleButton * zoom_mode;
 
+    Gtk::FileChooserDialog * open_dialog;
+
     bool destroy_handler(GdkEventAny*);
     gint idle();
 
     void menuNewModel();
     void showOptionBox(OptionBox &);
     void open_option();
+    void open_response(int);
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors

@@ -10,10 +10,6 @@
 
 #include "visual/Model.h"
 
-namespace Gtk {
-  class FileSelection;
-}
-
 class Cal3dStore : public Layer {
   private:
     GlView::rmode_t m_renderMode;
@@ -29,9 +25,6 @@ class Cal3dStore : public Layer {
 
     int m_nameCount;
     int m_nameDict;
-
-    void load(Gtk::FileSelection *);
-    void cancel(Gtk::FileSelection *);
   public:
     Cal3dStore(Model &);
 

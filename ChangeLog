@@ -1,5 +1,13 @@
 2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/MainWindow.h, app/MainWindow.cpp: Make Open FileChooser
+	  non application modal.
+
+	* app/Cal3dStore.h, app/Cal3dStore.cpp: Use FileChooser for
+	  import menu item.
+
+2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/MainWindow.cpp: Simplify cal3d loading filters a bit.
 
 2005-02-02  Al Riddoch  <ajr@ecs.soton.ac.uk>

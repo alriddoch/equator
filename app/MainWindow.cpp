@@ -204,6 +204,21 @@ MainWindow::MainWindow() :
 
     add(*vbox);
 
+    // FIXME Leak perhaps, but this cannot be manage()d
+    open_dialog = new Gtk::FileChooserDialog("Open...");
+    open_dialog->set_transient_for(*this);
+
+    open_dialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    open_dialog->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+    Gtk::FileFilter filter_cfg;
+    filter_cfg.set_name("Cal3d files");
+    filter_cfg.add_pattern("*.cfg");
+    filter_cfg.add_pattern("*.cal");
+    open_dialog->add_filter(filter_cfg);
+
+    open_dialog->signal_response().connect(SigC::slot(*this, &MainWindow::open_response));
+
     set_title("Equator");
 
     // Gtk::Main::timeout.connect(SigC::slot(this, &MainWindow::idle), 1000);
@@ -214,32 +229,23 @@ MainWindow::MainWindow() :
 
 void MainWindow::open_option()
 {
-    Gtk::FileChooserDialog fc("");
-    fc.set_transient_for(*this);
+    open_dialog->show_all();
+}
 
-    fc.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    fc.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+void MainWindow::open_response(int response)
+{
+    open_dialog->hide();
 
-
-    Gtk::FileFilter filter_cfg;
-    filter_cfg.set_name("Cal3d files");
-    filter_cfg.add_pattern("*.cfg");
-    filter_cfg.add_pattern("*.cal");
-    fc.add_filter(filter_cfg);
-
-    int result = fc.run();
-
-    switch (result) {
+    switch (response) {
         case Gtk::RESPONSE_OK:
-            std::cout << "LOAD: " << fc.get_filename()
-                      << std::endl << std::flush;
-            loadFile(fc.get_filename());
+            loadFile(open_dialog->get_filename());
             break;
         case Gtk::RESPONSE_CANCEL:
             break;
         default:
+            std::cerr << "Unexpected response " << response << " from MainWIndow File Open FileChooserDialogue" << std::endl << std::flush;
             break;
-    }
+    };
 }
 
 gint MainWindow::quit(GdkEventAny *)
