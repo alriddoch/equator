@@ -14,13 +14,23 @@ class LoginWindow;
 class CharacterWindow;
 
 namespace Gtk {
-  class OptionMenu;
+   class ListStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+   class TreeView;
+   class TreeSelection;
 };
 
 class ServerWindow : public Gtk::Window
 {
   private:
-    Gtk::OptionMenu * m_serverMenu;
+    Glib::RefPtr<Gtk::ListStore> m_treeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_hostnameColumn;
+    Gtk::TreeModelColumn<Server *> * m_ptrColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
+    Gtk::TreeView * m_treeView;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
+
     Server * m_currentServer;
 
     ConnectWindow & m_connectWindow;

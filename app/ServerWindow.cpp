@@ -9,10 +9,15 @@
 #include "Layer.h"
 
 #include <gtkmm/frame.h>
-#include <gtkmm/menuitem.h>
-#include <gtkmm/optionmenu.h>
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/button.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treeselection.h>
 
 #include <iostream>
 #include <sstream>
@@ -25,19 +30,35 @@ ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     // destroy.connect(slot(this, &ServerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
 
-    Gtk::HBox * tophbox = manage( new Gtk::HBox() );
+    m_columns = new Gtk::TreeModelColumnRecord();
+    m_hostnameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_ptrColumn = new Gtk::TreeModelColumn<Server*>();
+    m_columns->add(*m_hostnameColumn);
+    m_columns->add(*m_ptrColumn);
 
-    tophbox->pack_start(*(manage( new Gtk::Label("Server connection:") ) ), Gtk::AttachOptions(0), 2);
-    m_serverMenu = manage( new Gtk::OptionMenu() );
-    tophbox->pack_start(*m_serverMenu, Gtk::EXPAND | Gtk::FILL, 2);
-    tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), Gtk::AttachOptions(0), 2);
-   
-    vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
+    m_treeModel = Gtk::ListStore::create(*m_columns);
+
+    m_treeView = manage( new Gtk::TreeView() );
+
+    m_treeView->set_model( m_treeModel );
+
+    m_treeView->append_column("Hostname", *m_hostnameColumn);
+
+    m_refTreeSelection = m_treeView->get_selection();
+    m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
+    // m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &ServerWindow::selectionChanged) );
+
+    vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::AttachOptions(0), 0);
+
+    Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
+    scrolled_window->set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    scrolled_window->set_size_request(250,150);
+    scrolled_window->add(*m_treeView);
+
+    vbox->pack_start(*scrolled_window, Gtk::FILL | Gtk::EXPAND, 0);
 
     add(*vbox);
     set_title("Servers");
-
-    set_sensitive(false);
 
     // show_all();
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
@@ -51,21 +72,8 @@ void ServerWindow::connect()
 
 void ServerWindow::newServer(Server * server)
 {
-    Gtk::Menu * menu = m_serverMenu->get_menu();
-    std::stringstream ident;
-    ident << /* server->getName() << */ "FIXME" /* << server->getModelNo() */;
-    if (menu == NULL) {
-        menu = manage( new Gtk::Menu() );
-        
-        Gtk::Menu_Helpers::MenuList& server_menu = menu->items();
-        server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(slot(*this, &ServerWindow::setServer),server)));
-        m_serverMenu->set_menu(*menu);
-        set_sensitive(true);
-        setServer(server);
-    } else {
-        Gtk::Menu_Helpers::MenuList& server_menu = menu->items();
-        server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(slot(*this, &ServerWindow::setServer),server)));
-    }
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+    row[*m_hostnameColumn] = Glib::ustring("hostname");
 }
 
 void ServerWindow::setServer(Server * server)
