@@ -17,14 +17,6 @@ namespace Gtk {
   class Label;
 }
 
-namespace Atlas {
-  namespace Objects {
-    namespace Entity {
-      class Player;
-    }
-  }
-}
-
 class LoginWindow : public Gtk::Dialog
 {
   private:
@@ -55,7 +47,7 @@ class LoginWindow : public Gtk::Dialog
     void create();
 
     void failure(const std::string & msg);
-    void loggedIn(const Atlas::Objects::Entity::Player & );
+    void loggedIn();
 
     void dismiss(int);
 

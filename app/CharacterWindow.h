@@ -35,6 +35,9 @@ class CharacterWindow : public Gtk::Dialog
 
     SigC::Connection m_failure;
     SigC::Connection m_created;
+    SigC::Connection m_charlist;
+
+    void gotCharacterList();
   public:
     CharacterWindow();
 

@@ -112,9 +112,9 @@ void LoginWindow::login()
     m_passwdEntry->set_editable(false);
     m_loginButton->set_sensitive(false);
 
-    m_loggedIn = m_server->m_connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &LoginWindow::loggedIn));
 
     m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
+    m_loggedIn = m_server->m_player->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
 }
 
 void LoginWindow::failure(const std::string & msg)
@@ -135,7 +135,7 @@ void LoginWindow::failure(const std::string & msg)
     m_loginButton->set_sensitive(true);
 }
 
-void LoginWindow::loggedIn(const Atlas::Objects::Entity::Player &)
+void LoginWindow::loggedIn()
 {
     assert(m_server != 0);
 

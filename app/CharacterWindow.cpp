@@ -99,6 +99,27 @@ void CharacterWindow::useServer(Server * s)
 
     m_server = s;
     m_serverLabel->set_text(std::string("Create avatar on ") + m_server->getName() + ":");
+    m_charlist = m_server->m_player->GotAllCharacters.connect(slot(*this, &CharacterWindow::gotCharacterList));
+    m_server->m_player->refreshCharacterInfo();
+
+    std::list<Glib::ustring> listStrings;
+    m_nameEntry->set_popdown_strings(listStrings);
+}
+
+void CharacterWindow::gotCharacterList()
+{
+    assert(m_server != 0);
+
+    std::cout << "GOT CHARACTER LIST" << std::endl << std::flush;
+
+    Eris::CharacterList chars = m_server->m_player->getCharacters();
+    Eris::CharacterList::iterator I = chars.begin();
+    std::list<Glib::ustring> listStrings;
+    for(; I != chars.end(); ++I) {
+        Atlas::Objects::Entity::GameEntity & ge = *I;
+        listStrings.push_back(ge.getName());
+    }
+    m_nameEntry->set_popdown_strings(listStrings);
 }
 
 void CharacterWindow::create()
@@ -127,6 +148,7 @@ void CharacterWindow::failure(const std::string & msg)
 
     m_failure.disconnect();
     m_created.disconnect();
+    m_charlist.disconnect();
 
     m_nameEntry->get_entry()->set_editable(true);
     m_typeEntry->set_editable(true);
@@ -151,6 +173,10 @@ void CharacterWindow::created(Eris::Entity *)
     std::cout << "Got connection success in CharacterWindow" << std::endl
               << std::flush;
 
+    m_failure.disconnect();
+    m_created.disconnect();
+    m_charlist.disconnect();
+
     hide();
 }
 
@@ -158,5 +184,6 @@ void CharacterWindow::dismiss(int response)
 {
     m_failure.disconnect();
     m_created.disconnect();
+    m_charlist.disconnect();
     hide();
 }

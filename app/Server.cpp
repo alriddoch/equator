@@ -47,7 +47,7 @@ void Server::lobbyTalk(Eris::Room *r, const std::string & nm,
     std::cout << "TALK: " << t << std::endl << std::flush;
 }
 
-void Server::loginComplete(const Atlas::Objects::Entity::Player &p)
+void Server::loginComplete()
 {
     std::cout << "Logged in" << std::endl << std::flush;
 
@@ -228,16 +228,16 @@ void Server::login(const std::string & name, const std::string & password)
 {
     m_player = new Eris::Player(&m_connection);
     m_player->login(name, password);
+    m_player->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
     m_lobby = m_connection.getLobby();
-    m_lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::createAccount(const std::string& name, const std::string& password)
 {
     m_player = new Eris::Player(&m_connection);
     m_player->createAccount(name, name, password);
+    m_player->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
     m_lobby = m_connection.getLobby();
-    m_lobby->LoggedIn.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::netDisconnected()

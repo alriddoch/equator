@@ -1,5 +1,13 @@
 2003-12-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Server.h, app/Server.cpp, app/LoginWindow.h, app/LoginWindow.cpp:
+	  Fix login code to use an Eris signal which better signals a success.
+
+	* app/CharacterWindow.h, app/CharacterWindow.cpp: Add code to list
+	  existing characters in the combo widget.
+
+2003-12-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/CharacterWindow.h, app/CharacterWindow.cpp,
 	  app/LoginWindow.h, app/LoginWindow.cpp: Switch to using Combo
 	  widget for username and character name entry. Could also use for

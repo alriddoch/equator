@@ -20,21 +20,13 @@ namespace Eris {
   class Entity;
 }
 
-namespace Atlas {
- namespace Objects {
-  namespace Entity {
-   class Player;
-  }
- }
-}
-
 class Model;
 class Terrain;
 
 class Server : public SigC::Object {
   private:
     void lobbyTalk(Eris::Room *r, const std::string& nm, const std::string& t);
-    void loginComplete(const Atlas::Objects::Entity::Player &p);
+    void loginComplete();
 
     void roomEnter(Eris::Room *r);
 
