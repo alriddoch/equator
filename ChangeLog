@@ -1,3 +1,7 @@
+2003-02-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.cpp: Fix the final vertex array memory leak.
+
 2003-02-06  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp: Disable use of accumulation buffer as its too slow

@@ -195,13 +195,13 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
         // if (view.getScale() > 0.05f) {
             heightMapRegion(view, map);
         // }
-        return;
+    } else {
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, varray);
+        glDrawArrays(GL_LINE_STRIP, 0, segSize * 4);
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, varray);
-    glDrawArrays(GL_LINE_STRIP, 0, segSize * 4);
-    glDisableClientState(GL_VERTEX_ARRAY);
     delete varray;
 }
 
