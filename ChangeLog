@@ -1,3 +1,7 @@
+2003-06-27  Damien McGinnes
+
+	* app/ServerEntities.cpp: modified mercator hack to use latest api.
+	
 2003-06-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/EntityLayer.cpp, app/HeightManager.cpp,

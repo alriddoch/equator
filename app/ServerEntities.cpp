@@ -833,34 +833,19 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
     }
  
     //============HACKED TO TEST MERCATOR
-    const WFMath::Ball<2> circ(WFMath::Point<2>(28.0,28.0), 12.0);
-    const WFMath::AxisBox<2> sq(WFMath::Point<2>(45.0,2.0),
-                                WFMath::Point<2>(55.0,12.0));
-    const WFMath::AxisBox<2> rect(WFMath::Point<2>(30.0,30.0),
-                                  WFMath::Point<2>(60.0,32.0));
-    const WFMath::RotBox<2> rot(WFMath::Point<2>(10.,40.) ,
-                                WFMath::Vector<2>(8.0,12.0),
+
+    const WFMath::Ball<2> circ2(WFMath::Point<2>(0.0,0.0), 12.0);
+    Mercator::LevelTerrainMod<WFMath::Ball<2> > mod2(10.0f, circ2);
+    m_model.m_terrain.addMod(mod2);
+
+    const WFMath::RotBox<2> rot(WFMath::Point<2>(-80.,-130.) ,
+                                WFMath::Vector<2>(150.0,120.0),
                                 WFMath::RotMatrix<2>().rotation(WFMath::Pi/4));
+    Mercator::LevelTerrainMod<WFMath::RotBox<2> > mod3(10.0f, rot);
+    m_model.m_terrain.addMod(mod3);
 
-    Mercator::TerrainMod *mod;
-    Mercator::Segment *seg;
-    mod = new Mercator::SlopeTerrainMod<WFMath::Ball<2> >(25.0f, 0.2f, -0.3f, circ);
-    seg = m_model.m_terrain.getSegment(-1,0);
-    if (seg) seg->addMod(mod);
-
-    
-    mod = new Mercator::LevelTerrainMod<WFMath::AxisBox<2> >(25.0f, sq);
-    seg = m_model.m_terrain.getSegment(-1,0);
-    if (seg) seg->addMod(mod);
-    
-    mod = new Mercator::LevelTerrainMod<WFMath::RotBox<2> >(25.0f, rot);
-    seg = m_model.m_terrain.getSegment(-1,1);
-    if (seg) seg->addMod(mod);
-    
-    mod = new Mercator::AdjustTerrainMod<WFMath::AxisBox<2> >(15.0f, rect);
-    seg = m_model.m_terrain.getSegment(-1,1);
-    if (seg) seg->addMod(mod);
     //==================================== 
+
 
 }
 
