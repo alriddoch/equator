@@ -7,6 +7,7 @@
 #include "HeightManager.h"
 
 #include "Model.h"
+#include "MainWindow.h"
 #include "GlView.h"
 
 #include "arrow_mesh.h"
@@ -164,40 +165,6 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
     delete carray;
 }
 
-void HeightManager::decorateRegion(GlView & view, Mercator::Segment * map)
-{
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColor3f(1.0f, 0.f, 1.0f);
-    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
-    float scale = 0.00625 / view.getScale();
-
-    glPushMatrix();
-    glTranslatef(0.f, 0.f, map->get(0, 0));
-    glScalef(scale, scale, scale);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(0.f, segSize, map->get(0, segSize));
-    glScalef(scale, scale, scale);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(segSize, 0.f, map->get(segSize, 0));
-    glScalef(scale, scale, scale);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(segSize, segSize, map->get(segSize, segSize));
-    glScalef(scale, scale, scale);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
-    glPopMatrix();
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-}
-
 void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
 {
     float * varray = new float[(segSize + 1) * 4 * 3];
@@ -229,7 +196,6 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
         outlineLineStrip(varray, (segSize + 1) * 4, view.getAnimCount());
         glDisable(GL_TEXTURE_1D);
         // if (view.getScale() > 0.05f) {
-            decorateRegion(view, map);
             heightMapRegion(view, map);
         // }
     } else {
@@ -257,6 +223,32 @@ void HeightManager::draw(GlView & view)
             glPopMatrix();
         }
     }
+
+    if ((m_model.getCurrentLayer() != this) ||
+        (m_model.m_mainWindow.getMode() != MainWindow::VERTEX)) {
+        return;
+    }
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glColor3f(1.0f, 0.f, 1.0f);
+    glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+    float scale = 0.00625 / view.getScale();
+    
+    const Mercator::Terrain::Pointstore & points = m_model.m_terrain.getPoints();
+    Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+    for(; K != points.end(); ++K) {
+        const Mercator::Terrain::Pointcolumn & col = K->second;
+        Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+        for (; L != col.end(); ++L) {
+            glPushMatrix();
+            glTranslatef(K->first * segSize, L->first * segSize, L->second);
+            glScalef(scale, scale, scale);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, arrow_mesh_size);
+            glPopMatrix();
+        }
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void HeightManager::animate(GlView & view)

@@ -1,3 +1,8 @@
+2003-02-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.h, app/HeightManager.cpp: Change the way
+	  base points are decorated to make editing for feasable.
+
 2003-02-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp, app/HeightManager.h: Add decorations to
