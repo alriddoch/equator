@@ -9,7 +9,7 @@
 #include "MainWindow.h"
 #include "Palette.h"
 
-#include <coal/database.h>
+#include <coal/container.h>
 #include <coal/bladeloader.h>
 
 #include <GL/glu.h>
@@ -20,8 +20,70 @@
 
 using std::cout;
 
-void BladeMap::drawMapRegion(CoalRegion & map_region)
+void BladeMap::drawMapRegion(CoalLandscape & map_region)
 {
+    std::cout << "Drawing... " << map_region.GetID() << std::endl << std::flush;
+    CoalShape * cs = map_region.GetShape();
+    if (cs == NULL) {
+        std::cout << "no shape" << std::endl << std::flush;
+        return;
+    }
+    CoalGraphic * cg = map_region.GetGraphic();
+    int tex_id = -1;
+    if (cg == NULL) {
+        std::cout << "no graphic" << std::endl << std::flush;
+        return;
+    }
+    if (!cg->filename.empty()) {
+        tex_id = Texture::get(cg->filename);
+    }
+    CoalPolygonShape * cps = dynamic_cast<CoalPolygonShape *>(cs);
+    if (cps != NULL) {
+        if (tex_id != -1) {
+            glBegin(GL_POLYGON);
+            glColor3f(cg->bkgdcolor.red / 255.0f,
+                      cg->bkgdcolor.green / 255.0f,
+                      cg->bkgdcolor.blue / 255.0f);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, tex_id);
+            glEnable(GL_TEXTURE_2D);
+            glBegin(GL_POLYGON);                // start drawing a polygon
+            glColor3f(1.0, 0.0, 1.0);
+        }
+        glNormal3f(0, 0, 1);
+        // FIXME Not implemented yet
+        glEnd();
+        return;
+    }
+    CoalRectShape * crs = dynamic_cast<CoalRectShape *>(cs);
+    if (crs != NULL) {
+        if (tex_id == -1) {
+            glBegin(GL_QUADS);
+            glColor3f(cg->bkgdcolor.red / 255.0f,
+                      cg->bkgdcolor.green / 255.0f,
+                      cg->bkgdcolor.blue / 255.0f);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, tex_id);
+            glEnable(GL_TEXTURE_2D);
+            glBegin(GL_QUADS);                // start drawing a polygon
+            glColor3f(1.0, 0.0, 1.0);
+        }
+        glNormal3f(0, 0, 1);
+        glTexCoord2f(crs->GetLeft() / 16.0f, crs->GetTop() / 16.0f);
+        glVertex3f(crs->GetLeft(), crs->GetTop(), 0.0f);
+        glTexCoord2f(crs->GetLeft() / 16.0f, crs->GetBottom() / 16.0f);
+        glVertex3f(crs->GetLeft(), crs->GetBottom(), 0.0f);
+        glTexCoord2f(crs->GetRight() / 16.0f, crs->GetBottom() / 16.0f);
+        glVertex3f(crs->GetRight(), crs->GetBottom(), 0.0f);
+        glTexCoord2f(crs->GetRight() / 16.0f, crs->GetTop() / 16.0f);
+        glVertex3f(crs->GetRight(), crs->GetTop(), 0.0f);
+        glEnd();
+        if (tex_id != -1) {
+            glDisable(GL_TEXTURE_2D);
+        }
+        return;
+    }
+#if 0
     int tex_id = -1;
     CoalFill * fill = map_region.GetFill();
     if (fill != NULL) {
@@ -72,18 +134,15 @@ void BladeMap::drawMapRegion(CoalRegion & map_region)
         glVertex3f(shape.GetCoord(0).GetX(), shape.GetCoord(1).GetY(), shape.GetCoord(2).GetZ());
         glEnd();
     }
+#endif
 }
 
-void BladeMap::drawMapObject(CoalObject & map_object)
-{
-    
-}
-
-void BladeMap::drawMap(CoalDatabase & map_base)
+void BladeMap::drawMap(CoalContainer & map_base)
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glDepthMask(GL_FALSE);
     //glDisable(GL_DEPTH_TEST);
+#if 0
     int count = map_base.GetRegionCount();
     for (int i = 0; i < count; i++) {
         CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
@@ -93,18 +152,23 @@ void BladeMap::drawMap(CoalDatabase & map_base)
     }
     //glDepthMask(GL_TRUE);
     //glEnable(GL_DEPTH_TEST);
-
-    count = map_base.GetObjectCount();
-    for (int i = 0; i < count; i++) {
-        CoalObject * object = (CoalObject*)map_base.GetObject(i);
-        if (object) {
-            drawMapObject(*object);
+#else
+    const std::vector<CoalComponent *> contents = map_base.GetChildren();
+    std::vector<CoalComponent *>::const_iterator I = contents.begin();
+    for(; I != contents.end(); ++I) {
+        // CoalComponent * c = I->Current();
+        CoalLandscape * l = dynamic_cast<CoalLandscape *>(*I);
+        if (l != NULL) {
+            std::cout << "GOT ONE" << std::endl << std::flush;
+            drawMapRegion(*l);
+        } else {
+            std::cout << "NOT DRAWING " << (*I)->GetID() << std::endl << std::flush;
         }
     }
-
+#endif
 }
 
-bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
+bool BladeMap::selectMap(GlView & view, CoalContainer & map_base,
                          int nx, int ny, int fx, int fy,
                          bool check)
 {
@@ -127,11 +191,13 @@ bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
     glTranslatef(m_xoff, m_yoff, m_zoff);
 
     int nameCount = 0;
-    std::map<int, CoalRegion *> nameDict;
+    std::map<int, CoalComponent *> nameDict;
 
-    int count = map_base.GetRegionCount();
     glPushName(nameCount);
-    for (int i = 0; i < count; i++) {
+
+    CoalIterator * I = map_base.GetIterator();
+    for(I->First(); !I->IsLast(); I->Next()) {
+#if 0
         CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
         if (region == NULL) { continue; }
         nameDict[++nameCount] = region;
@@ -148,6 +214,7 @@ bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
             glVertex3f(x, y, z);
         }
         glEnd();
+#endif
     }
     glPopName();
 
@@ -172,7 +239,7 @@ bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
             std::cout << "{" << hitName << "}";
-            std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
+            std::map<int, CoalComponent *>::const_iterator I = nameDict.find(hitName);
             if (check) {
                 if (m_selection.find(I->second) != m_selection.end()) {
                     return true;
@@ -194,10 +261,10 @@ bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
 
 void BladeMap::load(Gtk::FileSelection * fsel)
 {
-    CoalBladeLoader loader (m_database);
+    CoalBladeLoader loader;
 
     std::string filename = fsel->get_filename();
-    loader.LoadMap(filename.c_str());
+    loader.LoadMap(filename.c_str(), &m_database);
     size_t i = filename.find_last_of('/');
     if (i == 0) {
         m_name = filename;
@@ -221,6 +288,7 @@ void BladeMap::installTextures()
 {
     Palette & p = m_model.m_mainWindow.m_palettewindow;
 
+#if 0
     int c = m_database.GetGraphicCount(); 
     for (int i = 0; i < c; i++) {
         CoalGraphic * g = m_database.GetGraphic(i);
@@ -229,12 +297,13 @@ void BladeMap::installTextures()
         p.addTextureEntry(&m_model, g->name);
 #warning TODO Add code to coal to add short names for tiles
     }
+#endif
     m_model.typesAdded.emit();
     // p.addTileEntry();
 }
 
 BladeMap::BladeMap(Model & model) : Layer(model, "map", "BladeMap"),
-                                        m_database(*new CoalDatabase()),
+                                        m_database(*new CoalContainer()),
                                         m_validDrag(false)
 {
 }

@@ -9,9 +9,9 @@
 
 #include <map>
 
-class CoalRegion;
-class CoalObject;
-class CoalDatabase;
+class CoalLandscape;
+class CoalComponent;
+class CoalContainer;
 
 namespace Gtk {
   class FileSelection;
@@ -19,14 +19,13 @@ namespace Gtk {
 
 class BladeMap : public Layer {
   private:
-    CoalDatabase & m_database;
-    std::map<CoalRegion *,int> m_selection;
+    CoalContainer & m_database;
+    std::map<CoalComponent *,int> m_selection;
     bool m_validDrag;
 
-    void drawMapRegion(CoalRegion & map_region);
-    void drawMapObject(CoalObject & map_object);
-    void drawMap(CoalDatabase & map_base);
-    bool selectMap(GlView &, CoalDatabase & map_base,int,int,int,int, bool check = false);
+    void drawMapRegion(CoalLandscape & map_region);
+    void drawMap(CoalContainer & map_base);
+    bool selectMap(GlView &, CoalContainer & map_base,int,int,int,int, bool check = false);
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
     void installTextures();

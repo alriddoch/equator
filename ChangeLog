@@ -1,5 +1,13 @@
 2002-04-24  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/BladeMap.cpp, app/BladeMap.h: Re-wrote blade renderer to use
+	  new coal API.
+
+	* app/IsoMap.cpp, app/IsoMap.h: Re-wrote iso processing code to
+	  use new coal API.
+
+2002-04-24  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/GlView.cpp, app/Server.h: Removed obsolete code which
 	  still relied on old Eris types.
 

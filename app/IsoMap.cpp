@@ -10,8 +10,9 @@
 #include "Palette.h"
 #include "TileMap.h"
 
-#include <coal/database.h>
+#include <coal/container.h>
 #include <coal/isoloader.h>
+#include <coal/maptile.h>
 #include <coal/debug.h>
 
 #include <GL/gl.h>
@@ -24,28 +25,26 @@
 
 class Palette;
 
-void IsoMap::buildTileMap(CoalDatabase & map_base)
+void IsoMap::buildTileMap(CoalContainer & map_base)
 {
     m_tileMap = new TileMap();
-    int count = map_base.GetRegionCount();
-    for (int i = 0; i < count; i++) {
-        CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
-        if (region) {
-            CoalFill * fill = region->GetFill();
-            if ((fill == NULL) || (fill->graphic == NULL) ||
-                (fill->graphic->filename.size() == 0)) {
-                continue;
-            }
-            Tile * tile = Tile::get(fill->graphic->filename);
-            if (tile == NULL) {
-                continue;
-            }
-            CoalShape & shape = *region;
-            const CoalCoord & coord = shape.GetCoord(0);
-            float bx = coord.GetX();
-            float by = coord.GetY();
-            m_tileMap->add((int)bx, (int)by, tile);
+    const std::vector<CoalComponent*> & contents = map_base.GetChildren();
+    std::vector<CoalComponent*>::const_iterator I = contents.begin();
+    for (; I != contents.end(); ++I) {
+        CoalMapTile * tile = dynamic_cast<CoalMapTile*>(*I);
+        if (tile == NULL) { continue; }
+        CoalGraphic * fill = tile->GetGraphic();
+        if ((fill == NULL) || fill->filename.empty()) {
+            continue;
         }
+        Tile * tileImage = Tile::get(fill->filename);
+        if (tileImage == NULL) {
+            continue;
+        }
+        CoalCoord coord = tile->GetAnchor();
+        float bx = coord.x;
+        float by = coord.y;
+        m_tileMap->add((int)bx, (int)by, tileImage);
     }
 }
 
@@ -96,7 +95,7 @@ void IsoMap::animateMap(GlView & view, float count)
     }
 }
 
-bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
+bool IsoMap::selectMap(GlView & view, CoalContainer & map_base,
                        int nx, int ny, int fx, int fy,
                        bool check)
 {
@@ -187,10 +186,10 @@ bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
 
 void IsoMap::load(Gtk::FileSelection * fsel)
 {
-    CoalIsoLoader loader (m_database);
+    CoalIsoLoader loader;
 
     std::string filename = fsel->get_filename();
-    loader.LoadMap(filename.c_str());
+    loader.LoadMap(filename.c_str(), &m_database);
     size_t i = filename.find_last_of('/');
     if (i == 0) {
         m_name = filename;
@@ -269,18 +268,20 @@ void IsoMap::installTiles()
 {
     Palette & p = m_model.m_mainWindow.m_palettewindow;
 
+#if 0
     int c = m_database.GetGraphicCount(); 
     for (int i = 0; i < c; i++) {
         CoalGraphic * g = m_database.GetGraphic(i);
         p.addTileEntry(&m_model, g->filename);
 #warning TODO Add code to coal to add short names for tiles
     }
+#endif
     m_model.typesAdded.emit();
     // p.addTileEntry();
 }
 
 IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),
-                                        m_database(*new CoalDatabase()),
+                                        m_database(*new CoalContainer()),
                                         m_validDrag(false),
                                         m_tileMap(NULL)
 {
