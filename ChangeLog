@@ -1,5 +1,10 @@
 2005-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ServerWindow.cpp, app/ServerWindow.h: More entries in the
+	  popup.
+
+2005-01-28  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/CharacterWindow.cpp, app/CharacterWindow.h,
 	  app/ConnectWindow.cpp, app/ConnectWindow.h,
 	  app/LoginWindow.cpp, app/LoginWindow.h: Handle all the buttons in

@@ -78,7 +78,8 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Login..."));
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Character..."));
     server_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Types...", SigC::slot(*this, &ServerWindow::typesPressed)));
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Status", SigC::slot(*this, &ServerWindow::statusPressed)));
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Types", SigC::slot(*this, &ServerWindow::typesPressed)));
     server_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Disconnect..."));
 
@@ -130,6 +131,16 @@ void ServerWindow::loggedIn(Server * server)
 
     m_characterWindow.useServer(server);
     m_characterWindow.show_all();
+}
+
+void ServerWindow::statusPressed()
+{
+    Gtk::TreeModel::Row row = *(m_refTreeSelection->get_selected());
+    Server * selServer = row[*m_ptrColumn];
+
+    assert(selServer != 0);
+
+    // FIXME Query status
 }
 
 void ServerWindow::typesPressed()

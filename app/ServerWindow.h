@@ -44,6 +44,7 @@ class ServerWindow : public OptionBox
     void buttonPressEvent(GdkEventButton*);
     void newServer(Server *);
     void loggedIn(Server *);
+    void statusPressed();
     void typesPressed();
 
     bool deleteEvent(GdkEventAny*) {
