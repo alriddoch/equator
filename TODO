@@ -1,3 +1,6 @@
+ASAP fix update code in GlView so that redraw is scheduled, not forced when
+a change occurs.
+
 Modify cursor placement so it uses depth value if depth value is not infinite.
 Add option to snap view to something or other, probably in camera control
 window. Camera control needs to become an OptionBox, and needs to be

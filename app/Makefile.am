@@ -13,7 +13,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  CharacterWindow.cpp CharacterWindow.h \
 		  Palette.cpp Palette.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
-		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \
 		  Model.cpp Model.h \
 		  WorldEntity.cpp WorldEntity.h \
