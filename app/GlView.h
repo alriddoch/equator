@@ -30,7 +30,7 @@ class GlView : public Gtk::DrawingArea {
     bool m_redrawRequired;
     bool m_refreshRequired;
     GLubyte * m_frameStore;
-    GLuint * m_depthStore;
+    GLfloat * m_depthStore;
     int m_frameStoreWidth;
     int m_frameStoreHeight;
 

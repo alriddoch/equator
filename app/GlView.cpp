@@ -359,14 +359,14 @@ void GlView::drawgl()
             m_frameStoreHeight = get_height();
 
             m_frameStore = new GLubyte[get_width() * get_height() * 4];
-            m_depthStore = new GLuint[get_width() * get_height()];
+            m_depthStore = new GLfloat[get_width() * get_height()];
         }
         std::cout << "Frampt " << m_frameStoreWidth << " " << m_frameStoreHeight << std::endl << std::flush;
         std::cout << "Grimple " << get_width() << " " << get_height() << std::endl << std::flush;
         glReadPixels(0, 0, get_width(), get_height(),
                      GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
         glReadPixels(0, 0, get_width(), get_height(),
-                     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+                     GL_DEPTH_COMPONENT, GL_FLOAT, m_depthStore);
 
         mouseEffects();
         swap_buffers();
@@ -397,7 +397,7 @@ bool GlView::animate()
     glRasterPos2i(0,0);
     glDepthMask(GL_FALSE);
     glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, m_depthStore);
+                 GL_DEPTH_COMPONENT, GL_FLOAT, m_depthStore);
     glDrawPixels(m_frameStoreWidth, m_frameStoreHeight,
                  GL_RGBA, GL_UNSIGNED_BYTE, m_frameStore);
     glDepthMask(GL_TRUE);

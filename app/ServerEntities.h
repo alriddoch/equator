@@ -47,6 +47,7 @@ class ServerEntities : public Layer {
     typedef std::set<Eris::Entity*> entlist_t;
     typedef std::map<int,Eris::Entity*> entname_t;
     typedef std::vector<Eris::Entity*> entstack_t;
+    typedef enum { SELECT_INVERT, SELECT_ALL } selectMod_t;
 
     Server & m_serverConnection;
   private:
@@ -55,8 +56,8 @@ class ServerEntities : public Layer {
     Eris::Entity * m_selection; 
     entlist_t m_selectionList; 
     entstack_t m_selectionStack; 
-    entlist_t m_lowSelectionList;
-    entlist_t m_highSelectionList;
+    entlist_t m_lowVertexSelection;
+    entlist_t m_highVertexSelection;
     bool m_validDrag;
     WFMath::Vector<3> m_dragPoint;
 
@@ -78,13 +79,18 @@ class ServerEntities : public Layer {
     void drawEntity(GlView &, Eris::Entity *, Eris::Entity *, entstack_t::const_iterator);
     void drawWorld(GlView &, Eris::Entity * wrld);
     void moveTo(Eris::Entity * ent, Eris::Entity * wrld);
-    void selectEntity(Eris::Entity*,Eris::Entity *, entstack_t::const_iterator);
+    void selectEntity(GlView &, Eris::Entity *, entstack_t::const_iterator);
     bool selectEntities(GlView & view, int nx, int ny, int fx, int fy,
                         bool check = false);
     void newType(Eris::TypeInfo*);
     void descendTypeTree(Eris::TypeInfo*);
     void alignEntityParent(Eris::Entity * ent);
     void connectEntity(Eris::Entity * );
+
+    void modifyEntitySelection(Eris::Entity *, entstack_t::const_iterator,
+                               selectMod_t, const entlist_t &,
+                               const entlist_t &, const entlist_t &);
+    void modifySelection(selectMod_t);
 
     void loadOptions(Gtk::FileSelection *);
     void saveOptions(Gtk::FileSelection *);

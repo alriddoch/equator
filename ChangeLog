@@ -1,3 +1,14 @@
+2004-03-24  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/GlView.cpp, app/GlView.h: Modify the depth frame store to be
+	  float. Works better now.
+
+	* app/Holo.cpp: Disable smooth antialiased lines.
+
+	* app/ServerEntities.cpp, app/ServerEntities.h: Clean up code that
+	  iterates over the entity tree. Implement select all, and
+	  select invert.
+
 2004-03-18  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ServerEntities.cpp, app/ServerEntities.h: Start implementing

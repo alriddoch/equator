@@ -47,8 +47,8 @@ static const bool debug_flag = false;
 
 using Atlas::Message::Element;
 
-EntityImportOptions * ServerEntities::m_importOptions = NULL;
-EntityExportOptions * ServerEntities::m_exportOptions = NULL;
+EntityImportOptions * ServerEntities::m_importOptions = 0;
+EntityExportOptions * ServerEntities::m_exportOptions = 0;
 
 
 class DummyDecoder : public Atlas::Message::DecoderBase {
@@ -249,12 +249,6 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
 
     PosType pos = ent->getPosition();
 
-    // This is where code would go to adjust position for velocity etc.
-
-    // Manipulate camera position if necessary
-
-    // Check type of entity to see if it should be rendered
-
     glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
     orient(ent->getOrientation());
@@ -292,11 +286,9 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
         if (ent != m_world) {
             ++J;
         }
-        debug(std::cout << ent->getID() << " " << numEnts << " emts"
-                        << std::endl << std::flush;);
         for (int i = 0; i < numEnts; i++) {
             Eris::Entity * e = ent->getMember(i);
-            assert(e != NULL);
+            assert(e != 0);
 
             drawEntity(view, e, 0, J);
         }
@@ -307,18 +299,18 @@ void ServerEntities::drawEntity(GlView & view, Eris::Entity* ent,
 
 void ServerEntities::drawWorld(GlView & view, Eris::Entity * wrld)
 {
-    assert(wrld != NULL);
+    assert(wrld != 0);
 
     m_world = wrld;
 
     drawEntity(view, wrld, 0, m_selectionStack.begin());
 }
 
-void ServerEntities::selectEntity(Eris::Entity * wrld,
+void ServerEntities::selectEntity(GlView & view,
                                   Eris::Entity * ent,
                                   entstack_t::const_iterator I)
 {
-    assert(ent != NULL);
+    assert(ent != 0);
 
     PosType pos = ent->getPosition();
 
@@ -326,24 +318,27 @@ void ServerEntities::selectEntity(Eris::Entity * wrld,
     glTranslatef(pos.x(), pos.y(), pos.z());
     orient(ent->getOrientation());
 
+    bool openEntity = ((ent == m_world) ||
+                       ((I != m_selectionStack.end()) && (*I == ent)));
+
     if (ent->hasBBox()) {
+        m_nameDict[++m_nameCount] = ent;
+        glPushName(m_nameCount);
         draw3DCube(ent->getBBox());
+        glPopName();
     }
 
-    if ((ent == wrld) || (I != m_selectionStack.end()) && (*I == ent)) {
+    if (openEntity) {
         int numEnts = ent->getNumMembers();
         entstack_t::const_iterator J = I;
-        if (ent != wrld) {
+        if (ent != m_world) {
             ++J;
         }
         for (int i = 0; i < numEnts; i++) {
             Eris::Entity * e = ent->getMember(i);
-            assert(e != NULL);
+            assert(e != 0);
 
-            m_nameDict[++m_nameCount] = e;
-            glPushName(m_nameCount);
-            selectEntity(wrld, e, J);
-            glPopName();
+            selectEntity(view, e, J);
         }
     }
     glPopMatrix();
@@ -364,18 +359,18 @@ bool ServerEntities::selectEntities(GlView & view,
 
     entstack_t::const_iterator I = m_selectionStack.begin();
 
-    Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
+    m_world = m_serverConnection.m_world->getRootEntity();
 
-    assert(root != NULL);
+    assert(m_world != 0);
 
-    selectEntity(root, root, I);
+    selectEntity(view, m_world, I);
 
     
     int hits = glRenderMode(GL_RENDER);
 
     if (!check) {
+        m_selection = 0;
         m_selectionList.clear();
-        m_selection = NULL;
     }
 
     std::cout << "Got " << hits << " hits" << std::endl << std::flush;
@@ -422,7 +417,7 @@ bool ServerEntities::selectEntities(GlView & view,
 void ServerEntities::newType(Eris::TypeInfo * node)
 {
     std::cout << "GOT NEW SERVER TYPE" << std::endl << std::flush;
-    assert(node != NULL);
+    assert(node != 0);
 
     if (!m_gameEntityType->isBound()) {
         return;
@@ -438,7 +433,7 @@ void ServerEntities::newType(Eris::TypeInfo * node)
 
 void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
 {
-    assert(node != NULL);
+    assert(node != 0);
 
     m_model.m_mainWindow.m_palettewindow.addEntityEntry(&m_model, node->getName());
     const Eris::TypeInfoSet & children = node->getChildren();
@@ -450,7 +445,7 @@ void ServerEntities::descendTypeTree(Eris::TypeInfo * node)
 
 void ServerEntities::alignEntityParent(Eris::Entity * ent)
 {
-    assert(ent != NULL);
+    assert(ent != 0);
     std::cout << "Aligning ... " << std::endl << std::flush;
 
     Eris::Entity * parent = ent->getContainer();
@@ -496,7 +491,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
                     << std::endl << std::flush;);
     for (int i = 0; i < numEnts; i++) {
         Eris::Entity * e = ent->getMember(i);
-        assert(e != NULL);
+        assert(e != 0);
         alignEntityParent(e);
     }
 }
@@ -565,7 +560,7 @@ void ServerEntities::load(Gtk::FileSelection * fsel)
         insertEntityContents(m_serverConnection.m_world->getRootEntity()->getID(),
                              I->second.asMap(), fileEnts);
     } else /* (m_importOptions->m_target == IMPORT_SELECTION) */ {
-        if (m_selection == NULL) {
+        if (m_selection == 0) {
             std::cerr << "ERROR: Can't import into selection, as nothing is selected. Tell the user" << std::endl << std::flush;
             return;
         }
@@ -587,9 +582,9 @@ void ServerEntities::exportEntity(const std::string & id,
         Eris::Entity * me = ee->getMember(i);
         std::string eid = me->getID();
         if (m_exportOptions->m_charCheck->get_active() &&
-            m_exportOptions->m_charType != NULL) {
+            m_exportOptions->m_charType != 0) {
             Eris::TypeInfoPtr entType = me->getType();
-            if (entType != NULL && entType->isA(m_exportOptions->m_charType)) {
+            if (entType != 0 && entType->isA(m_exportOptions->m_charType)) {
                 std::cout << "Omitting " << eid << std::endl << std::flush;
                 continue;
             }
@@ -607,7 +602,7 @@ void ServerEntities::exportEntity(const std::string & id,
     ent["name"] = ee->getName();
     ent["parents"] = Atlas::Message::Element::ListType(1, *ee->getInherits().begin());
     Eris::Entity * loc = ee->getContainer();
-    if (loc != NULL) {
+    if (loc != 0) {
         // FIXME AJR 2002-07-15
         // The id of the container actually needs a little bit of processing.
         // If we have overriddent the top level container, it needs to be
@@ -622,7 +617,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     std::string filename = fsel->get_filename();
     delete fsel;
 
-    Eris::Entity * export_root = NULL;
+    Eris::Entity * export_root = 0;
     switch (m_exportOptions->m_target) {
         case EntityExportOptions::EXPORT_SELECTION:
             export_root = m_selection;
@@ -639,7 +634,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
             break;
     }
 
-    if (export_root == NULL) {
+    if (export_root == 0) {
         std::cerr << "ERROR: Nothing to export" << std::endl << std::flush;
         return;
     }
@@ -722,14 +717,14 @@ void ServerEntities::connectEntity(Eris::Entity * ent)
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
                                m_serverConnection(server),
-                               m_selection(NULL), m_validDrag(false),
-                               m_gameEntityType(NULL)
+                               m_selection(0), m_validDrag(false),
+                               m_gameEntityType(0)
 {
     // FIXME This stuff populates palette, but does not belong here.
     // It probably belongs in server.
     m_serverConnection.m_connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
     m_gameEntityType = m_serverConnection.m_connection.getTypeService()->getTypeByName("game_entity");
-    assert(m_gameEntityType != NULL);
+    assert(m_gameEntityType != 0);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
     if (m_gameEntityType->isBound()) {
         descendTypeTree(m_gameEntityType);
@@ -748,7 +743,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
         SigC::slot(*this, &ServerEntities::gotNewEntity)
     );
 
-    if (m_importOptions == NULL) {
+    if (m_importOptions == 0) {
         createOptionsWindows();
     }
 }
@@ -773,12 +768,103 @@ void ServerEntities::exportFile()
     fsel->show();
 }
 
+void ServerEntities::modifyEntitySelection(Eris::Entity * ent,
+                                           entstack_t::const_iterator I,
+                                           ServerEntities::selectMod_t sm,
+                                           const entlist_t & osl,
+                                           const entlist_t & olvs,
+                                           const entlist_t & ohvs)
+{
+    assert(ent != 0);
+
+    bool openEntity = ((ent == m_world) ||
+                       ((I != m_selectionStack.end()) && (*I == ent)));
+
+    if (ent->hasBBox()) {
+        if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+            if (m_selectionList.find(ent) != m_selectionList.end()) {
+                if (sm == ServerEntities::SELECT_INVERT) {
+                    if (olvs.find(ent) == olvs.end()) {
+                        m_lowVertexSelection.insert(ent);
+                    }
+                    if (ohvs.find(ent) == ohvs.end()) {
+                        m_highVertexSelection.insert(ent);
+                    }
+                } else {
+                    m_lowVertexSelection.insert(ent);
+                    m_highVertexSelection.insert(ent);
+                }
+            }
+        } else {
+            // FIXME We assume the only other mode is ENTITY
+            if (sm == ServerEntities::SELECT_INVERT) {
+                if (osl.find(ent) == osl.end()) {
+                    m_selectionList.insert(ent);
+                }
+            } else {
+                m_selectionList.insert(ent);
+            }
+        }
+        draw3DCube(ent->getBBox());
+    }
+
+    if (openEntity) {
+        int numEnts = ent->getNumMembers();
+        entstack_t::const_iterator J = I;
+        if (ent != m_world) {
+            ++J;
+        }
+        for (int i = 0; i < numEnts; i++) {
+            Eris::Entity * e = ent->getMember(i);
+            assert(e != 0);
+
+            modifyEntitySelection(e, J, sm, osl, olvs, ohvs);
+        }
+    }
+}
+
+void ServerEntities::modifySelection(selectMod_t sm)
+{
+    ServerEntities::entlist_t oldSelectionList,
+                              oldLowVertexSelection,
+                              oldHighVertexSelection;
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        if (sm == ServerEntities::SELECT_INVERT) {
+            oldLowVertexSelection = m_lowVertexSelection;
+            oldHighVertexSelection = m_highVertexSelection;
+        }
+        m_lowVertexSelection.clear();
+        m_highVertexSelection.clear();
+    // FIXME We assume the only other mode is ENTITY
+    } else {
+        if (sm == ServerEntities::SELECT_INVERT) {
+            oldSelectionList = m_selectionList;
+        }
+        m_selection = 0;
+        m_selectionList.clear();
+        m_lowVertexSelection.clear();
+        m_highVertexSelection.clear();
+    }
+
+    entstack_t::const_iterator I = m_selectionStack.begin();
+
+    m_world = m_serverConnection.m_world->getRootEntity();
+
+    assert(m_world != 0);
+
+    modifyEntitySelection(m_world, I, sm, oldSelectionList,
+                                          oldLowVertexSelection,
+                                          oldHighVertexSelection);
+}
+
 void ServerEntities::selectInvert()
 {
+    modifySelection(SELECT_INVERT);
 }
 
 void ServerEntities::selectAll()
 {
+    modifySelection(SELECT_ALL);
 }
 
 void ServerEntities::selectNone()
@@ -786,11 +872,13 @@ void ServerEntities::selectNone()
     m_selection = 0;
     m_selectionList.clear();
     m_selectionStack.clear();
+    m_lowVertexSelection.clear();
+    m_highVertexSelection.clear();
 }
 
 void ServerEntities::moveTo(Eris::Entity * ent, Eris::Entity * world)
 {
-    if ((ent == world) || (ent == NULL)) {
+    if ((ent == world) || (ent == 0)) {
         return;
     }
     Eris::Entity * cont = ent->getContainer();
@@ -824,10 +912,10 @@ bool ServerEntities::animate(GlView & view)
             glTranslatef(m_dragPoint.x(), m_dragPoint.y(), m_dragPoint.z());
         }
         if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
-            if (!m_lowSelectionList.empty()) {
+            if (!m_lowVertexSelection.empty()) {
                 // Do summit
             }
-            if (!m_highSelectionList.empty()) {
+            if (!m_highVertexSelection.empty()) {
                 // Do summit
             }
         } else {
@@ -858,10 +946,10 @@ void ServerEntities::select(GlView & view, int x, int y, int fx, int fy)
 
 void ServerEntities::pushSelection()
 {
-    if (m_selection != NULL) {
+    if (m_selection != 0) {
         std::cout << "Pushing " << m_selection->getID() << std::endl << std::flush;
         m_selectionStack.push_back(m_selection);
-        m_selection = NULL;
+        m_selection = 0;
     }
 }
 
@@ -890,6 +978,7 @@ void ServerEntities::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 void ServerEntities::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
     if (m_validDrag) {
+        // FIXME Drag everything, or just the one?
         std::cout << "MOVING " << m_selection->getID() << " to " << v
                   << std::endl << std::flush;
         m_serverConnection.avatarMoveEntity(m_selection->getID(),
