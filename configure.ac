@@ -14,9 +14,6 @@ VERSION=0.0.2
 
 AM_INIT_AUTOMAKE(equator, $VERSION)
 
-dnl check if user wishes maintainer-mode ("--enable-maintainer-mode = yes")
-AM_MAINTAINER_MODE
-
 dnl Need libtool
 
 AC_DISABLE_STATIC
