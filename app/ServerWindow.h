@@ -41,7 +41,7 @@ class ServerWindow : public OptionBox
     LoginWindow & m_loginWindow;
     CharacterWindow & m_characterWindow;
 
-    bool buttonPressEvent(GdkEventButton*);
+    void buttonPressEvent(GdkEventButton*);
     void newServer(Server *);
     void loggedIn(Server *);
     void typesPressed();

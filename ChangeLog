@@ -1,5 +1,10 @@
 2005-01-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ServerWindow.h, app/ServerWindow.cpp: Implement right-click
+	  popup menu.
+
+2005-01-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* gui/gtkmm/TypeTree.h, gui/gtkmm/TypeTree.cpp:
 	  Make types more tree-like for easier browsing.
 

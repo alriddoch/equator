@@ -52,7 +52,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_treeView->set_model( m_treeModel );
 
     m_treeView->append_column("Hostname", *m_hostnameColumn);
-    m_treeView->signal_button_press_event().connect(SigC::slot(*this, &ServerWindow::buttonPressEvent));
+    m_treeView->signal_button_press_event().connect_notify(SigC::slot(*this, &ServerWindow::buttonPressEvent));
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -75,20 +75,20 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
 
     m_popupMenu = manage( new Gtk::Menu );
     Gtk::Menu_Helpers::MenuList & server_menu = m_popupMenu->items();
-    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Type tree"));
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Types...", SigC::slot(*this, &ServerWindow::typesPressed)));
 
     signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(SigC::slot(*this, &ServerWindow::loggedIn));
 }
 
-bool ServerWindow::buttonPressEvent(GdkEventButton * event)
+void ServerWindow::buttonPressEvent(GdkEventButton * event)
 {
     std::cout << "Button press event" << std::endl << std::flush;
     if (event->button == 3) {
         m_popupMenu->popup(event->button, event->time);
     }
-    return TRUE;
+    // return TRUE;
 }
 
 void ServerWindow::connect()
