@@ -1,5 +1,10 @@
 2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Terrain.cpp, app/Terrain.h: Lots of changes to texture
+	  selection and editing, making interface much more powerful.
+
+2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Terrain.h, app/Terrain.cpp: Implement selecting basepoints.
 
 2004-02-01  Al Riddoch  <ajr@ecs.soton.ac.uk>

@@ -68,14 +68,14 @@ void Terrain::initIndeces()
 
 Terrain::Terrain(Model & m, Mercator::Terrain & mt) :
      Layer(m, "terrain", "Terrain"), m_terrain(mt), m_numLineIndeces(0),
-     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
+     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2]), m_validDrag(false)
 {
     initIndeces();
 }
 
 Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
      m_terrain(*new Mercator::Terrain), m_numLineIndeces(0),
-     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2])
+     m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2]), m_validDrag(false)
 {
     initIndeces();
 }
@@ -253,32 +253,6 @@ void Terrain::draw(GlView & view)
         }
     }
 
-    // Draw the sea - annoying
-#if 0
-    glEnable(GL_BLEND);
-    I = segs.begin();
-    for (; I != segs.end(); ++I) {
-        const Mercator::Terrain::Segmentcolumn & col = I->second;
-        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
-        for (; J != col.end(); ++J) {
-            if (m_selection.find(GroundCoord(I->first, J->first)) == m_selection.end()) {
-                continue;
-            }
-            glPushMatrix();
-            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
-            GLfloat vertices[] = { 0.f, 0.f, 0.f,
-                                   segSize, 0, 0.f,
-                                   segSize, segSize, 0.f,
-                                   0, segSize, 0.f };
-            glVertexPointer(3, GL_FLOAT, 0, vertices);
-            glColor4f(1.f, 1.f, 1.f, 0.3f);
-            glDrawArrays(GL_QUADS, 0, 4);
-            glPopMatrix();
-        }
-    }
-    glDisable(GL_BLEND);
-#endif
-
     if ((m_model.getCurrentLayer() != this) ||
         (m_model.m_mainWindow.getMode() != MainWindow::VERTEX)) {
         return;
@@ -318,46 +292,92 @@ void Terrain::draw(GlView & view)
 }
 
 bool Terrain::animate(GlView & view)
-#if 0
 {
-    HeightData::Terrain::const_iterator I = m_model.m_heightData.begin();
-    for (; I != m_model.m_heightData.end(); ++I) {
-        if (m_selection.find(I->second) == m_selection.end()) {
-            continue;
+    if (m_selection.empty()) {
+        return false;
+    }
+    if ((m_model.getCurrentLayer() == this) &&
+        (m_model.m_mainWindow.getMode() == MainWindow::VERTEX)) {
+        if (m_vertexSelection.empty()) {
+            return false;
         }
+        glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
+        glDepthFunc(GL_LEQUAL);
+        glMatrixMode(GL_TEXTURE);
         glPushMatrix();
-        const GroundCoord & coord = I->first;
-        glTranslatef(coord.first * 200.0f, coord.second * 200.0f, 0.0f);
-        glDisable(GL_DEPTH_TEST);
+        float phase = view.getAnimCount();
+        glTranslatef(phase, phase, phase);
+        glMatrixMode(GL_MODELVIEW);
+        
+        GLfloat s_scale = 0.5f * view.getScale();
+        GLfloat sx[] = { s_scale, s_scale, s_scale, 0 };
+
         glEnable(GL_TEXTURE_1D);
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        outlineRegion(I->second, view.getAnimCount());
-        glDisable(GL_TEXTURE_1D);
-        glEnable(GL_DEPTH_TEST);
-        glPopMatrix();
-    }
-}
-#else
-{
-    const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
+        glColor3f(1.f, 1.f, 1.f);
+        glEnable(GL_TEXTURE_GEN_S);
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+        glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
 
-    Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
-    for (; I != segs.end(); ++I) {
-        const Mercator::Terrain::Segmentcolumn & col = I->second;
-        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
-        for (; J != col.end(); ++J) {
-            glPushMatrix();
-            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
-            // std::cout << "Animating segment at " << I->first << "," << J->first
-                      // << std::endl << std::flush;
-            // FIXME Actually do some animation maybe?
-            drawRegion(view, *J->second, GroundCoord(I->first, J->first));
-            glPopMatrix();
+        float scale = 0.00625 / view.getScale();
+    
+        const Mercator::Terrain::Pointstore & points = m_terrain.getPoints();
+        Mercator::Terrain::Pointstore::const_iterator K = points.begin();
+        for(; K != points.end(); ++K) {
+            const Mercator::Terrain::Pointcolumn & col = K->second;
+            Mercator::Terrain::Pointcolumn::const_iterator L = col.begin();
+            for (; L != col.end(); ++L) {
+                GroundCoord gc(K->first, L->first);
+                if ((m_selection.find(GroundCoord(K->first, L->first)) == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first)) == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first - 1, L->first - 1)) == m_selection.end()) &&
+                    (m_selection.find(GroundCoord(K->first, L->first - 1)) == m_selection.end())) {
+                    continue;
+                }
+                if (m_vertexSelection.find(gc) == m_vertexSelection.end()) {
+                    continue;
+                }
+                glPushMatrix();
+                glTranslatef(K->first * segSize,
+                             L->first * segSize,
+                             L->second.height());
+                if (m_validDrag) {
+                    glTranslatef(0.f, 0.f, m_dragPoint.z());
+                }
+                glScalef(scale, scale, scale);
+                glDrawArrays(GL_LINE_STRIP, 0, arrow_mesh_size);
+                glPopMatrix();
+            }
+        }
+
+        glDisable(GL_TEXTURE_GEN_S);
+        glDisable(GL_TEXTURE_1D);
+
+        glDepthFunc(GL_LESS);
+
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        return true;
+    } else {
+        const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
+        Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+        for (; I != segs.end(); ++I) {
+            const Mercator::Terrain::Segmentcolumn & col = I->second;
+            Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+            for (; J != col.end(); ++J) {
+                glPushMatrix();
+                glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
+                if (m_validDrag) {
+                    glTranslatef(0.f, 0.f, m_dragPoint.z());
+                }
+                drawRegion(view, *J->second, GroundCoord(I->first, J->first));
+                glPopMatrix();
+            }
         }
     }
     return false;
 }
-#endif
 
 bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool check)
 {
@@ -413,6 +433,7 @@ bool Terrain::selectSegments(GlView & view, int nx, int ny, int fx, int fy, bool
                     return true;
                 }
                 m_selection.insert(c);
+                view.startAnimation();
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
             }
@@ -489,6 +510,7 @@ bool Terrain::selectBasepoints(GlView & view, int nx, int ny, int fx, int fy, bo
                     return true;
                 }
                 m_vertexSelection.insert(c);
+                view.startAnimation();
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
             }
@@ -516,10 +538,19 @@ typedef std::map<int, GroundCoord > BasepointSelection;
 
 void Terrain::dragStart(GlView & view, int x, int y)
 {
-    if (m_model.m_mainWindow.getMode() != MainWindow::VERTEX) {
-        return;
+    if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+        if (selectBasepoints(view, x, y, x + 1, y + 1, true)) {
+            m_validDrag = true;
+            m_dragPoint = WFMath::Vector<3>(0.f, 0.f, 0.f);
+        }
+    } else {
+        if (selectSegments(view, x, y, x + 1, y + 1, true)) {
+            m_validDrag = true;
+            m_dragPoint = WFMath::Vector<3>(0.f, 0.f, 0.f);
+        }
     }
 
+#if 0
     m_vertexSelection.clear();
 
     GLuint selectBuf[32768];
@@ -579,25 +610,45 @@ void Terrain::dragStart(GlView & view, int x, int y)
             }
         }
     }
-
+#endif
 }
 
 void Terrain::dragUpdate(GlView & view, const WFMath::Vector<3> & v)
 {
+    m_dragPoint = v;
+}
+
+void Terrain::alterBasepoint(const GroundCoord & pt, float diff)
+{
+    Mercator::BasePoint ref;
+    if (!m_terrain.getBasePoint(pt.first, pt.second, ref)) {
+        return;
+    }
+    std::cout << "DRAGGED " << pt.first
+              << "," << pt.second
+              << " FROM " << ref.height()
+              << " TO " << ref.height() + diff
+              << std::endl << std::flush;
+    ref.height() += diff; 
+    m_terrain.setBasePoint(pt.first, pt.second, ref);
 }
 
 void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
 {
+    if (!m_validDrag) {
+        return;
+    }
     std::set<GroundCoord> & selection = 
         (m_model.m_mainWindow.getMode() == MainWindow::VERTEX)
         ?  m_vertexSelection : m_selection;
     GroundCoordSet::const_iterator I = selection.begin();
     for(; I != selection.end(); ++I) {
         const GroundCoord & coord = *I;
+#if 0
         Mercator::BasePoint ref;
         if (!m_terrain.getBasePoint(coord.first,
                                             coord.second, ref)) {
-            return;
+            continue;
         }
         std::cout << "DRAGGED " << coord.first
                   << "," << coord.second
@@ -606,7 +657,18 @@ void Terrain::dragEnd(GlView & view, const WFMath::Vector<3> & v)
                   << std::endl << std::flush;
         ref.height() += v.z(); 
         m_terrain.setBasePoint(coord.first, coord.second, ref);
+#endif
+        alterBasepoint(coord, v.z());
+        if (m_model.m_mainWindow.getMode() == MainWindow::VERTEX) {
+            continue;
+        }
+        // FIXME Cause things to get moved more than once.
+        alterBasepoint(GroundCoord(coord.first + 1, coord.second), v.z());
+        alterBasepoint(GroundCoord(coord.first, coord.second + 1), v.z());
+        alterBasepoint(GroundCoord(coord.first + 1, coord.second + 1), v.z());
+
     }
+    m_validDrag = false;
 }
 
 void Terrain::insert(const PosType & curs)

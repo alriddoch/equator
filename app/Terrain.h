@@ -46,6 +46,7 @@ class Terrain : public Layer {
     void heightMapRegion(GlView & view, Mercator::Segment & map);
     void drawRegion(GlView & view, Mercator::Segment & map,
                     const GroundCoord & gc);
+    void alterBasepoint(const GroundCoord &, float);
 
     bool selectSegments(GlView &, int, int, int, int, bool check = false);
     bool selectBasepoints(GlView &, int, int, int, int, bool check = false);
