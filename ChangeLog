@@ -1,5 +1,10 @@
 2001-12-10  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/MainWindow.cpp, app/GlView.cpp:
+	  Made all menus tear off.
+
+2001-12-10  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/BladeMap.cpp, app/BladeMap.h, app/GlView.cpp, app/GlView.h,
 	  app/IsoMap.cpp, app/IsoMap.h, app/Layer.h, app/Texture.cpp,
 	  app/Texture.h:

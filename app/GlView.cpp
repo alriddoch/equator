@@ -34,9 +34,11 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL)
 
     m_popup = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& list_popup = m_popup->items();
+    list_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
 
     Gtk::Menu *menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_popup = menu_sub->items();
+    file_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save"));
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save As..."));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -48,6 +50,7 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL)
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& edit_popup = menu_sub->items();
+    edit_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Undo"));
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Redo"));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -59,6 +62,7 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL)
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& select_popup = menu_sub->items();
+    select_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Invert"));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("All"));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("None"));
@@ -67,10 +71,12 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL)
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& view_popup = menu_sub->items();
+    view_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", '=', slot(this, &GlView::zoomIn)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", '-', slot(this, &GlView::zoomOut)));
     Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& zoom_popup = menu_sub_sub->items();
+    zoom_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("16:1", SigC::bind<float>(slot(this, &GlView::setScale), 16)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("8:1", SigC::bind<float>(slot(this, &GlView::setScale), 8)));
     zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("4:1", SigC::bind<float>(slot(this, &GlView::setScale), 4)));
@@ -96,12 +102,14 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0), m_currentLayer(NULL)
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
+    layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<GlView*>(slot(&m_viewwindow.m_mainwindow, &MainWindow::open_layers),this)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& net_popup = menu_sub->items();
+    net_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     net_popup.push_back(Gtk::Menu_Helpers::MenuElem("Connect.."));
     net_popup.push_back(Gtk::Menu_Helpers::MenuElem("Disconnect..."));
 

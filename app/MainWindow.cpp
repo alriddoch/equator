@@ -11,6 +11,7 @@
 #include <gtk--/main.h>
 #include <gtk--/menu.h>
 #include <gtk--/menuitem.h>
+#include <gtk--/tearoffmenuitem.h>
 #include <gtk--/menubar.h>
 #include <gtk--/button.h>
 #include <gtk--/box.h>
@@ -25,6 +26,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
 
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
+    file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::CTL|'n', slot(this, &MainWindow::new_view)));
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::CTL|'o'));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -33,6 +35,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
 
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
+    dialog_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<GlView*>(slot(this, &MainWindow::open_layers),NULL)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
