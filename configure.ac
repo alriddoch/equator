@@ -1,6 +1,6 @@
 dnl Initialise autoconf
 
-AC_INIT(equator, 0.1.0)
+AC_INIT(equator, 0.1.1)
 AC_CONFIG_SRCDIR([app/equator_plugin.cpp])
 
 dnl Detect the canonical host and target environment

@@ -32,18 +32,18 @@
 
 #include <gtk/gtkwindow.h>
 
-#include "../arrow.xpm"
-#include "../select.xpm"
-#include "../draw.xpm"
-#include "../rotate.xpm"
-#include "../scale.xpm"
-#include "../move.xpm"
-#include "../entity.xpm"
-#include "../vertex.xpm"
+#include "arrow.xpm"
+#include "select.xpm"
+#include "draw.xpm"
+#include "rotate.xpm"
+#include "scale.xpm"
+#include "move.xpm"
+#include "entity.xpm"
+#include "vertex.xpm"
 
-#include "../stock-tool-move-16.xpm"
-#include "../stock-tool-zoom-16.xpm"
-#include "../stock-tool-rotate-16.xpm"
+#include "stock-tool-move-16.xpm"
+#include "stock-tool-zoom-16.xpm"
+#include "stock-tool-rotate-16.xpm"
 
 #include <sigc++/bind.h>
 #include <sigc++/object_slot.h>

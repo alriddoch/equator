@@ -1,5 +1,13 @@
 2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* configure.ac: Increment version to 0.1.1 and release.
+
+2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/LayerWindow.cpp, app/MainWindow.cpp: Include xpms correctly.
+
+2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* Makefile.am: Add more missing xpm to dist.
 
 2005-02-12  Al Riddoch  <ajr@ecs.soton.ac.uk>

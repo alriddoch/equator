@@ -29,13 +29,13 @@
 #include <list>
 #include <sstream>
 
-// #include "../eye.xpm"
-// #include "../null.xpm"
-#include "../newlayer.xpm"
-#include "../raise.xpm"
-#include "../lower.xpm"
-#include "../duplicate.xpm"
-#include "../delete.xpm"
+// #include "eye.xpm"
+// #include "null.xpm"
+#include "newlayer.xpm"
+#include "raise.xpm"
+#include "lower.xpm"
+#include "duplicate.xpm"
+#include "delete.xpm"
 
 LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
                                             m_currentModel(0)
