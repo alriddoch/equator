@@ -46,9 +46,13 @@ AC_LANG_CPLUSPLUS
 AC_REQUIRE_CPP
 
 SDL_VERSION=1.2.0
-AM_PATH_SDL($SDL_VERSION)
-CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
-LIBS="$LIBS $SDL_LIBS"
+AM_PATH_SDL($SDL_VERSION, [
+    CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+    LIBS="$LIBS $SDL_LIBS"
+],
+[
+    AC_MSG_ERROR(Could not find SDL. Please try your distribution vendor, or go to http://www.libsdl.org/ and get at least version $SDL_VERSION)
+])
 
 AC_CHECK_LIB(SDL_image,IMG_Load, [ LIBS="$LIBS -lSDL_image" ],
     AC_MSG_ERROR(Could not find SDL_image library)
