@@ -1,0 +1,78 @@
+dnl Initialise autoconf
+
+AC_INIT(app/equator.cpp)
+AM_CONFIG_HEADER(config.h)
+
+dnl Initialise automake
+
+AM_INIT_AUTOMAKE(equator, 0.0.0)
+
+dnl Need libtool
+
+AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
+
+dnl Test for C++ compiler
+
+AC_PROG_CC
+AC_PROG_CXX
+
+CFLAGS='-Wall -g -I/usr/X11R6/include'
+CXXFLAGS='-Wall -g -I/usr/X11R6/include'
+LIBS='-L/usr/X11R6/lib -L/usr/local/lib -L/opt/forge/lib'
+
+SDL_VERSION=1.2.0
+AM_PATH_SDL($SDL_VERSION)
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+LIBS="$LIBS $SDL_LIBS"
+
+AM_PATH_GTK(1.2.0,,AC_MSG_ERROR([Cannot find proper gtk version]))
+AM_PATH_GTKMM(1.1.7,,AC_MSG_ERROR([Cannot find proper gtk-- version]))
+dnl GTKMM_PROC=`$GTKMM_CONFIG --proc`
+dnl AC_SUBST(GTKMM_PROC)
+CPPFLAGS="$CPPFLAGS $GTKMM_CFLAGS"
+LDFLAGS="$LDFLAGS $GTKMM_LIBS"
+
+ATLAS_VERSION=0.4.3
+AM_PATH_ATLAS($ATLAS_VERSION)
+CFLAGS="$CFLAGS $ATLAS_CFLAGS"
+CPPFLAGS="$CPPFLAGS $ATLAS_CFLAGS"
+CXXFLAGS="$CXXFLAGS $ATLAS_CFLAGS"
+LIBS="$LIBS $ATLAS_LIBS"
+
+AC_CHECK_LIB(SDL_image,IMG_Load)
+AC_CHECK_LIB(GL,glViewport)
+AC_CHECK_LIB(GLU,gluPerspective)
+
+LIBXML_CHECK
+CPPFLAGS="$CPPFLAGS $LIBXML_CFLAGS"
+CXXFLAGS="$CXXFLAGS $LIBXML_CFLAGS"
+LIBS="$LIBS $LIBXML_LIBS"
+
+AM_PATH_SIGC(1.0.2,,AC_MSG_ERROR(Couldn't find libsigc++))
+CPPFLAGS="$CPPFLAGS $SIGC_CFLAGS"
+LDFLAGS="$LDFLAGS $SIGC_LIBS"
+
+AC_LANG_CPLUSPLUS
+AC_REQUIRE_CPP
+
+AC_CHECK_LIB(coal,main)
+AC_CHECK_LIB(coalblade,main)
+AC_CHECK_LIB(coaliso,main)
+AC_CHECK_LIB(skstream,main)
+AC_CHECK_LIB(cal3d,main)
+AC_CHECK_LIB(Demeter,main)
+AC_CHECK_LIB(ccxx,main)
+AC_CHECK_LIB(ccstd,main)
+AC_CHECK_LIB(ccio,main)
+AC_CHECK_LIB(gtkgl,main)
+AC_CHECK_LIB(gtkglmm,main)
+dnl AC_CHECK_LIB(cyphesis,main)
+
+dnl Generate files
+AC_OUTPUT([
+	Makefile
+	app/Makefile
+])

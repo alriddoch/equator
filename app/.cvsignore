@@ -1,0 +1,5 @@
+.deps
+equator
+.libs
+Makefile
+Makefile.in
