@@ -64,6 +64,7 @@ class Server : public SigC::Object {
 
   public:
     explicit Server(MainWindow &, const std::string &);
+    ~Server();
 
     MainWindow & m_mainWindow;
     Renderer & m_renderer;

@@ -59,6 +59,10 @@ Server::Server(MainWindow & mw, const std::string & name) :
 {
 }
 
+Server::~Server()
+{
+}
+
 void Server::lobbyTalk(Eris::Room *r, const std::string & nm,
                                       const std::string & t)
 {
