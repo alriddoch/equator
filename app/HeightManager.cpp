@@ -327,8 +327,8 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
     int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
     gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
 
-    view.setPickProjection(); // Sets the projection, sets up names
-                                  // and sets up the modelview
+    // Sets the projection, sets up names and sets up the modelview
+    view.setPickProjection(nx, ny, fx, fy);
 
     int nameCount = 0;
     std::map<int, GroundCoord> nameDict;
@@ -378,11 +378,26 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
     std::cout << std::endl << std::flush;
 }
 
+typedef std::map<int, std::pair<int, int> > BasepointSelection;
+
+void HeightManager::dragStart(GlView & view, int x, int y)
+{
+}
+
+void HeightManager::dragUpdate(GlView & view, float x, float y, float z)
+{
+}
+
+void HeightManager::dragEnd(GlView & view, float x, float y, float z)
+{
+}
+
 void HeightManager::insert(const WFMath::Point<3> & curs)
 {
     int posx = round(curs.x() / segSize);
     int posy = round(curs.y() / segSize);
-    std::cout << "Setting height at " << posx << "," << posy << " to " << curs.z()
+    std::cout << "Setting height at " << posx << "," << posy
+              << " to " << curs.z()
               << std::endl << std::flush;
     m_model.m_terrain.setBasePoint(posx,     posy,     curs.z());
     for(int i = posx - 2; i < posx + 2; ++i) {

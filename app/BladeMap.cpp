@@ -175,20 +175,9 @@ bool BladeMap::selectMap(GlView & view, Coal::Container & map_base,
     GLuint selectBuf[32768];
 
     glSelectBuffer(32768,selectBuf);
-    glRenderMode(GL_SELECT);
 
-    glMatrixMode(GL_PROJECTION);
-    // glPushMatrix();
-    glLoadIdentity();
-
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    gluPickMatrix(nx, ny, fx - nx, fy - ny, viewport);
-
-    view.setPickProjection(); // Sets the projection, sets up names
-                                  // and sets up the modelview
-
-    glTranslatef(m_xoff, m_yoff, m_zoff);
+    // Sets the projection, sets up names and sets up the modelview
+    view.setPickProjection(nx, ny, fx, fy);
 
     int nameCount = 0;
     std::map<int, Coal::Component *> nameDict;

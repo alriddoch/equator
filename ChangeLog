@@ -1,3 +1,10 @@
+2003-02-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/GlView.cpp, app/GlView.h,
+	  app/HeightManager.cpp, app/HeightManager.h,
+	  app/IsoMap.cpp, app/ServerEntities.cpp: Move common picking
+	  code into the GlView class.
+
 2003-02-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp: Improve performance of arrows by locking.

@@ -512,24 +512,9 @@ bool ServerEntities::selectEntities(GlView & view,
     GLuint selectBuf[32768];
 
     glSelectBuffer(32768,selectBuf);
-    glRenderMode(GL_SELECT);
 
-    glMatrixMode(GL_PROJECTION);
-    // glPushMatrix();
-    glLoadIdentity();
-
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    int sWidth = abs(fx - nx);
-    int sHeight = abs(fy - ny);
-    int sXCentre = (fx > nx) ? (nx + sWidth / 2) : (fx + sWidth / 2);
-    int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
-    std::cout << "PICK: " << sXCentre << ":" << sYCentre << ":"
-              << sWidth << ":" << sHeight << std::endl << std::flush;
-    gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
-
-    view.setPickProjection(); // Sets the projection, sets up names
-                              // and sets up the modelview
+    // Sets the projection, sets up names and sets up the modelview
+    view.setPickProjection(nx, ny, fx, fy);
 
     m_nameCount = 0;
     m_nameDict.clear();

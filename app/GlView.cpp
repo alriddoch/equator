@@ -868,8 +868,23 @@ void GlView::redraw()
     drawgl();
 }
 
-void GlView::setPickProjection()
+void GlView::setPickProjection(int nx, int ny, int fx, int fy)
 {
+    glRenderMode(GL_SELECT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    int sWidth = abs(fx - nx);
+    int sHeight = abs(fy - ny);
+    int sXCentre = (fx > nx) ? (nx + sWidth / 2) : (fx + sWidth / 2);
+    int sYCentre = (fy > ny) ? (ny + sHeight / 2) : (fy + sHeight / 2);
+    std::cout << "PICK: " << sXCentre << ":" << sYCentre << ":"
+              << sWidth << ":" << sHeight << std::endl << std::flush;
+    gluPickMatrix(sXCentre, sYCentre, sWidth, sHeight, viewport);
+
     if (m_projection == GlView::PERSP) {
         if (get_width()>get_height()) {
             GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();

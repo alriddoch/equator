@@ -147,7 +147,7 @@ class GlView : public Gtk::DrawingArea {
 
     const std::string details() const;
 
-    void setPickProjection();
+    void setPickProjection(int nx, int ny, int fx, int fy);
     void getViewOffset(float & h, float & v, float & d);
     void setViewOffset(float h, float v, float d);
     float getViewSize();
