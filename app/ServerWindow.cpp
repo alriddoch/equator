@@ -140,6 +140,7 @@ void ServerWindow::typesPressed()
         TypeTree * tw = new TypeTree(*selServer);
         (new DockWindow(*tw))->show_all();
         m_typeTrees[selServer] = tw;
+        tw->populate();
     } else {
         I->second->getDock()->show_all();
     }

@@ -6,6 +6,9 @@
 
 #include "app/Server.h"
 
+#include <Eris/Connection.h>
+#include <Eris/TypeInfo.h>
+
 #include <gtkmm/box.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/label.h>
@@ -29,8 +32,10 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
 
     m_columns = new Gtk::TreeModelColumnRecord();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
+    m_objTypeColumn = new Gtk::TreeModelColumn<Glib::ustring>();
     m_ptrColumn = new Gtk::TreeModelColumn<Eris::TypeInfo *>();
     m_columns->add(*m_nameColumn);
+    m_columns->add(*m_objTypeColumn);
     m_columns->add(*m_ptrColumn);
 
     m_treeModel = Gtk::TreeStore::create(*m_columns);
@@ -40,6 +45,7 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
     m_treeView->set_model( m_treeModel );
 
     m_treeView->append_column("Typename", *m_nameColumn);
+    m_treeView->append_column("Objtype", *m_objTypeColumn);
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -61,4 +67,35 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
     vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
 
     signal_delete_event().connect(SigC::slot(*this, &TypeTree::deleteEvent));
+}
+
+void TypeTree::insertType(Eris::TypeInfo * const ti)
+{
+    assert(ti != 0);
+
+    Gtk::TreeModel::Row row = *(m_treeModel->append());
+
+    row[*m_nameColumn] = Glib::ustring(ti->getName());
+    row[*m_objTypeColumn] = Glib::ustring(ti->getName());
+    row[*m_ptrColumn] = ti;
+
+    const Eris::TypeInfoSet & children = ti->getChildren();
+    Eris::TypeInfoSet::const_iterator I = children.begin();
+    Eris::TypeInfoSet::const_iterator Iend = children.end();
+    for (; I != Iend; ++I) {
+        insertType(*I);
+    }
+}
+
+void TypeTree::populate()
+{
+    Eris::TypeService * ts = m_server.m_connection.getTypeService();
+
+    assert(ts != 0);
+
+    Eris::TypeInfo * ti = ts->findTypeByName("root");
+    if (ti == 0) {
+        std::cout << "No types" << std::endl << std::flush;
+    }
+    insertType(ti);
 }
