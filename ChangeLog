@@ -1,3 +1,11 @@
+2002-04-26  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/BladeMap.cpp, app/IsoMap.cpp: Modify coal calls to use new
+	  lower case method names.
+
+	* app/GlView.cpp: Disable accumulation buffer animation hack
+	  until an alternative can be found that performs better.
+
 2002-04-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/BladeMap.h, app/IsoMap.cpp, app/IsoMap.h:

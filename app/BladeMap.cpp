@@ -22,13 +22,13 @@ using std::cout;
 
 void BladeMap::drawMapRegion(Coal::Landscape & map_region)
 {
-    std::cout << "Drawing... " << map_region.GetID() << std::endl << std::flush;
-    Coal::Shape * cs = map_region.GetShape();
+    std::cout << "Drawing... " << map_region.getID() << std::endl << std::flush;
+    Coal::Shape * cs = map_region.getShape();
     if (cs == NULL) {
         std::cout << "no shape" << std::endl << std::flush;
         return;
     }
-    Coal::Graphic * cg = map_region.GetGraphic();
+    Coal::Graphic * cg = map_region.getGraphic();
     int tex_id = -1;
     if (cg == NULL) {
         std::cout << "no graphic" << std::endl << std::flush;
@@ -69,14 +69,14 @@ void BladeMap::drawMapRegion(Coal::Landscape & map_region)
             glColor3f(1.0, 0.0, 1.0);
         }
         glNormal3f(0, 0, 1);
-        glTexCoord2f(crs->GetLeft() / 16.0f, crs->GetTop() / 16.0f);
-        glVertex3f(crs->GetLeft(), crs->GetTop(), 0.0f);
-        glTexCoord2f(crs->GetLeft() / 16.0f, crs->GetBottom() / 16.0f);
-        glVertex3f(crs->GetLeft(), crs->GetBottom(), 0.0f);
-        glTexCoord2f(crs->GetRight() / 16.0f, crs->GetBottom() / 16.0f);
-        glVertex3f(crs->GetRight(), crs->GetBottom(), 0.0f);
-        glTexCoord2f(crs->GetRight() / 16.0f, crs->GetTop() / 16.0f);
-        glVertex3f(crs->GetRight(), crs->GetTop(), 0.0f);
+        glTexCoord2f(crs->getLeft() / 16.0f, crs->getTop() / 16.0f);
+        glVertex3f(crs->getLeft(), crs->getTop(), 0.0f);
+        glTexCoord2f(crs->getLeft() / 16.0f, crs->getBottom() / 16.0f);
+        glVertex3f(crs->getLeft(), crs->getBottom(), 0.0f);
+        glTexCoord2f(crs->getRight() / 16.0f, crs->getBottom() / 16.0f);
+        glVertex3f(crs->getRight(), crs->getBottom(), 0.0f);
+        glTexCoord2f(crs->getRight() / 16.0f, crs->getTop() / 16.0f);
+        glVertex3f(crs->getRight(), crs->getTop(), 0.0f);
         glEnd();
         if (tex_id != -1) {
             glDisable(GL_TEXTURE_2D);
@@ -85,7 +85,7 @@ void BladeMap::drawMapRegion(Coal::Landscape & map_region)
     }
 #if 0
     int tex_id = -1;
-    Coal::Fill * fill = map_region.GetFill();
+    Coal::Fill * fill = map_region.getFill();
     if (fill != NULL) {
         if ((fill->graphic != NULL) && (fill->graphic->filename.size() != 0)) {
             tex_id = Texture::get(fill->graphic->filename);
@@ -108,11 +108,11 @@ void BladeMap::drawMapRegion(Coal::Landscape & map_region)
     }
     glNormal3f(0, 0, 1);
     Coal::Shape & shape = map_region;
-    for (unsigned int i = 0; i < shape.GetCoordCount (); i++) {
-        const Coal::Coord & coord = shape.GetCoord(i);
-        float x = coord.GetX();
-        float y = coord.GetY();
-        float z = coord.GetZ();
+    for (unsigned int i = 0; i < shape.getCoordCount (); i++) {
+        const Coal::Coord & coord = shape.getCoord(i);
+        float x = coord.getX();
+        float y = coord.getY();
+        float z = coord.getZ();
         //std::cout << "[" << x << "," << y << "z" << z << std::endl
                   //<< std::flush;
         glTexCoord2f(x/16, y/16); glVertex3f(x, y, z);
@@ -153,7 +153,7 @@ void BladeMap::drawMap(Coal::Container & map_base)
     //glDepthMask(GL_TRUE);
     //glEnable(GL_DEPTH_TEST);
 #else
-    const std::vector<Coal::Component *> contents = map_base.GetChildren();
+    const std::vector<Coal::Component *> contents = map_base.getChildren();
     std::vector<Coal::Component *>::const_iterator I = contents.begin();
     for(; I != contents.end(); ++I) {
         // CoalComponent * c = I->Current();
@@ -162,7 +162,7 @@ void BladeMap::drawMap(Coal::Container & map_base)
             std::cout << "GOT ONE" << std::endl << std::flush;
             drawMapRegion(*l);
         } else {
-            std::cout << "NOT DRAWING " << (*I)->GetID() << std::endl << std::flush;
+            std::cout << "NOT DRAWING " << (*I)->getID() << std::endl << std::flush;
         }
     }
 #endif
@@ -195,8 +195,8 @@ bool BladeMap::selectMap(GlView & view, Coal::Container & map_base,
 
     glPushName(nameCount);
 
-    Coal::Iterator * I = map_base.GetIterator();
-    for(I->First(); !I->IsLast(); I->Next()) {
+    Coal::Iterator * I = map_base.getIterator();
+    for(I->first(); !I->isLast(); I->next()) {
 #if 0
         CoalRegion * region = (CoalRegion*)map_base.GetRegion(i);
         if (region == NULL) { continue; }
@@ -264,7 +264,7 @@ void BladeMap::load(Gtk::FileSelection * fsel)
     Coal::BladeLoader loader;
 
     std::string filename = fsel->get_filename();
-    loader.LoadMap(filename.c_str(), &m_database);
+    loader.loadMap(filename.c_str(), &m_database);
     size_t i = filename.find_last_of('/');
     if (i == 0) {
         m_name = filename;

@@ -197,7 +197,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
 
     // list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Float 3"));
 
-    Gtk::Main::timeout.connect(slot(this, &GlView::animate), 100);
+    // Gtk::Main::timeout.connect(slot(this, &GlView::animate), 100);
 
     m_popup->accelerate(m_viewWindow);
 

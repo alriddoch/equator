@@ -28,12 +28,12 @@ class Palette;
 void IsoMap::buildTileMap(Coal::Container & map_base)
 {
     m_tileMap = new TileMap();
-    const std::vector<Coal::Component*> & contents = map_base.GetChildren();
+    const std::vector<Coal::Component*> & contents = map_base.getChildren();
     std::vector<Coal::Component*>::const_iterator I = contents.begin();
     for (; I != contents.end(); ++I) {
         Coal::MapTile * tile = dynamic_cast<Coal::MapTile*>(*I);
         if (tile == NULL) { continue; }
-        Coal::Graphic * fill = tile->GetGraphic();
+        Coal::Graphic * fill = tile->getGraphic();
         if ((fill == NULL) || fill->filename.empty()) {
             continue;
         }
@@ -41,7 +41,7 @@ void IsoMap::buildTileMap(Coal::Container & map_base)
         if (tileImage == NULL) {
             continue;
         }
-        Coal::Coord coord = tile->GetAnchor();
+        Coal::Coord coord = tile->getAnchor();
         float bx = coord.x;
         float by = coord.y;
         m_tileMap->add((int)bx, (int)by, tileImage);
@@ -189,7 +189,7 @@ void IsoMap::load(Gtk::FileSelection * fsel)
     Coal::IsoLoader loader;
 
     std::string filename = fsel->get_filename();
-    loader.LoadMap(filename.c_str(), &m_database);
+    loader.loadMap(filename.c_str(), &m_database);
     size_t i = filename.find_last_of('/');
     if (i == 0) {
         m_name = filename;
