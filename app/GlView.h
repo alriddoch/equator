@@ -10,7 +10,8 @@
 
 #include <gtkglmm.h>
 
-#include <list>
+#include <map>
+#include <set>
 
 class Layer;
 class ViewWindow;
@@ -21,7 +22,7 @@ class GlView : public Gtk::DrawingArea {
   public:
     typedef enum view { ORTHO, PERSP } projection_t;
     typedef enum drag { NONE, SELECT, MOVE, PAN } drag_t;
-    typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT } rmode_t;
+    typedef enum render { LINE, SOLID, SHADED, TEXTURE, SHADETEXT, DEFAULT } rmode_t;
   private:
     Gtk::Menu * m_popup;
     const int m_viewNo;
@@ -40,6 +41,9 @@ class GlView : public Gtk::DrawingArea {
     projection_t m_projection;
     drag_t m_dragType;
     rmode_t m_renderMode;
+
+    std::map<std::string, rmode_t> m_renderModes;
+    std::set<std::string> m_hiddenLayers;
 
     void setOrthographic();
     void setPerspective();
@@ -113,7 +117,7 @@ class GlView : public Gtk::DrawingArea {
         m_zoff = z;
     }
 
-    enum render getRenderMode() const {
+    rmode_t getDefaultRenderMode() const {
         return m_renderMode;
     }
 
@@ -125,8 +129,20 @@ class GlView : public Gtk::DrawingArea {
         return m_animCount;
     }
 
-    void setRenderMode(enum render m) {
+    void setRenderMode(rmode_t m) {
         m_renderMode = m;
+    }
+
+    const std::set<std::string> & getHiddenLayers() const {
+        return m_hiddenLayers;
+    }
+    
+    void hideLayer(const std::string & l) {
+        m_hiddenLayers.insert(l);
+    }
+
+    void showLayer(const std::string & l) {
+        m_hiddenLayers.erase(l);
     }
 
     const std::string details() const;
@@ -135,6 +151,8 @@ class GlView : public Gtk::DrawingArea {
     void getViewOffset(float & h, float & v, float & d);
     void setViewOffset(float h, float v, float d);
     float getViewSize();
+    rmode_t getRenderMode(const std::string & layer) const;
+    void setLayerRenderMode(rmode_t m);
     void redraw();
 
     const float getZ(int x, int y) const;

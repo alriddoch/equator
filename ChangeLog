@@ -1,3 +1,9 @@
+2003-02-17  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/GlView.h, app/HeightManager.cpp,
+	  app/ServerEntities.cpp: Add per-layer rendering options
+	  overrides, and start to look at per view layer visibility.
+
 2003-02-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/MainWindow.cpp, app/LayerWindow.cpp: Add tooltips, and stop

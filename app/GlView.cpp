@@ -195,13 +195,13 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
                          "Perspective", slot(*this, &GlView::setPerspective)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     Gtk::RadioMenuItem::Group render_group;
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Line", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),LINE)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Solid", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SOLID)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Line", SigC::bind<rmode_t>(slot(*this, &GlView::setRenderMode),LINE)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Solid", SigC::bind<rmode_t>(slot(*this, &GlView::setRenderMode),SOLID)));
     static_cast<Gtk::RadioMenuItem*>(&view_popup.back())->set_active();
     m_renderMode = GlView::SOLID;
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Shaded", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SHADED)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),TEXTURE)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SHADETEXT)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Shaded", SigC::bind<rmode_t>(slot(*this, &GlView::setRenderMode),SHADED)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<rmode_t>(slot(*this, &GlView::setRenderMode),TEXTURE)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<rmode_t>(slot(*this, &GlView::setRenderMode),SHADETEXT)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& face_popup = menu_sub_sub->items();
@@ -223,6 +223,18 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
     layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
     layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(m_mainWindow, &MainWindow::openLayers)));
+
+    menu_sub_sub = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& current_layer_popup = menu_sub_sub->items();
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Default", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),DEFAULT)));
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Line", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),LINE)));
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Solid", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),SOLID)));
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Shaded", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),SHADED)));
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Textured", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),TEXTURE)));
+    current_layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Lit", SigC::bind<rmode_t>(slot(*this, &GlView::setLayerRenderMode),SHADETEXT)));
+
+    layer_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Current Layer", *menu_sub_sub));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
@@ -337,7 +349,7 @@ bool GlView::extensionsInitialised = 0;
 
 void GlView::initExtensions()
 {
-    if (Gdk::GL::Query::gl_extension("GL_EXT_compiled_vertex_array")) {
+    if (Gdk::GL::query_gl_extension("GL_EXT_compiled_vertex_array")) {
         std::cout << "GL EXTENSION GL_EXT_compiled_vertex_array"
             << std::endl << std::flush;
 #ifndef GL_EXT_compiled_vertex_array
@@ -918,6 +930,28 @@ float GlView::getViewSize()
     float winsize = std::sqrt((float)(get_width() * get_width() + get_height() * get_height()));
 
     return (winsize / (40.0f * getScale()) + 1);
+}
+
+GlView::rmode_t GlView::getRenderMode(const std::string & layer) const
+{
+    std::map<std::string,rmode_t>::const_iterator I = m_renderModes.find(layer);
+    if (I == m_renderModes.end()) {
+        return getDefaultRenderMode();
+    } else {
+        return I->second;
+    }
+}
+
+void GlView::setLayerRenderMode(rmode_t m)
+{
+    Layer * l = m_model.getCurrentLayer();
+    if (0 != l) {
+        if (GlView::DEFAULT == m) {
+            m_renderModes.erase(l->getName());
+        } else {
+            m_renderModes[l->getName()] = m;
+        }
+    }
 }
 
 const float GlView::getZ(int x, int y) const

@@ -146,7 +146,7 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
     if (have_GL_EXT_compiled_vertex_array) {
         glLockArraysEXT(0, segSize * segSize);
     }
-    if (view.getRenderMode() == GlView::LINE) {
+    if (view.getRenderMode(m_name) == GlView::LINE) {
         glDrawElements(GL_LINE_STRIP, m_numLineIndeces,
                        GL_UNSIGNED_INT, m_lineIndeces);
     } else {

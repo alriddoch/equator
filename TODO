@@ -1,3 +1,6 @@
+Re-work rendering options so that they work per-layer. This also applies to visibility
+of layers, and probably layer order should be removed.
+
 Sort out the ui bugs.
 
 Add doted line to insert cursor to show its height.
