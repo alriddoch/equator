@@ -224,12 +224,8 @@ void MainWindow::open_option()
     Gtk::FileFilter filter_cfg;
     filter_cfg.set_name("Cal3d files");
     filter_cfg.add_pattern("*.cfg");
+    filter_cfg.add_pattern("*.cal");
     fc.add_filter(filter_cfg);
-
-    Gtk::FileFilter filter_cal;
-    filter_cal.set_name("Sear Cal3d files");
-    filter_cal.add_pattern("*.cal");
-    fc.add_filter(filter_cal);
 
     int result = fc.run();
 
