@@ -1,5 +1,13 @@
 2005-01-31  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* stock-tool-move-16.xpm, stock-tool-rotate-16.xpm,
+	  stock-tool-zoom-16.xpm: Improve alpha thresholding on tool icons.
+
+	* app/GlView.h: Fix getLogScale() accessor so it now access the
+	  right value. Zoom tool now works.
+
+2005-01-31  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/GlView.cpp, app/GlView.h: Implement controlling the view using
 	  the middle button and the three new tool buttons.
 

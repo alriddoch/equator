@@ -138,7 +138,7 @@ class GlView : public Gtk::DrawingArea {
     }
 
     float getLogScale() const {
-        return m_xAdj.get_value();
+        return m_scaleAdj.get_value();
     }
 
     float getXoff() const {
