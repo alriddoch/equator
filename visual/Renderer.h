@@ -11,6 +11,12 @@ class Renderer {
   public:
     Renderer() { }
 
+    void fogOn() { }
+    void fogOff() { }
+
+    void lightOn() { }
+    void lightOff() { }
+
     SigC::Signal1<void, float> Update;
 };
 

@@ -361,6 +361,7 @@ void GlView::drawgl()
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glTexCoordPointer(1, GL_FLOAT, 0, texcoords);
         glDrawArrays(GL_LINES, 0, 2);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisable(GL_TEXTURE_1D);
         face();
         cursor();
@@ -380,6 +381,7 @@ void GlView::drawgl()
         glLoadIdentity();
         glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
         if ((clickx != 0) && (m_dragType == GlView::SELECT)) {
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTranslatef(clickx, get_height() - clicky, 100.0f);
             float x = mousex - clickx;
             float y = clicky - mousey;
@@ -404,8 +406,8 @@ void GlView::drawgl()
                 glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
                 glDrawArrays(GL_LINE_STRIP, 0, 5);
             }
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glFlush();
         swap_buffers();
     }

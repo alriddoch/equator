@@ -1,5 +1,14 @@
 2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* visual/Renderer.h: Add null functions for apogee code that likes
+	  to be able to turn fogging on and off.
+
+	* app/GlView.cpp: More tightly manage Texture coord array client
+	  state, so its not left on when the main bulk of the rendering
+	  is done.
+
+2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.cpp: Use new GameView layer.
 
 2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
