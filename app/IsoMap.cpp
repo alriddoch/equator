@@ -5,6 +5,7 @@
 #include "IsoMap.h"
 #include "Texture.h"
 #include "GlView.h"
+#include "Model.h"
 
 #include <coal/database.h>
 #include <coal/isoloader.h>
@@ -100,7 +101,7 @@ void IsoMap::drawMap(CoalDatabase & map_base)
 
 }
 
-bool IsoMap::selectMap(CoalDatabase & map_base,
+bool IsoMap::selectMap(GlView & view, CoalDatabase & map_base,
                        int nx, int ny, int fx, int fy,
                        bool check)
 {
@@ -118,7 +119,7 @@ bool IsoMap::selectMap(CoalDatabase & map_base,
     std::cout << "PICK " << nx << " " << ny << " " << fx - nx << " " << fy - ny << std::endl << std::flush;
     gluPickMatrix(nx, ny, fx - nx, fy - ny, viewport);
 
-    m_window.setPickProjection(); // Sets the projection, sets up names
+    view.setPickProjection(); // Sets the projection, sets up names
                                   // and sets up the modelview
 
     glTranslatef(m_xoff, m_yoff, m_zoff);
@@ -205,6 +206,8 @@ void IsoMap::load(Gtk::FileSelection * fsel)
  
 
     delete fsel;
+
+    m_model.updated.emit();
 }
 
 void IsoMap::cancel(Gtk::FileSelection * fsel)
@@ -212,7 +215,7 @@ void IsoMap::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-IsoMap::IsoMap(GlView & window) : Layer(window, "map", "IsoMap"),
+IsoMap::IsoMap(Model & model) : Layer(model, "map", "IsoMap"),
                                         m_database(*new CoalDatabase()),
                                         m_validDrag(false)
 {
@@ -226,7 +229,7 @@ void IsoMap::importFile()
     fsel->show();
 }
 
-void IsoMap::draw()
+void IsoMap::draw(GlView &)
 {
     glPushMatrix();
     glTranslatef(m_xoff, m_yoff, m_zoff);
@@ -234,19 +237,19 @@ void IsoMap::draw()
     glPopMatrix();
 }
 
-void IsoMap::select(int x, int y)
+void IsoMap::select(GlView & view, int x, int y)
 {
-    select(x, y, x + 1, y + 1);
+    select(view, x, y, x + 1, y + 1);
 }
 
-void IsoMap::select(int nx, int ny, int fx, int fy)
+void IsoMap::select(GlView & view, int nx, int ny, int fx, int fy)
 {
-    selectMap(m_database, nx, ny, fx, fy);
+    selectMap(view, m_database, nx, ny, fx, fy);
 }
 
-void IsoMap::dragStart(int x, int y)
+void IsoMap::dragStart(GlView & view, int x, int y)
 {
-    if (selectMap(m_database, x, y, x+1, y+1, true)) {
+    if (selectMap(view, m_database, x, y, x+1, y+1, true)) {
         m_validDrag = true;
         if (m_selection.empty()) {
             std::cout << "Moving whole layer" << std::endl << std::flush;
@@ -261,11 +264,11 @@ void IsoMap::dragStart(int x, int y)
     }
 }
 
-void IsoMap::dragUpdate(float x, float y, float z)
+void IsoMap::dragUpdate(GlView & ,float x, float y, float z)
 {
 }
 
-void IsoMap::dragEnd(float x, float y, float z)
+void IsoMap::dragEnd(GlView &, float x, float y, float z)
 {
     if (m_validDrag) {
         if (m_selection.empty()) {
@@ -276,6 +279,7 @@ void IsoMap::dragEnd(float x, float y, float z)
             // FIXME move the current selection
         }
         m_validDrag = false;
+        m_model.updated.emit();
     }
 }
 

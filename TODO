@@ -1,9 +1,6 @@
-GlView is currently a total mess, half way to making a generic way of handling
-all the mouse interactions. Need to generalise the drag calculating code
-and then make sure things are correctly passed through to the layers for
-processing. Drag code now generalised, and depth reading now works. Need
-to make sure depth is not recalculated when finishing drag, as result can
-be spurious at best.
+Last remaining problem with drag code is that reading depth fails on all
+layers except the Holo layer, which means that correct tracking only
+works in Ortho mode.
 
 Add to the gimp interface.
 

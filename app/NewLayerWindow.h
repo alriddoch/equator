@@ -10,18 +10,19 @@
 
 class Layer;
 class GlView;
+class Model;
 
 class LayerFactory {
   public:
-    virtual Layer * newLayer(GlView &) = 0;
+    virtual Layer * newLayer(Model &) = 0;
 
     static std::map<std::string, LayerFactory *> factories;
-    static Layer * newLayer(const std::string & type, GlView & v) {
+    static Layer * newLayer(const std::string & type, Model & m) {
         std::map<std::string, LayerFactory *>::const_iterator I = factories.find(type);
         if (I == factories.end()) {
             return NULL;
         }
-        return I->second->newLayer(v);
+        return I->second->newLayer(m);
     }
 };
 
@@ -29,7 +30,7 @@ template <typename T>
 class LayerPlant : public LayerFactory {
   public:
     LayerPlant() { }
-    Layer * newLayer(GlView & v) { return new T(v); }
+    Layer * newLayer(Model & m) { return new T(m); }
 };
 
 #include <gtk--/window.h>
@@ -39,11 +40,11 @@ class NewLayerWindow : public Gtk::Window
 {
   private:
     Gtk::List * m_list;
-    GlView * m_currentView;
+    Model * m_currentModel;
   public:
     NewLayerWindow();
 
-    void doshow(GlView * view);
+    void doshow(Model * view);
 
     void okay();
     void cancel();

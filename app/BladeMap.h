@@ -26,18 +26,18 @@ class BladeMap : public Layer {
     void drawMapRegion(CoalRegion & map_region);
     void drawMapObject(CoalObject & map_object);
     void drawMap(CoalDatabase & map_base);
-    bool selectMap(CoalDatabase & map_base,int,int,int,int, bool check = false);
+    bool selectMap(GlView &, CoalDatabase & map_base,int,int,int,int, bool check = false);
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
   public:
-    explicit BladeMap(GlView &);
+    explicit BladeMap(Model &);
     void importFile();
-    void draw();
-    void select(int x, int y);
-    void select(int x, int y, int w, int h);
-    void dragStart(int x, int y);
-    void dragUpdate(float x, float y, float z);
-    void dragEnd(float x, float y, float z);
+    void draw(GlView & view);
+    void select(GlView & view, int x, int y);
+    void select(GlView & view, int x, int y, int w, int h);
+    void dragStart(GlView & view, int x, int y);
+    void dragUpdate(GlView & view, float x, float y, float z);
+    void dragEnd(GlView & view, float x, float y, float z);
 };
 
 #endif // EQUATOR_APP_BLADEMAP_H

@@ -2,16 +2,20 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
-#ifndef EQUATOR_APP_NEWLAYERWINDOW_H
-#define EQUATOR_APP_NEWLAYERWINDOW_H
+#ifndef EQUATOR_APP_NEWSERVERWINDOW_H
+#define EQUATOR_APP_NEWSERVERWINDOW_H
 
 #include <gtk--/window.h>
 #include <gtk--/list.h>
 
-class NewLayerWindow : public Gtk::Window
+class MainWindow;
+
+class NewServerWindow : public Gtk::Window
 {
+  private:
+    MainWindow & m_mainWindow;
   public:
-    NewLayerWindow();
+    NewServerWindow(MainWindow & m);
 
     void doshow();
 
@@ -19,4 +23,4 @@ class NewLayerWindow : public Gtk::Window
     void cancel();
 };
 
-#endif // EQUATOR_APP_NEWLAYERWINDOW_H
+#endif // EQUATOR_APP_NEWSERVERWINDOW_H

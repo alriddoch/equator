@@ -77,6 +77,8 @@ int main(int argc, char ** argv)
     int type = gimp_main (argc, argv);
 
     if (type == 1) { // We are not being invoked as a plugin
+        std::cout << "Dropping back to running as an application instead"
+                  << std::endl << std::flush;
         MainWindow * window = new MainWindow();
 
         window->set_title("Equator");

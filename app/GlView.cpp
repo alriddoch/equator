@@ -3,6 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "GlView.h"
+#include "Model.h"
 #include "MainWindow.h"
 #include "ViewWindow.h"
 #include "Holo.h"
@@ -20,21 +21,26 @@
 
 static const bool pretty = false;
 
-GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
-                               m_currentLayer(NULL),
+GlView::GlView(ViewWindow&w, Model&m) : m_popup(NULL),
+                               m_viewNo(m.getViewNo()),
+                               m_scale(1.0),
+                               // m_currentLayer(NULL),
                                m_xoff(0), m_yoff(0), m_zoff(0),
                                clickx(0), clicky(0),
                                dragx(0.0), dragy(0.0), dragz(0.0),
                                m_dragType(NONE),
-                               m_viewwindow(w)
+                               m_viewwindow(w),
+                               m_model(m)
 {
+    m.updated.connect(slot(this, &GlView::redraw));
+
     set_events(GDK_POINTER_MOTION_MASK|
                GDK_EXPOSURE_MASK|
                GDK_BUTTON_PRESS_MASK|
                GDK_BUTTON_RELEASE_MASK);
 
-    m_currentLayer = new Holo(*this);
-    m_layers.push_front( m_currentLayer );
+    // m_currentLayer = new Holo(*this);
+    // m_layers.push_front( m_currentLayer );
 
     m_popup = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& list_popup = m_popup->items();
@@ -46,7 +52,7 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save"));
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save As..."));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", slot(this, &GlView::importFile)));
+    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", SigC::slot(&m_model, &Model::importFile)));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Close"));
 
@@ -99,13 +105,15 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
     m_projection = GlView::ORTHO;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
                          "Perspective", slot(this, &GlView::setPerspective)));
+    view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("New View", SigC::bind<Model*>(slot(&m_viewwindow.m_mainwindow, &MainWindow::newView),&m_model)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("View",*menu_sub));
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
     layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<GlView*>(slot(&m_viewwindow.m_mainwindow, &MainWindow::open_layers),this)));
+    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<Model*>(slot(&m_viewwindow.m_mainwindow, &MainWindow::open_layers),&m_model)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
@@ -221,9 +229,10 @@ void GlView::drawgl()
     if (make_current()) {
         origin();
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
-        for(I = m_layers.begin(); I != m_layers.end(); I++) {
-            (*I)->draw();
+        for(I = layers.begin(); I != layers.end(); I++) {
+            (*I)->draw(*this);
         }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -277,19 +286,12 @@ void GlView::drawgl()
     swap_buffers();
 }
 
-void GlView::importFile()
-{
-    if (m_currentLayer != NULL) {
-        m_currentLayer->importFile();
-    }
-}
-
 void GlView::clickOn(int x, int y)
 {
     switch (m_viewwindow.m_mainwindow.getTool()) {
         case MainWindow::SELECT:
             if (make_current()) {
-                m_currentLayer->select(mousex, height() - mousey);
+                m_model.getCurrentLayer()->select(*this, mousex, height() - mousey);
             }
             break;
         case MainWindow::AREA:
@@ -298,7 +300,7 @@ void GlView::clickOn(int x, int y)
             break;
         case MainWindow::MOVE:
             //clickx = x; clicky = y;
-            m_currentLayer->dragStart(x, height() - y);
+            m_model.getCurrentLayer()->dragStart(*this, x, height() - y);
             dragDepth = -2;
             worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
             m_dragType = GlView::MOVE;
@@ -316,9 +318,9 @@ void GlView::clickOff(int x, int y)
         case MainWindow::AREA:
             if (make_current()) {
                 if ((clickx == mousex) && (clicky == clicky)) {
-                    m_currentLayer->select(mousex, height() - mousey);
+                    m_model.getCurrentLayer()->select(*this, mousex, height() - mousey);
                 } else {
-                    m_currentLayer->select(clickx, height() - clicky,
+                    m_model.getCurrentLayer()->select(*this, clickx, height() - clicky,
                                            mousex, height() - mousey);
                 }
             }
@@ -329,7 +331,7 @@ void GlView::clickOff(int x, int y)
                 double tx, ty, tz;
                 worldPoint(x, y, dragDepth, &tx, &ty, &tz);
                 // Send move thingy to layer
-                m_currentLayer->dragEnd(tx - dragx, ty - dragy, tz - dragz);
+                m_model.getCurrentLayer()->dragEnd(*this, tx - dragx, ty - dragy, tz - dragz);
                 m_dragType = GlView::NONE;
             }
             break;
@@ -486,15 +488,17 @@ const std::string GlView::details() const
 {
     std::stringstream dets;
     const char * view =  (m_projection == ORTHO) ? "Orthographic" : "Perspective";
-    dets << " (" << view << ") " << (int)(m_scale * 100) << "%";
+    dets << "-" << m_model.getModelNo() << "." << m_viewNo << " (" << view << ") " << (int)(m_scale * 100) << "%";
     return dets.str();
 }
 
+#if 0
 void GlView::addLayer(Layer * layer)
 {
-    std::list<Layer *>::iterator I = m_layers.begin();
-    for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
-    if (I != m_layers.end()) { ++I; }
+    const std::list<Layer *> & layers = m_model.getLayers();
+    std::list<Layer *>::iterator I = layers.begin();
+    for (; I != layers.end() && m_currentLayer != *I; I++) {}
+    if (I != layers.end()) { ++I; }
     m_layers.insert(I, layer);
     m_currentLayer = layer;
     m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
@@ -520,6 +524,15 @@ void GlView::lowerCurrentLayer()
     I = m_layers.erase(I);
     m_layers.insert(--I, m_currentLayer);
     m_viewwindow.m_mainwindow.getLayerWindow()->setView(this);
+}
+#endif
+
+void GlView::redraw()
+{
+    if (make_current()) {
+        setupgl();
+        drawgl();
+    }
 }
 
 void GlView::setPickProjection()

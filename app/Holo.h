@@ -17,13 +17,13 @@ class Holo : public Layer {
     void load(Gtk::FileSelection *) { }
     void cancel(Gtk::FileSelection *) { }
   public:
-    explicit Holo(GlView &);
-    void draw();
-    void select(int x, int y) { }
-    void select(int x, int y, int w, int h) { }
-    void dragStart(int x, int y) { }
-    void dragUpdate(float x, float y, float z) { }
-    void dragEnd(float x, float y, float z) { }
+    explicit Holo(Model &);
+    void draw(GlView & view);
+    void select(GlView & view, int x, int y) { }
+    void select(GlView & view, int x, int y, int w, int h) { }
+    void dragStart(GlView & view, int x, int y) { }
+    void dragUpdate(GlView & view, float x, float y, float z) { }
+    void dragEnd(GlView & view, float x, float y, float z) { }
 };
 
 #endif // EQUATOR_APP_HOLO_H

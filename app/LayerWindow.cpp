@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "ViewWindow.h"
 #include "GlView.h"
+#include "Model.h"
 #include "Layer.h"
 #include "NewLayerWindow.h"
 
@@ -23,19 +24,20 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <sstream>
 
 LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
-                                           m_currentView(NULL), m_mainWindow(w)
+                                           m_currentModel(NULL), m_mainWindow(w)
 {
     // destroy.connect(slot(this, &LayerWindow::destroy_handler));
     Gtk::VBox * vbox = manage( new Gtk::VBox(false, 2) );
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
-    tophbox->pack_start(*(manage( new Gtk::Label("View:") ) ), false, false, 2);
-    m_viewMenu = manage( new Gtk::OptionMenu() );
+    tophbox->pack_start(*(manage( new Gtk::Label("Model:") )), false, false, 2);
+    m_modelMenu = manage( new Gtk::OptionMenu() );
 
-    tophbox->pack_start(*m_viewMenu, true, true, 2);
+    tophbox->pack_start(*m_modelMenu, true, true, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
     vbox->pack_start(*tophbox, false, false, 2);
@@ -96,20 +98,20 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
 }
 
-void LayerWindow::setView(GlView * view)
+void LayerWindow::setModel(Model * model)
 {
     m_clist->clear();
 
-    m_currentView = view;
+    m_currentModel = model;
 
-    if (m_currentView == NULL) {
+    if (m_currentModel == NULL) {
         set_sensitive(false);
         return;
     }
 
     set_sensitive(true);
 
-    const std::list<Layer *> & layers = view->getLayers();
+    const std::list<Layer *> & layers = model->getLayers();
  
     std::list<Layer *>::const_iterator I = layers.begin();
     for (; I != layers.end(); I++) {
@@ -117,57 +119,59 @@ void LayerWindow::setView(GlView * view)
         entry.push_back((*I)->getType());
         entry.push_back((*I)->getName());
         m_clist->rows().push_front(entry);
-        if (*I == view->getCurrentLayer()) {
+        if (*I == model->getCurrentLayer()) {
             m_clist->rows().front()->select();
         }
     }
 
 }
 
-void LayerWindow::addModel(ViewWindow * view)
+void LayerWindow::addModel(Model * model)
 {
-    Gtk::Menu * menu = m_viewMenu->get_menu();
+    Gtk::Menu * menu = m_modelMenu->get_menu();
+    stringstream ident;
+    ident << model->getName() << "-" << model->getModelNo();
     if (menu == NULL) {
         menu = manage( new Gtk::Menu() );
         
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
-        m_viewMenu->set_menu(menu);
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(this, &LayerWindow::setModel),model)));
+        m_modelMenu->set_menu(menu);
         set_sensitive(true);
-        setView(view->getView());
+        setModel(model);
     } else {
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(slot(this, &LayerWindow::setModel),model)));
     }
     // m_viewMenu->set_menu(m_viewMenu->get_menu());
 }
 
 void LayerWindow::selectionMade(gint row, gint column, GdkEvent * event)
 {
-    const std::list<Layer *> & layers = m_currentView->getLayers();
+    const std::list<Layer *> & layers = m_currentModel->getLayers();
     std::list<Layer *>::const_iterator I = layers.begin();
     for (int i = layers.size() - 1; i > row && I != layers.end(); --i, ++I) { }
     if (I == layers.end()) {
         std::cerr << "No layer described" << std::endl << std::flush;
         return;
     }
-    m_currentView->setCurrentLayer(*I);
+    m_currentModel->setCurrentLayer(*I);
     std::cout << "new sel" << row << " " << (*I)->getName() << std::endl << std::flush;
 }
 
 void LayerWindow::newLayerRequested()
 {
-    m_newLayerWindow->doshow(m_currentView);
+    m_newLayerWindow->doshow(m_currentModel);
 }
 
 void LayerWindow::raiseLayer()
 {
-    m_currentView->raiseCurrentLayer();
+    m_currentModel->raiseCurrentLayer();
 }
 
 void LayerWindow::lowerLayer()
 {
-    m_currentView->lowerCurrentLayer();
+    m_currentModel->lowerCurrentLayer();
 }
 
 // FIXME How do we get notification of the current view?

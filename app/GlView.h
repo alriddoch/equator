@@ -12,13 +12,15 @@
 
 class Layer;
 class ViewWindow;
+class Model;
 
 class GlView : public Gtk::GLArea {
   private:
     Gtk::Menu * m_popup;
-    std::list<Layer *> m_layers;
+    const int m_viewNo;
+    // std::list<Layer *> m_layers;
     float m_scale;
-    Layer * m_currentLayer;
+    // Layer * m_currentLayer;
     float m_xoff, m_yoff, m_zoff;
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
@@ -40,7 +42,7 @@ class GlView : public Gtk::GLArea {
     void origin();
     void drawgl();
 
-    void importFile();
+    // void importFile();
 
     void clickOn(int x, int y);
     void clickOff(int x, int y);
@@ -58,31 +60,33 @@ class GlView : public Gtk::GLArea {
     virtual gint configure_event_impl(GdkEventConfigure *event);
   public:
     ViewWindow & m_viewwindow;
+    Model & m_model;
 
-    explicit GlView(ViewWindow&);
+    explicit GlView(ViewWindow&, Model&);
 
     float getScale() const {
         return m_scale;
     }
 
-    const std::list<Layer *> & getLayers() const {
-        return m_layers;
-    }
+    // const std::list<Layer *> & getLayers() const {
+        // return m_layers;
+    // }
 
-    const Layer * getCurrentLayer() const {
-        return m_currentLayer;
-    }
+    // const Layer * getCurrentLayer() const {
+        // return m_currentLayer;
+    // }
 
-    void setCurrentLayer(Layer * l) {
-        m_currentLayer = l;
-    }
+    // void setCurrentLayer(Layer * l) {
+        // m_currentLayer = l;
+    // }
 
     const std::string details() const;
-    void addLayer(Layer *);
+    // void addLayer(Layer *);
 
-    void raiseCurrentLayer();
-    void lowerCurrentLayer();
+    // void raiseCurrentLayer();
+    // void lowerCurrentLayer();
 
+    void redraw();
     void setPickProjection();
 
     const float getZ(int x, int y) const;

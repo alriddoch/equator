@@ -26,7 +26,7 @@ ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     tophbox->pack_start(*(manage( new Gtk::Label("Server connection:") ) ), false, false, 2);
     m_serverMenu = manage( new Gtk::OptionMenu() );
-    tophbox->pack_start(*m_serverMenu, true, false, 2);
+    tophbox->pack_start(*m_serverMenu, true, true, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
     vbox->pack_start(*tophbox, false, false, 2);

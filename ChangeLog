@@ -1,3 +1,24 @@
+2001-12-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Model.h, app/Model.cpp: Class that stores the world model,
+	  extracted from GlView class so that model and view are separate,
+	  allowing multiple views of a single model.
+
+	* app/ViewWindow.h, app/ViewWindow.cpp, app/NewLayerWindow.h,
+	  app/NewLayerWindow.cpp, app/MainWindow.h, app/MainWindow.cpp,
+	  app/LayerWindow.h, app/LayerWindow.cpp, app/Layer.h,
+	  app/IsoMap.h, app/IsoMap.cpp, app/Holo.h, app/Holo.cpp,
+	  app/GlView.h, app/GlView.cpp, app/BladeMap.h, app/BladeMap.cpp:
+	  Switched over to using Model to store data, enabling multiple
+	  views. Implemented enumeration of models and views, and using
+	  numer to identify.
+
+	* app/ServerWindow.cpp, app/NewServerWindow.h, app/NewServerWindow.cpp,
+	  Cleaned up window layout.
+
+	* app/equator_plugin.cpp: Added elaoration so it is clear that gimp
+	  plugin error is not a problem.
+
 2001-12-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/AtlasMapWidget.cpp, app/BladeMap.cpp, app/GlView.cpp,

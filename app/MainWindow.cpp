@@ -7,6 +7,8 @@
 #include "LayerWindow.h"
 #include "InheritanceWindow.h"
 #include "ServerWindow.h"
+#include "NewServerWindow.h"
+#include "Model.h"
 
 #include <gtk--/main.h>
 #include <gtk--/menu.h>
@@ -31,13 +33,15 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL), m_tool(MainWindow::
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::CTL|'n', slot(this, &MainWindow::new_view)));
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::CTL|'o'));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(this, &MainWindow::new_server_dialog)));
+    file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Preferences..."));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
     dialog_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<GlView*>(slot(this, &MainWindow::open_layers),NULL)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<Model*>(slot(this, &MainWindow::open_layers),NULL)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entities..."));
@@ -113,6 +117,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL), m_tool(MainWindow::
     m_layerwindow = manage( new LayerWindow(*this) );
     m_inheritancewindow = manage( new InheritanceWindow(*this) );
     m_serverwindow = manage( new ServerWindow(*this) );
+    m_newServerwindow = manage( new NewServerWindow(*this) );
 }
 
 gint MainWindow::quit(GdkEventAny *)
@@ -128,11 +133,20 @@ void MainWindow::destroy_handler()
 
 void MainWindow::new_view()
 {
-    ViewWindow * view = manage( new ViewWindow(*this) );
-    view->setName("Untitled");
+    Model * model = new Model(*this);
+    ViewWindow * view = manage( new ViewWindow(*this, *model) );
+    model->setName("Untitled");
     m_views.push_back(view);
-    modelAdded.emit(view);
+    m_models.push_back(model);
+    modelAdded.emit(model);
     
+}
+
+void MainWindow::newView(Model * model)
+{
+    ViewWindow * view = manage( new ViewWindow(*this, *model) );
+    m_views.push_back(view);
+    view->setTitle();
 }
 
 void MainWindow::menu_quit()
@@ -150,10 +164,15 @@ void MainWindow::server_dialog()
     m_serverwindow->show_all();
 }
 
-void MainWindow::open_layers(GlView * view)
+void MainWindow::new_server_dialog()
 {
-    if (view != NULL) {
-        m_layerwindow->setView(view);
+    m_newServerwindow->show_all();
+}
+
+void MainWindow::open_layers(Model * model)
+{
+    if (model != NULL) {
+        m_layerwindow->setModel(model);
     }
     m_layerwindow->show_all();
 }

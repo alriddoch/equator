@@ -12,6 +12,7 @@ class MainWindow;
 class ViewWindow;
 class GlView;;
 class NewLayerWindow;;
+class Model;
 
 namespace Gtk {
    class OptionMenu;
@@ -21,8 +22,8 @@ class LayerWindow : public Gtk::Window
 {
   private:
     Gtk::CList * m_clist;
-    Gtk::OptionMenu * m_viewMenu;
-    GlView * m_currentView;
+    Gtk::OptionMenu * m_modelMenu;
+    Model * m_currentModel;
     NewLayerWindow * m_newLayerWindow;
 
   public:
@@ -30,8 +31,8 @@ class LayerWindow : public Gtk::Window
 
     explicit LayerWindow(MainWindow &);
 
-    void setView(GlView * view);
-    void addModel(ViewWindow * view);
+    void setModel(Model * model);
+    void addModel(Model * view);
     void selectionMade(gint row, gint column, GdkEvent * event);
 
     void newLayerRequested();

@@ -14,7 +14,9 @@ class ViewWindow;
 class LayerWindow;
 class InheritanceWindow;
 class ServerWindow;
+class NewServerWindow;
 class GlView;
+class Model;
 
 namespace Gtk {
   class ToggleButton;
@@ -25,9 +27,11 @@ class MainWindow : public Gtk::Window
   private:
     //Gtk::Menu * m_menu;
     std::list<ViewWindow*> m_views;
+    std::list<Model*> m_models;
     LayerWindow * m_layerwindow;
     InheritanceWindow * m_inheritancewindow;
     ServerWindow * m_serverwindow;
+    NewServerWindow * m_newServerwindow;
 
   public:
     typedef enum {
@@ -57,13 +61,15 @@ class MainWindow : public Gtk::Window
 
     gint quit( GdkEventAny *);
     void new_view();
+    void newView(Model *);
     void menu_quit();
     void inheritance_dialog();
     void server_dialog();
-    void open_layers(GlView *);
+    void new_server_dialog();
+    void open_layers(Model *);
     void toolSelect(toolType);
 
-    SigC::Signal1<void, ViewWindow *> modelAdded;
+    SigC::Signal1<void, Model *> modelAdded;
 };
 
 #endif // EQUATOR_APP_MAINWINDOW_H

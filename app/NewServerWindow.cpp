@@ -3,12 +3,14 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "NewServerWindow.h"
+#include "MainWindow.h"
 
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/box.h>
 #include <gtk--/button.h>
 
-NewServerWindow::NewServerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
+NewServerWindow::NewServerWindow(MainWindow &m) :
+                 Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(m)
 {
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
     //vbox->pack_start(*scrolled_window, true, true, 2);
@@ -26,7 +28,7 @@ NewServerWindow::NewServerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     add(*vbox);
 }
 
-void NewLayerWindow::doshow()
+void NewServerWindow::doshow()
 {
     show_all();
 }

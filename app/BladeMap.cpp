@@ -5,6 +5,7 @@
 #include "BladeMap.h"
 #include "Texture.h"
 #include "GlView.h"
+#include "Model.h"
 
 #include <coal/database.h>
 #include <coal/bladeloader.h>
@@ -99,7 +100,7 @@ void BladeMap::drawMap(CoalDatabase & map_base)
 
 }
 
-bool BladeMap::selectMap(CoalDatabase & map_base,
+bool BladeMap::selectMap(GlView & view, CoalDatabase & map_base,
                          int nx, int ny, int fx, int fy,
                          bool check)
 {
@@ -116,7 +117,7 @@ bool BladeMap::selectMap(CoalDatabase & map_base,
     glGetIntegerv(GL_VIEWPORT,viewport);
     gluPickMatrix(nx, ny, fx - nx, fy - ny, viewport);
 
-    m_window.setPickProjection(); // Sets the projection, sets up names
+    view.setPickProjection(); // Sets the projection, sets up names
                                   // and sets up the modelview
 
     glTranslatef(m_xoff, m_yoff, m_zoff);
@@ -201,6 +202,8 @@ void BladeMap::load(Gtk::FileSelection * fsel)
     }
 
     delete fsel;
+
+    m_model.updated.emit();
 }
 
 void BladeMap::cancel(Gtk::FileSelection * fsel)
@@ -208,7 +211,7 @@ void BladeMap::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-BladeMap::BladeMap(GlView & window) : Layer(window, "map", "BladeMap"),
+BladeMap::BladeMap(Model & model) : Layer(model, "map", "BladeMap"),
                                         m_database(*new CoalDatabase()),
                                         m_validDrag(false)
 {
@@ -222,7 +225,7 @@ void BladeMap::importFile()
     fsel->show();
 }
 
-void BladeMap::draw()
+void BladeMap::draw(GlView &)
 {
     glPushMatrix();
     glTranslatef(m_xoff, m_yoff, m_zoff);
@@ -230,19 +233,19 @@ void BladeMap::draw()
     glPopMatrix();
 }
 
-void BladeMap::select(int x, int y)
+void BladeMap::select(GlView & view, int x, int y)
 {
-    select(x, y, x + 1, y + 1);
+    select(view, x, y, x + 1, y + 1);
 }
 
-void BladeMap::select(int nx, int ny, int fx, int fy)
+void BladeMap::select(GlView & view, int nx, int ny, int fx, int fy)
 {
-    selectMap(m_database, nx, ny, fx, fy);
+    selectMap(view, m_database, nx, ny, fx, fy);
 }
 
-void BladeMap::dragStart(int x, int y)
+void BladeMap::dragStart(GlView & view, int x, int y)
 {
-    if (selectMap(m_database, x, y, x+1, y+1, true)) {
+    if (selectMap(view, m_database, x, y, x+1, y+1, true)) {
         m_validDrag = true;
         if (m_selection.empty()) {
             // Moving whole layer
@@ -254,11 +257,11 @@ void BladeMap::dragStart(int x, int y)
     }
 }
 
-void BladeMap::dragUpdate(float x, float y, float z)
+void BladeMap::dragUpdate(GlView & view, float x, float y, float z)
 {
 }
 
-void BladeMap::dragEnd(float x, float y, float z)
+void BladeMap::dragEnd(GlView & view, float x, float y, float z)
 {
     if (m_validDrag) {
         if (m_selection.empty()) {
@@ -269,5 +272,6 @@ void BladeMap::dragEnd(float x, float y, float z)
             // FIXME move the current selection
         }
         m_validDrag = false;
+        m_model.updated.emit();
     }
 }

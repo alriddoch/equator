@@ -7,15 +7,15 @@
 
 #include <GL/gl.h>
 
-Holo::Holo(GlView & window) : Layer(window, "background", "HoloWorld")
+Holo::Holo(Model & model) : Layer(model, "background", "HoloWorld")
 {
 }
 
-void Holo::draw()
+void Holo::draw(GlView & view)
 {
-    float winsize = std::max(m_window.width(), m_window.height());
+    float winsize = std::max(view.width(), view.height());
 
-    int numlines = winsize / (40.0f * m_window.getScale()) + 1;
+    int numlines = winsize / (40.0f * view.getScale()) + 1;
     //glTranslatef(0.0f, 0.0f, -40.0f);
     //glRotatef(60.0f, 1.0f, 0.0f, 0.0f);
     //glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);

@@ -4,6 +4,7 @@
 
 #include "ViewWindow.h"
 #include "GlView.h"
+#include "Model.h"
 
 #include <gtk--/frame.h>
 #include <gtk--/eventbox.h>
@@ -11,13 +12,15 @@
 
 #include <iostream>
 
-ViewWindow::ViewWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+ViewWindow::ViewWindow(MainWindow & w, Model & m) :
+                                         Gtk::Window(GTK_WINDOW_TOPLEVEL),
                                          m_glarea(NULL), m_popup(NULL),
                                          m_mainwindow(w)
 {
+    m.nameChanged.connect(slot(this, &ViewWindow::setTitle));
     // destroy.connect(slot(this, &ViewWindow::destroy_handler));
 
-    m_glarea = manage( new GlView(*this) );
+    m_glarea = manage( new GlView(*this, m) );
     m_glarea->set_usize(300,300);
 
     Gtk::Frame * frame = manage( new Gtk::Frame() );
@@ -41,15 +44,8 @@ ViewWindow::ViewWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 void ViewWindow::setTitle()
 {
     if (m_glarea == NULL) {
-        set_title(m_name);
+        set_title("");
     } else {
-        set_title(m_name + m_glarea->details());
+        set_title(m_glarea->m_model.getName() + m_glarea->details());
     }
 }
-
-void ViewWindow::setName(const std::string & n)
-{
-    m_name = n;
-    setTitle();
-}
-

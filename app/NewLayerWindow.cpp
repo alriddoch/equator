@@ -7,6 +7,7 @@
 #include "BladeMap.h"
 #include "IsoMap.h"
 #include "GlView.h"
+#include "Model.h"
 
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/box.h>
@@ -63,9 +64,9 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL)
     add(*vbox);
 }
 
-void NewLayerWindow::doshow(GlView * view)
+void NewLayerWindow::doshow(Model * model)
 {
-    m_currentView = view;
+    m_currentModel = model;
     show_all();
 }
 
@@ -75,8 +76,8 @@ void NewLayerWindow::okay()
         return;
     }
     FactoryItem * newLayerType = (FactoryItem *) *m_list->selection().begin();
-    Layer * newLayer = newLayerType->getFactory()->newLayer(*m_currentView);
-    m_currentView->addLayer(newLayer);
+    Layer * newLayer = newLayerType->getFactory()->newLayer(*m_currentModel);
+    m_currentModel->addLayer(newLayer);
     hide();
 }
 
