@@ -9,14 +9,22 @@
 
 // Base class from which all option windows inherit. In fact all option
 // windows are just boxes which are used in a common dock class.
-// It has no public constructor or methods.
+// It has no public constructor.
 
 class OptionBox : public Gtk::VBox {
   private:
+    Gtk::Window * m_dock;
   protected:
     OptionBox(const Glib::ustring & title);
 
     std::list<Gtk::TargetEntry> m_targetList;
+
+  public:
+    void setDock(Gtk::Window * dock);
+
+    Gtk::Window * getDock() const {
+        return m_dock;
+    }
 };
 
 #endif // EQUATOR_GUI_GTKMM_OPTION_BOX_H

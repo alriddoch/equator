@@ -1,5 +1,17 @@
 2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* gui/gtkmm/OptionBox.h, gui/gtkmm/OptionBox.cpp: Store pointer
+	  to dock window in OptionBox, with accessors.
+
+	* gui/gtkmm/DockWindow.h, gui/gtkmm/DockWindow.cpp: Use a
+	  utility function to add OptionBox widgets.
+
+	* app/MainWindow.h, app/MainWindow.cpp: Add a function to handle
+	  showing an optionbox generally, and correctly handle the same
+	  window being shown more than once.
+
+2004-01-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* gui/gtkmm/OptionBox.h, gui/gtkmm/OptionBox.cpp,
 	  gui/gtkmm/DockWindow.h, gui/gtkmm/DockWindow.cpp: Add base for
 	  dockable option windows, and class to act as a general purpose

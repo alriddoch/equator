@@ -218,33 +218,42 @@ void MainWindow::menu_quit()
     Gtk::Main::quit();
 }
 
+void MainWindow::showOptionBox(OptionBox & ob)
+{
+    Gtk::Window * w = ob.getDock();
+    if (w == 0) {
+        DockWindow * dw = new DockWindow(ob);
+        dw->show_all();
+    } else {
+        if (!w->is_visible()) {
+            w->show();
+        }
+    }
+}
+
 void MainWindow::inheritance_window()
 {
-    DockWindow * dw = new DockWindow(m_inheritancewindow);
-    dw->show_all();
+    showOptionBox(m_inheritancewindow);
 }
 
 void MainWindow::server_window()
 {
-    DockWindow * dw = new DockWindow(m_serverwindow);
-    dw->show_all();
+    showOptionBox(m_serverwindow);
 }
 
 void MainWindow::palette_window()
 {
-    DockWindow * dw = new DockWindow(m_palettewindow);
-    dw->show_all();
+    showOptionBox(m_palettewindow);
 }
 
 void MainWindow::layer_window()
 {
-    DockWindow * dw = new DockWindow(m_layerwindow);
-    dw->show_all();
+    showOptionBox(m_layerwindow);
 }
 
 void MainWindow::new_server_dialog()
 {
-    m_serverwindow.show_all();
+    server_window();
     m_serverwindow.connect();
 }
 

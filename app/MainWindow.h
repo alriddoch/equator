@@ -15,6 +15,7 @@ class InheritanceWindow;
 class ServerWindow;
 class Palette;
 class Model;
+class OptionBox;
 
 namespace Gtk {
   class ToggleButton;
@@ -53,6 +54,7 @@ class MainWindow : public Gtk::Window
     gint idle();
 
     void menuNewModel();
+    void showOptionBox(OptionBox &);
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors

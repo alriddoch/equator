@@ -9,7 +9,8 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/stock.h>
 
-OptionBox::OptionBox(const Glib::ustring & title) : m_targetList(1, Gtk::TargetEntry("application/x-equator-toolbar", 0, 0))
+OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
+    m_targetList(1, Gtk::TargetEntry("application/x-equator-toolbar", 0, 0))
 {
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
     pack_start(*tophbox, Gtk::PACK_SHRINK, 6);
@@ -27,4 +28,15 @@ OptionBox::OptionBox(const Glib::ustring & title) : m_targetList(1, Gtk::TargetE
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*b);
     tophbox->pack_start(*a, Gtk::PACK_EXPAND_WIDGET);
+}
+
+void OptionBox::setDock(Gtk::Window * dock)
+{
+    if (dock == 0) {
+        assert(m_dock != 0);
+    } else {
+        assert(m_dock == 0);
+    }
+
+    m_dock = dock;
 }

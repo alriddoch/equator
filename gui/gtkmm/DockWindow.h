@@ -20,6 +20,8 @@ class DockWindow : public Gtk::Window {
     Gtk::VBox * m_vbox;
   public:
     DockWindow(OptionBox &);
+
+    void addChild(OptionBox &, bool top = false);
 };
 
 #endif // EQUATOR_GUI_GTKMM_DOCK_WINDOW_H
