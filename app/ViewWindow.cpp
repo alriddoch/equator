@@ -207,14 +207,16 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) : m_glarea(0),
     MenuList& tools_menu = menu_sub->items();
     menu_sub_sub = manage( new Gtk::Menu() );
     MenuList& generic_tools_menu = menu_sub_sub->items();
-    generic_tools_menu.push_back(MenuElem("Select single", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
-    generic_tools_menu.push_back(MenuElem("Select area", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
-    generic_tools_menu.push_back(MenuElem("Insert", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
-    generic_tools_menu.push_back(MenuElem("Rotate", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
+    Gtk::RadioMenuItem::Group generic_tools_group;
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Select single", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
+    static_cast<Gtk::RadioMenuItem*>(&generic_tools_menu.back())->set_active();
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Select area", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Insert", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Rotate", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
     generic_tools_menu.back().set_sensitive(false);
-    generic_tools_menu.push_back(MenuElem("Scale", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Scale", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
     generic_tools_menu.back().set_sensitive(false);
-    generic_tools_menu.push_back(MenuElem("Translate", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
+    generic_tools_menu.push_back(RadioMenuElem(generic_tools_group, "Translate", SigC::bind(SigC::slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
     tools_menu.push_back(MenuElem("Generic", *menu_sub_sub));
 
     menuitem = manage( new Gtk::MenuItem("Tools") );
