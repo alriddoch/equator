@@ -11,7 +11,11 @@
 #include "Model.h"
 #include "Server.h"
 
+#include "gui/gtkmm/DockWindow.h"
+#include "gui/gtkmm/TypeTree.h"
+
 #include <gtkmm/box.h>
+#include <gtkmm/menu.h>
 #include <gtkmm/label.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
@@ -48,6 +52,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_treeView->set_model( m_treeModel );
 
     m_treeView->append_column("Hostname", *m_hostnameColumn);
+    m_treeView->signal_button_press_event().connect(SigC::slot(*this, &ServerWindow::buttonPressEvent));
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -60,9 +65,30 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
 
     vbox->pack_start(*scrolled_window);
 
+    Gtk::HBox * bothbox = manage( new Gtk::HBox );
+
+    Gtk::Button * b = manage( new Gtk::Button("Types...") );
+    b->signal_clicked().connect(SigC::slot(*this, &ServerWindow::typesPressed));
+    bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
+
+    vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
+
+    m_popupMenu = manage( new Gtk::Menu );
+    Gtk::Menu_Helpers::MenuList & server_menu = m_popupMenu->items();
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem("Type tree"));
+
     signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(SigC::slot(*this, &ServerWindow::loggedIn));
+}
+
+bool ServerWindow::buttonPressEvent(GdkEventButton * event)
+{
+    std::cout << "Button press event" << std::endl << std::flush;
+    if (event->button == 3) {
+        m_popupMenu->popup(event->button, event->time);
+    }
+    return TRUE;
 }
 
 void ServerWindow::connect()
@@ -76,6 +102,9 @@ void ServerWindow::newServer(Server * server)
 
     Gtk::TreeModel::Row row = *(m_treeModel->append());
     row[*m_hostnameColumn] = Glib::ustring(server->getName());
+    row[*m_ptrColumn] = server;
+
+    m_refTreeSelection->select(row);
 
     m_loginWindow.useServer(server);
     m_loginWindow.show_all();
@@ -96,4 +125,25 @@ void ServerWindow::loggedIn(Server * server)
 
     m_characterWindow.useServer(server);
     m_characterWindow.show_all();
+}
+
+void ServerWindow::typesPressed()
+{
+    Gtk::TreeModel::Row row = *(m_refTreeSelection->get_selected());
+    Server * selServer = row[*m_ptrColumn];
+
+    assert(selServer != 0);
+
+    std::map<Server *, TypeTree *>::const_iterator I = m_typeTrees.find(selServer);
+
+    if (I == m_typeTrees.end()) {
+        TypeTree * tw = new TypeTree(*selServer);
+        (new DockWindow(*tw))->show_all();
+        m_typeTrees[selServer] = tw;
+    } else {
+        I->second->getDock()->show_all();
+    }
+
+
+    std::cout << "Making types window" << std::endl << std::flush;
 }

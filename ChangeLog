@@ -1,3 +1,12 @@
+2005-01-27  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* gui/gtkmm/TypeTree.cpp, gui/gtkmm/TypeTree.h: New window for
+	  displaying server type hierarchy.
+
+	* app/ServerWindow.cpp, app/ServerWindow.h: Add a button to show
+	  the type tree for a server, and an initial attempt at a popup
+	  menu.
+
 2005-01-23  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/MainWindow.cpp: Re-structure the file menu to make creating

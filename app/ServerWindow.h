@@ -12,6 +12,7 @@ class Server;
 class ConnectWindow;
 class LoginWindow;
 class CharacterWindow;
+class TypeTree;
 
 namespace Gtk {
    class ListStore;
@@ -19,6 +20,7 @@ namespace Gtk {
    class TreeModelColumnRecord;
    class TreeView;
    class TreeSelection;
+   class Menu;
 };
 
 class ServerWindow : public OptionBox
@@ -30,28 +32,33 @@ class ServerWindow : public OptionBox
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
+    Gtk::Menu * m_popupMenu;
 
     Server * m_currentServer;
+    std::map<Server *, TypeTree *> m_typeTrees;
 
     ConnectWindow & m_connectWindow;
     LoginWindow & m_loginWindow;
     CharacterWindow & m_characterWindow;
 
-  public:
-    MainWindow & m_mainWindow;
-
-    explicit ServerWindow(MainWindow &);
+    bool buttonPressEvent(GdkEventButton*);
+    void newServer(Server *);
+    void loggedIn(Server *);
+    void typesPressed();
 
     bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }
 
+  public:
+    MainWindow & m_mainWindow;
+
+    explicit ServerWindow(MainWindow &);
+
     void connect();
 
-    void newServer(Server *);
     void setServer(Server *);
-    void loggedIn(Server *);
 };
 
 #endif // EQUATOR_APP_SERVERWINDOW_H
