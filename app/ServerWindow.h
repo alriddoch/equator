@@ -52,6 +52,7 @@ class ServerWindow : public Gtk::Window
     void newServer(Server *);
     void setServer(Server *);
     void loggedIn(Server *);
+    void creatingAvatar(Server *);
     void createdAvatar(Server *);
 };
 

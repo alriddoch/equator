@@ -66,6 +66,7 @@ ServerWindow::ServerWindow(MainWindow & mw) :
     signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
     m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(slot(*this, &ServerWindow::loggedIn));
+    m_characterWindow.createStart.connect(slot(*this, &ServerWindow::creatingAvatar));
     m_characterWindow.createSuccess.connect(slot(*this, &ServerWindow::createdAvatar));
 }
 
@@ -102,11 +103,20 @@ void ServerWindow::loggedIn(Server * server)
     m_characterWindow.show_all();
 }
 
-void ServerWindow::createdAvatar(Server * server)
+void ServerWindow::creatingAvatar(Server * server)
 {
     assert(server != 0);
 
+    if (server->getModel() != 0) {
+        return;
+    }
+
     Model & model = m_mainWindow.newModel();
     model.setName(server->getName());
-    server->createLayers(model);
+    server->takeModel(model);
+}
+
+void ServerWindow::createdAvatar(Server * server)
+{
+    server->createLayers();
 }

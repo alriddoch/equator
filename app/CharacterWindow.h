@@ -64,6 +64,7 @@ class CharacterWindow : public Gtk::Dialog
 
     void dismiss(int);
 
+    SigC::Signal1<void, Server *> createStart;
     SigC::Signal1<void, Server *> createSuccess;
 };
 

@@ -81,7 +81,8 @@ class Server : public SigC::Object {
     void createAccount(const std::string &, const std::string &);
     void takeCharacter(const std::string &);
     void createCharacter(const std::string &, const std::string &);
-    void createLayers(Model & model);
+    void takeModel(Model & model);
+    void createLayers();
 
     void moveCharacter(const PosType & pos);
 

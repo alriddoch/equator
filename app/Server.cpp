@@ -185,11 +185,17 @@ void Server::checkEntityForNewLayers(Eris::Entity & ent)
     }
 }
 
-void Server::createLayers(Model & model)
+void Server::takeModel(Model & model)
 {
     m_model = &model;
-    Layer * layer = new ServerEntities(model, *this);
-    model.addLayer(layer);
+}
+
+void Server::createLayers()
+{
+    assert(m_model != 0);
+
+    Layer * layer = new ServerEntities(*m_model, *this);
+    m_model->addLayer(layer);
 
     Eris::Entity * worldRoot = m_world->getRootEntity();
 
