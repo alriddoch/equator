@@ -1,5 +1,10 @@
 2003-09-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/NewServerWindow.h, app/NewServerWindow.cpp: Work in
+	  progress adding new features.
+
+2003-09-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/NewServerWindow.h, app/NewServerWindow.cpp: Convert to using
 	  Dialog class instead of Window. Finish off work for conformance
 	  with the Gnome HIG.

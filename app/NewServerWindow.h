@@ -38,6 +38,7 @@ class NewServerWindow : public Gtk::Dialog
 
     Gtk::Entry * m_hostEntry;
     Gtk::OptionMenu * m_portChoice;
+    Gtk::OptionMenu * m_characterChoice;
     Gtk::SpinButton * m_portSpin;
     Gtk::Button * m_connectButton;
     Gtk::Entry * m_userEntry;
@@ -54,11 +55,14 @@ class NewServerWindow : public Gtk::Dialog
     int m_statusContext;
     Server * m_server;
 
+    std::string m_selectedCharacterId;
+
     SigC::Connection m_failure;
     SigC::Connection m_connected;
     SigC::Connection m_loggedIn;
     SigC::Connection m_worldEnter;
 
+    void setSelectedCharacter(std::string s);
     void setPort(int );
     void setCustomPort();
   public:
@@ -74,6 +78,7 @@ class NewServerWindow : public Gtk::Dialog
     void createConnection();
     void loginAccount();
     void createAccount();
+    void takeAvatar();
     void createAvatar();
     void createView();
 

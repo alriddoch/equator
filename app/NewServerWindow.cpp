@@ -113,7 +113,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     vbox->pack_start(*hbox);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    Gtk::VBox * v2box = manage( new Gtk::VBox(false, 6) );
+    Gtk::HBox * v2box = manage( new Gtk::HBox(false, 6) );
     m_loginButton = manage( new Gtk::Button("Login") );
     m_loginButton->signal_clicked().connect(slot(*this, &NewServerWindow::loginAccount));
     m_loginButton->set_sensitive(false);
@@ -130,26 +130,38 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     vbox->pack_start(*a);
 
     hbox = manage( new Gtk::HBox() );
-    table = manage( new Gtk::Table(2, 2) );
+    table = manage( new Gtk::Table(3, 2) );
     table->set_row_spacings(6);
     table->set_col_spacings(12);
+    m_portChoice = manage( new Gtk::OptionMenu() );
+    Gtk::Menu * portMenu = manage( new Gtk::Menu() );
+    Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6767)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6768)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCustomPort)));
+    m_portChoice->set_menu(*portMenu);
+    table->attach(*m_portChoice, 1, 2, 1, 2);
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Avatar Name:") )));
-    table->attach(*a, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
+    table->attach(*a, 0, 1, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_avatarNameEntry = manage( new Gtk::Entry() );
     m_avatarNameEntry->set_max_length(60);
-    table->attach(*m_avatarNameEntry, 1, 2, 0, 1);
+    table->attach(*m_avatarNameEntry, 1, 2, 1, 2);
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Avatar Type:") )));
-    table->attach(*a, 1, 2, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
+    table->attach(*a, 0, 1, 2, 3, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 6);
     m_avatarTypeEntry = manage( new Gtk::Entry() );
     m_avatarTypeEntry->set_max_length(60);
-    table->attach(*m_avatarTypeEntry, 1, 2, 1, 2);
+    table->attach(*m_avatarTypeEntry, 1, 2, 2, 3);
     hbox->pack_start(*table);
     vbox->pack_start(*hbox);
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
-    v2box = manage( new Gtk::VBox(false, 6) );
+    v2box = manage( new Gtk::HBox(false, 6) );
+    m_takeAvatarButton = manage( new Gtk::Button("Take Avatar") );
+    m_takeAvatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::takeAvatar));
+    m_takeAvatarButton->set_sensitive(false);
+    v2box->pack_start(*m_avatarButton);
     m_avatarButton = manage( new Gtk::Button("Create Avatar") );
     m_avatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
@@ -166,6 +178,13 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     // vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
 
     signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));
+}
+
+void NewServerWindow::setSelectCharacter(std::string charId)
+{
+    m_selectedCharacterId = charId;
+
+#warning FIXME Populate widgets with the information
 }
 
 void NewServerWindow::setPort(int port)
