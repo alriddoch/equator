@@ -6,6 +6,8 @@
 #include "Holo.h"
 #include "HeightData.h"
 
+#include <Mercator/Terrain.h>
+
 #include <GL/glu.h>
 
 #include <sstream>
@@ -20,7 +22,8 @@ Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
                                 m_cursX(0.0f), m_cursY(0.0f), m_cursZ(0.0f),
                                 m_sizeX(500.0f), m_sizeY(500.0f),
                                 m_sizeZ(500.0f), m_mainWindow(mw),
-                                m_heightData(* new HeightData())
+                                // m_heightData(* new HeightData())
+                                m_terrain(* new Mercator::Terrain(200))
 {
     m_currentLayer = new Holo(*this);
     m_layers.push_front( m_currentLayer );

@@ -29,7 +29,9 @@ class Texture {
     static int get(const std::string & filename);
 };
 
-class HeightData;
+namespace Mercator {
+  class Terrain;
+}
 
 class Tile {
   private:
@@ -56,7 +58,7 @@ class Tile {
 
     bool load(const std::string & filename);
     void draw();
-    void draw(const HeightData &, int, int);
+    void draw(const Mercator::Terrain &, int, int);
     void select();
     void outline(float);
 

@@ -9,6 +9,9 @@
 #include "HeightMap.h"
 #include "GlView.h"
 
+#include <Mercator/Terrain.h>
+#include <Mercator/Segment.h>
+
 #include <gtkmm/fileselection.h>
 
 #include <GL/glu.h>
@@ -22,7 +25,16 @@ void HeightManager::load(Gtk::FileSelection * fsel)
     int posx = x / HeightData::m_gridSize, posy = y / HeightData::m_gridSize;
     if (x < 0) { posx -= 1; }
     if (y < 0) { posy -= 1; }
-    m_model.m_heightData.load(fsel->get_filename(),posx,posy);
+    // FIXME Do we even wanna load anymore?
+    m_model.m_terrain.setBasePoint(posx,     posy,     12.0);
+    m_model.m_terrain.setBasePoint(posx + 1, posy,     16.0);
+    m_model.m_terrain.setBasePoint(posx,     posy + 1, 18.0);
+    m_model.m_terrain.setBasePoint(posx + 1, posy + 1, 10.0);
+    m_model.m_terrain.refresh(posx,     posy);
+    m_model.m_terrain.refresh(posx + 1, posy);
+    m_model.m_terrain.refresh(posx,     posy + 1);
+    m_model.m_terrain.refresh(posx + 1, posy + 1);
+    // m_model.m_heightData.load(fsel->get_filename(),posx,posy);
     // FIXME Handle error conditions from height loader
 
     delete fsel;
@@ -35,9 +47,31 @@ void HeightManager::cancel(Gtk::FileSelection * fsel)
     delete fsel;
 }
 
-HeightManager::HeightManager(Model &m) :
-                              Layer(m, "heightfield", "HeightField")
+HeightManager::HeightManager(Model &m) : Layer(m, "heightfield", "HeightField"),
+                       m_numLineIndeces(0),
+                       m_lineIndeces(new int[segSize * segSize * 2])
 {
+    int idx = -1;
+    for (int i = 0; i < segSize - 1; ++i) {
+        for (int j = 0; j < segSize; ++j) {
+            m_lineIndeces[++idx] = j * segSize + i;
+            m_lineIndeces[++idx] = j * segSize + i + 1;
+            // glVertex3f(i, j, map->get(i, j));
+            // glVertex3f(i + 1, j, map->get(i + 1, j));
+        }
+        if (++i >= segSize - 1) { break; }
+        for (int j = segSize - 1; j >= 0; --j) {
+            m_lineIndeces[++idx] = j * segSize + i;
+            m_lineIndeces[++idx] = j * segSize + i + 1;
+            // glVertex3f(i, j, map->get(i, j));
+            // glVertex3f(i + 1, j, map->get(i + 1, j));
+        }
+    }
+    m_numLineIndeces = ++idx;
+    for(int i = 0; i < 300; ++i) {
+        std::cout << m_lineIndeces[i] << ":";
+    }
+    std::cout << std::endl << std::flush;
 }
 
 void HeightManager::importFile()
@@ -50,66 +84,130 @@ void HeightManager::importFile()
 
 }
 
-void HeightManager::selectRegion(HeightMap * map)
+void HeightManager::selectRegion(Mercator::Segment * map)
 {
+    int size = map->getSize();
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(100.0f,100.0f,0.0f);
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
-        glVertex3f(i, 0.0f, map->get(i, 0) / 32.0f);
+    glVertex3f(size / 2.0f, size / 2.0f ,0.0f);
+    for (int i = 0; i < size; ++i) {
+        glVertex3f(i, 0.0f, map->get(i, 0));
     }
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
-        glVertex3f(199.0f, i, map->get(199, i) / 32.0f);
+    for (int i = 0; i < size; ++i) {
+        glVertex3f(size - 1, i, map->get(size - 1, i));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
-        glVertex3f(i, 199.0f, map->get(i, 199) / 32.0f);
+    for (int i = size - 1; i >= 0; --i) {
+        glVertex3f(i, size - 1, map->get(i, size - 1));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
-        glVertex3f(0.0f, i, map->get(0, i) / 32.0f);
+    for (int i = size - 1; i >= 0; --i) {
+        glVertex3f(0.0f, i, map->get(0, i));
     }
     glEnd();
 }
 
-void HeightManager::outlineRegion(HeightMap * map, float count)
+void HeightManager::outlineRegion(Mercator::Segment * map, float count)
 {
+#if 0
+    int size = map->getSize();
     glBegin(GL_LINE_STRIP);
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
+    for (int i = 0; i < size; ++i) {
         glTexCoord1f(i + count);
-        glVertex3f(i, 0.0f, map->get(i, 0) / 32.0f);
+        glVertex3f(i, 0.0f, map->get(i, 0));
     }
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
+    for (int i = 0; i < size; ++i) {
         glTexCoord1f(i + count);
-        glVertex3f(199.0f, i, map->get(199, i) / 32.0f);
+        glVertex3f(size - 1, i, map->get(size - 1, i));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
+    for (int i = size - 1; i >= 0; --i) {
         glTexCoord1f(i + count);
-        glVertex3f(i, 199.0f, map->get(i, 199) / 32.0f);
+        glVertex3f(i, size - 1, map->get(i, size - 1));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
+    for (int i = size - 1; i >= 0; --i) {
         glTexCoord1f(i + count);
-        glVertex3f(0.0f, i, map->get(0, i) / 32.0f);
+        glVertex3f(0.0f, i, map->get(0, i));
     }
     glEnd();
+#else
+    float * varray = new float[segSize * 4 * 3];
+    float * tarray = new float[segSize * segSize * 3];
+    int tdx = -1, vdx = -1;
+    for (int i = 0; i < segSize; ++i) {
+        tarray[++tdx] = i + count;
+        varray[++vdx] = i;
+        varray[++vdx] = 0.0f;
+        varray[++vdx] = map->get(i, 0);
+    }
+    for (int i = 0; i < segSize; ++i) {
+        tarray[++tdx] = i + count;
+        varray[++vdx] = segSize - 1;
+        varray[++vdx] = i;
+        varray[++vdx] = map->get(segSize - 1, i);
+    }
+    for (int i = segSize - 1; i >= 0; --i) {
+        tarray[++tdx] = i + count;
+        varray[++vdx] = i;
+        varray[++vdx] = segSize - 1;
+        varray[++vdx] = map->get(i, segSize - 1);
+    }
+    for (int i = segSize - 1; i >= 0; --i) {
+        tarray[++tdx] = i + count;
+        varray[++vdx] = 0.0f;
+        varray[++vdx] = i;
+        varray[++vdx] = map->get(0, i);
+    }
+    glPushMatrix();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, varray);
+    glTexCoordPointer(1, GL_FLOAT, 0, tarray);
+    glDrawArrays(GL_LINE_STRIP, 0, ++tdx);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glPopMatrix();
+#endif
 }
 
-void HeightManager::heightMapRegion(HeightMap * map)
+void HeightManager::heightMapRegion(Mercator::Segment * map)
 {
+#if 1
+    int size = map->getSize();
     glBegin(GL_LINE_STRIP);
     glColor3f(0.5f, 0.0f, 0.0f);
-    for (int i = 0; i < HeightData::m_gridSize - 1; ++i) {
-        for (int j = 0; j < HeightData::m_gridSize; ++j) {
-            glVertex3f(i, j, map->get(i, j) / 32.0f);
-            glVertex3f(i + 1, j, map->get(i + 1, j) / 32.0f);
+    for (int i = 0; i < size - 1; ++i) {
+        for (int j = 0; j < size; ++j) {
+            glVertex3f(i, j, map->get(i, j));
+            glVertex3f(i + 1, j, map->get(i + 1, j));
         }
-        if (++i >= HeightData::m_gridSize - 1) { break; }
-        for (int j = HeightData::m_gridSize - 1; j >= 0; --j) {
-            glVertex3f(i, j, map->get(i, j) / 32.0f);
-            glVertex3f(i + 1, j, map->get(i + 1, j) / 32.0f);
+        if (++i >= size - 1) { break; }
+        for (int j = size - 1; j >= 0; --j) {
+            glVertex3f(i, j, map->get(i, j));
+            glVertex3f(i + 1, j, map->get(i + 1, j));
         }
     }
     glEnd();
+#else
+    float * harray = new float[segSize * segSize * 3];
+    const double * points = map->getPoints();
+    int idx = -1;
+    for(int j = 0; j < segSize; ++j) {
+        for(int i = 0; i < segSize; ++i) {
+            harray[++idx] = i;
+            harray[++idx] = j;
+            harray[++idx] = map->get(i, j); // points[j * segSize + i];
+        }
+    }
+    for(int i = 0; i < 30; ++i) {
+        std::cout << harray[i] << ":";
+    }
+    std::cout << std::endl << std::flush;
+    glColor3f(0.5f, 0.0f, 0.0f);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, harray);
+    glDrawElements(GL_LINES, m_numLineIndeces, GL_INT, m_lineIndeces);
+    glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }
 
-void HeightManager::drawRegion(GlView & view, HeightMap * map)
+void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
 {
     bool selected = (m_selection.find(map) != m_selection.end());
     if (selected) {
@@ -117,41 +215,50 @@ void HeightManager::drawRegion(GlView & view, HeightMap * map)
         glBindTexture(GL_TEXTURE_1D, view.getAnts());
         outlineRegion(map, view.getAnimCount());
         glDisable(GL_TEXTURE_1D);
-        if (view.getScale() > 0.24f) {
+        // if (view.getScale() > 0.05f) {
             heightMapRegion(map);
-        }
+        // }
         return;
     }
+    int size = map->getSize();
     glBegin(GL_LINE_STRIP);
     glColor3f(1.0f, 0.0f, 0.0f);
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
-        glVertex3f(i, 0.0f, map->get(i, 0) / 32.0f);
+    for (int i = 0; i < size; ++i) {
+        glVertex3f(i, 0.0f, map->get(i, 0));
     }
-    for (int i = 0; i < HeightData::m_gridSize; ++i) {
-        glVertex3f(199.0f, i, map->get(199, i) / 32.0f);
+    for (int i = 0; i < size; ++i) {
+        glVertex3f(size - 1, i, map->get(199, i));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
-        glVertex3f(i, 199.0f, map->get(i, 199) / 32.0f);
+    for (int i = size - 1; i >= 0; --i) {
+        glVertex3f(i, size - 1, map->get(i, 199));
     }
-    for (int i = HeightData::m_gridSize - 1; i >= 0; --i) {
-        glVertex3f(0.0f, i, map->get(0, i) / 32.0f);
+    for (int i = size - 1; i >= 0; --i) {
+        glVertex3f(0.0f, i, map->get(0, i));
     }
     glEnd();
 }
 
 void HeightManager::draw(GlView & view)
 {
-    HeightData::HeightMapGrid::const_iterator I = m_model.m_heightData.begin();
-    for (; I != m_model.m_heightData.end(); ++I) {
-        glPushMatrix();
-        const GroundCoord & coord = I->first;
-        glTranslatef(coord.first * 200.0f, coord.second * 200.0f, 0.0f);
-        drawRegion(view, I->second);
-        glPopMatrix();
+    const Mercator::Terrain::Segmentstore & segs = m_model.m_terrain.getTerrain();
+
+    Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+    for (; I != segs.end(); ++I) {
+        const Mercator::Terrain::Segmentcolumn & col = I->second;
+        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+        for (; J != col.end(); ++J) {
+            glPushMatrix();
+            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            std::cout << "Drawing segment at " << I->first << "," << J->first
+                      << std::endl << std::flush;
+            drawRegion(view, J->second);
+            glPopMatrix();
+        }
     }
 }
 
 void HeightManager::animate(GlView & view)
+#if 0
 {
     HeightData::HeightMapGrid::const_iterator I = m_model.m_heightData.begin();
     for (; I != m_model.m_heightData.end(); ++I) {
@@ -170,6 +277,26 @@ void HeightManager::animate(GlView & view)
         glPopMatrix();
     }
 }
+#else
+{
+    const Mercator::Terrain::Segmentstore & segs = m_model.m_terrain.getTerrain();
+
+    Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+    for (; I != segs.end(); ++I) {
+        const Mercator::Terrain::Segmentcolumn & col = I->second;
+        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+        for (; J != col.end(); ++J) {
+            glPushMatrix();
+            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            std::cout << "Animating segment at " << I->first << "," << J->first
+                      << std::endl << std::flush;
+            // FIXME Actually do some animation maybe?
+            drawRegion(view, J->second);
+            glPopMatrix();
+        }
+    }
+}
+#endif
 
 void HeightManager::select(GlView & view, int x, int y)
 {
@@ -204,15 +331,20 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
     std::map<int, GroundCoord> nameDict;
     glPushName(nameCount);
 
-    HeightData::HeightMapGrid::const_iterator I = m_model.m_heightData.begin();
-    for (; I != m_model.m_heightData.end(); ++I) {
-        const GroundCoord & coord = I->first;
-        nameDict[++nameCount] = coord;
-        glLoadName(nameCount);
-        glPushMatrix();
-        glTranslatef(coord.first * 200.0f, coord.second * 200.0f, 0.0f);
-        selectRegion(I->second);
-        glPopMatrix();
+    const Mercator::Terrain::Segmentstore & segs = m_model.m_terrain.getTerrain();
+
+    Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
+    for (; I != segs.end(); ++I) {
+        const Mercator::Terrain::Segmentcolumn & col = I->second;
+        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+        for (; J != col.end(); ++J) {
+            nameDict[++nameCount] = GroundCoord(I->first, J->first);
+            glLoadName(nameCount);
+            glPushMatrix();
+            glTranslatef(I->first * 200.0f, J->first * 200.0f, 0.0f);
+            selectRegion(J->second);
+            glPopMatrix();
+        }
     }
     glPopName();
 
@@ -230,12 +362,11 @@ void HeightManager::select(GlView & view, int nx, int ny, int fx, int fy)
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
             std::cout << "{" << hitName << "}";
-            std::map<int, GroundCoord>::const_iterator I = nameDict.find(hitName);
-            if (I != nameDict.end()) {
-                HeightData::HeightMapGrid::const_iterator J = m_model.m_heightData.find(I->second);
-                if (J != m_model.m_heightData.end()) {
-                    m_selection.insert(J->second);
-                }
+            std::map<int, GroundCoord>::const_iterator K = nameDict.find(hitName);
+            if (K != nameDict.end()) {
+                const GroundCoord & c = K->second;
+                m_selection.insert(m_model.m_terrain.getSegmentSafe(c.first,
+                                                                    c.second));
             } else {
                 std::cout << "UNKNOWN NAME" << std::endl << std::flush;
             }

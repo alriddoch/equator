@@ -14,20 +14,26 @@ namespace Gtk {
 }
 
 class GlView;
-class HeightMap;
+
+namespace Mercator {
+  class Segment;
+}
 
 class HeightManager : public Layer {
   private:
-    std::set<HeightMap *> m_selection;
+    std::set<Mercator::Segment *> m_selection;
+    int m_numLineIndeces;
+    int * const m_lineIndeces;
 
     void load(Gtk::FileSelection *);
     void cancel(Gtk::FileSelection *);
 
-    void selectRegion(HeightMap * map);
-    void outlineRegion(HeightMap * map, float);
-    void heightMapRegion(HeightMap * map);
-    void drawRegion(GlView & view, HeightMap * map);
+    void selectRegion(Mercator::Segment * map);
+    void outlineRegion(Mercator::Segment * map, float);
+    void heightMapRegion(Mercator::Segment * map);
+    void drawRegion(GlView & view, Mercator::Segment * map);
   public:
+    static const int segSize = 200;
     explicit HeightManager(Model &);
 
     void importFile();

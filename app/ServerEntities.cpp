@@ -12,6 +12,8 @@
 
 #include "debug.h"
 
+#include <Mercator/Terrain.h>
+
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 #include <Eris/TypeInfo.h>
@@ -633,7 +635,7 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
         float x = offset.x();
         float y = offset.y();
         float z = o.z();
-        float height = m_model.m_heightData.get(x, y) / 32.0f;
+        float height = m_model.m_terrain.get(x, y); // / 32.0f;
         std::cout << ent->getID() << " had height of " << offset.z()
                   << " and we change it to " << height << std::endl << std::flush;
         WFMath::Point<3> newPos = pos;

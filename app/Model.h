@@ -15,7 +15,11 @@
 class Layer;
 class Server;
 class MainWindow;
-class HeightData;
+// class HeightData;
+
+namespace Mercator {
+  class Terrain;
+}
 
 class Model : public SigC::Object {
   private:
@@ -32,7 +36,8 @@ class Model : public SigC::Object {
 
   public:
     MainWindow & m_mainWindow;
-    HeightData & m_heightData;
+    // HeightData & m_heightData;
+    Mercator::Terrain & m_terrain;
 
     explicit Model(MainWindow & m);
 

@@ -1,3 +1,5 @@
+Sort out the ui bugs. Think about how we should handle the terrain.
+
 Add doted line to insert cursor to show its height.
 
 Re-work the scrolling code so it scrolls round a dynamic world size, and

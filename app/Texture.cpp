@@ -5,6 +5,8 @@
 #include "Texture.h"
 #include "HeightData.h"
 
+#include <Mercator/Terrain.h>
+
 #include <SDL_image.h>
 #include <GL/gl.h>
 
@@ -238,7 +240,7 @@ void Tile::draw()
     glDisable(GL_TEXTURE_2D);
 }
 
-void Tile::draw(const HeightData & h, int x, int y)
+void Tile::draw(const Mercator::Terrain & h, int x, int y)
 {
     if (tex_id == -1) { return; }
     glBindTexture(GL_TEXTURE_2D, tex_id);

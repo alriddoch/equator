@@ -1,3 +1,10 @@
+2003-01-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/HeightManager.cpp, app/HeightManager.h, app/IsoMap.cpp,
+	  app/Model.cpp, app/Model.h, app/ServerEntities.cpp,
+	  app/Texture.cpp, app/Texture.h: Use Mercator for terrain handling
+	  now, and start using vertex arrays to display it.
+
 2003-01-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.in: Correctly pick up the latest gtkglext.

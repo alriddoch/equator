@@ -63,7 +63,7 @@ void IsoMap::drawMap(GlView & view)
             glPushMatrix();
             glTranslatef(x, y, 0);
             // t->draw(map_height, x, y);
-            t->draw(m_model.m_heightData, x, y);
+            t->draw(m_model.m_terrain, x, y);
             glPopMatrix();
         }
     }
