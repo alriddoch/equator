@@ -1,5 +1,9 @@
 2003-12-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* Automate pulling in apogee rendering code.
+
+2003-12-30  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* common: Equivalent of a bunch of files from apogee, for
 	  compatability with apogee's rendering code.
 
