@@ -4,8 +4,6 @@
 
 #include "NewLayerWindow.h"
 #include "Holo.h"
-#include "BladeMap.h"
-#include "IsoMap.h"
 #include "Model.h"
 #include "Terrain.h"
 
@@ -46,18 +44,18 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
     row[*m_nameColumn]     = "HoloWorld";
     //m_list->add(*(manage( new FactoryItem(factory, "HoloWorld") )));
 
-    factory = new LayerPlant<BladeMap>();
-    LayerFactory::factories["BladeMap"] = factory;
-    m_factories["BladeMap"] = factory;
-    row = *(m_treeModel->append());
-    row[*m_nameColumn]     = "BladeMap";
+    // factory = new LayerPlant<BladeMap>();
+    // LayerFactory::factories["BladeMap"] = factory;
+    // m_factories["BladeMap"] = factory;
+    // row = *(m_treeModel->append());
+    // row[*m_nameColumn]     = "BladeMap";
     //m_list->add(*(manage( new FactoryItem(factory, "BladeMap") )));
 
-    factory = new LayerPlant<IsoMap>();
-    LayerFactory::factories["IsoMap"] = factory;
-    m_factories["IsoMap"] = factory;
-    row = *(m_treeModel->append());
-    row[*m_nameColumn]     = "IsoMap";
+    // factory = new LayerPlant<IsoMap>();
+    // LayerFactory::factories["IsoMap"] = factory;
+    // m_factories["IsoMap"] = factory;
+    // row = *(m_treeModel->append());
+    // row[*m_nameColumn]     = "IsoMap";
     //m_list->add(*(manage( new FactoryItem(factory, "IsoMap") )));
 
     // factory = new LayerPlant<HeightManager>();

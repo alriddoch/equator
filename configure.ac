@@ -64,7 +64,7 @@ AC_CHECK_LIB(GLU,gluPerspective, [ LIBS="$LIBS -lGLU" ],
     AC_MSG_ERROR(Could not find OpenGL U library)
 )
 
-PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 coal-blade-0.4 coal-iso-0.4 ,
+PKG_CHECK_MODULES(WF, mercator-0.2 eris-1.2 ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         LIBS="$LIBS $WF_LIBS"

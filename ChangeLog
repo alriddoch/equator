@@ -1,3 +1,8 @@
+2003-12-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/NewLayerWindow.cpp: Remove coal dependency, and remove coal
+	  based iso and blade map layer types.
+
 2003-12-02  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* Make configre bail if SDL libraries are missing.

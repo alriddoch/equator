@@ -18,8 +18,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  Server.cpp Server.h \
 		  Layer.cpp Layer.h \
 		  Holo.cpp Holo.h \
-		  BladeMap.cpp BladeMap.h \
-		  IsoMap.cpp IsoMap.h \
 		  TileMap.cpp TileMap.h \
 		  Terrain.cpp Terrain.h \
 		  EntityLayer.cpp EntityLayer.h \
