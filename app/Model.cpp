@@ -12,6 +12,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <cassert>
+
 static const bool pretty = false;
 
 int Model::modelCount = 0;

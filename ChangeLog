@@ -1,3 +1,10 @@
+2003-10-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/HeightMap.cpp, app/Model.cpp,
+	  app/NewServerWindow.cpp, app/ServerEntities.cpp:
+	  Add <cassert> in all the files that use the assert
+	  macro.
+
 2003-10-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp, app/ServerEntities.h: Remove coords

@@ -37,6 +37,8 @@
 
 #include <fstream>
 
+#include <cassert>
+
 static const bool debug_flag = false;
 
 using Atlas::Message::Element;

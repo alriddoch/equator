@@ -26,6 +26,8 @@
 
 #include <inttypes.h>
 
+#include <cassert>
+
 #ifndef GL_EXT_compiled_vertex_array
 PFNGLLOCKARRAYSEXTPROC glLockArraysExt = 0;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysExt = 0;

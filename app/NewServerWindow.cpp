@@ -26,6 +26,8 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
+#include <cassert>
+
 NewServerWindow::NewServerWindow(MainWindow & mw) :
                  Gtk::Dialog("Connect to server", false, true),
                  m_mainWindow(mw), m_hostEntry(0),

@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include <cassert>
+
 void pngErrorFunction(png_structp, const char *c)
 {
     std::cerr << "pngErrorFunction" << c << std::endl << std::flush;
