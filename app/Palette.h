@@ -15,18 +15,30 @@ class MainWindow;
 class Model;
 
 namespace Gtk {
-  class Notebook;
-  class CList;
-  class OptionMenu;
+   class Notebook;
+   class OptionMenu;
+   class ListStore;
+   template <class T> class TreeModelColumn;
+   class TreeModelColumnRecord;
+   class TreeView;
 }
 
 class Palette : public Gtk::Window
 {
   private:
     Gtk::Notebook * m_notebook;
-    Gtk::CList * m_tile_clist;
-    Gtk::CList * m_entity_clist;
-    Gtk::CList * m_texture_clist;
+    Glib::RefPtr<Gtk::ListStore> m_tileTreeModel;
+    Glib::RefPtr<Gtk::ListStore> m_entityTreeModel;
+    Glib::RefPtr<Gtk::ListStore> m_textureTreeModel;
+    Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
+    Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> > * m_visColumn;
+    Gtk::TreeModelColumnRecord * m_columns;
+    Gtk::TreeView * m_tileTreeView;
+    Gtk::TreeView * m_entityTreeView;
+    Gtk::TreeView * m_textureTreeView;
+    // Gtk::CList * m_tile_clist;
+    // Gtk::CList * m_entity_clist;
+    // Gtk::CList * m_texture_clist;
     Gtk::OptionMenu * m_modelMenu;
     Model * m_currentModel;
     SigC::Connection m_typeMonitor;

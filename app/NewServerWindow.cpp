@@ -23,7 +23,7 @@
 #include <gtkmm/statusbar.h>
 
 NewServerWindow::NewServerWindow(MainWindow & mw) :
-                 Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(mw),
+                 Gtk::Window(Gtk::WINDOW_TOPLEVEL), m_mainWindow(mw),
                  m_hostEntry(NULL), m_portChoice(NULL),
                  m_portSpin(NULL), m_connectButton(NULL),
                  m_userEntry(NULL), m_passwdEntry(NULL),
@@ -37,87 +37,92 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Hostname:") )), false, false, 2);
-    m_hostEntry = manage( new Gtk::Entry(60) );
+    hbox->pack_start(*(manage( new Gtk::Label("Hostname:") )), Gtk::AttachOptions(0), 2);
+    m_hostEntry = manage( new Gtk::Entry() );
     m_hostEntry->set_text("localhost");
-    hbox->pack_end(*m_hostEntry, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    m_hostEntry->set_max_length(60);
+    hbox->pack_end(*m_hostEntry, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Port:") )), false, false, 2);
+    hbox->pack_start(*(manage( new Gtk::Label("Port:") )), Gtk::AttachOptions(0), 2);
     m_portChoice = manage( new Gtk::OptionMenu() );
     Gtk::Menu * portMenu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
     portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6767)));
     portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(slot(*this, &NewServerWindow::setPort), 6768)));
     portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", slot(*this, &NewServerWindow::setCustomPort)));
-    m_portChoice->set_menu(portMenu);
-    hbox->pack_start(*m_portChoice, false, false, 2);
+    m_portChoice->set_menu(*portMenu);
+    hbox->pack_start(*m_portChoice, Gtk::AttachOptions(0), 2);
     Gtk::Adjustment * adj = manage( new Gtk::Adjustment (6767.0, 1.0, 32768.0) );
     m_portSpin = manage( new Gtk::SpinButton(*adj, 1) );
     m_portSpin->set_sensitive(false);
-    hbox->pack_end(*m_portSpin, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    hbox->pack_end(*m_portSpin, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     m_connectButton = manage( new Gtk::Button("Connect") );
-    m_connectButton->clicked.connect(slot(*this, &NewServerWindow::createConnection));
-    vbox->pack_start(*m_connectButton, false, false, 0);
+    m_connectButton->signal_clicked().connect(slot(*this, &NewServerWindow::createConnection));
+    vbox->pack_start(*m_connectButton, Gtk::AttachOptions(0), 0);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Username:") )), false, false, 2);
-    m_userEntry = manage( new Gtk::Entry(60) );
-    hbox->pack_end(*m_userEntry, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    hbox->pack_start(*(manage( new Gtk::Label("Username:") )), Gtk::AttachOptions(0), 2);
+    m_userEntry = manage( new Gtk::Entry() );
+    m_userEntry->set_max_length(60);
+    hbox->pack_end(*m_userEntry, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Password:") )), false, false, 2);
-    m_passwdEntry = manage( new Gtk::Entry(60) );
+    hbox->pack_start(*(manage( new Gtk::Label("Password:") )), Gtk::AttachOptions(0), 2);
+    m_passwdEntry = manage( new Gtk::Entry() );
     m_passwdEntry->set_visibility(false);
-    hbox->pack_end(*m_passwdEntry, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    m_passwdEntry->set_max_length(60);
+    hbox->pack_end(*m_passwdEntry, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     hbox = manage( new Gtk::HBox() );
     m_loginButton = manage( new Gtk::Button("Login") );
-    m_loginButton->clicked.connect(slot(*this, &NewServerWindow::loginAccount));
+    m_loginButton->signal_clicked().connect(slot(*this, &NewServerWindow::loginAccount));
     m_loginButton->set_sensitive(false);
-    hbox->pack_start(*m_loginButton, true, true, 0);
+    hbox->pack_start(*m_loginButton);
     m_createButton = manage( new Gtk::Button("Create") );
-    m_createButton->clicked.connect(slot(*this, &NewServerWindow::createAccount));
+    m_createButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAccount));
     m_createButton->set_sensitive(false);
-    hbox->pack_start(*m_createButton, true, true, 0);
-    vbox->pack_start(*hbox, false, false, 0);
+    hbox->pack_start(*m_createButton);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
-    vbox->pack_start(*(manage( new Gtk::Label("In Game Avatar") )), false, false, 2);
-
-    hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Avatar Name:") )), false, false, 2);
-    m_avatarNameEntry = manage( new Gtk::Entry(60) );
-    hbox->pack_end(*m_avatarNameEntry, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    vbox->pack_start(*(manage( new Gtk::Label("In Game Avatar") )), Gtk::AttachOptions(0), 2);
 
     hbox = manage( new Gtk::HBox() );
-    hbox->pack_start(*(manage( new Gtk::Label("Avatar Type:") )), false, false, 2);
-    m_avatarTypeEntry = manage( new Gtk::Entry(60) );
-    hbox->pack_end(*m_avatarTypeEntry, false, false, 2);
-    vbox->pack_start(*hbox, false, false, 0);
+    hbox->pack_start(*(manage( new Gtk::Label("Avatar Name:") )), Gtk::AttachOptions(0), 2);
+    m_avatarNameEntry = manage( new Gtk::Entry() );
+    m_avatarNameEntry->set_max_length(60);
+    hbox->pack_end(*m_avatarNameEntry, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
+
+    hbox = manage( new Gtk::HBox() );
+    hbox->pack_start(*(manage( new Gtk::Label("Avatar Type:") )), Gtk::AttachOptions(0), 2);
+    m_avatarTypeEntry = manage( new Gtk::Entry() );
+    m_avatarTypeEntry->set_max_length(60);
+    hbox->pack_end(*m_avatarTypeEntry, Gtk::AttachOptions(0), 2);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     m_avatarButton = manage( new Gtk::Button("Create Avatar") );
-    m_avatarButton->clicked.connect(slot(*this, &NewServerWindow::createAvatar));
+    m_avatarButton->signal_clicked().connect(slot(*this, &NewServerWindow::createAvatar));
     m_avatarButton->set_sensitive(false);
-    vbox->pack_start(*m_avatarButton, false, false, 0);
+    vbox->pack_start(*m_avatarButton, Gtk::AttachOptions(0), 0);
 
     m_viewButton = manage( new Gtk::Button("View") );
-    m_viewButton->clicked.connect(slot(*this, &NewServerWindow::createView));
+    m_viewButton->signal_clicked().connect(slot(*this, &NewServerWindow::createView));
     m_viewButton->set_sensitive(false);
-    vbox->pack_start(*m_viewButton, false, false, 0);
+    vbox->pack_start(*m_viewButton, Gtk::AttachOptions(0), 0);
 
     Gtk::Button * b = manage( new Gtk::Button("Dismiss") );
-    b->clicked.connect(slot(*this, &NewServerWindow::dismiss));
-    vbox->pack_start(*b, false, false, 0);
+    b->signal_clicked().connect(slot(*this, &NewServerWindow::dismiss));
+    vbox->pack_start(*b, Gtk::AttachOptions(0), 0);
 
     m_status = manage( new Gtk::Statusbar() );
     m_statusContext = m_status->get_context_id("Connection status");
-    vbox->pack_start(*m_status, false, false, 0);
+    vbox->pack_start(*m_status, Gtk::AttachOptions(0), 0);
 
     add(*vbox);
 
@@ -148,7 +153,7 @@ void NewServerWindow::createConnection()
 {
     assert(m_server == NULL);
 
-    m_status->push(m_statusContext, "Connecting...");
+    m_status->push("Connecting...", m_statusContext);
 
     m_server = new Server();
 
@@ -170,7 +175,7 @@ void NewServerWindow::loginAccount()
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Logging in");
+    m_status->push("Logging in", m_statusContext);
 
     m_server->login(m_userEntry->get_text(), m_passwdEntry->get_text());
     m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
@@ -181,7 +186,7 @@ void NewServerWindow::createAccount()
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Creating account");
+    m_status->push("Creating account", m_statusContext);
 
     m_server->createAccount(m_userEntry->get_text(), m_passwdEntry->get_text());
     m_loggedIn = m_server->connection.getLobby()->LoggedIn.connect(SigC::slot(*this, &NewServerWindow::loginComplete));
@@ -192,7 +197,7 @@ void NewServerWindow::createAvatar()
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Creating avatar");
+    m_status->push("Creating avatar", m_statusContext);
 
     m_server->createCharacter(m_avatarNameEntry->get_text(), m_avatarTypeEntry->get_text());
 
@@ -210,7 +215,7 @@ void NewServerWindow::createView()
 void NewServerWindow::failure(const std::string & msg)
 {
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Connection failed");
+    m_status->push("Connection failed", m_statusContext);
 
     std::cout << "Got connection failure in NewServerWindow" << std::endl
               << std::flush;
@@ -222,7 +227,7 @@ void NewServerWindow::connected()
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Connected");
+    m_status->push("Connected", m_statusContext);
 
     m_hostEntry->set_editable(false);
     m_connectButton->set_sensitive(false);
@@ -238,7 +243,7 @@ void NewServerWindow::loginComplete(const Atlas::Objects::Entity::Player &)
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Logged in");
+    m_status->push("Logged in", m_statusContext);
 
     m_userEntry->set_editable(false);
     m_passwdEntry->set_text("");
@@ -252,7 +257,7 @@ void NewServerWindow::worldEnter(Eris::Entity*)
     assert(m_server != NULL);
 
     m_status->pop(m_statusContext);
-    m_status->push(m_statusContext, "Avatar created in world");
+    m_status->push("Avatar created in world", m_statusContext);
 
     m_avatarNameEntry->set_editable(false);
     m_avatarTypeEntry->set_editable(false);

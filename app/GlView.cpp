@@ -56,9 +56,10 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
                                m_viewWindow(vw),
                                m_model(m)
 {
-    glconfig = Gdk::GL::Config::create(Gdk::GL::MODE_RGB |
-                                     Gdk::GL::MODE_DEPTH |
-                                     Gdk::GL::MODE_DOUBLE);
+    Glib::RefPtr<Gdk::GL::Config> glconfig = Gdk::GL::Config::create(
+                                             Gdk::GL::MODE_RGB |
+                                             Gdk::GL::MODE_DEPTH |
+                                             Gdk::GL::MODE_DOUBLE);
     if (glconfig.is_null()) {
         std::cerr << "*** Cannot find the double-buffered visual.\n"
                   << "*** Trying single-buffered visual.\n";
@@ -76,12 +77,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
         Gtk::GL::Widget::set_gl_capability(*this, glconfig);
     }
 
-    m.updated.connect(slot(this, &GlView::redraw));
+    m.updated.connect(slot(*this, &GlView::redraw));
 
-    set_events(GDK_POINTER_MOTION_MASK|
-               GDK_EXPOSURE_MASK|
-               GDK_BUTTON_PRESS_MASK|
-               GDK_BUTTON_RELEASE_MASK);
+    set_events(Gdk::POINTER_MOTION_MASK|
+               Gdk::EXPOSURE_MASK|
+               Gdk::BUTTON_PRESS_MASK|
+               Gdk::BUTTON_RELEASE_MASK);
 
     m_popup = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& list_popup = m_popup->items();
@@ -93,8 +94,8 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save"));
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Save As..."));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", SigC::slot(&m_model, &Model::importFile)));
-    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Export...", SigC::slot(&m_model, &Model::exportFile)));
+    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Import...", SigC::slot(m_model, &Model::importFile)));
+    file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Export...", SigC::slot(m_model, &Model::exportFile)));
     file_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_popup.push_back(Gtk::Menu_Helpers::MenuElem("Close"));
 
@@ -106,11 +107,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Undo"));
     edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Redo"));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut", Gtk::Menu_Helpers::CTL|'x'));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy", Gtk::Menu_Helpers::CTL|'c'));
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste", Gtk::Menu_Helpers::CTL|'v'));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Cut", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'x')));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Copy", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'c')));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Paste", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'v')));
     edit_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Delete", Gtk::Menu_Helpers::CTL|'d'));
+    edit_popup.push_back(Gtk::Menu_Helpers::MenuElem("Delete", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'d')));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Edit",*menu_sub));
 
@@ -121,15 +122,15 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("All"));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("None"));
     select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Push", '>', slot(&m_model, &Model::pushSelection)));
-    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Pop", '<', slot(&m_model, &Model::popSelection)));
+    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Push", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '>'), slot(m_model, &Model::pushSelection)));
+    select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Pop", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '<'), slot(m_model, &Model::popSelection)));
     select_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     Gtk::Menu * menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& align_popup = menu_sub_sub->items();
     align_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to heightfield", SigC::bind<Alignment>(slot(&m_model, &Model::alignSelection), ALIGN_HEIGHT)));
-    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to grid", SigC::bind<Alignment>(slot(&m_model, &Model::alignSelection), ALIGN_GRID)));
+    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to heightfield", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_HEIGHT)));
+    align_popup.push_back(Gtk::Menu_Helpers::MenuElem("to grid", SigC::bind<Alignment>(slot(m_model, &Model::alignSelection), ALIGN_GRID)));
     select_popup.push_back(Gtk::Menu_Helpers::MenuElem("Align", *menu_sub_sub));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select",*menu_sub));
@@ -137,59 +138,59 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& view_popup = menu_sub->items();
     view_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", '=', slot(this, &GlView::zoomIn)));
-    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", '-', slot(this, &GlView::zoomOut)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom In", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '='), slot(*this, &GlView::zoomIn)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom Out", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '-'), slot(*this, &GlView::zoomOut)));
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& zoom_popup = menu_sub_sub->items();
     zoom_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("16:1", SigC::bind<float>(slot(this, &GlView::setScale), 16)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("8:1", SigC::bind<float>(slot(this, &GlView::setScale), 8)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("4:1", SigC::bind<float>(slot(this, &GlView::setScale), 4)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("2:1", SigC::bind<float>(slot(this, &GlView::setScale), 2)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:1", '1', SigC::bind<float>(slot(this, &GlView::setScale), 1)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:2", SigC::bind<float>(slot(this, &GlView::setScale), 0.5f)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:4", SigC::bind<float>(slot(this, &GlView::setScale), 0.25f)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:8", SigC::bind<float>(slot(this, &GlView::setScale), 0.125f)));
-    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:16", SigC::bind<float>(slot(this, &GlView::setScale), 0.0625f)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("16:1", SigC::bind<float>(slot(*this, &GlView::setScale), 16)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("8:1", SigC::bind<float>(slot(*this, &GlView::setScale), 8)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("4:1", SigC::bind<float>(slot(*this, &GlView::setScale), 4)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("2:1", SigC::bind<float>(slot(*this, &GlView::setScale), 2)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:1", Gtk::Menu_Helpers::AccelKey(Gdk::ModifierType(0), '1'), SigC::bind<float>(slot(*this, &GlView::setScale), 1)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:2", SigC::bind<float>(slot(*this, &GlView::setScale), 0.5f)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:4", SigC::bind<float>(slot(*this, &GlView::setScale), 0.25f)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:8", SigC::bind<float>(slot(*this, &GlView::setScale), 0.125f)));
+    zoom_popup.push_back(Gtk::Menu_Helpers::MenuElem("1:16", SigC::bind<float>(slot(*this, &GlView::setScale), 0.0625f)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Zoom", *menu_sub_sub));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     Gtk::RadioMenuItem::Group projection_group;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
-                         "Orthographic", slot(this, &GlView::setOrthographic)));
-    static_cast<Gtk::RadioMenuItem*>(view_popup.back())->set_active();
+                         "Orthographic", slot(*this, &GlView::setOrthographic)));
+    static_cast<Gtk::RadioMenuItem*>(&view_popup.back())->set_active();
     m_projection = GlView::ORTHO;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
-                         "Perspective", slot(this, &GlView::setPerspective)));
+                         "Perspective", slot(*this, &GlView::setPerspective)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     Gtk::RadioMenuItem::Group render_group;
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Line", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),LINE)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Solid", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SOLID)));
-    static_cast<Gtk::RadioMenuItem*>(view_popup.back())->set_active();
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Line", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),LINE)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Solid", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SOLID)));
+    static_cast<Gtk::RadioMenuItem*>(&view_popup.back())->set_active();
     m_renderMode = GlView::SOLID;
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Shaded", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SHADED)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),TEXTURE)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<enum render>(slot(this, &GlView::setRenderMode),SHADETEXT)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Shaded", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SHADED)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Textured", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),TEXTURE)));
+    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(render_group, "Lit", SigC::bind<enum render>(slot(*this, &GlView::setRenderMode),SHADETEXT)));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& face_popup = menu_sub_sub->items();
     face_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Isometric", "KP_5", SigC::bind<float, float>(slot(this, &GlView::setFace), 60, 45)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("North", "KP_1", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 0)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("South", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 180)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("West", "KP_3", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, -90)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("East", SigC::bind<float, float>(slot(this, &GlView::setFace), 90, 90)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", "KP_7", SigC::bind<float, float>(slot(this, &GlView::setFace), 0, 0)));
-    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Up", SigC::bind<float, float>(slot(this, &GlView::setFace), 180, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Isometric", Gtk::Menu_Helpers::AccelKey("KP_5"), SigC::bind<float, float>(slot(*this, &GlView::setFace), 60, 45)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("North", Gtk::Menu_Helpers::AccelKey("KP_1"), SigC::bind<float, float>(slot(*this, &GlView::setFace), 90, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("South", SigC::bind<float, float>(slot(*this, &GlView::setFace), 90, 180)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("West", Gtk::Menu_Helpers::AccelKey("KP_3"), SigC::bind<float, float>(slot(*this, &GlView::setFace), 90, -90)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("East", SigC::bind<float, float>(slot(*this, &GlView::setFace), 90, 90)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Down", Gtk::Menu_Helpers::AccelKey("KP_7"), SigC::bind<float, float>(slot(*this, &GlView::setFace), 0, 0)));
+    face_popup.push_back(Gtk::Menu_Helpers::MenuElem("Up", SigC::bind<float, float>(slot(*this, &GlView::setFace), 180, 0)));
     view_popup.push_back(Gtk::Menu_Helpers::MenuElem("Face..", *menu_sub_sub));
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("New View", SigC::bind<Model*>(slot(&m_mainWindow, &MainWindow::newView),&m_model)));
+    view_popup.push_back(Gtk::Menu_Helpers::MenuElem("New View", SigC::bind<Model*>(slot(m_mainWindow, &MainWindow::newView),&m_model)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("View",*menu_sub));
 
     menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& layer_popup = menu_sub->items();
     layer_popup.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(&m_mainWindow, &MainWindow::openLayers)));
+    layer_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(m_mainWindow, &MainWindow::openLayers)));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Layers",*menu_sub));
 
@@ -197,12 +198,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     Gtk::Menu_Helpers::MenuList& tools_popup = menu_sub->items();
     menu_sub_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& generic_tools_popup = menu_sub_sub->items();
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select single", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select area", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Insert", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Rotate", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Scale", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
-    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Translate", bind(slot(&m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select single", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SELECT)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Select area", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::AREA)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Insert", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::DRAW)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Rotate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::ROTATE)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Scale", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::SCALE)));
+    generic_tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Translate", SigC::bind(slot(m_mainWindow,&MainWindow::toolSelect),MainWindow::MOVE)));
     tools_popup.push_back(Gtk::Menu_Helpers::MenuElem("Generic", *menu_sub_sub));
 
     list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Tools",*menu_sub));
@@ -234,11 +235,11 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
 
     // list_popup.push_back(Gtk::Menu_Helpers::MenuElem("Float 3"));
 
-    // Gtk::Main::timeout.connect(slot(this, &GlView::animate), 100);
+    // Gtk::Main::timeout.connect(slot(*this, &GlView::animate), 100);
 
     m_popup->accelerate(m_viewWindow);
 
-    m_model.cursorMoved.connect(SigC::slot(&m_viewWindow,
+    m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
                                            &ViewWindow::cursorMoved));
 }
 
@@ -327,21 +328,21 @@ void GlView::setupgl()
     if (make_current()) {
         glClearColor(0.0, 0.0, 0.0, 0.0);
         glEnable(GL_DEPTH_TEST);
-        glViewport(0, 0, (GLint)(width()), (GLint)(height()));
+        glViewport(0, 0, (GLint)(get_width()), (GLint)(get_height()));
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
         if (m_projection == GlView::PERSP) {
-            if (width()>height()) {
-                GLfloat w = (GLfloat) width() / (GLfloat) height();
+            if (get_width()>get_height()) {
+                GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();
                 glFrustum( -w, w, -1.0f, 1.0f, 1.0f, 60.0f );
             } else {
-                GLfloat h = (GLfloat) height() / (GLfloat) width();
+                GLfloat h = (GLfloat) get_height() / (GLfloat) get_width();
                 glFrustum( -1.0f, 1.0f, -h, h, 1.0f, 60.0f );
             }
         } else {
-            float xsize = width() / 40.0f / 2.0f;
-            float ysize = height() / 40.0f / 2.0f;
+            float xsize = get_width() / 40.0f / 2.0f;
+            float ysize = get_height() / 40.0f / 2.0f;
             glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
         }
     }
@@ -426,12 +427,12 @@ void GlView::drawgl()
         }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
+        glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glBlendFunc(GL_SRC_ALPHA,GL_ONE);                   // Set The Blending Function For Translucency
         if ((clickx != 0) && (m_dragType == GlView::SELECT)) {
-            glTranslatef(clickx, height() - clicky, 100.0f);
+            glTranslatef(clickx, get_height() - clicky, 100.0f);
             float x = mousex - clickx;
             float y = clicky - mousey;
             std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
@@ -508,7 +509,7 @@ void GlView::clickOn(int x, int y)
     switch (m_mainWindow.getTool()) {
         case MainWindow::SELECT:
             if (make_current()) {
-                m_model.getCurrentLayer()->select(*this, mousex, height() - mousey);
+                m_model.getCurrentLayer()->select(*this, mousex, get_height() - mousey);
             }
             break;
         case MainWindow::AREA:
@@ -517,7 +518,7 @@ void GlView::clickOn(int x, int y)
             break;
         case MainWindow::MOVE:
             //clickx = x; clicky = y;
-            m_model.getCurrentLayer()->dragStart(*this, x, height() - y);
+            m_model.getCurrentLayer()->dragStart(*this, x, get_height() - y);
             dragDepth = -2;
             worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
             m_dragType = GlView::MOVE;
@@ -549,9 +550,9 @@ void GlView::clickOff(int x, int y)
         case MainWindow::AREA:
             if (make_current()) {
                 if ((clickx == mousex) && (clicky == clicky)) {
-                    m_model.getCurrentLayer()->select(*this, mousex, height() - mousey);
+                    m_model.getCurrentLayer()->select(*this, mousex, get_height() - mousey);
                 } else {
-                    m_model.getCurrentLayer()->select(*this, clickx, height() - clicky, mousex, height() - mousey);
+                    m_model.getCurrentLayer()->select(*this, clickx, get_height() - clicky, mousex, get_height() - mousey);
                 }
             }
             m_dragType = GlView::NONE;
@@ -606,7 +607,7 @@ void GlView::worldPoint(int x, int y, double &z,
         GLdouble mvmatrix[16], projmatrix[16];
         // float z = 0.5;
         if (z < -1) {
-            z = getZ(x, height() - y);
+            z = getZ(x, get_height() - y);
         }
 
         setupgl();
@@ -616,7 +617,7 @@ void GlView::worldPoint(int x, int y, double &z,
         glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
         glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
-        gluUnProject(x, height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
+        gluUnProject(x, get_height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
         std::cout << "[" << x << ":" << y << ":" << z << "]";
         std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
     }
@@ -630,7 +631,7 @@ void GlView::screenPoint(double x, double y, double z,
         GLdouble mvmatrix[16], projmatrix[16];
         // float z = 0.5;
         if (z < -1) {
-            z = getZ(x, height() - y);
+            z = getZ(x, get_height() - y);
         }
 
         setupgl();
@@ -643,14 +644,14 @@ void GlView::screenPoint(double x, double y, double z,
         double tx, ty, tz;
         gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
         sx = tx;
-        sy = height() - ty;
+        sy = get_height() - ty;
         sz = tz;
     }
 }
 
 void GlView::realize_impl()
 {
-    Gtk::GLArea::realize_impl();
+    Gtk::DrawingArea::realize_impl();
     initgl();
 }
 
@@ -672,12 +673,12 @@ void GlView::mouseEffects()
     if (clickx != 0) {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, width(), 0, height(), -100.0f, 200.0f);
+        glOrtho(0, get_width(), 0, get_height(), -100.0f, 200.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glBlendFunc(GL_SRC_ALPHA,GL_ONE); // Set The Blending Function For Translucency
         // glClear( GL_COLOR_BUFFER_BIT);
-        glTranslatef(clickx, height() - clicky, 100.0f);
+        glTranslatef(clickx, get_height() - clicky, 100.0f);
         float x = mousex - clickx;
         float y = clicky - mousey;
         std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
@@ -787,16 +788,16 @@ void GlView::redraw()
 void GlView::setPickProjection()
 {
     if (m_projection == GlView::PERSP) {
-        if (width()>height()) {
-            GLfloat w = (GLfloat) width() / (GLfloat) height();
+        if (get_width()>get_height()) {
+            GLfloat w = (GLfloat) get_width() / (GLfloat) get_height();
             glFrustum( -w, w, -1.0f, 1.0f, 0.65f, 60.0f );
         } else {
-            GLfloat h = (GLfloat) height() / (GLfloat) width();
+            GLfloat h = (GLfloat) get_height() / (GLfloat) get_width();
             glFrustum( -1.0f, 1.0f, -h, h, 0.65f, 60.0f );
         }
     } else {
-        float xsize = width() / 40.0f / 2.0f;
-        float ysize = height() / 40.0f / 2.0f;
+        float xsize = get_width() / 40.0f / 2.0f;
+        float ysize = get_height() / 40.0f / 2.0f;
         glOrtho(-xsize, xsize, -ysize, ysize, -0.0f, 1000.0f);
     }
     glMatrixMode(GL_MODELVIEW);
@@ -844,7 +845,7 @@ void GlView::setViewOffset(float h, float v, float d)
 
 float GlView::getViewSize()
 {
-    float winsize = std::sqrt((float)(width() * width() + height() * height()));
+    float winsize = std::sqrt((float)(get_width() * get_width() + get_height() * get_height()));
 
     return (winsize / (40.0f * getScale()) + 1);
 }

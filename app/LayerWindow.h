@@ -14,7 +14,6 @@ class NewLayerWindow;;
 class Model;
 
 namespace Gtk {
-   class CList;
    class OptionMenu;
    class ListStore;
    template <class T> class TreeModelColumn;

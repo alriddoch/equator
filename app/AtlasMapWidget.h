@@ -6,18 +6,18 @@
 #define EQUATOR_APP_ATLASMAPWIDGET_H
 
 #include <Atlas/Message/Object.h>
-#include <gtkmm/ctree.h>
+#include <gtkmm/treeview.h>
 
-class AtlasMapWidget : public Gtk::CTree
+class AtlasMapWidget : public Gtk::TreeView
 {
   private:
     Atlas::Message::Object::MapType m_contents;
 
-    void add(Gtk::CTree_Helpers::RowList, const std::string&,
+    void add(/* Gtk::CTree_Helpers::RowList,*/ const std::string&,
              const Atlas::Message::Object &);
     void update();
   public:
-    AtlasMapWidget(const Gtk::SArray &,
+    AtlasMapWidget(/* const Gtk::SArray &, */
                    const Atlas::Message::Object::MapType &);
 
     void setContents(const Atlas::Message::Object::MapType &);
