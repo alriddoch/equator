@@ -1,5 +1,10 @@
 2003-05-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/HeightManager.cpp: Render water surface with terrain, to make
+	  the edge of the water clearer.
+
+2003-05-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/ServerEntities.cpp: Fix texture coords for marching ants.
 
 2003-05-11  Al Riddoch  <alriddoch@zepler.org>

@@ -227,6 +227,29 @@ void HeightManager::draw(GlView & view)
         }
     }
 
+    glEnable(GL_BLEND);
+    I = segs.begin();
+    for (; I != segs.end(); ++I) {
+        const Mercator::Terrain::Segmentcolumn & col = I->second;
+        Mercator::Terrain::Segmentcolumn::const_iterator J = col.begin();
+        for (; J != col.end(); ++J) {
+            if (m_selection.find(J->second) == m_selection.end()) {
+                continue;
+            }
+            glPushMatrix();
+            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
+            GLfloat vertices[] = { 0.f, 0.f, 0.f,
+                                   segSize, 0, 0.f,
+                                   segSize, segSize, 0.f,
+                                   0, segSize, 0.f };
+            glVertexPointer(3, GL_FLOAT, 0, vertices);
+            glColor4f(1.f, 1.f, 1.f, 0.3f);
+            glDrawArrays(GL_QUADS, 0, 4);
+            glPopMatrix();
+        }
+    }
+    glDisable(GL_BLEND);
+
     if ((m_model.getCurrentLayer() != this) ||
         (m_model.m_mainWindow.getMode() != MainWindow::VERTEX)) {
         return;
