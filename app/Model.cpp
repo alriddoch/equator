@@ -39,6 +39,11 @@ void Model::addLayer(Layer * layer)
     updated.emit();
 }
 
+void Model::update()
+{
+    updated.emit();
+}
+
 void Model::raiseCurrentLayer()
 {
     std::list<Layer *>::iterator I = m_layers.begin();

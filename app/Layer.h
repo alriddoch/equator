@@ -49,6 +49,10 @@ class Layer : public SigC::Object {
     bool isVisible() const {
         return m_visible;
     }
+
+    bool toggleVisible() {
+        return (m_visible = !m_visible);
+    }
 };
 
 #endif // EQUATOR_APP_LAYER_H

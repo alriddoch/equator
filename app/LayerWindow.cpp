@@ -24,6 +24,9 @@
 #include <list>
 #include <sstream>
 
+#include "../eye.xpm"
+#include "../null.xpm"
+
 LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
                                            m_currentModel(NULL) // , m_mainWindow(w)
 {
@@ -89,6 +92,12 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     set_title("Layers");
     set_sensitive(false);
 
+    m_eye = gdk_pixmap_create_from_xpm_d(m_clist->gtkobj()->clist_window,
+            &m_eyemask, &GTK_WIDGET(m_clist->gtkobj())->style->white, eye_xpm);
+
+    m_null = gdk_pixmap_create_from_xpm_d(m_clist->gtkobj()->clist_window,
+           &m_nullmask, &GTK_WIDGET(m_clist->gtkobj())->style->white, null_xpm);
+
     m_newLayerWindow = manage( new NewLayerWindow() );
     // show_all();
 
@@ -118,18 +127,23 @@ void LayerWindow::setModel(Model * model)
 
 void LayerWindow::updateLayers()
 {
+
     m_clist->clear();
     const std::list<Layer *> & layers = m_currentModel->getLayers();
  
     std::list<Layer *>::const_iterator I = layers.begin();
     for (; I != layers.end(); I++) {
-        std::vector<Gtk::string> entry(1, (*I)->isVisible() ? "X" : "");
+        std::vector<Gtk::string> entry(1,"");
         entry.push_back((*I)->getType());
         entry.push_back((*I)->getName());
         m_clist->rows().push_front(entry);
         if (*I == m_currentModel->getCurrentLayer()) {
             m_clist->rows().front()->select();
         }
+        if (!(*I)->isVisible()) {
+            continue;
+        }
+        m_clist->cell(0, 0).set_pixmap(m_eye,m_eyemask);
     }
 
 }
@@ -164,7 +178,16 @@ void LayerWindow::selectionMade(gint row, gint column, GdkEvent * event)
         return;
     }
     m_currentModel->setCurrentLayer(*I);
-    std::cout << "new sel" << row << " " << (*I)->getName() << std::endl << std::flush;
+    std::cout << "new sel " << row << " " << column << " " << (*I)->getName() << std::endl << std::flush;
+    if (column == 0) {
+        bool vis = (*I)->toggleVisible();
+        if (vis) {
+            m_clist->cell(row, column).set_pixmap(m_eye,m_eyemask);
+        } else {
+            m_clist->cell(row, column).set_pixmap(m_null,m_nullmask);
+        }
+        m_currentModel->update();
+    }
 }
 
 void LayerWindow::newLayerRequested()

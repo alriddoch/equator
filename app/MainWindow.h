@@ -14,6 +14,7 @@ class ViewWindow;
 class LayerWindow;
 class InheritanceWindow;
 class ServerWindow;
+class Palette;
 class NewServerWindow;
 class GlView;
 class Model;
@@ -33,6 +34,7 @@ class MainWindow : public Gtk::Window
     InheritanceWindow * m_inheritancewindow;
     ServerWindow * m_serverwindow;
     NewServerWindow * m_newServerwindow;
+    Palette * m_palettewindow;
 
   public:
     typedef enum {
@@ -81,6 +83,7 @@ class MainWindow : public Gtk::Window
     void menu_quit();
     void inheritance_dialog();
     void server_dialog();
+    void palette();
     void new_server_dialog();
     void open_layers(Model *);
     void toolSelect(toolType);
@@ -88,6 +91,7 @@ class MainWindow : public Gtk::Window
 
     SigC::Signal1<void, Model *> modelAdded;
     SigC::Signal1<void, Server *> serverAdded;
+    SigC::Signal1<void, Model *> currentModelChanged;
 };
 
 #endif // EQUATOR_APP_MAINWINDOW_H

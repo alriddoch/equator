@@ -9,6 +9,7 @@
 #include "ServerWindow.h"
 #include "NewServerWindow.h"
 #include "Model.h"
+#include "Palette.h"
 
 #include <gtk--/main.h>
 #include <gtk--/menu.h>
@@ -20,6 +21,9 @@
 #include <gtk--/box.h>
 #include <gtk--/pixmap.h>
 #include <gtk--/table.h>
+
+#warning Should probably use this trick with all of them
+#include "../arrow.xpm"
 
 #include <iostream>
 
@@ -46,7 +50,7 @@ MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", SigC::bind<Model*>(slot(this, &MainWindow::open_layers),NULL)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
     dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entities..."));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(this, &MainWindow::palette)));
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -76,7 +80,8 @@ MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::ToggleButton * b = select_tool = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
     b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::SELECT));
-    Gtk::Pixmap * p = manage( new Gtk::Pixmap("arrow.xpm") );
+    //Gtk::Pixmap * p = manage( new Gtk::Pixmap("arrow.xpm") );
+    Gtk::Pixmap * p = manage( new Gtk::Pixmap(arrow_xpm) );
     b->add(*p);
     table->attach(*b, 0, 1, 0, 1);
 
@@ -144,6 +149,7 @@ MainWindow::MainWindow(Gtk::Main & m) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_inheritancewindow = manage( new InheritanceWindow(*this) );
     m_serverwindow = manage( new ServerWindow(*this) );
     m_newServerwindow = manage( new NewServerWindow(*this) );
+    m_palettewindow = manage( new Palette(*this) );
 }
 
 gint MainWindow::quit(GdkEventAny *)
@@ -188,6 +194,11 @@ void MainWindow::inheritance_dialog()
 void MainWindow::server_dialog()
 {
     m_serverwindow->show_all();
+}
+
+void MainWindow::palette()
+{
+    m_palettewindow->show_all();
 }
 
 void MainWindow::new_server_dialog()

@@ -7,6 +7,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  ServerWindow.cpp ServerWindow.h \
 		  NewLayerWindow.cpp NewLayerWindow.h \
 		  NewServerWindow.cpp NewServerWindow.h \
+		  Palette.cpp Palette.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
 		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \

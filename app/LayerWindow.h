@@ -6,7 +6,6 @@
 #define EQUATOR_APP_LAYERWINDOW_H
 
 #include <gtk--/window.h>
-#include <gtk--/clist.h>
 
 class MainWindow;
 class ViewWindow;
@@ -15,7 +14,9 @@ class NewLayerWindow;;
 class Model;
 
 namespace Gtk {
+   class CList;
    class OptionMenu;
+   class Pixmap;
 }
 
 class LayerWindow : public Gtk::Window
@@ -23,6 +24,11 @@ class LayerWindow : public Gtk::Window
   private:
     Gtk::CList * m_clist;
     Gtk::OptionMenu * m_modelMenu;
+    GdkPixmap * m_eye;
+    GdkBitmap * m_eyemask;
+    GdkPixmap * m_null;
+    GdkBitmap * m_nullmask;
+
     Model * m_currentModel;
     NewLayerWindow * m_newLayerWindow;
     SigC::Connection m_updateSignal;

@@ -232,7 +232,7 @@ void GlView::drawgl()
         const std::list<Layer *> & layers = m_model.getLayers();
         std::list<Layer *>::const_iterator I;
         for(I = layers.begin(); I != layers.end(); I++) {
-            (*I)->draw(*this);
+            if ((*I)->isVisible()) { (*I)->draw(*this); }
         }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();

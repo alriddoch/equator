@@ -1,3 +1,21 @@
+2002-01-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Model.h, app/Model.cpp: Add update method, so other code can
+	  notify that the models data has changed, and cause Model to emit
+	  a signal.
+
+	* app/Palette.h, app/Palette.cpp, app/MainWIndow.h, app/MainWindow.cpp:
+	  Beginnings of dialogue which will allow tiles, entities, textures
+	  etc to be selected for adding to models.
+
+	* app/Layer.h: Add method which toggles layers visibility.
+
+	* app/LayerWindow.h, app/LayerWindow.cpp: Use pixmap of eye
+	  to indicate if a layer is visible, and implement toggling of
+	  layers visibility by clicking on the column in the layers window.
+
+	* app/GlView.cpp: Only render layer if it is supposed to be visible.
+
 2002-01-14  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp: Progress on
