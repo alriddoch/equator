@@ -113,6 +113,7 @@ void HeightManager::outlineLineStrip(float * varray, unsigned int size,
     glDrawArrays(GL_LINE_STRIP, 0, size);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    delete tarray;
 }
 
 void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
@@ -157,6 +158,8 @@ void HeightManager::heightMapRegion(GlView & view, Mercator::Segment * map)
     }
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+    delete harray;
+    delete carray;
 }
 
 void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
@@ -199,6 +202,7 @@ void HeightManager::drawRegion(GlView & view, Mercator::Segment * map)
     glVertexPointer(3, GL_FLOAT, 0, varray);
     glDrawArrays(GL_LINE_STRIP, 0, segSize * 4);
     glDisableClientState(GL_VERTEX_ARRAY);
+    delete varray;
 }
 
 void HeightManager::draw(GlView & view)
