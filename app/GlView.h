@@ -219,6 +219,8 @@ class GlView : public Gtk::DrawingArea {
     float getViewSize();
     rmode_t getRenderMode(const std::string & layer) const;
     void setLayerRenderMode(rmode_t m);
+    void enableAnts();
+    void disableAnts();
 
     const float getZ(int x, int y) const;
 };

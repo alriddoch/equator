@@ -144,12 +144,8 @@ void GameView::selectNone()
 
 void GameView::draw(GlView & view)
 {
-    glDepthFunc(GL_LEQUAL);
-
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     drawWorld(view, root);
-
-    glDepthFunc(GL_LESS);
 }
 
 bool GameView::animate(GlView & view)

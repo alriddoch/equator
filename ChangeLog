@@ -1,5 +1,17 @@
 2004-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/ServerEntities.h, app/ServerEntities.cpp,
+	  app/Holo.cpp, app/GlView.h, app/GlView.cpp, app/GameView.cpp:
+	  Move the ants code into GlView so its only there once, and
+	  switch the default depth function to GL_LEQUAL so that we
+	  don't have to keep switching.
+
+	* app/Terrain.h, app/Terrain.cpp: Re-write the way selected
+	  and animated terrain segments are drawn to be more efficient,
+	  and allow segments to be dragged more easily.
+
+2004-02-03  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/ServerEntities.cpp, app/ServerEntities.h: Clean up ant
 	  code.
 

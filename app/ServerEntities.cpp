@@ -174,25 +174,9 @@ void ServerEntities::draw3DBox(const WFMath::AxisBox<3> & bbox)
 }
 
 void ServerEntities::draw3DSelectedBox(GlView & view,
-                                       const WFMath::AxisBox<3> & bbox,
-                                       float phase)
+                                       const WFMath::AxisBox<3> & bbox)
 {
-    glDepthFunc(GL_LEQUAL);
-
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glTranslatef(phase, phase, phase);
-    glMatrixMode(GL_MODELVIEW);
-
-    GLfloat scale = 0.5f * view.getScale();
-    GLfloat sx[] = { scale, scale, scale, 0 };
-
-    glEnable(GL_TEXTURE_1D);
-    glBindTexture(GL_TEXTURE_1D, view.getAnts());
-    glColor3f(1.f, 1.f, 1.f);
-    glEnable(GL_TEXTURE_GEN_S);
-    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-    glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
+    view.enableAnts();
     
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -209,14 +193,7 @@ void ServerEntities::draw3DSelectedBox(GlView & view,
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
 
-    glDisable(GL_TEXTURE_GEN_S);
-    glDisable(GL_TEXTURE_1D);
-
-    glDepthFunc(GL_LESS);
-
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    view.disableAnts();
 }
 
 void ServerEntities::orient(const WFMath::Quaternion & orientation)
@@ -802,8 +779,7 @@ bool ServerEntities::animate(GlView & view)
         std::cout << "Dragging " << m_dragPoint << std::endl << std::flush;
         glTranslatef(m_dragPoint.x(), m_dragPoint.y(), m_dragPoint.z());
     }
-    draw3DSelectedBox(view, m_selection->getBBox(),
-                      view.getAnimCount());
+    draw3DSelectedBox(view, m_selection->getBBox());
     glPopMatrix();
     return true;
 }

@@ -139,12 +139,6 @@ void Terrain::selectRegion(Mercator::Segment & map)
     glDrawArrays(GL_TRIANGLE_FAN, 0, size * 4 + 1);
 }
 
-void Terrain::outlineLineStrip(float * varray, unsigned int size)
-{
-    glVertexPointer(3, GL_FLOAT, 0, varray);
-    glDrawArrays(GL_LINE_STRIP, 0, size);
-}
-
 void Terrain::heightMapRegion(GlView & view, Mercator::Segment & map)
 {
     float * const harray = new float[(segSize + 1) * (segSize + 1) * 3];
@@ -182,10 +176,8 @@ void Terrain::heightMapRegion(GlView & view, Mercator::Segment & map)
     delete carray;
 }
 
-void Terrain::drawRegion(GlView & view, Mercator::Segment & map,
-                         const GroundCoord & gc)
+void Terrain::populateVertices(float * varray, Mercator::Segment & map)
 {
-    float * varray = new float[(segSize + 1) * 4 * 3];
     int vdx = -1;
     for (int i = 0; i < (segSize + 1); ++i) {
         varray[++vdx] = i;
@@ -207,44 +199,36 @@ void Terrain::drawRegion(GlView & view, Mercator::Segment & map,
         varray[++vdx] = i;
         varray[++vdx] = map.get(0, i);
     }
+}
+
+void Terrain::animateRegion(GlView & view, Mercator::Segment & map)
+{
+    float * varray = new float[(segSize + 1) * 4 * 3];
+    populateVertices(varray, map);
+
+    view.enableAnts();
+
+    glVertexPointer(3, GL_FLOAT, 0, varray);
+    glDrawArrays(GL_LINE_STRIP, 0, (segSize + 1) * 4);
+
+    view.disableAnts();
+
+    delete varray;
+}
+
+void Terrain::drawRegion(GlView & view, Mercator::Segment & map,
+                         const GroundCoord & gc)
+{
+    float * varray = new float[(segSize + 1) * 4 * 3];
+    populateVertices(varray, map);
     bool selected = (m_selection.find(gc) != m_selection.end());
     if (selected) {
-        glDepthFunc(GL_LEQUAL);
-
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        float phase = view.getAnimCount();
-        glTranslatef(phase, phase, phase);
-        glMatrixMode(GL_MODELVIEW);
-
-        GLfloat scale = 0.5f * view.getScale();
-        GLfloat sx[] = { scale, scale, scale, 0 };
-
-        glEnable(GL_TEXTURE_1D);
-        glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        glColor3f(1.f, 1.f, 1.f);
-        glEnable(GL_TEXTURE_GEN_S);
-        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-        glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
-
-        outlineLineStrip(varray, (segSize + 1) * 4);
-        glDisable(GL_TEXTURE_1D);
-
-        glDisable(GL_TEXTURE_GEN_S);
-        glDisable(GL_TEXTURE_1D);
-
-        glDepthFunc(GL_LESS);
-
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-
         heightMapRegion(view, map);
-    } else {
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertexPointer(3, GL_FLOAT, 0, varray);
-        glDrawArrays(GL_LINE_STRIP, 0, (segSize + 1) * 4);
     }
+
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertexPointer(3, GL_FLOAT, 0, varray);
+    glDrawArrays(GL_LINE_STRIP, 0, (segSize + 1) * 4);
     delete varray;
 }
 
@@ -317,22 +301,8 @@ bool Terrain::animate(GlView & view)
             return false;
         }
         glVertexPointer(3, GL_FLOAT, 0, arrow_mesh);
-        glDepthFunc(GL_LEQUAL);
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        float phase = view.getAnimCount();
-        glTranslatef(phase, phase, phase);
-        glMatrixMode(GL_MODELVIEW);
-        
-        GLfloat s_scale = 0.5f * view.getScale();
-        GLfloat sx[] = { s_scale, s_scale, s_scale, 0 };
 
-        glEnable(GL_TEXTURE_1D);
-        glBindTexture(GL_TEXTURE_1D, view.getAnts());
-        glColor3f(1.f, 1.f, 1.f);
-        glEnable(GL_TEXTURE_GEN_S);
-        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-        glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
+        view.enableAnts();
 
         float scale = 0.00625 / view.getScale();
     
@@ -365,14 +335,7 @@ bool Terrain::animate(GlView & view)
             }
         }
 
-        glDisable(GL_TEXTURE_GEN_S);
-        glDisable(GL_TEXTURE_1D);
-
-        glDepthFunc(GL_LESS);
-
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
+        view.disableAnts();
     } else {
         const Mercator::Terrain::Segmentstore & segs = m_terrain.getTerrain();
         Mercator::Terrain::Segmentstore::const_iterator I = segs.begin();
@@ -389,7 +352,7 @@ bool Terrain::animate(GlView & view)
                 if (m_validDrag) {
                     glTranslatef(0.f, 0.f, m_dragPoint.z());
                 }
-                drawRegion(view, *J->second, gc);
+                animateRegion(view, *J->second);
                 glPopMatrix();
             }
         }

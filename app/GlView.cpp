@@ -218,6 +218,7 @@ void GlView::initgl()
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnableClientState(GL_VERTEX_ARRAY);
+    glDepthFunc(GL_LEQUAL);
 
     uint8_t ants[] = { 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0, 0x0,
                         0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
@@ -827,6 +828,35 @@ void GlView::setLayerRenderMode(rmode_t m)
             m_renderModes[l->getName()] = m;
         }
     }
+}
+
+void GlView::enableAnts()
+{
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    float phase = getAnimCount();
+    glTranslatef(phase, phase, phase);
+    glMatrixMode(GL_MODELVIEW);
+
+    GLfloat scale = 0.5f * getScale();
+    GLfloat sx[] = { scale, scale, scale, 0 };
+
+    glEnable(GL_TEXTURE_1D);
+    glBindTexture(GL_TEXTURE_1D, getAnts());
+    glColor3f(1.f, 1.f, 1.f);
+    glEnable(GL_TEXTURE_GEN_S);
+    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+    glTexGenfv(GL_S, GL_OBJECT_PLANE, sx);
+}
+
+void GlView::disableAnts()
+{
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_1D);
+
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 const float GlView::getZ(int x, int y) const
