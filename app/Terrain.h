@@ -20,6 +20,10 @@ namespace Mercator {
   class Segment;
 }
 
+namespace Eris {
+  class Entity;
+}
+
 typedef std::set<GroundCoord> GroundCoordSet;
 
 class Terrain : public Layer {
@@ -55,6 +59,8 @@ class Terrain : public Layer {
     static const int segSize = 64;
     explicit Terrain(Model &, Mercator::Terrain &);
     explicit Terrain(Model &);
+
+    void readTerrain(const Eris::Entity & ent);
 
     virtual void options();
     virtual void importFile();

@@ -30,7 +30,6 @@ namespace Atlas {
 
 class MainWindow;
 class Model;
-class Terrain;
 class Renderer;
 class TerrainEntity;
 
@@ -115,7 +114,6 @@ class Server : public SigC::Object {
                           const VelType & vel);
 
     const PosType getAbsCharPos();
-    void readTerrain(Terrain & t, Eris::Entity & ent);
 };
 
 #endif // EQUATOR_SERVER_H

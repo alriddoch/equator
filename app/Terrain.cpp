@@ -12,10 +12,12 @@
 
 #include "arrow_mesh.h"
 
-#include <wfmath/point.h>
+#include <Eris/Entity.h>
 
 #include <Mercator/Terrain.h>
 #include <Mercator/Segment.h>
+
+#include <wfmath/point.h>
 
 #include <gtkmm/fileselection.h>
 
@@ -23,6 +25,8 @@
 
 #include <iostream>
 #include <math.h>
+
+using Atlas::Message::Element;
 
 void Terrain::load(Gtk::FileSelection * fsel)
 {
@@ -78,6 +82,52 @@ Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
      m_lineIndeces(new unsigned int[(segSize + 1) * (segSize + 1) * 2]), m_validDrag(false)
 {
     initIndeces();
+}
+
+void Terrain::readTerrain(const Eris::Entity & ent)
+{
+    if (!ent.hasProperty("terrain")) {
+        std::cerr << "Terrain object has no terrain" << std::endl << std::flush;
+        std::cerr << "Terrain " << ent.getID() << std::endl << std::flush;
+        return;
+    }
+    const Element & terrain = ent.getProperty("terrain");
+    if (!terrain.isMap()) {
+        std::cerr << "Terrain is not a map" << std::endl << std::flush;
+    }
+    const Element::MapType & tmap = terrain.asMap();
+    Element::MapType::const_iterator I = tmap.find("points");
+    int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    if ((I == tmap.end()) || !I->second.isMap()) {
+        std::cerr << "No terrain points" << std::endl << std::flush;
+    }
+    const Element::MapType & plist = I->second.asMap();
+    Element::MapType::const_iterator J = plist.begin();
+    for(; J != plist.end(); ++J) {
+        if (!J->second.isList()) {
+            std::cout << "Non list in points" << std::endl << std::flush;
+            continue;
+        }
+        const Element::ListType & point = J->second.asList();
+        if (point.size() < 3) {
+            std::cout << "point without 3 nums" << std::endl << std::flush;
+            continue;
+        }
+        int x = (int)point[0].asNum();
+        int y = (int)point[1].asNum();
+        xmin = std::min(xmin, x);
+        xmax = std::max(xmax, x);
+        ymin = std::min(ymin, y);
+        ymax = std::max(ymax, y);
+        Mercator::BasePoint bp(point[2].asNum());
+        if (point.size() > 3) {
+            bp.roughness()=point[3].asNum();
+            if (point.size() > 4) {
+                bp.falloff()=point[4].asNum();
+            }
+        }
+        m_terrain.setBasePoint(x, y, bp);
+    }
 }
 
 void Terrain::options()
