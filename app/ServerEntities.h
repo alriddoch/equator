@@ -100,6 +100,7 @@ class ServerEntities : public Layer {
   public:
     ServerEntities(Model &, Server &);
 
+    virtual void options();
     virtual void importFile();
     virtual void exportFile();
     virtual void selectInvert();

@@ -30,6 +30,7 @@ class GameView : public Layer {
   public:
     GameView(Model & m, Server & m);
 
+    virtual void options();
     virtual void importFile();
     virtual void exportFile();
     virtual void selectInvert();

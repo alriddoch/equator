@@ -28,6 +28,7 @@ class Layer : public SigC::Object {
     bool m_visible;
     float m_xoff, m_yoff, m_zoff;
   public:
+    virtual void options() = 0;
     virtual void importFile() = 0;
     virtual void exportFile() = 0;
     virtual void selectInvert() = 0;

@@ -734,6 +734,10 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     }
 }
 
+void ServerEntities::options()
+{
+}
+
 void ServerEntities::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");

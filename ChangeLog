@@ -1,5 +1,12 @@
 2004-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
+	* app/Layer.h, app/Holo.h, app/GameView.h, app/GameView.cpp,
+	  app/ServerEntities.h, app/ServerEntities.cpp,
+	  app/Terrain.h, app/Terrain.cpp:
+	  Add method to layer interface for opening an options window.
+
+2004-01-06  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
 	* app/Server.h: Add accessor so we can tell if this server is
 	  in-game.
 

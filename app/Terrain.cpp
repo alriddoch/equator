@@ -80,6 +80,10 @@ Terrain::Terrain(Model &m) : Layer(m, "terrain", "Terrain"),
     initIndeces();
 }
 
+void Terrain::options()
+{
+}
+
 void Terrain::importFile()
 {
 

@@ -30,6 +30,11 @@ OptionBox::OptionBox(const Glib::ustring & title) : m_dock(0),
     a = manage( new Gtk::Alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*b);
     tophbox->pack_start(*a, Gtk::PACK_EXPAND_WIDGET);
+
+    l->set_events(l->get_events() | Gdk::ALL_EVENTS_MASK |
+               Gdk::BUTTON_MOTION_MASK |
+               Gdk::POINTER_MOTION_MASK
+               );
 }
 
 void OptionBox::setDock(Gtk::Window * dock)

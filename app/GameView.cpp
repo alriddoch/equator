@@ -112,6 +112,10 @@ void GameView::drawWorld(GlView & view, Eris::Entity * wrld)
 // The code below implements the virtual methods required by the Layer
 // base class.
 
+void GameView::options()
+{
+}
+
 void GameView::importFile()
 {
     // Nothing

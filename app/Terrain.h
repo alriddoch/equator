@@ -44,6 +44,7 @@ class Terrain : public Layer {
     explicit Terrain(Model &, Mercator::Terrain &);
     explicit Terrain(Model &);
 
+    virtual void options();
     virtual void importFile();
     virtual void exportFile();
     virtual void selectInvert();
