@@ -1,3 +1,6 @@
+Draw walking ant by using 1D texture, lined box, without depth test.
+May have to copy to back buffer.
+
 Investigate call of ->getID() on null pointer from ServerEntities.cpp:378
 
 Fix cyphesis so the creator can perceive the world.

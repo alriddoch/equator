@@ -41,12 +41,15 @@ class ServerEntities : public Layer {
 
     int m_nameCount;
     entname_t m_nameDict;
+    unsigned int m_antTexture;
 
     Eris::TypeInfo * m_gameEntityType;
 
     void draw3DCube(const WFMath::Point<3> & coords,
                     const WFMath::AxisBox<3> & bbox,
                     bool open = false);
+    void draw3DSelectedBox(const WFMath::Point<3> & coords,
+                   const WFMath::AxisBox<3> & bbox);
     void draw3DBox(const WFMath::Point<3> & coords,
                    const WFMath::AxisBox<3> & bbox);
     void drawEntity(Eris::Entity * ent, entstack_t::const_iterator);

@@ -1,3 +1,9 @@
+2002-03-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/ServerEntities.h, app/ServerEntities.cpp, app/GlView.h,
+	  app/GlView.cpp: Highlight selection using an as yet unanimated
+	  marching ants style outline.
+
 2002-03-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.h, app/ServerEntities.cpp: Added hook

@@ -138,6 +138,88 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
 
 }
 
+void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
+                                       const WFMath::AxisBox<3> & bbox)
+{
+    glPushMatrix();
+    // origin();
+    glTranslatef(coords.x(), coords.y(), coords.z());
+
+    glDisable(GL_DEPTH_TEST);
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_TEXTURE_1D);
+    glBindTexture(GL_TEXTURE_1D, m_antTexture);
+
+    glBegin(GL_LINES);
+    // glColor3f(0.0f, 0.0f, 1.0f);
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().x());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().z() - bbox.lowCorner().z());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().y());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.lowCorner().z());
+    glTexCoord1f(bbox.highCorner().y() - bbox.lowCorner().y());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.lowCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.lowCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glTexCoord1f(bbox.highCorner().y() - bbox.lowCorner().y());
+    glVertex3f(bbox.lowCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+
+    glTexCoord1f(0);
+    glVertex3f(bbox.highCorner().x(),bbox.lowCorner().y(),bbox.highCorner().z());
+    glTexCoord1f(bbox.highCorner().x() - bbox.lowCorner().y());
+    glVertex3f(bbox.highCorner().x(),bbox.highCorner().y(),bbox.highCorner().z());
+    glEnd();
+
+    glPopMatrix();
+    glDisable(GL_TEXTURE_1D);
+
+    glEnable(GL_DEPTH_TEST);
+}
+
 void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
 {
     assert(ent != NULL);
@@ -167,6 +249,9 @@ void ServerEntities::drawEntity(Eris::Entity* ent, entstack_t::const_iterator I)
             default:
                 draw3DCube(e->getPosition(), e->getBBox(),
                            openEntity);
+        }
+        if (e == m_selection) {
+            draw3DSelectedBox(e->getPosition(), e->getBBox());
         }
         //draw3DBox(e->getPosition(), e->getBBox());
         if (openEntity) {
@@ -335,6 +420,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 void ServerEntities::draw(GlView & view)
 {
     float winsize = std::max(view.width(), view.height());
+    m_antTexture = view.getAnts();
 
     m_renderMode = view.getRenderMode();
     Eris::Entity * root = m_serverConnection.world->getRootEntity();

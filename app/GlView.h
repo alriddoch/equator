@@ -31,6 +31,7 @@ class GlView : public Gtk::GLArea {
     int clickx,clicky;
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
+    unsigned int m_antTexture;
 
     projection_t m_projection;
     drag_t m_dragType;
@@ -80,8 +81,12 @@ class GlView : public Gtk::GLArea {
         return m_scale;
     }
 
-    enum render getRenderMode() {
+    enum render getRenderMode() const {
         return m_renderMode;
+    }
+
+    unsigned int getAnts() const {
+        return m_antTexture;
     }
 
     void setRenderMode(enum render m) {

@@ -19,6 +19,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <inttypes.h>
+
 static const bool pretty = false;
 
 GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : m_popup(NULL),
@@ -215,6 +217,27 @@ void GlView::initgl()
     if (make_current()) {
         setupgl();
     }
+
+    uint8_t ants[] = { 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0, 0x0,
+                        0x0, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0xff,
+                        0xff, 0xff, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff };
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glGenTextures(1, &m_antTexture);
+    glBindTexture(GL_TEXTURE_1D, m_antTexture);
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 8, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, ants);
+    if (glGetError() != 0) {
+        std::cerr << "Failed to create ants" << std::endl << std::flush;
+    }
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
 }
 
 void GlView::setupgl()
