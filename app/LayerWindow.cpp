@@ -8,16 +8,16 @@
 #include "Layer.h"
 #include "NewLayerWindow.h"
 
-#include <gtk--/frame.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/box.h>
-#include <gtk--/clist.h>
-#include <gtk--/label.h>
-#include <gtk--/scrolledwindow.h>
-#include <gtk--/button.h>
-#include <gtk--/separator.h>
-#include <gtk--/optionmenu.h>
-#include <gtk--/pixmap.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/box.h>
+// #include <gtkmm/clist.h>
+#include <gtkmm/label.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/button.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/optionmenu.h>
+// #include <gtkmm/pixmap.h>
 
 #include <iostream>
 #include <vector>
@@ -32,7 +32,7 @@
 #include "../duplicate.xpm"
 #include "../delete.xpm"
 
-LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
                                             m_currentModel(NULL)
 {
     // destroy.connect(slot(this, &LayerWindow::destroy_handler));
@@ -40,13 +40,13 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
 
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
-    tophbox->pack_start(*(manage( new Gtk::Label("Model:") )), false, false, 2);
+    tophbox->pack_start(*(manage( new Gtk::Label("Model:") )), Gtk::AttachOptions(0), 2);
     m_modelMenu = manage( new Gtk::OptionMenu() );
 
-    tophbox->pack_start(*m_modelMenu, true, true, 2);
-    tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
+    tophbox->pack_start(*m_modelMenu, Gtk::FILL | Gtk::EXPAND, 2);
+    tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), Gtk::AttachOptions(0), 2);
    
-    vbox->pack_start(*tophbox, false, false, 2);
+    vbox->pack_start(*tophbox, Gtk::AttachOptions(0), 2);
     
     static const gchar *titles[] = { "Visible", "Type", "Name", NULL };
     m_clist = manage( new Gtk::CList(titles) );
@@ -57,39 +57,39 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_clist->set_column_width (1, 80);
     m_clist->set_column_width (2, 80);
 
-    vbox->pack_start(*manage(new Gtk::HSeparator()), false, false, 0);
+    vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::AttachOptions(0), 0);
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(GTK_POLICY_ALWAYS, GTK_POLICY_ALWAYS);
     scrolled_window->set_usize(250,150);
     scrolled_window->add(*m_clist);
 
-    vbox->pack_start(*scrolled_window, true, true, 0);
+    vbox->pack_start(*scrolled_window, Gtk::FILL | Gtk::EXPAND, 0);
 
     Gtk::HBox * bothbox = manage( new Gtk::HBox() );
     Gtk::Button * b = manage( new Gtk::Button() );
     Gtk::Pixmap * p = manage( new Gtk::Pixmap(newlayer_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::newLayerRequested));
-    bothbox->pack_start(*b, true, true, 0);
+    bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
     b = manage( new Gtk::Button() );
     p = manage( new Gtk::Pixmap(raise_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::raiseLayer));
-    bothbox->pack_start(*b, true, true, 0);
+    bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
     b = manage( new Gtk::Button() );
     p = manage( new Gtk::Pixmap(lower_xpm) );
     b->add(*p);
     b->clicked.connect(slot(this, &LayerWindow::lowerLayer));
-    bothbox->pack_start(*b, true, true, 0);
+    bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
     b = manage( new Gtk::Button() );
     p = manage( new Gtk::Pixmap(duplicate_xpm) );
     b->add(*p);
-    bothbox->pack_start(*b, true, true, 0);
+    bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
     b = manage( new Gtk::Button() );
     p = manage( new Gtk::Pixmap(delete_xpm) );
     b->add(*p);
-    bothbox->pack_start(*b, true, true, 0);
+    bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
 
     vbox->pack_end(*bothbox, false, true, 0);
 

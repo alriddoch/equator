@@ -12,15 +12,15 @@
 #include <Eris/Lobby.h>
 #include <Eris/World.h>
 
-#include <gtk--/box.h>
-#include <gtk--/button.h>
-#include <gtk--/label.h>
-#include <gtk--/optionmenu.h>
-#include <gtk--/entry.h>
-#include <gtk--/spinbutton.h>
-#include <gtk--/adjustment.h>
-#include <gtk--/main.h>
-#include <gtk--/statusbar.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
+#include <gtkmm/label.h>
+#include <gtkmm/optionmenu.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/adjustment.h>
+#include <gtkmm/main.h>
+#include <gtkmm/statusbar.h>
 
 NewServerWindow::NewServerWindow(MainWindow & mw) :
                  Gtk::Window(GTK_WINDOW_TOPLEVEL), m_mainWindow(mw),

@@ -22,10 +22,10 @@
 
 #include <GL/glu.h>
 
-#include <gtk--/fileselection.h>
-#include <gtk--/frame.h>
-#include <gtk--/radiobutton.h>
-#include <gtk--/label.h>
+#include <gtkmm/fileselection.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/radiobutton.h>
+#include <gtkmm/label.h>
 
 #include <fstream>
 

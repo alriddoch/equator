@@ -5,7 +5,7 @@
 #include "AtlasMapWidget.h"
 #include <sstream>
 
-#include <gtk--/frame.h>
+#include <gtkmm/frame.h>
 
 typedef Atlas::Message::Object AObject;
 

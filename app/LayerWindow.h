@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_LAYERWINDOW_H
 #define EQUATOR_APP_LAYERWINDOW_H
 
-#include <gtk--/window.h>
+#include <gtkmm/window.h>
 
 class MainWindow;
 class ViewWindow;

@@ -6,7 +6,7 @@
 #define EQUATOR_APP_ATLASMAPWIDGET_H
 
 #include <Atlas/Message/Object.h>
-#include <gtk--/ctree.h>
+#include <gtkmm/ctree.h>
 
 class AtlasMapWidget : public Gtk::CTree
 {

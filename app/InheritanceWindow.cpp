@@ -6,15 +6,15 @@
 #include "AtlasMapWidget.h"
 #include "inheritance.h"
 
-#include <gtk--/frame.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/box.h>
-#include <gtk--/label.h>
-#include <gtk--/scrolledwindow.h>
-#include <gtk--/button.h>
-#include <gtk--/separator.h>
-#include <gtk--/tree.h>
-#include <gtk--/ctree.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/button.h>
+#include <gtkmm/separator.h>
+#include <gtkmm/tree.h>
+#include <gtkmm/ctree.h>
 
 #include <iostream>
 #include <vector>

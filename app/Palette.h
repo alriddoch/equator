@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_PALETTE_H
 #define EQUATOR_APP_PALETTE_H
 
-#include <gtk--/window.h>
+#include <gtkmm/window.h>
 
 #include <map>
 #include <list>
@@ -29,7 +29,7 @@ class Palette : public Gtk::Window
     Gtk::CList * m_texture_clist;
     Gtk::OptionMenu * m_modelMenu;
     Model * m_currentModel;
-    Gtk::Connection m_typeMonitor;
+    SigC::Connection m_typeMonitor;
 
     std::map<Model *, std::list<std::string> > m_tiles;
     std::map<Model *, std::list<std::string> > m_entities;

@@ -7,11 +7,11 @@
 #include "MainWindow.h"
 #include "Model.h"
 
-#include <gtk--/notebook.h>
-#include <gtk--/box.h>
-#include <gtk--/clist.h>
-#include <gtk--/scrolledwindow.h>
-#include <gtk--/optionmenu.h>
+#include <gtkmm/notebook.h>
+#include <gtkmm/box.h>
+#include <gtkmm/clist.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/optionmenu.h>
 
 #include <iostream>
 #include <sstream>

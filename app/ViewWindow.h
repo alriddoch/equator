@@ -5,9 +5,7 @@
 #ifndef EQUATOR_APP_VIEWWINDOW_H
 #define EQUATOR_APP_VIEWWINDOW_H
 
-#include <gtkgl--/glarea.h>
-#include <gtk--/window.h>
-#include <gtk--/menu.h>
+#include <gtkmm/window.h>
 
 class MainWindow;
 class GlView;

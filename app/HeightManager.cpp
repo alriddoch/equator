@@ -9,7 +9,7 @@
 #include "HeightMap.h"
 #include "GlView.h"
 
-#include <gtk--/fileselection.h>
+#include <gtkmm/fileselection.h>
 
 #include <GL/glu.h>
 

@@ -12,10 +12,10 @@
 
 #include <GL/glu.h>
 
-#include <gtk--/main.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/menushell.h>
-#include <gtk--/fileselection.h>
+#include <gtkmm/main.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/menushell.h>
+#include <gtkmm/fileselection.h>
 
 #include <iostream>
 #include <sstream>
@@ -41,7 +41,7 @@ float deg2Rad(float d)
     return (d * Deg2Rad);
 }
 
-GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
+GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
                                m_popup(NULL),
                                m_viewNo(m.getViewNo()),
                                m_scale(1.0),
@@ -56,6 +56,26 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : Gtk::GLArea(attrlist),
                                m_viewWindow(vw),
                                m_model(m)
 {
+    glconfig = Gdk::GL::Config::create(Gdk::GL::MODE_RGB |
+                                     Gdk::GL::MODE_DEPTH |
+                                     Gdk::GL::MODE_DOUBLE);
+    if (glconfig.is_null()) {
+        std::cerr << "*** Cannot find the double-buffered visual.\n"
+                  << "*** Trying single-buffered visual.\n";
+
+        // Try single-buffered visual
+        glconfig = Gdk::GL::Config::create(Gdk::GL::MODE_RGB |
+                                         Gdk::GL::MODE_DEPTH);
+        if (glconfig.is_null()) {
+            std::cerr << "*** Cannot find any OpenGL-capable visual.\n";
+
+        }
+    }
+
+    if (!glconfig.is_null()) {
+        Gtk::GL::Widget::set_gl_capability(*this, glconfig);
+    }
+
     m.updated.connect(slot(this, &GlView::redraw));
 
     set_events(GDK_POINTER_MOTION_MASK|

@@ -7,11 +7,11 @@
 #include "GlView.h"
 #include "Layer.h"
 
-#include <gtk--/frame.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/optionmenu.h>
-#include <gtk--/box.h>
-#include <gtk--/label.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/optionmenu.h>
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
 
 #include <iostream>
 #include <sstream>

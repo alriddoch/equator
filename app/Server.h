@@ -8,7 +8,7 @@
 #include <Eris/Connection.h>
 #include <Eris/Log.h>
 
-#include <gtk--/main.h>
+#include <gtkmm/main.h>
 
 namespace Eris {
   class Player;

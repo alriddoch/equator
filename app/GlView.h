@@ -5,8 +5,10 @@
 #ifndef EQUATOR_APP_GLVIEW_H
 #define EQUATOR_APP_GLVIEW_H
 
-#include <gtkgl--/glarea.h>
-#include <gtk--/menu.h>
+#include <gtkmm/drawingarea.h>
+#include <gtkmm/menu.h>
+
+#include <gtkglmm.h>
 
 #include <list>
 
@@ -15,7 +17,7 @@ class ViewWindow;
 class MainWindow;
 class Model;
 
-class GlView : public Gtk::GLArea {
+class GlView : public Gtk::DrawingArea {
   public:
     typedef enum view { ORTHO, PERSP } projection_t;
     typedef enum drag { NONE, SELECT, MOVE, PAN } drag_t;

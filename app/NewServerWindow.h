@@ -5,8 +5,7 @@
 #ifndef EQUATOR_APP_NEWSERVERWINDOW_H
 #define EQUATOR_APP_NEWSERVERWINDOW_H
 
-#include <gtk--/window.h>
-#include <gtk--/list.h>
+#include <gtkmm/window.h>
 
 class MainWindow;
 class Server;

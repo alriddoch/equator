@@ -5,7 +5,7 @@
 #ifndef EQUATOR_APP_SERVERWINDOW_H
 #define EQUATOR_APP_SERVERWINDOW_H
 
-#include <gtk--/window.h>
+#include <gtkmm/window.h>
 
 class MainWindow;
 class Server;

@@ -5,15 +5,13 @@
 #ifndef EQUATOR_APP_INHERITANCEWINDOW_H
 #define EQUATOR_APP_INHERITANCEWINDOW_H
 
-#include <gtk--/window.h>
-#include <gtk--/clist.h>
+#include <gtkmm/window.h>
 
 class MainWindow;
 class AtlasMapWidget;
 
 namespace Gtk {
   class Tree;
-  class CTree;
 };
 
 class InheritanceWindow : public Gtk::Window

@@ -6,7 +6,7 @@
 
 #include "MainWindow.h"
 
-#include <gtk--/main.h>
+#include <gtkmm/main.h>
 
 int main(int argc, char ** argv)
 {

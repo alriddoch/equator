@@ -9,9 +9,9 @@
 #include "Model.h"
 #include "HeightManager.h"
 
-#include <gtk--/scrolledwindow.h>
-#include <gtk--/box.h>
-#include <gtk--/button.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/box.h>
+#include <gtkmm/button.h>
 
 std::map<std::string, LayerFactory *> LayerFactory::factories;
 

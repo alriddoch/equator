@@ -11,16 +11,19 @@
 #include "Model.h"
 #include "Palette.h"
 
-#include <gtk--/main.h>
-#include <gtk--/menu.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/tearoffmenuitem.h>
-#include <gtk--/menubar.h>
-#include <gtk--/button.h>
-#include <gtk--/togglebutton.h>
-#include <gtk--/box.h>
-#include <gtk--/pixmap.h>
-#include <gtk--/table.h>
+#include <gtkmm/main.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/tearoffmenuitem.h>
+#include <gtkmm/menubar.h>
+#include <gtkmm/button.h>
+#include <gtkmm/togglebutton.h>
+#include <gtkmm/box.h>
+#include <gtkmm/table.h>
+
+#include <gdkmm/pixmap.h>
+
+#include <gtk/gtkwindow.h>
 
 #include "../arrow.xpm"
 #include "../select.xpm"
@@ -33,7 +36,7 @@
 
 #include <iostream>
 
-MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
+MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_tool(MainWindow::SELECT), m_toolMode(MainWindow::ENTITY),
     m_layerwindow (*manage( new LayerWindow(*this) )),
     m_inheritancewindow (*manage( new InheritanceWindow(*this) )),
@@ -41,15 +44,15 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     m_newServerwindow (*manage( new NewServerWindow(*this) )),
     m_palettewindow (*manage( new Palette(*this) ))
 {
-    destroy.connect(slot(this, &MainWindow::destroy_handler));
+    // destroy.connect(slot(this, &MainWindow::destroy_handler));
 
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
     file_menu.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::CTL|'n', slot(this, &MainWindow::newModel)));
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::CTL|'o'));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_New", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK, 'n'), SigC::slot(*this, &MainWindow::newModel)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Open...", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'o')));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(this, &MainWindow::new_server_dialog)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Connect...", slot(*this, &MainWindow::new_server_dialog)));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Preferences..."));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -57,14 +60,14 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::Menu * menu_sub = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& dialog_sub = menu_sub->items();
     dialog_sub.push_back(Gtk::Menu_Helpers::TearoffMenuElem());
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(this, &MainWindow::openLayers)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(this, &MainWindow::inheritance_dialog)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(this, &MainWindow::server_dialog)));
-    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(this, &MainWindow::palette)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Layers...", slot(*this, &MainWindow::openLayers)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Inheritance...", slot(*this, &MainWindow::inheritance_dialog)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Servers...", slot(*this, &MainWindow::server_dialog)));
+    dialog_sub.push_back(Gtk::Menu_Helpers::MenuElem("Entity palette...", slot(*this, &MainWindow::palette)));
 
     file_menu.push_back(Gtk::Menu_Helpers::MenuElem("Dialogs", *menu_sub));
     file_menu.push_back(Gtk::Menu_Helpers::SeparatorElem());
-    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::CTL|'q', slot(this, &MainWindow::menu_quit)));
+    file_menu.push_back(Gtk::Menu_Helpers::MenuElem("_Quit", Gtk::Menu_Helpers::AccelKey(Gdk::CONTROL_MASK,'q'), slot(*this, &MainWindow::menu_quit)));
 
     menu->accelerate(*this);
     //Gtk::MenuItem * menu_items = manage( new Gtk::MenuItem("New") );
@@ -83,59 +86,59 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     menu_bar->append(*menu_root);
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
-    vbox->pack_start(*menu_bar, false, false, 0);
+    vbox->pack_start(*menu_bar, Gtk::AttachOptions(0), 0);
 
     Gtk::Table * table = manage( new Gtk::Table(5, 2, true) );
 
     Gtk::ToggleButton * b = select_tool = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::SELECT));
-    //Gtk::Pixmap * p = manage( new Gtk::Pixmap("arrow.xpm") );
-    Gtk::Pixmap * p = manage( new Gtk::Pixmap(arrow_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SELECT));
+    Glib::RefPtr<Gdk::Bitmap> pixmask;
+    Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, arrow_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 0, 1);
 
     b = area_tool = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::AREA));
-    p = manage( new Gtk::Pixmap(select_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::AREA));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 0, 1);
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::DRAW));
-    p = manage( new Gtk::Pixmap(draw_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 0, 1);
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::ROTATE));
-    p = manage( new Gtk::Pixmap(rotate_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 3, 4, 0, 1);
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::SCALE));
-    p = manage( new Gtk::Pixmap(scale_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 4, 5, 0, 1);
 
     b = move_tool = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::toolSelect),MainWindow::MOVE));
-    p = manage( new Gtk::Pixmap(move_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 1, 2);
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
-    b->clicked.connect(bind(slot(this,&MainWindow::modeSelect),MainWindow::ENTITY));
-    p = manage( new Gtk::Pixmap(entity_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::modeSelect),MainWindow::ENTITY));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 2, 3);
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
-    b->clicked.connect(bind(slot(this,&MainWindow::modeSelect),MainWindow::VERTEX));
-    p = manage( new Gtk::Pixmap(vertex_xpm) );
-    b->add(*p);
+    b->signal_clicked().connect(bind(slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 2, 3);
 
     b = manage( new Gtk::ToggleButton("7") );
@@ -147,7 +150,7 @@ MainWindow::MainWindow() : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     b = manage( new Gtk::ToggleButton("10") );
     table->attach(*b, 3, 4, 3, 4);
 
-    vbox->pack_end(*table, true, true, 0);
+    vbox->pack_end(*table);
 
     add(*vbox);
 

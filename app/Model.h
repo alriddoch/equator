@@ -10,7 +10,7 @@
 #include <string>
 #include <list>
 #include <sigc++/object.h>
-#include <sigc++/signal_system.h>
+#include <sigc++/signal.h>
 
 class Layer;
 class Server;

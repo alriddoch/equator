@@ -18,7 +18,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include <gtk--/fileselection.h>
+#include <gtkmm/fileselection.h>
 
 #include <fstream>
 #include <iostream>

@@ -6,25 +6,25 @@
 #include "GlView.h"
 #include "Model.h"
 
-#include <gtk--/frame.h>
-#include <gtk--/eventbox.h>
-#include <gtk--/menuitem.h>
-#include <gtk--/box.h>
-#include <gtk--/statusbar.h>
-#include <gtk--/table.h>
-#include <gtk--/ruler.h>
-#include <gtk--/scrollbar.h>
-#include <gtk--/adjustment.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/eventbox.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/box.h>
+#include <gtkmm/statusbar.h>
+#include <gtkmm/table.h>
+#include <gtkmm/ruler.h>
+#include <gtkmm/scrollbar.h>
+#include <gtkmm/adjustment.h>
 
 #include <iostream>
 #include <sstream>
 #include <cmath>
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) :
-                                         Gtk::Window(GTK_WINDOW_TOPLEVEL),
+                                         Gtk::Window(Gtk::WINDOW_TOPLEVEL),
                                          m_glarea(NULL), m_mainWindow(w)
 {
-    m.nameChanged.connect(slot(this, &ViewWindow::setTitle));
+    m.nameChanged.connect(slot(*this, &ViewWindow::setTitle));
     // destroy.connect(slot(this, &ViewWindow::destroy_handler));
 
     Gtk::VBox * vbox = manage( new Gtk::VBox() );
@@ -32,14 +32,14 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     // This needs to be done before the GlView is created
     m_cursorCoords = manage( new Gtk::Statusbar() );
     m_cursorContext = m_cursorCoords->get_context_id("Cursor coordinates");
-    m_cursorCoords->push(m_cursorContext, " xxx,xxx,xxx ");
+    m_cursorCoords->push(" xxx,xxx,xxx ", m_cursorContext);
 
     m_viewCoords = manage( new Gtk::Statusbar() );
     m_viewContext = m_viewCoords->get_context_id("View coordinates");
-    m_viewCoords->push(m_cursorContext, " xxx,xxx,xxx ");
+    m_viewCoords->push(" xxx,xxx,xxx ", m_cursorContext);
 
     m_glarea = manage( new GlView(w, *this, m) );
-    m_glarea->set_usize(300,300);
+    m_glarea->set_size_request(300,300);
 
     // Gtk::Frame * frame = manage( new Gtk::Frame() );
     // frame->set_shadow_type(GTK_SHADOW_IN);
@@ -49,29 +49,29 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     // vbox->pack_start(*frame, true, true, 0);
 
     m_vAdjust = manage( new Gtk::Adjustment(0, -500, 500, 1, 25, 10) );
-    m_vAdjust->value_changed.connect(slot(this, &ViewWindow::vAdjustChanged));
+    m_vAdjust->signal_value_changed().connect(slot(*this, &ViewWindow::vAdjustChanged));
     m_hAdjust = manage( new Gtk::Adjustment(0, -500, 500, 1, 25, 10) );
-    m_hAdjust->value_changed.connect(slot(this, &ViewWindow::hAdjustChanged));
+    m_hAdjust->signal_value_changed().connect(slot(*this, &ViewWindow::hAdjustChanged));
 
     Gtk::Table * table = manage( new Gtk::Table(3, 3, false) );
     m_vRuler = manage( new Gtk::VRuler() );
-    table->attach(*m_vRuler, 0, 1, 1, 2, GTK_FILL, GTK_FILL);
+    table->attach(*m_vRuler, 0, 1, 1, 2, Gtk::FILL, Gtk::FILL);
     m_hRuler = manage( new Gtk::HRuler() );
-    table->attach(*m_hRuler, 1, 2, 0, 1, GTK_FILL, GTK_FILL);
+    table->attach(*m_hRuler, 1, 2, 0, 1, Gtk::FILL, Gtk::FILL);
     m_vScrollbar = manage( new Gtk::VScrollbar(*m_vAdjust) );
-    table->attach(*m_vScrollbar, 2, 3, 1, 2, GTK_FILL, GTK_FILL);
+    table->attach(*m_vScrollbar, 2, 3, 1, 2, Gtk::FILL, Gtk::FILL);
     m_hScrollbar = manage( new Gtk::HScrollbar(*m_hAdjust) );
-    table->attach(*m_hScrollbar, 1, 2, 2, 3, GTK_FILL, GTK_FILL);
+    table->attach(*m_hScrollbar, 1, 2, 2, 3, Gtk::FILL, Gtk::FILL);
     table->attach(*m_glarea, 1, 2, 1, 2);
 
-    vbox->pack_start(*table, true, true, 0);
+    vbox->pack_start(*table, Gtk::FILL | Gtk::EXPAND, 0);
 
     Gtk::HBox * hbox = manage( new Gtk::HBox() );
 
-    hbox->pack_start(*m_cursorCoords, true, true, 2);
-    hbox->pack_start(*m_viewCoords, true, true, 2);
+    hbox->pack_start(*m_cursorCoords, Gtk::FILL | Gtk::EXPAND, 2);
+    hbox->pack_start(*m_viewCoords, Gtk::FILL | Gtk::EXPAND, 2);
 
-    vbox->pack_start(*hbox, false, false, 0);
+    vbox->pack_start(*hbox, Gtk::AttachOptions(0), 0);
 
     add(*vbox);
 
@@ -80,7 +80,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
 
     show_all();
 
-    m_glarea->viewChanged.connect(slot(this, &ViewWindow::glViewChanged));
+    m_glarea->viewChanged.connect(slot(*this, &ViewWindow::glViewChanged));
     glViewChanged();
 }
 
@@ -100,7 +100,7 @@ void ViewWindow::cursorMoved()
     m_glarea->m_model.getCursor(x, y, z);
     text << " " << x << "," << y << "," << z << " ";
     m_cursorCoords->pop(m_cursorContext);
-    m_cursorCoords->push(m_cursorContext, text.str());
+    m_cursorCoords->push(text.str(), m_cursorContext);
 }
 
 void ViewWindow::viewMoved()
@@ -111,7 +111,7 @@ void ViewWindow::viewMoved()
     std::stringstream text;
     text << " " << x << "," << y << "," << z << " ";
     m_viewCoords->pop(m_viewContext);
-    m_viewCoords->push(m_viewContext, text.str());
+    m_viewCoords->push(text.str(), m_viewContext);
     doRulers();
 }
 
@@ -141,8 +141,8 @@ void ViewWindow::glViewChanged()
               << std::endl << std::flush;
     float wx, wy, wz;
     m_glarea->m_model.getSize(wx, wy, wz);
-    float winx = m_glarea->width() / (40.0f * m_glarea->getScale());
-    float winy = m_glarea->height() / (40.0f * m_glarea->getScale());
+    float winx = m_glarea->get_width() / (40.0f * m_glarea->getScale());
+    float winy = m_glarea->get_height() / (40.0f * m_glarea->getScale());
     float worldSize = hypot(wx, wy);
 
     std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
@@ -173,8 +173,8 @@ void ViewWindow::glViewChanged()
 void ViewWindow::doRulers()
 {
     float th = m_hAdjust->get_value(), tv = m_vAdjust->get_value();
-    float winx = m_glarea->width() / (40.0f * m_glarea->getScale());
-    float winy = m_glarea->height() / (40.0f * m_glarea->getScale());
+    float winx = m_glarea->get_width() / (40.0f * m_glarea->getScale());
+    float winy = m_glarea->get_height() / (40.0f * m_glarea->getScale());
     float hrl = th - winx/2,
           hrh = th + winx/2,
           vrl = - tv + winy/2,

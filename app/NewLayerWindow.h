@@ -33,8 +33,11 @@ class LayerPlant : public LayerFactory {
     Layer * newLayer(Model & m) { return new T(m); }
 };
 
-#include <gtk--/window.h>
-#include <gtk--/list.h>
+#include <gtkmm/window.h>
+
+namespace Gtk {
+  class List;
+}
 
 class NewLayerWindow : public Gtk::Window
 {
