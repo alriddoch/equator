@@ -20,6 +20,7 @@
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/box.h>
 #include <gtkmm/table.h>
+#include <gtkmm/tooltips.h>
 
 #include <gdkmm/pixmap.h>
 
@@ -38,11 +39,11 @@
 
 MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_tool(MainWindow::SELECT), m_toolMode(MainWindow::ENTITY),
-    m_layerwindow (*manage( new LayerWindow(*this) )),
-    m_inheritancewindow (*manage( new InheritanceWindow(*this) )),
-    m_serverwindow (*manage( new ServerWindow(*this) )),
-    m_newServerwindow (*manage( new NewServerWindow(*this) )),
-    m_palettewindow (*manage( new Palette(*this) ))
+    m_layerwindow (*new LayerWindow(*this) ),
+    m_inheritancewindow (*new InheritanceWindow(*this) ),
+    m_serverwindow (*new ServerWindow(*this) ),
+    m_newServerwindow (*new NewServerWindow(*this) ),
+    m_palettewindow (*new Palette(*this) )
 {
     signal_delete_event().connect(slot(*this, &MainWindow::destroy_handler));
 
@@ -97,36 +98,48 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, arrow_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 0, 1);
+    Gtk::Tooltips * t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Select Item");
 
     b = area_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::AREA));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, select_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 0, 1);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Select Area");
 
     b = draw_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::DRAW));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, draw_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 0, 1);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Insert");
 
     b = rotate_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::ROTATE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, rotate_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 3, 4, 0, 1);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Rotate");
 
     b = scale_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::SCALE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, scale_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 4, 5, 0, 1);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Scale");
 
     b = move_tool = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::toolSelect),MainWindow::MOVE));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, move_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 1, 2);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Translate");
 
     b = entity_mode = manage( new Gtk::ToggleButton() );
     b->set_active(true); // Do this before we connect to the signal
@@ -134,12 +147,16 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, entity_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 2, 3);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Entity Mode");
 
     b = vertex_mode = manage( new Gtk::ToggleButton() );
     b->signal_clicked().connect(bind(slot(*this,&MainWindow::modeSelect),MainWindow::VERTEX));
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, vertex_xpm);
     b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 2, 3);
+    t = manage( new Gtk::Tooltips() );
+    t->set_tip(*b, "Vertex Mode");
 
     b = manage( new Gtk::ToggleButton("7") );
     table->attach(*b, 0, 1, 3, 4);

@@ -1,3 +1,8 @@
+2003-02-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/MainWindow.cpp, app/LayerWindow.cpp: Add tooltips, and stop
+	  trying to manage to level windows from other top level windows.
+
 2003-02-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp: Fix the final vertex array memory leak.

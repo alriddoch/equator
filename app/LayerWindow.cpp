@@ -135,7 +135,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     //m_null = gdk_pixmap_create_from_xpm_d(m_clist->gtkobj()->clist_window,
            //&m_nullmask, &GTK_WIDGET(m_clist->gtkobj())->style->white, null_xpm);
 
-    m_newLayerWindow = manage( new NewLayerWindow() );
+    m_newLayerWindow = new NewLayerWindow();
     // show_all();
 
     mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::addModel));
