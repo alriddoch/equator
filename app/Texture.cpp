@@ -7,6 +7,8 @@
 #include <SDL_image.h>
 #include <GL/gl.h>
 
+#include <iostream>
+
 std::map<std::string, int> * Texture::texturedb = NULL;
 
 SDL_Surface * Texture::imageLoad(const std::string & filename)
@@ -150,12 +152,12 @@ Tile * Tile::get(const std::string & filename)
 unsigned int Tile::twoN(unsigned int size)
 {
     for(int i = 0; i < 12; i++) {
-        const unsigned int num = std::pow(2,i);
+        const unsigned int num = (1 << i);
         if (size <= num) {
             return num;
         }
     }
-    return std::pow(2,12);
+    return (1 << 12);
 }
 
 bool Tile::load(const std::string & filename)
@@ -210,7 +212,7 @@ bool Tile::load(const std::string & filename)
         tileSize = 6;
         if (sprite_h > 216) { sprite_h = 216; }
     } else {
-        cout << "Tile size is unknown " << tileSize << "," << sprite_w << endl << flush;
+        std::cout << "Tile size is unknown " << tileSize << "," << sprite_w << std::endl << std::flush;
         tileSize = 0;
     }
     m_pw = (float)sprite_w / textur_w;

@@ -7,7 +7,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  ServerWindow.cpp ServerWindow.h \
 		  NewLayerWindow.cpp NewLayerWindow.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
-		  ClientConnection.cpp ClientConnection.h \
 		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \
 		  Holo.cpp Holo.h \

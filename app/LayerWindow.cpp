@@ -35,9 +35,6 @@ LayerWindow::LayerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     tophbox->pack_start(*(manage( new Gtk::Label("View:") ) ), false, false, 2);
     m_viewMenu = manage( new Gtk::OptionMenu() );
 
-    Gtk::Menu * menu = manage( new Gtk::Menu() );
-
-    m_viewMenu->set_menu(menu);
     tophbox->pack_start(*m_viewMenu, true, true, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
@@ -125,18 +122,24 @@ void LayerWindow::setView(GlView * view)
         }
     }
 
-    cout << "Finished adding to list" << std::endl << std::flush;
 }
 
 void LayerWindow::addModel(ViewWindow * view)
 {
-    cout << "LayerWindow notified of new model" << std::endl << std::flush;
-    Gtk::Menu_Helpers::MenuList& model_menu = m_viewMenu->get_menu()->items();
-    if (model_menu.empty()) {
+    Gtk::Menu * menu = m_viewMenu->get_menu();
+    if (menu == NULL) {
+        menu = manage( new Gtk::Menu() );
+        
+        Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
+        m_viewMenu->set_menu(menu);
         set_sensitive(true);
         setView(view->getView());
+    } else {
+        Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
     }
-    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(view->getName(), SigC::bind<GlView*>(slot(this, &LayerWindow::setView),view->getView())));
+    // m_viewMenu->set_menu(m_viewMenu->get_menu());
 }
 
 void LayerWindow::selectionMade(gint row, gint column, GdkEvent * event)
@@ -145,11 +148,11 @@ void LayerWindow::selectionMade(gint row, gint column, GdkEvent * event)
     std::list<Layer *>::const_iterator I = layers.begin();
     for (int i = layers.size() - 1; i > row && I != layers.end(); --i, ++I) { }
     if (I == layers.end()) {
-        cout << "No layer described" << endl << flush;
+        std::cerr << "No layer described" << std::endl << std::flush;
         return;
     }
     m_currentView->setCurrentLayer(*I);
-    cout << "new sel" << row << " " << (*I)->getName() << endl << flush;
+    std::cout << "new sel" << row << " " << (*I)->getName() << std::endl << std::flush;
 }
 
 void LayerWindow::newLayerRequested()

@@ -3,7 +3,7 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "AtlasMapWidget.h"
-#include "sstream.h"
+#include <sstream>
 
 #include <gtk--/frame.h>
 
@@ -31,10 +31,10 @@ void AtlasMapWidget::add(Gtk::CTree_Helpers::RowList rowList,
                          const std::string & name,
                          const AObject & o)
 {
-    vector<const char*> item(2);
+    std::vector<const char*> item(2);
     item[0] = name.c_str();
     if (!o.IsList() && !o.IsMap()) {
-        stringstream data;
+        std::stringstream data;
         data << o;
         item[1] = data.str().c_str();
         rowList.push_back(Gtk::CTree_Helpers::Element(item));

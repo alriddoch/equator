@@ -9,13 +9,9 @@
 
 #include <gtk--/frame.h>
 #include <gtk--/menuitem.h>
+#include <gtk--/optionmenu.h>
 #include <gtk--/box.h>
 #include <gtk--/label.h>
-#include <gtk--/scrolledwindow.h>
-#include <gtk--/button.h>
-#include <gtk--/separator.h>
-#include <gtk--/tree.h>
-#include <gtk--/ctree.h>
 
 #include <iostream>
 #include <vector>
@@ -29,8 +25,8 @@ ServerWindow::ServerWindow(MainWindow & w) : Gtk::Window(GTK_WINDOW_TOPLEVEL),
     Gtk::HBox * tophbox = manage( new Gtk::HBox() );
 
     tophbox->pack_start(*(manage( new Gtk::Label("Server connection:") ) ), false, false, 2);
-    m_serverLabel = manage( new Gtk::Label("-unconnected-") );
-    tophbox->pack_start(*m_serverLabel, true, false, 2);
+    m_serverMenu = manage( new Gtk::OptionMenu() );
+    tophbox->pack_start(*m_serverMenu, true, false, 2);
     tophbox->pack_end(*(manage( new Gtk::Label("WOOT") ) ), false, false, 2);
    
     vbox->pack_start(*tophbox, false, false, 2);

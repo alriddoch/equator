@@ -24,13 +24,13 @@ class GlView : public Gtk::GLArea {
     double dragDepth, dragx, dragy, dragz;
     int mousex,mousey;
 
-    enum view { PLAN, ISO, PERSP } m_projection;
+    enum view { ORTHO, PERSP } m_projection;
 
     enum drag { NONE, SELECT, MOVE, PAN } m_dragType;
 
-    void setPlan();
-    void setIsometric();
+    void setOrthographic();
     void setPerspective();
+
     void setScale(float s);
     void zoomIn();
     void zoomOut();

@@ -13,6 +13,8 @@
 
 #include <gtk--/fileselection.h>
 
+#include <iostream>
+
 void BladeMap::drawMapRegion(CoalRegion & map_region)
 {
     int tex_id = -1;
@@ -150,7 +152,7 @@ bool BladeMap::selectMap(CoalDatabase & map_base,
         m_selection.clear();
     }
 
-    cout << "Got " << hits << " hits" << endl << flush;
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
     if (hits < 1) { return false; }
 
     if (check && m_selection.empty()) { return true; }
@@ -164,23 +166,23 @@ bool BladeMap::selectMap(CoalDatabase & map_base,
         ptr += 3;
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
-            cout << "{" << hitName << "}";
+            std::cout << "{" << hitName << "}";
             std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
             if (check) {
                 if (m_selection.find(I->second) != m_selection.end()) {
                     return true;
-                    cout << "SELECTION VERIFIED" << endl << flush;
+                    std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
                 }
             } else {
                 if (I != nameDict.end()) {
                     m_selection[I->second] = 0;
                 } else {
-                    cout << "UNKNOWN NAME" << endl << flush;
+                    std::cout << "UNKNOWN NAME" << std::endl << std::flush;
                 }
             }
         }
     }
-    cout << endl << flush;
+    std::cout << std::endl << std::flush;
     return !check;
 
 }

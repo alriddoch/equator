@@ -133,7 +133,6 @@ void MainWindow::new_view()
     m_views.push_back(view);
     modelAdded.emit(view);
     
-    cout << "new view" << endl << flush;
 }
 
 void MainWindow::menu_quit()
@@ -153,7 +152,6 @@ void MainWindow::server_dialog()
 
 void MainWindow::open_layers(GlView * view)
 {
-    cout << "open layers" << endl << flush;
     if (view != NULL) {
         m_layerwindow->setView(view);
     }

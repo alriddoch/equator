@@ -6,26 +6,26 @@
 #define EQUATOR_APP_SERVERWINDOW_H
 
 #include <gtk--/window.h>
-#include <gtk--/clist.h>
 
 class MainWindow;
+class Server;
+class NewServerWindow;
 
 namespace Gtk {
-  class Tree;
-  class CTree;
+  class OptionMenu;
 };
 
 class ServerWindow : public Gtk::Window
 {
   private:
-    Gtk::Label * m_serverLabel;
+    Gtk::OptionMenu * m_serverMenu;
+    Server * m_currentConnection;
+    NewServerWindow * m_newServerWindow;
 
   public:
     MainWindow & m_mainWindow;
 
     explicit ServerWindow(MainWindow &);
-
-    gint buttonEvent(GdkEventButton*);
 
 };
 

@@ -8,7 +8,7 @@
 #include "Holo.h"
 #include "LayerWindow.h"
 
-#include "sstream.h"
+#include <sstream>
 
 #include <GL/glu.h>
 
@@ -94,11 +94,9 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
     view_popup.push_back(Gtk::Menu_Helpers::SeparatorElem());
     Gtk::RadioMenuItem::Group projection_group;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
-                         "Plan", slot(this, &GlView::setPlan)));
-    view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
-                         "Isometric", slot(this, &GlView::setIsometric)));
+                         "Orthographic", slot(this, &GlView::setOrthographic)));
     static_cast<Gtk::RadioMenuItem*>(view_popup.back())->set_active();
-    m_projection = GlView::ISO;
+    m_projection = GlView::ORTHO;
     view_popup.push_back(Gtk::Menu_Helpers::RadioMenuElem(projection_group,
                          "Perspective", slot(this, &GlView::setPerspective)));
 
@@ -124,19 +122,9 @@ GlView::GlView(ViewWindow&w) : m_popup(NULL), m_scale(1.0),
     m_popup->accelerate(m_viewwindow);
 }
 
-void GlView::setPlan()
+void GlView::setOrthographic()
 {
-    m_projection = PLAN;
-    if (make_current()) {
-        setupgl();
-        drawgl();
-    }
-    m_viewwindow.setTitle();
-}
-
-void GlView::setIsometric()
-{
-    m_projection = ISO;
+    m_projection = ORTHO;
     if (make_current()) {
         setupgl();
         drawgl();
@@ -220,13 +208,9 @@ void GlView::origin()
     if (make_current()) {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        if (m_projection == GlView::PLAN) {
-            glTranslatef(0.0f, 0.0f, -10.0f);
-        } else {
-            glTranslatef(0.0f, 0.0f, -10.0f);
-            glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-            glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        }
+        glTranslatef(0.0f, 0.0f, -10.0f);
+        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
         glScalef(m_scale, m_scale, m_scale);
         glTranslatef(m_xoff, m_yoff, m_zoff);
     }
@@ -251,7 +235,7 @@ void GlView::drawgl()
             glTranslatef(clickx, height() - clicky, 100.0f);
             float x = mousex - clickx;
             float y = clicky - mousey;
-            cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << endl << flush;
+            std::cout << clickx << ":" << clicky << ":" << mousex << ":" << mousey << " " << x << ":" << y << std::endl << std::flush;
             if (pretty) {
                 glEnable(GL_BLEND);
                 glDisable(GL_DEPTH_TEST);
@@ -391,8 +375,8 @@ void GlView::worldPoint(int x, int y, double &z,
         glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
         gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, wx, wy, wz);
-        cout << "[" << x << ":" << y << ":" << z << "]";
-        cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << endl << flush;
+        std::cout << "[" << x << ":" << y << ":" << z << "]";
+        std::cout << "{" << *wx << ":" << *wy << ":" << *wz << "}" << std::endl << std::flush;
     }
         
 
@@ -416,9 +400,9 @@ void GlView::endDrag(int x, int y)
         double dx, dy, dz;
 
         gluUnProject (x, height() - y, z, mvmatrix, projmatrix, viewport, &dx, &dy, &dz);
-        cout << "[" << x << ":" << y << ":" << z << "]";
-        cout << "{" << dx << ":" << dy << ":" << dz << "}";
-        cout << "{" << dx - dragx << ":" << dy - dragy << ":" << dz - dragz << "}" << endl << flush;
+        std::cout << "[" << x << ":" << y << ":" << z << "]";
+        std::cout << "{" << dx << ":" << dy << ":" << dz << "}";
+        std::cout << "{" << dx - dragx << ":" << dy - dragy << ":" << dz - dragz << "}" << std::endl << std::flush;
         m_xoff += (dx - dragx);
         m_yoff += (dy - dragy);
         m_zoff += (dz - dragz);
@@ -449,7 +433,7 @@ gint GlView::motion_notify_event_impl(GdkEventMotion*event)
 
 int GlView::button_press_event_impl(GdkEventButton * event)
 {
-    cout << "BUTTON" << event->button << endl << flush;
+    std::cout << "BUTTON" << event->button << std::endl << std::flush;
     switch (event->button) {
         case 1:
             clickOn(event->x, event->y);
@@ -501,7 +485,7 @@ int GlView::configure_event_impl(GdkEventConfigure*)
 const std::string GlView::details() const
 {
     std::stringstream dets;
-    const char * view = (m_projection == PLAN) ? "Plan" : (m_projection == ISO) ? "Isometric" : "Perspective";
+    const char * view =  (m_projection == ORTHO) ? "Orthographic" : "Perspective";
     dets << " (" << view << ") " << (int)(m_scale * 100) << "%";
     return dets.str();
 }
@@ -556,13 +540,9 @@ void GlView::setPickProjection()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glInitNames();
-    if (m_projection == GlView::PLAN) {
-        glTranslatef(0.0f, 0.0f, -10.0f);
-    } else {
-        glTranslatef(0.0f, 0.0f, -10.0f);
-        glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-    }
+    glTranslatef(0.0f, 0.0f, -10.0f);
+    glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
     glScalef(m_scale, m_scale, m_scale);
     glTranslatef(m_xoff, m_yoff, m_zoff);
 }
@@ -571,6 +551,6 @@ const float GlView::getZ(int x, int y) const
 {
     float z = 0;
     glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
-    cout << "GOT Z " << z << endl << flush;
+    std::cout << "GOT Z " << z << std::endl << std::flush;
     return z;
 }

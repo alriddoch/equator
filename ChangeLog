@@ -1,3 +1,19 @@
+2001-12-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/AtlasMapWidget.cpp, app/BladeMap.cpp, app/GlView.cpp,
+	  app/IsoMap.cpp, app/LayerWindow.cpp, app/MainWindow.cpp,
+	  app/Texture.cpp:
+	  C++ compliance fixes.
+
+	* app/GlView.cpp, app/GlView.h:
+	  Removed special case plan view, as it is a version of orgthographic.
+
+	* app/LayerWindow.cpp:
+	  Fixed setting of view option menu.
+
+	* app/ServerWindow.cpp, app/ServerWindow.h:
+	  Began to add true management of connections to servers.
+
 2001-12-17  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/BladeMap.h, app/IsoMap.cpp, app/IsoMap.h,

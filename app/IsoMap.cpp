@@ -15,6 +15,8 @@
 
 #include <gtk--/fileselection.h>
 
+#include <iostream>
+
 void IsoMap::drawMapRegion(CoalRegion & map_region)
 {
     Tile * tile = NULL;
@@ -26,7 +28,7 @@ void IsoMap::drawMapRegion(CoalRegion & map_region)
         glNormal3f(0, 0, 1);
         CoalShape & shape = map_region;
         if (shape.GetCoordCount() != 2) {
-            cout << "This don't look like a tile" << endl << flush;
+            std::cout << "This don't look like a tile" << std::endl << std::flush;
         } else {
             //for (unsigned int i = 0; i < shape.GetCoordCount (); i++) {
             glPushMatrix();
@@ -113,7 +115,7 @@ bool IsoMap::selectMap(CoalDatabase & map_base,
 
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT,viewport);
-    cout << "PICK " << nx << " " << ny << " " << fx - nx << " " << fy - ny << endl << flush;
+    std::cout << "PICK " << nx << " " << ny << " " << fx - nx << " " << fy - ny << std::endl << std::flush;
     gluPickMatrix(nx, ny, fx - nx, fy - ny, viewport);
 
     m_window.setPickProjection(); // Sets the projection, sets up names
@@ -156,7 +158,7 @@ bool IsoMap::selectMap(CoalDatabase & map_base,
         m_selection.clear();
     }
 
-    cout << "Got " << hits << " hits" << endl << flush;
+    std::cout << "Got " << hits << " hits" << std::endl << std::flush;
     if (hits < 1) { return false; }
 
     if (check && m_selection.empty()) { return true; }
@@ -167,23 +169,23 @@ bool IsoMap::selectMap(CoalDatabase & map_base,
         ptr += 3;
         for (int j = 0; j < names; j++) {
             int hitName = *(ptr++);
-            cout << "{" << hitName << "}";
+            std::cout << "{" << hitName << "}";
             std::map<int, CoalRegion *>::const_iterator I = nameDict.find(hitName);
             if (check) {
                 if (m_selection.find(I->second) != m_selection.end()) {
                     return true;
-                    cout << "SELECTION VERIFIED" << endl << flush;
+                    std::cout << "SELECTION VERIFIED" << std::endl << std::flush;
                 }
             } else {
                 if (I != nameDict.end()) {
                     m_selection[I->second] = 0;
                 } else {
-                    cout << "UNKNOWN NAME" << endl << flush;
+                    std::cout << "UNKNOWN NAME" << std::endl << std::flush;
                 }
             }
         }
     }
-    cout << endl << flush;
+    std::cout << std::endl << std::flush;
     return !check;
 
 }
@@ -247,14 +249,14 @@ void IsoMap::dragStart(int x, int y)
     if (selectMap(m_database, x, y, x+1, y+1, true)) {
         m_validDrag = true;
         if (m_selection.empty()) {
-            cout << "Moving whole layer" << endl << flush;
+            std::cout << "Moving whole layer" << std::endl << std::flush;
             // Moving whole layer
         } else {
-            cout << "Moving selection layer" << endl << flush;
+            std::cout << "Moving selection layer" << std::endl << std::flush;
             // Moving selection
         }
     } else {
-            cout << "Moving nothing" << endl << flush;
+            std::cout << "Moving nothing" << std::endl << std::flush;
         m_validDrag = false;
     }
 }
