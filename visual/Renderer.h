@@ -23,6 +23,7 @@ class Renderer {
     void lightOn() { }
     void lightOff() { }
 
+    SigC::Signal0<void> Restart;
     SigC::Signal1<void, float> Update;
 };
 
