@@ -110,10 +110,17 @@ class WEFactory : public Eris::Factory
     virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *);
     virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *, Eris::View *);
 
+#if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     SigC::Signal1<void, AutonomousEntity *> AutonomousEntityCreated;
     SigC::Signal1<void, TerrainEntity *> TerrainEntityCreated;
     SigC::Signal1<void, TreeEntity *> TreeEntityCreated;
     SigC::Signal1<void, RenderableEntity *> RenderableEntityCreated;
+#else
+    sigc::signal1<void, AutonomousEntity *> AutonomousEntityCreated;
+    sigc::signal1<void, TerrainEntity *> TerrainEntityCreated;
+    sigc::signal1<void, TreeEntity *> TreeEntityCreated;
+    sigc::signal1<void, RenderableEntity *> RenderableEntityCreated;
+#endif
 };
 
 #endif // APOGEE_WORLDENTITY_H

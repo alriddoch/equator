@@ -147,12 +147,13 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
                                        Eris::TypeInfo * type,
                                        Eris::View * v)
 {
-    SigC::Slot0<void> slot;
     RenderableEntity * re = 0;
     const std::string & id = ge->getId();
 
     // Eris::TypeInfoPtr type = v->getConnection()->getTypeService()->getTypeForAtlas(ge);
 #if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
+    SigC::Slot0<void> slot;
+
     if (type->isA(autonomousType)) {
         AutonomousEntity * ae = new AutonomousEntity(id, type, v);
         slot = SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(), ae);
@@ -170,21 +171,23 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
         slot = SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(), re);
     }
 #else
+    sigc::slot<void> slot;
+
     if (type->isA(autonomousType)) {
         AutonomousEntity * ae = new AutonomousEntity(id, type, v);
-        slot = (SigC::Slot0<void>&)SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(), ae);
+        slot = sigc::bind<AutonomousEntity *>(AutonomousEntityCreated.make_slot(), ae);
         re = ae;
     } else if (type->isA(terrainType)) {
         TerrainEntity * te = new TerrainEntity(id, type, v);
-        slot = (SigC::Slot0<void>&)SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
+        slot = sigc::bind<TerrainEntity *>(TerrainEntityCreated.make_slot(), te);
         re = te;
     } else if (type->isA(treeType)) {
         TreeEntity * te = new TreeEntity(id, type, v);
-        slot = (SigC::Slot0<void>&)SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
+        slot = sigc::bind<TreeEntity *>(TreeEntityCreated.make_slot(), te);
         re = te;
     } else {
         re = new RenderableEntity(id, type, v);
-        slot = (SigC::Slot0<void>&)SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(), re);
+        slot = sigc::bind<RenderableEntity *>(RenderableEntityCreated.make_slot(), re);
     }
 #endif
     if (re->m_drawer == 0) {
