@@ -67,7 +67,6 @@ ServerWindow::ServerWindow(MainWindow & mw) :
     m_connectWindow.serverConnected.connect(slot(*this, &ServerWindow::newServer));
     m_loginWindow.loginSuccess.connect(slot(*this, &ServerWindow::loggedIn));
     m_characterWindow.createStart.connect(slot(*this, &ServerWindow::creatingAvatar));
-    m_characterWindow.createSuccess.connect(slot(*this, &ServerWindow::createdAvatar));
 }
 
 void ServerWindow::connect()
@@ -114,9 +113,4 @@ void ServerWindow::creatingAvatar(Server * server)
     Model & model = m_mainWindow.newModel();
     model.setName(server->getName());
     server->takeModel(model);
-}
-
-void ServerWindow::createdAvatar(Server * server)
-{
-    server->createLayers();
 }

@@ -53,7 +53,6 @@ class ServerWindow : public Gtk::Window
     void setServer(Server *);
     void loggedIn(Server *);
     void creatingAvatar(Server *);
-    void createdAvatar(Server *);
 };
 
 #endif // EQUATOR_APP_SERVERWINDOW_H

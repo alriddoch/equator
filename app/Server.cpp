@@ -295,9 +295,11 @@ void Server::worldEnter(Eris::Entity * chr)
 {
     std::cout << "Enter world" << std::endl << std::flush;
     inGame = true;
-    chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
     m_character = chr;
 
+    createLayers();
+
+    chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
 }
 
 void Server::charMoved(const PosType &)

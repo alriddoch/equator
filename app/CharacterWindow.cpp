@@ -232,8 +232,6 @@ void CharacterWindow::created(Eris::Entity *)
     m_status->pop(m_statusContext);
     m_status->push("Logged In", m_statusContext);
 
-    createSuccess.emit(m_server);
-
     m_server = 0;
 
     m_nameEntry->get_entry()->set_editable(true);
