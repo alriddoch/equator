@@ -1,3 +1,7 @@
+2003-02-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/LayerWindow.cpp, app/Model.cpp: Fix some ui glitches.
+
 2003-02-05  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/HeightManager.cpp: It is very important to free allocated

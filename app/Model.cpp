@@ -62,9 +62,9 @@ void Model::raiseCurrentLayer()
     std::list<Layer *>::iterator I = m_layers.begin();
     for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
     if (I == m_layers.end()) { return; }
+    if (I == m_layers.begin()) { return; }
     I = m_layers.erase(I);
-    if (I != m_layers.end()) { ++I; }
-    m_layers.insert(I, m_currentLayer);
+    m_layers.insert(--I, m_currentLayer);
     layersChanged.emit();
     updated.emit();
 }
@@ -74,9 +74,9 @@ void Model::lowerCurrentLayer()
     std::list<Layer *>::iterator I = m_layers.begin();
     for (; I != m_layers.end() && m_currentLayer != *I; I++) {}
     if (I == m_layers.end()) { return; }
-    if (I == m_layers.begin()) { return; }
     I = m_layers.erase(I);
-    m_layers.insert(--I, m_currentLayer);
+    if (I != m_layers.end()) { ++I; }
+    m_layers.insert(I, m_currentLayer);
     layersChanged.emit();
     updated.emit();
 }

@@ -91,37 +91,33 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
 
     Gtk::HBox * bothbox = manage( new Gtk::HBox() );
     Gtk::Button * b = manage( new Gtk::Button() );
-    // Gtk::Pixmap * p = manage( new Gtk::Pixmap(newlayer_xpm) );
-    // b->add(*p);
+
+
     Glib::RefPtr<Gdk::Bitmap> pixmask;
     Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, newlayer_xpm);
     b->add_pixmap(p, pixmask);
 
     b->signal_clicked().connect(slot(*this, &LayerWindow::newLayerRequested));
     bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
+
     b = manage( new Gtk::Button() );
-    // p = manage( new Gtk::Pixmap(raise_xpm) );
-    // b->add(*p);
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, raise_xpm);
     b->add_pixmap(p, pixmask);
     b->signal_clicked().connect(slot(*this, &LayerWindow::raiseLayer));
     bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
+
     b = manage( new Gtk::Button() );
-    // p = manage( new Gtk::Pixmap(lower_xpm) );
-    // b->add(*p);
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, lower_xpm);
     b->add_pixmap(p, pixmask);
     b->signal_clicked().connect(slot(*this, &LayerWindow::lowerLayer));
     bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
+
     b = manage( new Gtk::Button() );
-    // p = manage( new Gtk::Pixmap(duplicate_xpm) );
-    // b->add(*p);
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, duplicate_xpm);
     b->add_pixmap(p, pixmask);
     bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
+
     b = manage( new Gtk::Button() );
-    // p = manage( new Gtk::Pixmap(delete_xpm) );
-    // b->add(*p);
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, delete_xpm);
     b->add_pixmap(p, pixmask);
     bothbox->pack_start(*b, Gtk::FILL | Gtk::EXPAND, 0);
@@ -150,12 +146,12 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
 
 void LayerWindow::setModel(Model * model)
 {
-    if (m_currentModel != NULL) {
-        m_updateSignal.disconnect();
+    if (model == m_currentModel) {
+        return;
     }
 
-    if (model == m_currentModel) {
-	return;
+    if (m_currentModel != NULL) {
+        m_updateSignal.disconnect();
     }
 
     m_currentModel = model;
@@ -184,7 +180,7 @@ void LayerWindow::updateLayers()
         row[*m_visColumn] = (*I)->isVisible();
         row[*m_typeColumn] = Glib::ustring((*I)->getType());
         row[*m_nameColumn] = Glib::ustring((*I)->getName());
-	row[*m_ptrColumn] = *I;
+        row[*m_ptrColumn] = *I;
         if (*I == m_currentModel->getCurrentLayer()) {
             m_refTreeSelection->select(row);
         }
@@ -229,6 +225,10 @@ void LayerWindow::visibleToggled(const Glib::ustring& path_string)
 
     /* set new value */
     row[*m_visColumn] = visible;
+
+    if (0 != m_currentModel) {
+        m_currentModel->updated.emit();
+    }
 }
 
 void LayerWindow::selectionChanged()
@@ -236,8 +236,8 @@ void LayerWindow::selectionChanged()
     std::cout << "Got selection change" << std::endl << std::flush;
     Gtk::TreeIter i = m_refTreeSelection->get_selected();
     if (!i) {
-	std::cout << "Nothing selected no more" << std::endl << std::flush;
-	return;
+        std::cout << "Nothing selected no more" << std::endl << std::flush;
+        return;
     }
     Gtk::TreeModel::Row row = *i;
     Layer * layer = row[*m_ptrColumn];
