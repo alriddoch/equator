@@ -70,6 +70,7 @@ dnl AC_CHECK_LIB(ccstd,main)
 dnl AC_CHECK_LIB(ccio,main)
 AC_CHECK_LIB(gtkgl,main)
 AC_CHECK_LIB(gtkglmm,main)
+AC_CHECK_LIB(wfmath,main)
 
 AM_PATH_SKSTREAM(0.2.0, 
     [

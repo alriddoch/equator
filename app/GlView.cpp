@@ -363,13 +363,13 @@ void GlView::drawgl()
 
 gint GlView::animate()
 {
-    cout << "ANIMATE" << std::endl << std::flush;
+    std::cout << "ANIMATE" << std::endl << std::flush;
     if (make_current()) {
         setupgl();
         origin();
         cursor();
         //swap_buffers();
-        cout << "ANIMATED" << std::endl << std::flush;
+        std::cout << "ANIMATED" << std::endl << std::flush;
     }
     return 1;
 }

@@ -353,7 +353,7 @@ void ServerEntities::select(GlView & view, int x, int y, int w, int h)
 void ServerEntities::pushSelection()
 {
     if (m_selection != NULL) {
-        cout << "Pushing " << m_selection->getID() << endl << flush;
+        std::cout << "Pushing " << m_selection->getID() << std::endl << std::flush;
         m_selectionStack.push_back(m_selection);
         m_selection = NULL;
     }
@@ -362,7 +362,7 @@ void ServerEntities::pushSelection()
 void ServerEntities::popSelection()
 {
     if (!m_selectionStack.empty()) {
-        cout << "Popping" << endl << flush;
+        std::cout << "Popping" << std::endl << std::flush;
         m_selection = m_selectionStack.back();
         m_selectionStack.pop_back();
     }
