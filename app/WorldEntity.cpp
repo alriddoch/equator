@@ -28,8 +28,8 @@
 
 using Atlas::Objects::Entity::GameEntity;
 
-RenderableEntity::RenderableEntity(const GameEntity &ge, Eris::TypeInfo * t,
-                             Eris::View * v) : Eris::Entity(ge, t, v), m_drawer(0)
+RenderableEntity::RenderableEntity(const std::string & id, Eris::TypeInfo * t,
+                             Eris::View * v) : Eris::Entity(id, t, v), m_drawer(0)
 {
 }
 
@@ -37,8 +37,8 @@ void RenderableEntity::constrainChild(RenderableEntity &, PosType &)
 {
 }
 
-MovableEntity::MovableEntity(const GameEntity &ge, Eris::TypeInfo * t,
-                             Eris::View * v) : RenderableEntity(ge, t, v)
+MovableEntity::MovableEntity(const std::string & id, Eris::TypeInfo * t,
+                             Eris::View * v) : RenderableEntity(id, t, v)
 {
     Moved.connect(SigC::slot(*this, &MovableEntity::movedSignal));
     updateTime = SDL_GetTicks();
@@ -49,13 +49,13 @@ void MovableEntity::movedSignal(Eris::Entity *)
     updateTime = SDL_GetTicks();
 }
 
-AutonomousEntity::AutonomousEntity(const GameEntity &ge, Eris::TypeInfo * t,
-                                   Eris::View * v) : MovableEntity(ge, t, v)
+AutonomousEntity::AutonomousEntity(const std::string & id, Eris::TypeInfo * t,
+                                   Eris::View * v) : MovableEntity(id, t, v)
 {
 }
 
-TerrainEntity::TerrainEntity(const GameEntity &ge, Eris::TypeInfo * t,
-                             Eris::View * v) : RenderableEntity(ge, t, v)
+TerrainEntity::TerrainEntity(const std::string & id, Eris::TypeInfo * t,
+                             Eris::View * v) : RenderableEntity(id, t, v)
 {
 }
 
@@ -74,8 +74,8 @@ void TerrainEntity::constrainChild(RenderableEntity & re, PosType & pos)
     tr->m_terrain.getHeightAndNormal(pos.x(), pos.y(), pos.z(), n);
 }
 
-TreeEntity::TreeEntity(const GameEntity &ge, Eris::TypeInfo * t,
-                       Eris::View * v) : RenderableEntity(ge, t, v)
+TreeEntity::TreeEntity(const std::string & id, Eris::TypeInfo * t,
+                       Eris::View * v) : RenderableEntity(id, t, v)
 {
 }
 
@@ -149,40 +149,41 @@ Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
 {
     SigC::Slot0<void> slot;
     RenderableEntity * re = 0;
+    const std::string & id = ge->getId();
 
     // Eris::TypeInfoPtr type = v->getConnection()->getTypeService()->getTypeForAtlas(ge);
 #if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     if (type->isA(autonomousType)) {
-        AutonomousEntity * ae = new AutonomousEntity(ge, type, v);
+        AutonomousEntity * ae = new AutonomousEntity(id, type, v);
         slot = SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(), ae);
         re = ae;
     } else if (type->isA(terrainType)) {
-        TerrainEntity * te = new TerrainEntity(ge, type, v);
+        TerrainEntity * te = new TerrainEntity(id, type, v);
         slot = SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
         re = te;
     } else if (type->isA(treeType)) {
-        TreeEntity * te = new TreeEntity(ge, type, v);
+        TreeEntity * te = new TreeEntity(id, type, v);
         slot = SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
         re = te;
     } else {
-        re = new RenderableEntity(ge, type, v);
+        re = new RenderableEntity(id, type, v);
         slot = SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(), re);
     }
 #else
     if (type->isA(autonomousType)) {
-        AutonomousEntity * ae = new AutonomousEntity(ge, type, v);
+        AutonomousEntity * ae = new AutonomousEntity(id, type, v);
         slot = (SigC::Slot0<void>&)SigC::bind<AutonomousEntity *>(AutonomousEntityCreated.slot(), ae);
         re = ae;
     } else if (type->isA(terrainType)) {
-        TerrainEntity * te = new TerrainEntity(ge, type, v);
+        TerrainEntity * te = new TerrainEntity(id, type, v);
         slot = (SigC::Slot0<void>&)SigC::bind<TerrainEntity *>(TerrainEntityCreated.slot(), te);
         re = te;
     } else if (type->isA(treeType)) {
-        TreeEntity * te = new TreeEntity(ge, type, v);
+        TreeEntity * te = new TreeEntity(id, type, v);
         slot = (SigC::Slot0<void>&)SigC::bind<TreeEntity *>(TreeEntityCreated.slot(), te);
         re = te;
     } else {
-        re = new RenderableEntity(ge, type, v);
+        re = new RenderableEntity(id, type, v);
         slot = (SigC::Slot0<void>&)SigC::bind<RenderableEntity *>(RenderableEntityCreated.slot(), re);
     }
 #endif

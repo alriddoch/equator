@@ -24,7 +24,7 @@ class RenderableEntity : public Eris::Entity
   public:
     EntityRenderer * m_drawer;
 
-    RenderableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
+    RenderableEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
     virtual void constrainChild(RenderableEntity &, PosType & pos);
 };
 
@@ -34,7 +34,7 @@ class MovableEntity : public RenderableEntity
   public:
     void movedSignal(Eris::Entity *);
 
-    MovableEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
+    MovableEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
 
     const float getTime() {
         return updateTime;
@@ -44,14 +44,14 @@ class MovableEntity : public RenderableEntity
 class AutonomousEntity : public MovableEntity
 {
   public:
-    AutonomousEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
+    AutonomousEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
 
 };
 
 class TerrainEntity : public RenderableEntity
 {
   public:
-    TerrainEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
+    TerrainEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
 
     virtual void constrainChild(RenderableEntity &, PosType & pos);
 };
@@ -59,7 +59,7 @@ class TerrainEntity : public RenderableEntity
 class TreeEntity : public RenderableEntity
 {
   public:
-    TreeEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::TypeInfo *, Eris::View *);
+    TreeEntity(const std::string & id, Eris::TypeInfo *, Eris::View *);
 
 };
 
