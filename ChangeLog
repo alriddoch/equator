@@ -1,3 +1,21 @@
+2003-08-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp, app/GlView.h: Cut down on excessive use of doubles.
+
+	* app/HeightData.h, app/HeightManager.h, app/HeightMap.h: Remove
+	  obsolete code from the build.
+
+	* app/IsoMap.cpp, app/Model.cpp, app/Model.h: Remove direct link
+	  to Server and HeightField from Model.
+
+	* app/NewLayerWindow.cpp: Remove obsolete layer type.
+
+	* app/NewServerWindow.cpp: Don't automatically create a terrain
+	  layer when connecting to a server.
+
+	* app/ServerEntities.cpp: Can't align entities to hard-coded
+	  terrain object anymore.
+
 2003-08-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Layer.h, app/Layer.cpp: Move virtual destructor into

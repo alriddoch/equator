@@ -13,8 +13,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  AtlasMapWidget.cpp AtlasMapWidget.h \
 		  inheritance.cpp inheritance.h \
 		  GlView.cpp GlView.h \
-		  HeightMap.cpp HeightMap.h \
-		  HeightData.cpp HeightData.h \
 		  Model.cpp Model.h \
 		  Server.cpp Server.h \
 		  Layer.cpp Layer.h \
@@ -23,7 +21,6 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  IsoMap.cpp IsoMap.h \
 		  TileMap.cpp TileMap.h \
 		  Terrain.cpp Terrain.h \
-		  HeightManager.cpp HeightManager.h \
 		  EntityLayer.cpp EntityLayer.h \
 		  ServerEntities.cpp ServerEntities.h \
 		  Texture.cpp Texture.h default_texture.h \
@@ -31,3 +28,7 @@ equator_SOURCES = MainWindow.cpp MainWindow.h \
 		  types.h GL.h operations.h debug.h \
 		  arrow_mesh.h \
 		  equator_plugin.cpp
+
+#		  HeightMap.cpp HeightMap.h \
+#		  HeightData.cpp HeightData.h \
+#		  HeightManager.cpp HeightManager.h \

@@ -17,11 +17,9 @@ static const bool pretty = false;
 int Model::modelCount = 0;
 
 Model::Model(MainWindow & mw) : m_modelNo(modelCount++), m_viewCount(0),
-                                m_server(NULL),
                                 m_cursX(0.0f), m_cursY(0.0f), m_cursZ(0.0f),
                                 m_sizeX(500.0f), m_sizeY(500.0f),
-                                m_sizeZ(500.0f), m_mainWindow(mw),
-                                m_terrain(* new Mercator::Terrain(64))
+                                m_sizeZ(500.0f), m_mainWindow(mw)
 {
     m_currentLayer = new Holo(*this);
     m_layers.push_front( m_currentLayer );

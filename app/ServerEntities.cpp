@@ -549,10 +549,13 @@ void ServerEntities::alignEntityHeight(Eris::Entity * ent,
     WFMath::Point<3> pos = ent->getPosition();
     WFMath::Point<3> offset = pos + o;
     if (m_selectionList.find(ent) != m_selectionList.end()) {
+#warning FIXME - get the server object to handle the adjustment.
+        // The server object knows about what data we have available.
+        // We should probably support alignments like "other layer", "parent"
         float x = offset.x();
         float y = offset.y();
         float z = o.z();
-        float height = m_model.m_terrain.get(x, y); // / 32.0f;
+        float height = z; // = m_model.m_terrain.get(x, y); // / 32.0f;
         std::cout << ent->getID() << " had height of " << offset.z()
                   << " and we change it to " << height << std::endl << std::flush;
         WFMath::Point<3> newPos = pos;
@@ -829,7 +832,8 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
                 bp.falloff()=point[4].asNum();
             }
         }
-        m_model.m_terrain.setBasePoint(x, y, bp);
+#warning FIXME Work out where we need to handle the terrain
+        // m_model.m_terrain.setBasePoint(x, y, bp);
     }
  
 #if 0

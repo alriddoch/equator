@@ -73,7 +73,7 @@ class GlView : public Gtk::DrawingArea {
 
     void worldPoint(int x, int y, double & z,
                     double * wx, double * wy, double * wz);
-    void screenPoint(double x, double y, double z,
+    void screenPoint(float x, float y, float z,
                      int & sx, int & sy, double & sz);
 
     void realize();

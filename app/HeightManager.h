@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2001 Alistair Riddoch
 
+#error Removed from build
+
 #ifndef EQUATOR_HEIGHTMANAGER_H
 #define EQUATOR_HEIGHTMANAGER_H
 

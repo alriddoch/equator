@@ -13,13 +13,7 @@
 #include <sigc++/signal.h>
 
 class Layer;
-class Server;
 class MainWindow;
-// class HeightData;
-
-namespace Mercator {
-  class Terrain;
-}
 
 class Model : public SigC::Object {
   private:
@@ -29,15 +23,12 @@ class Model : public SigC::Object {
     int m_viewCount;
     std::list<Layer *> m_layers;
     Layer * m_currentLayer;
-    Server * m_server;
     std::string m_name;
     float m_cursX, m_cursY, m_cursZ;
     float m_sizeX, m_sizeY, m_sizeZ;
 
   public:
     MainWindow & m_mainWindow;
-    // HeightData & m_heightData;
-    Mercator::Terrain & m_terrain;
 
     explicit Model(MainWindow & m);
 
@@ -59,14 +50,6 @@ class Model : public SigC::Object {
 
     void setCurrentLayer(Layer * l) {
         m_currentLayer = l;
-    }
-
-    Server * getServer() const {
-        return m_server;
-    }
-
-    void setServer(Server * s) {
-        m_server = s;
     }
 
     const std::string & getName() const {

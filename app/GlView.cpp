@@ -712,7 +712,7 @@ void GlView::worldPoint(int x, int y, double &z,
     }
 }
 
-void GlView::screenPoint(double x, double y, double z,
+void GlView::screenPoint(float x, float y, float z,
                          int & sx, int & sy, double & sz)
 {
     if (make_current()) {

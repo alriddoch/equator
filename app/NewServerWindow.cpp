@@ -3,11 +3,11 @@
 // Copyright (C) 2000-2001 Alistair Riddoch
 
 #include "NewServerWindow.h"
+
 #include "MainWindow.h"
 #include "Server.h"
 #include "Model.h"
 #include "ServerEntities.h"
-#include "HeightManager.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Lobby.h>
@@ -270,10 +270,10 @@ void NewServerWindow::worldEnter(Eris::Entity*)
 void NewServerWindow::viewCreated(Model * model)
 {
     model->setName(m_hostEntry->get_text());
-    model->setServer(m_server);
-    Layer * layer = new HeightManager(*model);
-    model->addLayer(layer);
-    layer = new ServerEntities(*model, *m_server);
+    // model->setServer(m_server);
+    // Layer * layer = new HeightManager(*model);
+    // model->addLayer(layer);
+    Layer * layer = new ServerEntities(*model, *m_server);
     model->addLayer(layer);
     m_viewButton->set_sensitive(false);
 }
