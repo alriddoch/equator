@@ -243,14 +243,8 @@ class ExportOptions : public Gtk::Window
     }
 };
 
-void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
-                                const WFMath::AxisBox<3> & bbox, bool open)
+void ServerEntities::draw3DCube(const WFMath::AxisBox<3> & bbox, bool open)
 {
-    bool shaded = (m_renderMode == GlView::SHADED);
-    // glPushMatrix();
-
-    // glTranslatef(coords.x(), coords.y(), coords.z());
-
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
         bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -268,6 +262,8 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
     static const GLushort north[] = { 3, 2, 6, 7 };
     static const GLushort west[] = { 0, 3, 7, 4 };
     static const GLushort east[] = { 1, 2, 6, 5 };
+
+    bool shaded = (m_renderMode == GlView::SHADED);
 
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glColor3f(0.0f, 0.0f, 1.0f);
@@ -291,13 +287,8 @@ void ServerEntities::draw3DCube(const WFMath::Point<3> & coords,
     // glPopMatrix();
 }
 
-void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
-                               const WFMath::AxisBox<3> & bbox)
+void ServerEntities::draw3DBox(const WFMath::AxisBox<3> & bbox)
 {
-    // glPushMatrix();
-
-    // glTranslatef(coords.x(), coords.y(), coords.z());
-
     GLfloat vertices[] = {
         bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
         bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z(),
@@ -309,23 +300,16 @@ void ServerEntities::draw3DBox(const WFMath::Point<3> & coords,
         bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z() 
     };
     static const GLushort indices[] = { 0, 1, 3, 2, 7, 6, 4, 5, 0, 4, 1, 5,
-                                      3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
+                                        3, 7, 2, 6, 0, 3, 1, 2, 4, 7, 5, 6 };
 
     glColor3f(0.0f, 0.0f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
-    // glPopMatrix();
-
 }
 
-void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
-                                       const WFMath::AxisBox<3> & bbox,
+void ServerEntities::draw3DSelectedBox(const WFMath::AxisBox<3> & bbox,
                                        float phase)
 {
-    glPushMatrix();
-    // origin();
-    glTranslatef(coords.x(), coords.y(), coords.z());
-
     glDisable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
 
@@ -357,7 +341,6 @@ void ServerEntities::draw3DSelectedBox(const WFMath::Point<3> & coords,
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_SHORT, indices);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    glPopMatrix();
     glDisable(GL_TEXTURE_1D);
 
     glEnable(GL_DEPTH_TEST);
@@ -401,19 +384,18 @@ void ServerEntities::drawEntity(Eris::Entity* world,
     if (ent->hasBBox()) {
         switch (m_renderMode) {
             case GlView::LINE:
-                draw3DBox(ent->getPosition(), ent->getBBox());
+                draw3DBox(ent->getBBox());
                 break;
             case GlView::SOLID:
             case GlView::SHADED:
             case GlView::TEXTURE:
             case GlView::SHADETEXT:
             default:
-                draw3DCube(ent->getPosition(), ent->getBBox(),
-                           openEntity);
+                draw3DCube(ent->getBBox(), openEntity);
         }
         if ((ent == m_selection) ||
             (m_selectionList.find(ent) != m_selectionList.end())) {
-            draw3DSelectedBox(ent->getPosition(), ent->getBBox());
+            draw3DSelectedBox(ent->getBBox());
         }
     } // else draw it without using its bbox FIXME how ?
 
@@ -456,7 +438,7 @@ void ServerEntities::selectEntity(Eris::Entity * wrld,
     orient(ent->getOrientation());
 
     if (ent->hasBBox()) {
-        draw3DCube(ent->getPosition(), ent->getBBox());
+        draw3DCube(ent->getBBox());
     }
 
     if ((ent == wrld) || (I != m_selectionStack.end()) && (*I == ent)) {
@@ -914,7 +896,7 @@ void ServerEntities::animate(GlView & view)
     Eris::Entity * root = m_serverConnection.m_world->getRootEntity();
     glPushMatrix();
     moveTo(m_selection->getContainer(), root);
-    draw3DSelectedBox(m_selection->getPosition(), m_selection->getBBox(),
+    draw3DSelectedBox(m_selection->getBBox(),
                       view.getAnimCount());
     glPopMatrix();
 }

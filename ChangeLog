@@ -1,5 +1,11 @@
 2003-10-21  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/ServerEntities.cpp, app/ServerEntities.h: Remove coords
+	  argument from all box drawing methods, and clean them up. In
+	  doing so, fix the entity selection bug from previous message.
+
+2003-10-21  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/ServerEntities.cpp, app/ServerEntities.h: Re-write entity
 	  rendering to do draw order correctly so that orientation works.
 	  Add orientation. Needs cleaning, and entity selection bug sorting.
