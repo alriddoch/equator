@@ -54,7 +54,7 @@ class MainWindow : public Gtk::Window
     Gtk::ToggleButton * entity_mode;
     Gtk::ToggleButton * vertex_mode;
 
-    void destroy_handler();
+    bool destroy_handler(GdkEventAny*);
     gint idle();
   public:
     // THese signals absolutely must be constructed before the other window

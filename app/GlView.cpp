@@ -59,6 +59,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     Glib::RefPtr<Gdk::GL::Config> glconfig = Gdk::GL::Config::create(
                                              Gdk::GL::MODE_RGB |
                                              Gdk::GL::MODE_DEPTH |
+                                             Gdk::GL::MODE_ACCUM |
                                              Gdk::GL::MODE_DOUBLE);
     if (glconfig.is_null()) {
         std::cerr << "*** Cannot find the double-buffered visual.\n"
@@ -246,6 +247,7 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) : // Gtk::GLArea(attrlist),
     signal_expose_event().connect(SigC::slot(*this, &GlView::exposeEvent));
     signal_button_press_event().connect(SigC::slot(*this, &GlView::buttonPressEvent));
     signal_button_release_event().connect(SigC::slot(*this, &GlView::buttonReleaseEvent));
+    signal_motion_notify_event().connect(SigC::slot(*this, &GlView::motionNotifyEvent));
 }
 
 void GlView::setOrthographic()
@@ -480,10 +482,10 @@ void GlView::drawgl()
                 glEnd();
             }
         }
+        glFlush();
+        swap_buffers();
+        glAccum(GL_LOAD, 1.0f);
     }
-    glFlush();
-    swap_buffers();
-    glAccum(GL_LOAD, 1.0f);
 }
 
 gint GlView::animate()

@@ -14,6 +14,8 @@
 #include <Atlas/Objects/Operation/Move.h>
 #include <Atlas/Objects/Operation/Create.h>
 
+#include <glibmm/main.h>
+
 #include <sigc++/object_slot.h>
 
 using Atlas::Message::Object;
@@ -96,9 +98,9 @@ void Server::connect(const std::string & host, int port)
     // connection.connect("localhost", 6767);
 
 #warning Handle the socket input FIXME
-    // inputHandler = Gtk::Main::input.connect(slot(*this, &Server::poll),
-                                            // connection.getFileDescriptor(),
-                                            // GDK_INPUT_READ);
+    inputHandler = Glib::signal_io().connect(slot(*this, &Server::poll),
+                                             connection.getFileDescriptor(),
+                                             Glib::IO_IN);
 }
 
 void Server::netFailure(const std::string & msg)
@@ -139,7 +141,7 @@ void Server::netDisconnected()
     std::cout << "Disconnected from the server" << std::endl << std::flush;
 }
 
-void Server::poll(int, GdkInputCondition)
+bool Server::poll(Glib::IOCondition)
 {
     //connection.poll();
     Eris::PollDefault::poll();

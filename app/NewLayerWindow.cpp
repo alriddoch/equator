@@ -86,6 +86,8 @@ NewLayerWindow::NewLayerWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL)
     vbox->pack_start(*hbox, Gtk::AttachOptions(0), 2);
 
     add(*vbox);
+
+    signal_delete_event().connect(slot(*this, &NewLayerWindow::deleteEvent));
 }
 
 void NewLayerWindow::doshow(Model * model)

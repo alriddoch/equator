@@ -44,7 +44,7 @@ MainWindow::MainWindow() : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_newServerwindow (*manage( new NewServerWindow(*this) )),
     m_palettewindow (*manage( new Palette(*this) ))
 {
-    // destroy.connect(slot(this, &MainWindow::destroy_handler));
+    signal_delete_event().connect(slot(*this, &MainWindow::destroy_handler));
 
     Gtk::Menu * menu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& file_menu = menu->items();
@@ -167,10 +167,10 @@ gint MainWindow::quit(GdkEventAny *)
     return 0;
 }
 
-void MainWindow::destroy_handler()
+bool MainWindow::destroy_handler(GdkEventAny*)
 {
-    // This is called from the detructor, so must not contain anything else
     Gtk::Main::quit();
+    return 0;
 }
 
 gint MainWindow::idle()

@@ -127,6 +127,7 @@ NewServerWindow::NewServerWindow(MainWindow & mw) :
     add(*vbox);
 
     set_title("Connect to server");
+    signal_delete_event().connect(slot(*this, &NewServerWindow::deleteEvent));
 }
 
 void NewServerWindow::setPort(int port)

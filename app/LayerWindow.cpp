@@ -20,6 +20,7 @@
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
+#include <gtkmm/treeselection.h>
 
 #include <iostream>
 #include <vector>
@@ -74,6 +75,12 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_treeView = manage( new Gtk::TreeView() );
 
     m_treeView->set_model( m_treeModel );
+    m_treeView->append_column("Visible", *m_visColumn);
+    m_treeView->append_column("Type", *m_typeColumn);
+    m_treeView->append_column("Name", *m_nameColumn);
+
+    m_refTreeSelection = m_treeView->get_selection();
+    m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
 
     vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::AttachOptions(0), 0);
 
@@ -140,6 +147,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::addModel));
     mw.currentModelChanged.connect(SigC::slot(*this, &LayerWindow::setModel));
 
+    signal_delete_event().connect(slot(*this, &LayerWindow::deleteEvent));
 }
 
 void LayerWindow::setModel(Model * model)

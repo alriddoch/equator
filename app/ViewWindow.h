@@ -40,7 +40,7 @@ class ViewWindow : public Gtk::Window
 
     ViewWindow(MainWindow &, Model &);
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         // Fix it here so it don't close
         return 1;
     }

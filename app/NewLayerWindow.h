@@ -56,7 +56,7 @@ class NewLayerWindow : public Gtk::Window
   public:
     NewLayerWindow();
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }

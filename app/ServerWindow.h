@@ -26,7 +26,7 @@ class ServerWindow : public Gtk::Window
 
     explicit ServerWindow(MainWindow &);
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }

@@ -64,7 +64,7 @@ class NewServerWindow : public Gtk::Window
   public:
     NewServerWindow(MainWindow & m);
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }

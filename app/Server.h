@@ -60,7 +60,7 @@ class Server : public SigC::Object {
     void connectionLog(Eris::LogLevel level, const std::string & msg);
     void netDisconnected();
 
-    void poll(int, GdkInputCondition);
+    bool poll(Glib::IOCondition);
 
     void login(const std::string &, const std::string &);
     void createAccount(const std::string &, const std::string &);

@@ -105,6 +105,7 @@ Palette::Palette(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
 
     mw.modelAdded.connect(SigC::slot(*this, &Palette::addModel));
     mw.currentModelChanged.connect(SigC::slot(*this, &Palette::setModel));
+    signal_delete_event().connect(slot(*this, &Palette::deleteEvent));
 }
 
 void Palette::setCurrentTile(int row, int column, GdkEvent *)

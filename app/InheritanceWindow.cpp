@@ -93,4 +93,5 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw) :
     set_title("Inheritance");
 
     // show_all();
+    signal_delete_event().connect(slot(*this, &InheritanceWindow::deleteEvent));
 }

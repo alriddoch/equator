@@ -19,6 +19,7 @@ namespace Gtk {
    template <class T> class TreeModelColumn;
    class TreeModelColumnRecord;
    class TreeView;
+   class TreeSelection;
 }
 
 class LayerWindow : public Gtk::Window
@@ -30,6 +31,7 @@ class LayerWindow : public Gtk::Window
     Gtk::TreeModelColumn<Glib::ustring> * m_nameColumn;
     Gtk::TreeModelColumnRecord * m_columns;
     Gtk::TreeView * m_treeView;
+    Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
     Gtk::OptionMenu * m_modelMenu;
     GdkPixmap * m_eye;
     GdkBitmap * m_eyemask;
@@ -45,7 +47,7 @@ class LayerWindow : public Gtk::Window
 
     explicit LayerWindow(MainWindow &);
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }

@@ -62,7 +62,8 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
     table->attach(*m_vScrollbar, 2, 3, 1, 2, Gtk::FILL, Gtk::FILL);
     m_hScrollbar = manage( new Gtk::HScrollbar(*m_hAdjust) );
     table->attach(*m_hScrollbar, 1, 2, 2, 3, Gtk::FILL, Gtk::FILL);
-    table->attach(*m_glarea, 1, 2, 1, 2);
+    table->attach(*m_glarea, 1, 2, 1, 2, Gtk::FILL | Gtk::EXPAND,
+                                         Gtk::FILL | Gtk::EXPAND);
 
     vbox->pack_start(*table, Gtk::FILL | Gtk::EXPAND, 0);
 
@@ -82,6 +83,7 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
 
     m_glarea->viewChanged.connect(slot(*this, &ViewWindow::glViewChanged));
     glViewChanged();
+    signal_delete_event().connect(slot(*this, &ViewWindow::deleteEvent));
 }
 
 void ViewWindow::setTitle()

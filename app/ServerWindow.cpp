@@ -38,6 +38,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     set_sensitive(false);
 
     // show_all();
+    signal_delete_event().connect(slot(*this, &ServerWindow::deleteEvent));
 }
 
 void ServerWindow::newServer(Server * server)

@@ -59,7 +59,7 @@ class Palette : public Gtk::Window
 
     explicit Palette(MainWindow &);
 
-    gint delete_event_impl(GdkEventAny*) {
+    bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }
