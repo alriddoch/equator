@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 ViewWindow::ViewWindow(MainWindow & w, Model & m) :
                                          Gtk::Window(GTK_WINDOW_TOPLEVEL),
@@ -79,14 +80,8 @@ ViewWindow::ViewWindow(MainWindow & w, Model & m) :
 
     show_all();
 
-    float th = 0.0f, tv = 0.0f;
-
-    m_glarea->getViewOffset(th, tv, m_dAdjust);
-    std::cout << "Setting view things: " << th << ":" << tv << ":"
-              << m_dAdjust << std::endl << std::flush;
-    m_hAdjust->set_value(th);
-    m_vAdjust->set_value(tv);
     m_glarea->viewChanged.connect(slot(this, &ViewWindow::glViewChanged));
+    glViewChanged();
 }
 
 void ViewWindow::setTitle()
@@ -117,6 +112,7 @@ void ViewWindow::viewMoved()
     text << " " << x << "," << y << "," << z << " ";
     m_viewCoords->pop(m_viewContext);
     m_viewCoords->push(m_viewContext, text.str());
+    doRulers();
 }
 
 void ViewWindow::vAdjustChanged()
@@ -147,8 +143,53 @@ void ViewWindow::glViewChanged()
 {
     std::cout << "Changing sliders to take accout of view change"
               << std::endl << std::flush;
+    float wx, wy, wz;
+    m_glarea->m_model.getSize(wx, wy, wz);
+    float winx = m_glarea->width() / (40.0f * m_glarea->getScale());
+    float winy = m_glarea->height() / (40.0f * m_glarea->getScale());
+    float worldSize = hypot(wx, wy);
+    float xrel = winx/worldSize;
+    float yrel = winy/worldSize;
+    if (xrel > 1.0f) { xrel = 1.0f; }
+    if (yrel > 1.0f) { yrel = 1.0f; }
+
+    std::cout << "SLIDERS: " << winx << "," << winy << " (" << worldSize << ") "
+              << xrel << "," << yrel << std::endl << std::flush;
+
+    m_hAdjust->set_lower(-worldSize);
+    m_vAdjust->set_lower(-worldSize);
+    m_hAdjust->set_upper(worldSize);
+    m_vAdjust->set_upper(worldSize);
+    
+    m_hAdjust->set_page_size(xrel);
+    m_vAdjust->set_page_size(yrel);
+
+    m_hAdjust->set_page_increment(winx);
+    m_vAdjust->set_page_increment(winy);
+
+    m_hAdjust->set_step_increment(winx / 10.0f);
+    m_vAdjust->set_step_increment(winy / 10.0f);
+
     float th, tv;
     m_glarea->getViewOffset(th, tv, m_dAdjust);
     m_hAdjust->set_value(-th);
     m_vAdjust->set_value(tv);
+
+    doRulers();
+}
+
+void ViewWindow::doRulers()
+{
+    float th = m_hAdjust->get_value(), tv = m_vAdjust->get_value();
+    float winx = m_glarea->width() / (40.0f * m_glarea->getScale());
+    float winy = m_glarea->height() / (40.0f * m_glarea->getScale());
+    float hrl = th - winx/2,
+          hrh = th + winx/2,
+          vrl = - tv + winy/2,
+          vrh = - tv - winy/2;
+
+    m_hRuler->set_range(hrl, hrh, th, hrh);
+    m_hRuler->draw_ticks();
+    m_vRuler->set_range(vrl, vrh, tv, vrh);
+    m_vRuler->draw_ticks();
 }

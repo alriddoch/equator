@@ -57,6 +57,7 @@ class ViewWindow : public Gtk::Window
     void vAdjustChanged();
     void hAdjustChanged();
     void glViewChanged();
+    void doRulers();
 };
 
 #endif // EQUATOR_APP_VIEWWINDOW_H
