@@ -39,6 +39,10 @@
 #include "../entity.xpm"
 #include "../vertex.xpm"
 
+#include "../stock-tool-move-16.xpm"
+#include "../stock-tool-zoom-16.xpm"
+#include "../stock-tool-rotate-16.xpm"
+
 #include <sigc++/bind.h>
 #include <sigc++/object_slot.h>
 
@@ -169,15 +173,25 @@ MainWindow::MainWindow() :
     table->attach(*b, 1, 2, 2, 3);
     t->set_tip(*b, "Vertex Mode");
 
-    b = manage( new Gtk::ToggleButton("7") );
-    b->set_sensitive(false);
+    b = pan_mode = manage( new Gtk::ToggleButton() );
+    b->set_active(true); // Do this before we connect to the signal
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::PAN));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_move_16_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 0, 1, 3, 4);
-    b = manage( new Gtk::ToggleButton("8") );
-    b->set_sensitive(false);
+
+    b = pivot_mode = manage( new Gtk::ToggleButton() );
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::PIVOT));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_rotate_16_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 1, 2, 3, 4);
-    b = manage( new Gtk::ToggleButton("9") );
-    b->set_sensitive(false);
+
+    b = zoom_mode = manage( new Gtk::ToggleButton() );
+    b->signal_clicked().connect(SigC::bind(SigC::slot(*this,&MainWindow::navSelect),MainWindow::ZOOM));
+    p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, stock_tool_zoom_16_xpm);
+    b->add_pixmap(p, pixmask);
     table->attach(*b, 2, 3, 3, 4);
+
     b = manage( new Gtk::ToggleButton("10") );
     b->set_sensitive(false);
     table->attach(*b, 3, 4, 3, 4);
@@ -321,6 +335,20 @@ void MainWindow::modeSelect(MainWindow::ToolMode mode)
         vertex_mode->set_active(mode==MainWindow::VERTEX);
         changing = false;
         modeChanged.emit();
+    }
+}
+
+void MainWindow::navSelect(MainWindow::NavMode mode)
+{
+    static bool changing = false;
+    if (!changing) {
+        changing = true;
+        m_navMode = mode;
+        pan_mode->set_active(mode==MainWindow::PAN);
+        pivot_mode->set_active(mode==MainWindow::PIVOT);
+        zoom_mode->set_active(mode==MainWindow::ZOOM);
+        changing = false;
+        navChanged.emit();
     }
 }
 

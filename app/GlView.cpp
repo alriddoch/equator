@@ -515,11 +515,13 @@ void GlView::midClickOn(int x, int y)
     dragDepth = -2;
     worldPoint(x, y, dragDepth, &dragx, &dragy, &dragz);
     m_dragType = GlView::MOVE;
+#if 0
     if (m_mainWindow.getTool() == MainWindow::DRAW) {
         float cx, cy, cz;
         m_model.getCursor(cx, cy, cz);
         m_model.getCurrentLayer()->insert(PosType(cx, cy, cz));
     }
+#endif
 }
 
 void GlView::midClickOff(int x, int y)

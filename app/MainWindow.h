@@ -39,9 +39,14 @@ class MainWindow : public Gtk::Window
         ENTITY, VERTEX
     } ToolMode;
 
+    typedef enum {
+        PAN, PIVOT, ZOOM
+    } NavMode;
+
   private:
     ToolType m_tool;
     ToolMode m_toolMode;
+    NavMode m_navMode;
 
     Gtk::ToggleButton * select_tool;
     Gtk::ToggleButton * area_tool;
@@ -52,6 +57,10 @@ class MainWindow : public Gtk::Window
 
     Gtk::ToggleButton * entity_mode;
     Gtk::ToggleButton * vertex_mode;
+
+    Gtk::ToggleButton * pan_mode;
+    Gtk::ToggleButton * pivot_mode;
+    Gtk::ToggleButton * zoom_mode;
 
     bool destroy_handler(GdkEventAny*);
     gint idle();
@@ -66,6 +75,7 @@ class MainWindow : public Gtk::Window
     SigC::Signal1<void, Server *> serverAdded;
     SigC::Signal0<void> modeChanged;
     SigC::Signal0<void> toolChanged;
+    SigC::Signal0<void> navChanged;
 
     LayerWindow & m_layerwindow;
     InheritanceWindow & m_inheritancewindow;
@@ -83,6 +93,10 @@ class MainWindow : public Gtk::Window
         return m_toolMode;
     }
 
+    const NavMode getNavMode() {
+        return m_navMode;
+    }
+
     gint quit( GdkEventAny *);
     Model & newModel();
     void newView(Model *);
@@ -97,6 +111,7 @@ class MainWindow : public Gtk::Window
     void entity_tree_window();
     void toolSelect(ToolType);
     void modeSelect(ToolMode);
+    void navSelect(NavMode);
     void setCurrentModel(Model *);
 };
 
