@@ -1,3 +1,8 @@
+2004-09-22  Al Riddoch  <ajr@ecs.soton.ac.uk>
+
+	* app/Server.cpp, app/GameView.cpp: Fix use of toLocalCoords() and
+	  toParentCoords() to use orientation.
+
 2004-08-17  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/inheritance.h: Typedef tweak to comply with Atlas-C++ 0.6

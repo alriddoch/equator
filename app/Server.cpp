@@ -326,10 +326,13 @@ const PosType Server::getAbsCharPos()
     }
     PosType pos = m_character->getPosition();
     Eris::Entity * root = m_view->getTopLevel();
-    for(Eris::Entity * ref = m_character->getLocation();
-        ref != NULL && ref != root;
-        ref = ref->getLocation()) {
-        pos = pos.toParentCoords(ref->getPosition());
+    Eris::Entity * ref = m_character->getLocation();
+    for(; ref != NULL && ref != root; ref = ref->getLocation()) {
+        WFMath::Quaternion q = ref->getOrientation();
+        if (!q.isValid()) {
+            q.identity();
+        }
+        pos = pos.toParentCoords(ref->getPosition(), q);
     }
     return pos;
 }

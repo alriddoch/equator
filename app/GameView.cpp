@@ -53,6 +53,11 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
     float worldTime = 0; // FIXME Gratuitous hack
 
     PosType pos = ent->getPosition();
+    WFMath::Quaternion orientation = ent->getOrientation();
+
+    if (!orientation.isValid()) {
+        orientation.identity();
+    }
 
     MovableEntity * me = dynamic_cast<MovableEntity *>(ent);
     if (me != NULL) {
@@ -68,8 +73,8 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
                         << "\" is not a MovableEntity"
                         << std::endl << std::flush;);
     }
-    PosType camPos = cp;
-    camPos.toLocalCoords(pos, WFMath::Quaternion().identity());
+
+    PosType camPos = cp.toLocalCoords(pos, orientation);
 
     RenderableEntity * re = dynamic_cast<RenderableEntity *>(ent);
     if (re == 0) {
@@ -78,7 +83,7 @@ void GameView::drawEntity(GlView & view, Eris::Entity * ent,
 
     glPushMatrix();
     glTranslatef(pos.x(), pos.y(), pos.z());
-    orient(ent->getOrientation());
+    orient(orientation);
 
     re->m_drawer->render(view.m_renderer, camPos);
 
