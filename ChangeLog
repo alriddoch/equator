@@ -1,3 +1,8 @@
+2003-06-06  Damien McGinnes
+
+	* app/ServerEntities.cpp: modified terrain mod hack to use latest
+	  Mercator 
+
 2003-06-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/ServerEntities.cpp: Clean up header usage.

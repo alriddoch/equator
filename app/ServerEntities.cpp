@@ -13,6 +13,8 @@
 
 #include <Mercator/Terrain.h>
 #include <Mercator/Segment.h>
+#include <Mercator/TerrainMod.h>
+
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>
@@ -31,8 +33,6 @@
 #include <gtkmm/label.h>
 
 #include <fstream>
-
-#include <wfmath/ball.h>
 
 static const bool debug_flag = false;
 
@@ -831,10 +831,15 @@ void ServerEntities::readTerrain(Eris::Entity * ent)
     }
 
     //============HACKED TO TEST MERCATOR
-    const WFMath::Ball<2> circ(WFMath::Point<2>(28.0,28.0), 19.0);
-    m_model.m_terrain.getSegmentSafe(-1,0)->modifyShape(circ, 35.0f);
+    // modify the terrain in the segment -1,0
+    // make a circular patch of terrain 12 units in radius
+    // at an altitude of 25 units 
+    const WFMath::Ball<2> circ(WFMath::Point<2>(28.0,28.0), 12.0);
+    Mercator::SlopeTerrainMod< WFMath::Ball<2> > lCirc(25.0f, 0.2f, -0.3f, circ);
+    m_model.m_terrain.getSegmentSafe(-1,0)->addMod(&lCirc);
     //======================================
 }
+
 
 ServerEntities::ServerEntities(Model & model, Server & server) :
                                Layer(model, model.getName(), "ServerEntities"),
