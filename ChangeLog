@@ -1,7 +1,12 @@
+2003-06-27  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Holo.cpp: Respect the depth buffer when drawing holo grid, but
+	  still making it look right.
+
 2003-06-27  Damien McGinnes
 
 	* app/ServerEntities.cpp: modified mercator hack to use latest api.
-	
+
 2003-06-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/BladeMap.cpp, app/EntityLayer.cpp, app/HeightManager.cpp,

@@ -53,18 +53,18 @@ void Holo::draw(GlView & view)
         varray[++vCount] = 0.0f;
     }
 
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
 
-    glColor3f(0.0f, 0.3f, 0.0f);
 
     glVertexPointer(3, GL_FLOAT, 0, varray);
-    // Draw the green grid.
-    glDrawArrays(GL_LINES, 0, (vCount + 1) / 3);
-    glColor3f(0.0f, 1.0f, 0.0f);
     // Draw the origin lines.
+    glColor3f(0.0f, 1.0f, 0.0f);
     glDrawArrays(GL_LINES, ((numlines - numlines % incr) * 4) / incr, 4);
+    // Draw the green grid.
+    glColor3f(0.0f, 0.3f, 0.0f);
+    glDrawArrays(GL_LINES, 0, (vCount + 1) / 3);
 
-    glDepthMask(GL_TRUE);
+    // glDepthMask(GL_TRUE);
 
     delete varray;
 
