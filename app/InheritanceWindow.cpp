@@ -150,7 +150,12 @@ void InheritanceWindow::currentServerChanged(Server * s)
     }
 
     set_sensitive(true);
-    Eris::TypeService * ts = s->m_connection.getTypeService();
+    if (s->m_connection == 0) {
+        std::cout << "FIXME: Server not yet connected." << std::endl << std::flush;
+        return;
+    }
+
+    Eris::TypeService * ts = s->m_connection->getTypeService();
 
     if (ts == 0) {
         std::cout << "No type service)" << std::endl << std::flush;

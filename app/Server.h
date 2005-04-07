@@ -70,7 +70,7 @@ class Server : public SigC::Object {
     MainWindow & m_mainWindow;
     Renderer & m_renderer;
 
-    Eris::Connection & m_connection;
+    Eris::Connection * m_connection;
     Eris::Account * m_account;
     Eris::Avatar * m_avatar;
     Eris::Lobby * m_lobby;
@@ -95,7 +95,8 @@ class Server : public SigC::Object {
         return inGame;
     }
 
-    void connect(const std::string &, int);
+    void setupServerConnection(const std::string &, int);
+    void connect();
     void netConnected();
     void netFailure(const std::string & msg);
     void connectionLog(Eris::LogLevel level, const std::string & msg);

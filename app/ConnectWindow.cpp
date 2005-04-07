@@ -126,8 +126,10 @@ void ConnectWindow::createConnection()
     m_connectButton->set_sensitive(false);
     m_portChoice->set_sensitive(false);
 
-    m_failure = m_server->m_connection.Failure.connect(SigC::slot(*this, &ConnectWindow::failure));
-    m_connected = m_server->m_connection.Connected.connect(SigC::slot(*this, &ConnectWindow::connected));
+    m_server->setupServerConnection(m_hostEntry->get_text(), m_portNum);
+
+    m_failure = m_server->m_connection->Failure.connect(SigC::slot(*this, &ConnectWindow::failure));
+    m_connected = m_server->m_connection->Connected.connect(SigC::slot(*this, &ConnectWindow::connected));
 
     //std::cout << m_hostEntry->get_text() << ": " << m_portNum
               //<< std::endl << std::flush;
@@ -136,7 +138,7 @@ void ConnectWindow::createConnection()
     //Gtk::Main::input.connect(SigC::slot(server, &Server::poll), c.getSocket(),
                              //GDK_INPUT_READ);
     // m_server->connect("localhost", 6767);
-    m_server->connect(m_hostEntry->get_text(), m_portNum);
+    m_server->connect();
 }
 
 void ConnectWindow::failure(const std::string & msg)

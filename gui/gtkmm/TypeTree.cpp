@@ -84,7 +84,7 @@ void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
 
 void TypeTree::populate()
 {
-    Eris::TypeService * ts = m_server.m_connection.getTypeService();
+    Eris::TypeService * ts = m_server.m_connection->getTypeService();
 
     assert(ts != 0);
 

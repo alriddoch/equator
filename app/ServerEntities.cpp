@@ -828,7 +828,7 @@ void ServerEntities::save(Gtk::FileSelection * fsel)
     }
 
     if (m_exportOptions->m_charCheck->get_active()) {
-        m_exportOptions->m_charType = m_serverConnection.m_connection.getTypeService()->getTypeByName("character");
+        m_exportOptions->m_charType = m_serverConnection.m_connection->getTypeService()->getTypeByName("character");
     }
 
     if (m_exportOptions->m_target == EntityExportOptions::EXPORT_ALL_SELECTED) {
@@ -891,8 +891,8 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 {
     // FIXME This stuff populates palette, but does not belong here.
     // It probably belongs in server.
-    m_serverConnection.m_connection.getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
-    m_gameEntityType = m_serverConnection.m_connection.getTypeService()->getTypeByName("game_entity");
+    m_serverConnection.m_connection->getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
+    m_gameEntityType = m_serverConnection.m_connection->getTypeService()->getTypeByName("game_entity");
     assert(m_gameEntityType != 0);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
     if (m_gameEntityType->isBound()) {

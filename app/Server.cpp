@@ -55,9 +55,8 @@ Server::Server(MainWindow & mw, const std::string & name) :
                    m_name(name), m_model(0),
                    m_mainWindow(mw),
                    m_renderer(* new Renderer),
-                   m_connection(* new Eris::Connection("equator", true)),
-                   m_account(0), m_avatar(0), m_lobby(0), m_view(0),
-                   m_character(0)
+                   m_connection(0), m_account(0), m_avatar(0), m_lobby(0),
+                   m_view(0), m_character(0)
 {
 }
 
@@ -90,7 +89,7 @@ void Server::connectWorldSignals()
 
     m_account->AvatarSuccess.connect(SigC::slot(*this,&Server::gotAvatar));
 
-    WEFactory * wef = new WEFactory(*m_connection.getTypeService(), m_renderer);
+    WEFactory * wef = new WEFactory(*m_connection->getTypeService(), m_renderer);
     wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
     Eris::Factory::registerFactory(wef);
 
@@ -179,21 +178,26 @@ void Server::roomEnter(Eris::Room *r)
     std::cout << "Enter room" << std::endl << std::flush;
 }
 
-void Server::connect(const std::string & host, int port)
+void Server::setupServerConnection(const std::string & host, int port)
 {
-    m_connection.Failure.connect(SigC::slot(*this, &Server::netFailure));
-    m_connection.Connected.connect(SigC::slot(*this, &Server::netConnected));
-    m_connection.Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
-    Eris::Logged.connect(SigC::slot(*this, &Server::connectionLog));
-
-    Eris::setLogLevel(Eris::LOG_DEBUG);
-
     std::cout << host << ":" << port << std::endl << std::flush;
-    m_connection.connect(host, port);
-    // m_connection.connect("localhost", 6767);
+
+    m_connection = new Eris::Connection("equator", host, port, true);
+
+    m_connection->Failure.connect(SigC::slot(*this, &Server::netFailure));
+    m_connection->Connected.connect(SigC::slot(*this, &Server::netConnected));
+    m_connection->Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
+
+    Eris::Logged.connect(SigC::slot(*this, &Server::connectionLog));
+    Eris::setLogLevel(Eris::LOG_DEBUG);
+}
+
+void Server::connect()
+{
+    m_connection->connect();
 
     inputHandler = Glib::signal_io().connect(SigC::slot(*this, &Server::poll),
-                                             m_connection.getFileDescriptor(),
+                                             m_connection->getFileDescriptor(),
                                              Glib::IO_IN);
 }
 
@@ -216,14 +220,14 @@ void Server::netConnected()
 
 void Server::login(const std::string & name, const std::string & password)
 {
-    m_account = new Eris::Account(&m_connection);
+    m_account = new Eris::Account(m_connection);
     m_account->login(name, password);
     m_account->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
 }
 
 void Server::createAccount(const std::string& name, const std::string& password)
 {
-    m_account = new Eris::Account(&m_connection);
+    m_account = new Eris::Account(m_connection);
     m_account->createAccount(name, name, password);
     m_account->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
 }
@@ -292,7 +296,7 @@ void Server::moveCharacter(const PosType & pos)
     m->setArgsAsList(ListType(1, marg));
     m->setFrom(m_character->getId());
 
-    m_connection.send(m);
+    m_connection->send(m);
     
 }
 
@@ -330,7 +334,7 @@ void Server::modifyTerrain(Terrain * layer, TerrainEntity * tent)
     s->setArgsAsList(ListType(1, sarg));
     s->setFrom(m_character->getId());
 
-    m_connection.send(s);
+    m_connection->send(s);
     std::cerr << "Sent set op to server" << std::endl << std::flush;
 }
 
@@ -360,7 +364,7 @@ void Server::avatarCreateEntity(const MapType & ent)
     c->setFrom(m_character->getId());
     c->setTo(m_character->getId());
     
-    m_connection.send(c);
+    m_connection->send(c);
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
@@ -376,7 +380,7 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
     m->setFrom(m_character->getId());
     m->setTo(id);
 
-    m_connection.send(m);
+    m_connection->send(m);
 }
 
 void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
@@ -394,5 +398,5 @@ void Server::avatarMoveEntity(const std::string & id, const std::string &loc,
     m->setFrom(m_character->getId());
     m->setTo(id);
 
-    m_connection.send(m);
+    m_connection->send(m);
 }
