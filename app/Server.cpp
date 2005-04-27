@@ -89,9 +89,6 @@ void Server::connectWorldSignals()
 
     m_account->AvatarSuccess.connect(SigC::slot(*this,&Server::gotAvatar));
 
-    WEFactory * wef = new WEFactory(*m_connection->getTypeService(), m_renderer);
-    wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
-    Eris::Factory::registerFactory(wef);
 
     worldSignalsConnected = true;
 }
@@ -257,6 +254,10 @@ void Server::gotAvatar(Eris::Avatar * av)
 
     m_view = m_avatar->getView();
     m_view->EntityCreated.connect(SigC::slot(*this,&Server::worldEntityCreate));
+
+    WEFactory * wef = new WEFactory(*m_connection->getTypeService(), m_renderer);
+    wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
+    m_view->registerFactory(wef);
 
     Model & model = m_mainWindow.newModel();
     model.setName(getName());
