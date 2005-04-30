@@ -15,11 +15,14 @@ class CharacterWindow;
 class TypeTree;
 
 namespace Gtk {
+   class Action;
+   class ActionGroup;
    class ListStore;
    template <class T> class TreeModelColumn;
    class TreeModelColumnRecord;
    class TreeView;
    class TreeSelection;
+   class UIManager;
    class Menu;
 };
 
@@ -33,6 +36,14 @@ class ServerWindow : public OptionBox
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
     Gtk::Menu * m_popupMenu;
+    Glib::RefPtr< Gtk::UIManager > m_UIManager;
+    Glib::RefPtr< Gtk::ActionGroup > m_actions;
+    Glib::RefPtr< Gtk::Action > m_actionConnect;
+    Glib::RefPtr< Gtk::Action > m_actionLogin;
+    Glib::RefPtr< Gtk::Action > m_actionCharacter;
+    Glib::RefPtr< Gtk::Action > m_actionStatus;
+    Glib::RefPtr< Gtk::Action > m_actionTypes;
+    Glib::RefPtr< Gtk::Action > m_actionDisconnect;
 
     Server * m_currentServer;
     std::map<Server *, TypeTree *> m_typeTrees;
@@ -44,8 +55,13 @@ class ServerWindow : public OptionBox
     void buttonPressEvent(GdkEventButton*);
     void newServer(Server *);
     void loggedIn(Server *);
+    void connectPressed();
+    void loginPressed();
+    void characterPressed();
     void statusPressed();
     void typesPressed();
+    void disconnectPressed();
+    void selectionChanged();
 
     bool deleteEvent(GdkEventAny*) {
         hide();

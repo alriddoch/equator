@@ -175,6 +175,16 @@ void Server::roomEnter(Eris::Room *r)
     std::cout << "Enter room" << std::endl << std::flush;
 }
 
+bool Server::isConnected() const
+{
+    return ((m_connection != 0) && (m_connection->isConnected() == true));
+}
+
+bool Server::isLoggedIn() const
+{
+    return ((m_account != 0) && (m_account->isLoggedIn() == true));
+}
+
 void Server::setupServerConnection(const std::string & host, int port)
 {
     std::cout << host << ":" << port << std::endl << std::flush;

@@ -95,6 +95,8 @@ class Server : public SigC::Object {
         return inGame;
     }
 
+    bool isConnected() const;
+    bool isLoggedIn() const;
     void setupServerConnection(const std::string &, int);
     void connect();
     void netConnected();

@@ -1,3 +1,11 @@
+2005-04-30  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* app/Server.h, app/Server.cpp: Added convenience functions isConnected
+	  and isLoggedIn.
+	* app/ServerWindow.h, app/ServerWindow.cpp: PopupMenu and ToolBar now
+	  handled by UIManager. Trying to corrently set sensitivity of the
+	  associated actions.
+
 2005-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Update autoconf usage.
