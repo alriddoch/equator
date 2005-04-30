@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([config.h])
 dnl Detect the canonical host environment
 
 AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
 
 dnl Initialise automake
 
@@ -21,8 +22,6 @@ dnl Test for C++ compiler
 
 AC_PROG_CXX
 
-CXXFLAGS="$CXXFLAGS -Wall -DATLAS_ELEMENT_TYPEDEF_PRIVATE"
-
 AC_ARG_ENABLE(debug,
     [  --enable-debug          enable debug information [default=no]],
     [
@@ -36,7 +35,6 @@ AC_ARG_ENABLE(debug,
     ]
 )
 
-SEAR_LIBS=
 STATIC_LIBSTDCPP=
 STATIC_LIBGCC=
 
@@ -56,12 +54,10 @@ AC_ARG_ENABLE(static_link,
 )
 AM_CONDITIONAL(BUILD_STATIC, test x"$link_static" = xtrue)
 
+AC_LANG(C++)
 
 AC_CHECK_FUNC(rint,,[AC_CHECK_LIB(m,rint)])
 AC_CHECK_FUNCS([rintf lrintf lrint])
-
-AC_LANG_CPLUSPLUS
-AC_REQUIRE_CPP
 
 dnl Check SDL
 SDL_VERSION=1.2.2
@@ -143,7 +139,7 @@ if test $cross_compiling == no; then
 fi
 LIBS="$LIBS $EQUATOR_LIBS"
 
-PKG_CHECK_MODULES(WF, mercator-0.2 = 0.2.2 eris-1.3 = 1.3.4 varconf-1.0 sage ,
+PKG_CHECK_MODULES(WF, eris-1.3 = 1.3.4 mercator-0.2 = 0.2.2 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         EQUATOR_LIBS="$EQUATOR_LIBS $WF_LIBS"

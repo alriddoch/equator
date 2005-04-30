@@ -1,3 +1,7 @@
+2005-04-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Harmonise with apogee.
+
 2005-04-30  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* app/Server.h, app/Server.cpp: Added convenience functions isConnected
