@@ -2,20 +2,18 @@ dnl Initialise autoconf
 
 AC_INIT(equator, 0.1.1)
 AC_CONFIG_SRCDIR([app/equator_plugin.cpp])
+AC_CONFIG_HEADERS([config.h])
 
-dnl Detect the canonical host and target environment
+dnl Detect the canonical host environment
 
 AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
 
 dnl Initialise automake
 
 AM_INIT_AUTOMAKE([dist-bzip2])
-AM_CONFIG_HEADER(config.h)
 
 dnl Need libtool
 
-AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
@@ -215,7 +213,7 @@ dnl CXXFLAGS="$CXXFLAGS $WF_SDL_IMAGE_CFLAGS"
 dnl LIBS="$LIBS $WF_SDL_IMAGE_LIBS"
 
 dnl Generate files
-AC_OUTPUT([
+AC_CONFIG_FILES([
 	Makefile
 	common/Makefile
 	visual/Makefile
@@ -223,3 +221,4 @@ AC_OUTPUT([
 	gui/Makefile
 	gui/gtkmm/Makefile
 ])
+AC_OUTPUT

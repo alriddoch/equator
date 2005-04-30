@@ -1,3 +1,7 @@
+2005-04-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Update autoconf usage.
+
 2005-04-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Clarify the version requirements for the cal3d
