@@ -13,6 +13,7 @@
 
 #include "gui/gtkmm/DockWindow.h"
 #include "gui/gtkmm/TypeTree.h"
+#include "gui/gtkmm/ChatWindow.h"
 
 #include <gtkmm/action.h>
 #include <gtkmm/actiongroup.h>
@@ -34,6 +35,7 @@
 
 #include <cassert>
 
+#include <Eris/Account.h>
 #include <Eris/Connection.h>
 
 static const Glib::ustring g_sUI = ""
@@ -44,6 +46,7 @@ static const Glib::ustring g_sUI = ""
 "    <menuitem action='Login'/>"
 "    <menuitem action='Character'/>"
 "    <separator/>"
+"    <menuitem action='Chat'/>"
 "    <menuitem action='Status'/>"
 "    <menuitem action='Types' />"
 "    <separator/>"
@@ -89,8 +92,9 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
 
     vbox->pack_start(*scrolled_window);
     m_actionConnect = Gtk::Action::create("Connect", "Connect ...", "Connect to a server.");
-    m_actionLogin = Gtk::Action::create("Login", "Login ...", "Log inton the server.");
+    m_actionLogin = Gtk::Action::create("Login", "Login ...", "Log into the server.");
     m_actionCharacter = Gtk::Action::create("Character", "Character ...", "Take or create a character.");
+    m_actionChat = Gtk::Action::create("Chat", "Chat", "Open the session's chat window.");
     m_actionStatus = Gtk::Action::create("Status", "Status", "TODO: Tooltip.");
     m_actionTypes = Gtk::Action::create("Types", "Types", "TODO: Tooltip");
     m_actionDisconnect = Gtk::Action::create("Disconnect", "Disconnect", "Disconnect from the server.");
@@ -98,6 +102,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_actions->add(m_actionConnect, sigc::mem_fun(this, &ServerWindow::connectPressed));
     m_actions->add(m_actionLogin, sigc::mem_fun(this, &ServerWindow::loginPressed));
     m_actions->add(m_actionCharacter, sigc::mem_fun(this, &ServerWindow::characterPressed));
+    m_actions->add(m_actionChat, sigc::mem_fun(this, &ServerWindow::chatPressed));
     m_actions->add(m_actionStatus, sigc::mem_fun(this, &ServerWindow::statusPressed));
     m_actions->add(m_actionTypes, sigc::mem_fun(this, &ServerWindow::typesPressed));
     m_actions->add(m_actionDisconnect, sigc::mem_fun(this, &ServerWindow::disconnectPressed));
@@ -179,6 +184,30 @@ void ServerWindow::characterPressed()
     m_characterWindow.doshow();
 }
 
+void ServerWindow::chatPressed()
+{
+    Gtk::TreeIter Iterator(m_refTreeSelection->get_selected());
+    
+    if(Iterator == false) {
+        return;
+    }
+    
+    Server * pServer((*Iterator)[*m_ptrColumn]);
+    std::map< Server *, ChatWindow * >::iterator iChatWindow(m_chatWindows.find(pServer));
+    
+    if(iChatWindow == m_chatWindows.end()) {
+        ChatWindow * pChatWindow(new ChatWindow(*(pServer->m_lobby), pServer->m_account->getUsername()));
+        
+        m_chatWindows[pServer] = pChatWindow;
+        
+        pChatWindow->set_title("OOG Chat");
+        pChatWindow->show();
+    }
+    else {
+        iChatWindow->second->show();
+    }
+}
+
 void ServerWindow::statusPressed()
 {
     Gtk::TreeModel::Row row = *(m_refTreeSelection->get_selected());
@@ -233,6 +262,7 @@ void ServerWindow::selectionChanged(void)
         assert(pServer != 0);
         m_actionLogin->set_sensitive((pServer->isConnected() == true) && (pServer->isLoggedIn() == false));
         m_actionCharacter->set_sensitive((pServer->isLoggedIn() == true) && (pServer->isInGame() == false));
+        m_actionChat->set_sensitive(pServer->isLoggedIn() == true);
         m_actionStatus->set_sensitive(pServer->isConnected() == true);
         m_actionTypes->set_sensitive(pServer->isConnected() == true);
         m_actionDisconnect->set_sensitive(pServer->isConnected() == true);
@@ -241,6 +271,7 @@ void ServerWindow::selectionChanged(void)
         m_actionConnect->set_sensitive(true);
         m_actionLogin->set_sensitive(false);
         m_actionCharacter->set_sensitive(false);
+        m_actionChat->set_sensitive(false);
         m_actionStatus->set_sensitive(false);
         m_actionTypes->set_sensitive(false);
         m_actionDisconnect->set_sensitive(false);

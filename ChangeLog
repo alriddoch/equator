@@ -1,3 +1,18 @@
+2005-05-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* app/ServerWindow.h, app/ServerWindow.cpp: Added actions, buttons and
+	  handlers for displaying chat window.
+	* Added gui/gtkmm/ChatWindow.h, gui/gtkmm/ChatWindow.cpp,
+	  gui/gtkmm/PanelNotebook.h, gui/gtkmm/PanelNotebook.cpp: In essence a
+	  copy from silence. All classes packed into one file because they are
+	  really closely realated. The ChatWindow initializes the lobby chat and
+	  all private chats. The classes in PanelNotebook provide a  notebook with
+	  tabs that color on content change. The room tabs have a treeview aside
+	  that displays the names of users inside the same room. Additionally they
+	  have a dialog button that let's you start a private conversation with the
+	  selected person. There are still some things to do but this is a
+	  functional version to look at.
+
 2005-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Harmonise with apogee.

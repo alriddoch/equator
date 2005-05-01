@@ -12,6 +12,7 @@ class Server;
 class ConnectWindow;
 class LoginWindow;
 class CharacterWindow;
+class ChatWindow;
 class TypeTree;
 
 namespace Gtk {
@@ -41,12 +42,14 @@ class ServerWindow : public OptionBox
     Glib::RefPtr< Gtk::Action > m_actionConnect;
     Glib::RefPtr< Gtk::Action > m_actionLogin;
     Glib::RefPtr< Gtk::Action > m_actionCharacter;
+    Glib::RefPtr< Gtk::Action > m_actionChat;
     Glib::RefPtr< Gtk::Action > m_actionStatus;
     Glib::RefPtr< Gtk::Action > m_actionTypes;
     Glib::RefPtr< Gtk::Action > m_actionDisconnect;
 
     Server * m_currentServer;
     std::map<Server *, TypeTree *> m_typeTrees;
+    std::map< Server *, ChatWindow * > m_chatWindows;
 
     ConnectWindow & m_connectWindow;
     LoginWindow & m_loginWindow;
@@ -58,6 +61,7 @@ class ServerWindow : public OptionBox
     void connectPressed();
     void loginPressed();
     void characterPressed();
+    void chatPressed();
     void statusPressed();
     void typesPressed();
     void disconnectPressed();
