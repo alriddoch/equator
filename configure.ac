@@ -139,7 +139,7 @@ if test $cross_compiling == no; then
 fi
 LIBS="$LIBS $EQUATOR_LIBS"
 
-PKG_CHECK_MODULES(WF, eris-1.3 = 1.3.4 mercator-0.2 = 0.2.2 varconf-1.0 sage ,
+PKG_CHECK_MODULES(WF, eris-1.3 >= 1.3.4 mercator-0.2 = 0.2.2 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
         EQUATOR_LIBS="$EQUATOR_LIBS $WF_LIBS"
