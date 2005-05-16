@@ -1,3 +1,7 @@
+2005-05-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Require the correct version of eris.
+
 2005-05-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* app/ServerWindow.h, app/ServerWindow.cpp: Added actions, buttons and
