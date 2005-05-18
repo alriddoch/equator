@@ -3,6 +3,7 @@ noinst_LIBRARIES = libguigtkmm.a
 INCLUDES = -I$(top_srcdir)
 
 libguigtkmm_a_SOURCES = \
+                        ImportTypesWizard.cpp ImportTypesWizard.cpp \
                         OptionBox.cpp OptionBox.h \
                         CameraControl.cpp CameraControl.h \
                         Cal3dStoreOptions.cpp Cal3dStoreOptions.h \

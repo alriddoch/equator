@@ -7,8 +7,7 @@
 
 #include "OptionBox.h"
 
-#include <gtkmm/treeview.h>
-
+class ImportTypesWizard;
 class Server;
 
 namespace Eris {
@@ -16,12 +15,16 @@ namespace Eris {
 };
 
 namespace Gtk {
+   class Action;
+   class ActionGroup;
+   class Menu;
    class TreeStore;
    template <class T> class TreeModelColumn;
    class TreeModelColumnRecord;
+   class TreeRow;
    class TreeView;
    class TreeSelection;
-   class Menu;
+   class UIManager;
 };
 
 class TypeTree : public OptionBox
@@ -34,15 +37,21 @@ class TypeTree : public OptionBox
     Gtk::TreeView * m_treeView;
     Glib::RefPtr<Gtk::TreeSelection> m_refTreeSelection;
     Gtk::Menu * m_popupMenu;
+    Glib::RefPtr< Gtk::UIManager > m_UIManager;
+    Glib::RefPtr< Gtk::ActionGroup > m_actions;
+    Glib::RefPtr< Gtk::Action > m_actionImport;
 
     Server & m_server;
+    ImportTypesWizard * m_pImportTypesWizard;
 
     bool deleteEvent(GdkEventAny*) {
         hide();
         return 1;
     }
-
-    void insertType(Eris::TypeInfo * const, Gtk::TreeModel::Row);
+    bool buttonPressEvent(GdkEventButton * pEvent);
+    void importPressed();
+    void importTypesWizardResponse(int iResponse);
+    void insertType(Eris::TypeInfo * const, Gtk::TreeRow);
 
   public:
     explicit TypeTree(Server &);

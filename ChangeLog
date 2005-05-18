@@ -1,3 +1,13 @@
+2005-05-18  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* Added gui/gtkmm/ImportTypesWizard.cpp and gui/gtkmm/ImportTypesWizard.h.
+	  This is a two-step dialog box that lets you choose a file, reads the
+	  content and in the second step displays the types from the file letting
+	  you pick some/all to be imported on the server.
+	* gui/gtkmm/TypeTree.cpp, gui/gtkmm/TypeTree.h: UI (toolbar) is handled by
+	  UIManager. Added a pointer to an ImportTypesWizard so we can have _one_
+	  wizard per TypeTree.
+
 2005-05-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Require the correct version of eris.

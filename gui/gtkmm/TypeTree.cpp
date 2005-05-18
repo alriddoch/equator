@@ -9,14 +9,17 @@
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 
+#include <gtkmm/action.h>
+#include <gtkmm/actiongroup.h>
 #include <gtkmm/box.h>
-#include <gtkmm/menu.h>
 #include <gtkmm/label.h>
+#include <gtkmm/menu.h>
 #include <gtkmm/scrolledwindow.h>
-#include <gtkmm/button.h>
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeselection.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/uimanager.h>
 
 #include <sigc++/object_slot.h>
 
@@ -25,7 +28,20 @@
 
 #include <cassert>
 
-TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
+#include "ImportTypesWizard.h"
+
+static const Glib::ustring g_sUI = ""
+"<ui>"
+"  <popup name='PopupMenu'>"
+"    <menuitem action='Import'/>"
+"  </popup>"
+"  <toolbar name='ToolBar'>"
+"    <toolitem action='Import'/>"
+"  </toolbar>"
+"</ui>";
+
+TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s),
+    m_pImportTypesWizard(0)
 {
     Gtk::VBox * vbox = this;
 
@@ -40,6 +56,7 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
     m_treeView = manage( new Gtk::TreeView() );
 
     m_treeView->set_model( m_treeModel );
+    m_treeView->signal_button_press_event().connect(sigc::mem_fun(this, &TypeTree::buttonPressEvent), false);
 
     m_treeView->append_column("Typename", *m_nameColumn);
 
@@ -53,16 +70,25 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s)
     scrolled_window->add(*m_treeView);
 
     vbox->pack_start(*scrolled_window);
-
-    Gtk::HBox * bothbox = manage( new Gtk::HBox );
-
-    Gtk::Button * b = manage( new Gtk::Button("Wuh...") );
-    // b->signal_clicked().connect(SigC::slot(*this, &TypeTree::typesPressed));
-    bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
-
-    vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
-
+    m_actionImport = Gtk::Action::create("Import", "Import ...", "Import type definitions from a file.");
+    m_actions = Gtk::ActionGroup::create();
+    m_actions->add(m_actionImport, sigc::mem_fun(this, &TypeTree::importPressed));
+    m_UIManager = Gtk::UIManager::create();
+    m_UIManager->insert_action_group(m_actions);
+    m_UIManager->add_ui_from_string(g_sUI);
+    m_popupMenu = dynamic_cast< Gtk::Menu * >(m_UIManager->get_widget("/PopupMenu"));
+    vbox->pack_start(*(m_UIManager->get_widget("/ToolBar")), Gtk::PACK_SHRINK, 0);
     signal_delete_event().connect(SigC::slot(*this, &TypeTree::deleteEvent));
+}
+
+bool TypeTree::buttonPressEvent(GdkEventButton * pEvent)
+{
+    if (pEvent->button == 3)
+    {
+        m_popupMenu->popup(pEvent->button, pEvent->time);
+    }
+    
+    return false;
 }
 
 void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
@@ -79,6 +105,30 @@ void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
     for (; I != Iend; ++I) {
         Gtk::TreeModel::Row childrow = *(m_treeModel->append(row.children()));
         insertType(*I, childrow);
+    }
+}
+
+void TypeTree::importPressed()
+{
+    if(m_pImportTypesWizard == 0)
+    {
+        m_pImportTypesWizard = new ImportTypesWizard();
+        m_pImportTypesWizard->signal_response().connect(sigc::mem_fun(this, &TypeTree::importTypesWizardResponse));
+    }
+    m_pImportTypesWizard->present();
+}
+
+void TypeTree::importTypesWizardResponse(int iResponse)
+{
+    if(iResponse == Gtk::RESPONSE_OK)
+    {
+        // to the import
+    }
+    if((iResponse == Gtk::RESPONSE_OK) || (iResponse == Gtk::RESPONSE_CANCEL))
+    {
+        // only close the wizard on Cancel or OK
+        delete m_pImportTypesWizard;
+        m_pImportTypesWizard = 0;
     }
 }
 
