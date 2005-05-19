@@ -3,21 +3,24 @@
 	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp:
 	  Added an iterator class so we can iterate through the types that were
 	  selected to be imported.
+
 	* gui/gtkmm/TypeTree.h, gui/gtkmm/ImportTypesWizard.cpp: Going through
 	  the list of selected classes and doing Create ops for each of them.
 	  A responder connected on Eris level is responsible for getting error
 	  messages displayed to the user.
+
 	* AUTHORS: Added me.
 
 2005-05-18  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
-	* Added gui/gtkmm/ImportTypesWizard.cpp and gui/gtkmm/ImportTypesWizard.h.
+	* gui/gtkmm/ImportTypesWizard.cpp, gui/gtkmm/ImportTypesWizard.h:
 	  This is a two-step dialog box that lets you choose a file, reads the
-	  content and in the second step displays the types from the file letting
-	  you pick some/all to be imported on the server.
-	* gui/gtkmm/TypeTree.cpp, gui/gtkmm/TypeTree.h: UI (toolbar) is handled by
-	  UIManager. Added a pointer to an ImportTypesWizard so we can have _one_
-	  wizard per TypeTree.
+	  content and in the second step displays the types from the file
+	  letting you pick some/all to be imported on the server.
+
+	* gui/gtkmm/TypeTree.cpp, gui/gtkmm/TypeTree.h: UI (toolbar) is handled
+	  by UIManager. Added a pointer to an ImportTypesWizard so we can have
+	  _one_ wizard per TypeTree.
 
 2005-05-16  Al Riddoch  <alriddoch@zepler.org>
 
@@ -27,16 +30,17 @@
 
 	* app/ServerWindow.h, app/ServerWindow.cpp: Added actions, buttons and
 	  handlers for displaying chat window.
+
 	* Added gui/gtkmm/ChatWindow.h, gui/gtkmm/ChatWindow.cpp,
 	  gui/gtkmm/PanelNotebook.h, gui/gtkmm/PanelNotebook.cpp: In essence a
 	  copy from silence. All classes packed into one file because they are
-	  really closely realated. The ChatWindow initializes the lobby chat and
-	  all private chats. The classes in PanelNotebook provide a  notebook with
-	  tabs that color on content change. The room tabs have a treeview aside
-	  that displays the names of users inside the same room. Additionally they
-	  have a dialog button that let's you start a private conversation with the
-	  selected person. There are still some things to do but this is a
-	  functional version to look at.
+	  really closely realated. The ChatWindow initializes the lobby chat
+	  and all private chats. The classes in PanelNotebook provide a
+	  notebook with tabs that color on content change. The room tabs have
+	  a treeview aside that displays the names of users inside the same
+	  room. Additionally they have a dialog button that let's you start a
+	  private conversation with the selected person. There are still some
+	  things to do but this is a functional version to look at.
 
 2005-04-30  Al Riddoch  <alriddoch@zepler.org>
 
