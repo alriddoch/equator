@@ -14,7 +14,6 @@
 #include <gtkmm/toolbar.h>
 #include <gtkmm/uimanager.h>
 
-#include <Atlas/Message/Element.h>
 #include <Atlas/Message/DecoderBase.h>
 #include <Atlas/Codecs/XML.h>
 
@@ -118,6 +117,35 @@ private:
 };
 
 TypeStore::TypeStoreColumns * TypeStore::m_pColumns = 0;
+
+TypeIterator::TypeIterator(Glib::RefPtr< TypeStore > & Store, const Gtk::TreeIter & TreeIter) :
+    m_Store(Store),
+    m_TreeIter(TreeIter)
+{
+}
+
+TypeIterator::TypeIterator(const TypeIterator & TypeIterator) :
+    m_Store(TypeIterator.m_Store),
+    m_TreeIter(TypeIterator.m_TreeIter)
+{
+}
+
+TypeIterator & TypeIterator::operator++(void)
+{
+    ++m_TreeIter;
+    
+    return *this;
+}
+
+bool TypeIterator::operator!=(const TypeIterator & Other) const
+{
+    return m_TreeIter != Other.m_TreeIter;
+}
+
+Atlas::Message::MapType TypeIterator::operator*(void) const
+{
+    return (*m_TreeIter)[m_Store->Columns.Type];
+}
 
 ImportTypesWizard::ImportTypesWizard(void) :
     Gtk::Dialog("Import types ...", false, true),
@@ -292,4 +320,14 @@ void ImportTypesWizard::vActionRemove(void)
         m_ImportTypesStore->erase(m_ImportTypesStore->get_iter(SelectedRows.back().get_path()));
         SelectedRows.pop_back();
     }
+}
+
+ImportTypesWizard::iterator ImportTypesWizard::begin(void)
+{
+    return TypeIterator(m_ImportTypesStore, m_ImportTypesStore->children().begin());
+}
+
+ImportTypesWizard::iterator ImportTypesWizard::end(void)
+{
+    return TypeIterator(m_ImportTypesStore, m_ImportTypesStore->children().end());
 }

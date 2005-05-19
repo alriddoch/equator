@@ -1,3 +1,14 @@
+2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp:
+	  Added an iterator class so we can iterate through the types that were
+	  selected to be imported.
+	* gui/gtkmm/TypeTree.h, gui/gtkmm/ImportTypesWizard.cpp: Going through
+	  the list of selected classes and doing Create ops for each of them.
+	  A responder connected on Eris level is responsible for getting error
+	  messages displayed to the user.
+	* AUTHORS: Added me.
+
 2005-05-18  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* Added gui/gtkmm/ImportTypesWizard.cpp and gui/gtkmm/ImportTypesWizard.h.

@@ -6,6 +6,8 @@
 #include <gtkmm/notebook.h>
 #include <gtkmm/treeview.h>
 
+#include <Atlas/Message/Element.h>
+
 namespace Gtk
 {
     class Action;
@@ -14,12 +16,32 @@ namespace Gtk
 }
 
 class TypeStore;
+class ImportTypesWizard;
+
+class TypeIterator
+{
+    friend class ImportTypesWizard;
+public:
+    TypeIterator(const TypeIterator & TypeIterator);
+    TypeIterator & operator++(void);
+    bool operator!=(const TypeIterator & Other) const;
+    Atlas::Message::MapType operator*(void) const;
+private:
+    TypeIterator(Glib::RefPtr< TypeStore > & Store, const Gtk::TreeIter & TreeIter);
+    Glib::RefPtr< TypeStore > & m_Store;
+    Gtk::TreeIter m_TreeIter;
+};
 
 class ImportTypesWizard : public Gtk::Dialog
 {
 public:
+    typedef TypeIterator iterator;
+    
     ImportTypesWizard(void);
     ~ImportTypesWizard(void);
+    
+    iterator begin(void);
+    iterator end(void);
 private:
     virtual void on_response(int iResponse);
     void buttons(void);
