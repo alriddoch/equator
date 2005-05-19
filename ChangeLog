@@ -1,5 +1,10 @@
 2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
+	* gui/gtkmm/TypeTree.cpp: Added an error message dialog when the user
+	  is not logged in yet. This prevents a segfault.
+
+2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
 	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp:
 	  Added an iterator class so we can iterate through the types that were
 	  selected to be imported.

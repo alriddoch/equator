@@ -118,6 +118,14 @@ void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
 
 void TypeTree::importPressed()
 {
+    if(m_server.m_account == 0)
+    {
+        Gtk::MessageDialog ErrorDialog("Please log in first.", true, Gtk::MESSAGE_ERROR);
+        
+        ErrorDialog.run();
+        
+        return;
+    }
     if(m_pImportTypesWizard == 0)
     {
         m_pImportTypesWizard = new ImportTypesWizard();
