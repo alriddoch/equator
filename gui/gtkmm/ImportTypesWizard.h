@@ -19,9 +19,21 @@ namespace Gtk
     class UIManager;
 }
 
+namespace Eris
+{
+    class TypeInfo;
+}
+
 class TypeStore;
 class UploadStatusStore;
 class ImportTypesWizard;
+    
+enum Status
+{
+    STATUS_IMPORT,
+    STATUS_UPDATE,
+    STATUS_ERROR
+};
 
 class ImportTypesWizard : public Gtk::Dialog
 {
@@ -32,6 +44,8 @@ private:
     virtual void on_response(int iResponse);
     bool bLoadFile(const Glib::ustring & sFileName);
     void vImportMessage(const Atlas::Objects::Operation::RootOperation & Operation);
+    void vImportType(Eris::TypeInfo * pTypeInfo);
+    void vUpdateType(Eris::TypeInfo * pTypeInfo);
     void buttons(void);
     
     void vActionAdd(void);
@@ -61,6 +75,8 @@ private:
     int m_iPageWithTypePicker;
     int m_iPageWithUploadStatus;
     unsigned int m_uiUploadedTypes;
+    std::map< std::string, Gtk::TreeRowReference > m_QueuedTypes;
+    std::map< std::string, Status > m_TypeOperations;
 };
 
 #endif

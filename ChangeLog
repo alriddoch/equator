@@ -1,3 +1,10 @@
+2005-05-21  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: Added
+	  the necessary logic and stuff to not only import new types but also
+	  update existing ones. This is done using Eris' TypeService
+	  infrasturcture. Thanks for the fix, James.
+
 2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* gui/gtkmm/TypeTree.h, gui/gtkmm/TypeTree.cpp: Moved the creation and

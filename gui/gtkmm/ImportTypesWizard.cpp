@@ -26,6 +26,7 @@
 #include <Eris/Account.h>
 #include <Eris/Connection.h>
 #include <Eris/Response.h>
+#include <Eris/TypeInfo.h>
 
 #define RESPONSE_NEXT 1
 #define RESPONSE_PREVIOUS 2
@@ -144,20 +145,13 @@ private:
         }
     };
 public:
-    enum Status
-    {
-        STATUS_IMPORT,
-        STATUS_UPDATE,
-        STATUS_ERROR
-    };
-    
     static Glib::RefPtr< UploadStatusStore > create(void)
     {
         if(UploadStatusStore::m_pColumns == 0)
         {
             m_pColumns = new(UploadStatusStore::UploadStatusStoreColumns);
             m_ImportedColor.set_rgb_p(0.0, 0.8, 0.0);
-            m_UpdatedColor.set_rgb_p(0.5, 1.0, 0.0);
+            m_UpdatedColor.set_rgb_p(0.7, 0.8, 0.0);
             m_ErrorColor.set_rgb_p(0.8, 0.0, 0.0);
         }
         
@@ -337,25 +331,26 @@ void ImportTypesWizard::on_response(int iResponse)
                 m_uiUploadedTypes = 0;
                 ssText << "Imported Types: 0 / " << m_ImportTypesStore->children().size();
                 m_ProgressBar.set_text(ssText.str());
+                m_Server.m_connection->getTypeService()->BoundType.connect(sigc::mem_fun(this, &ImportTypesWizard::vUpdateType));
+                m_Server.m_connection->getTypeService()->BadType.connect(sigc::mem_fun(this, &ImportTypesWizard::vImportType));
                 
                 Gtk::TreeIter iType(m_ImportTypesStore->children().begin());
                 
                 while(iType != m_ImportTypesStore->children().end())
                 {
-                    Atlas::Objects::Operation::Create Create;
-                    Atlas::Message::ListType Arguments;
-                    Atlas::Message::MapType Type((*iType)[m_ImportTypesStore->Columns.Type]);
+                    Glib::ustring sID((*iType)[m_ImportTypesStore->Columns.Name]);
                     
-                    Type["ruleset"] = "mason";
-                    Arguments.push_back(Type);
-                    Create->setArgsAsList(Arguments);
-                    Create->setFrom(m_Server.m_account->getId());
+                    Eris::TypeInfoPtr TypeInfo(m_Server.m_connection->getTypeService()->getTypeByName(sID));
                     
-                    long lSerialNumber(Eris::getNewSerialno());
+                    m_Server.m_connection->getTypeService()->getTypeByName(sID);
                     
-                    Create->setSerialno(lSerialNumber);
-                    m_Server.m_connection->getResponder()->await(lSerialNumber, this, &ImportTypesWizard::vImportMessage);
-                    m_Server.m_connection->send(Create);
+                    Gtk::TreeRowReference RowRef(m_ImportTypesStore, Gtk::TreePath(iType));
+                    
+                    m_QueuedTypes[TypeInfo->getName()] = RowRef;
+                    if(TypeInfo->isBound() == true)
+                    {
+                        vUpdateType(TypeInfo);
+                    }
                     ++iType;
                 }
             }
@@ -488,14 +483,23 @@ void ImportTypesWizard::vImportMessage(const Atlas::Objects::Operation::RootOper
         
         Operation->getArgs()[0]->addToMessage(Arg0Map);
         Operation->getArgs()[1]->addToMessage(Arg1Map);
-        m_UploadStatusStore->vAddStatus(Arg1Map["args"].asList()[0].asMap()["id"].asString(), UploadStatusStore::STATUS_ERROR, Arg0Map["message"].asString());
+        
+        std::string sID(Arg1Map["args"].asList()[0].asMap()["id"].asString());
+        
+        m_UploadStatusStore->vAddStatus(sID, STATUS_ERROR, Arg0Map["message"].asString());
+        m_TypeOperations.erase(m_TypeOperations.find(sID));
     }
     else if(std::find(Parents.begin(), Parents.end(), "info") != Parents.end())
     {
         Atlas::Message::MapType Arg0Map;
         
         Operation->getArgs()[0]->addToMessage(Arg0Map);
-        m_UploadStatusStore->vAddStatus(Arg0Map["id"].asString(), UploadStatusStore::STATUS_IMPORT);
+        
+        std::string sID(Arg0Map["id"].asString());
+        std::map< std::string, Status >::iterator iOperation(m_TypeOperations.find(sID));
+        
+        m_UploadStatusStore->vAddStatus(sID, iOperation->second);
+        m_TypeOperations.erase(iOperation);
     }
     else
     {
@@ -516,4 +520,54 @@ void ImportTypesWizard::vImportMessage(const Atlas::Objects::Operation::RootOper
     m_ProgressBar.set_text(ssText.str());
     m_ProgressBar.set_fraction(static_cast< double >(m_uiUploadedTypes) / m_ImportTypesStore->children().size());
     buttons();
+}
+
+void ImportTypesWizard::vImportType(Eris::TypeInfo * pType)
+{
+    std::map< std::string, Gtk::TreeRowReference >::iterator iType(m_QueuedTypes.find(pType->getName()));
+    
+    if(iType != m_QueuedTypes.end())
+    {
+        Atlas::Objects::Operation::Create Create;
+        Atlas::Message::ListType Arguments;
+        Atlas::Message::MapType Type((*(m_ImportTypesStore->get_iter(iType->second.get_path())))[m_ImportTypesStore->Columns.Type]);
+        
+        Type["ruleset"] = "mason";
+        Arguments.push_back(Type);
+        Create->setArgsAsList(Arguments);
+        Create->setFrom(m_Server.m_account->getId());
+        
+        long lSerialNumber(Eris::getNewSerialno());
+        
+        Create->setSerialno(lSerialNumber);
+        m_Server.m_connection->getResponder()->await(lSerialNumber, this, &ImportTypesWizard::vImportMessage);
+        m_Server.m_connection->send(Create);
+        m_TypeOperations[pType->getName()] = STATUS_IMPORT;
+        m_QueuedTypes.erase(iType);
+    }
+}
+
+void ImportTypesWizard::vUpdateType(Eris::TypeInfo * pType)
+{
+    std::map< std::string, Gtk::TreeRowReference >::iterator iType(m_QueuedTypes.find(pType->getName()));
+    
+    if(iType != m_QueuedTypes.end())
+    {
+        Atlas::Objects::Operation::Set Set;
+        Atlas::Message::ListType Arguments;
+        Atlas::Message::MapType Type((*(m_ImportTypesStore->get_iter(iType->second.get_path())))[m_ImportTypesStore->Columns.Type]);
+        
+        Type["ruleset"] = "mason";
+        Arguments.push_back(Type);
+        Set->setArgsAsList(Arguments);
+        Set->setFrom(m_Server.m_account->getId());
+        
+        long lSerialNumber(Eris::getNewSerialno());
+        
+        Set->setSerialno(lSerialNumber);
+        m_Server.m_connection->getResponder()->await(lSerialNumber, this, &ImportTypesWizard::vImportMessage);
+        m_Server.m_connection->send(Set);
+        m_TypeOperations[pType->getName()] = STATUS_UPDATE;
+        m_QueuedTypes.erase(iType);
+    }
 }
