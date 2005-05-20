@@ -1,5 +1,17 @@
 2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
+	* gui/gtkmm/TypeTree.h, gui/gtkmm/TypeTree.cpp: Moved the creation and
+	  updating of types from the TypeTree to the ImportTypesWizard. This
+	  the UI is better to handle and the process of adding types is done
+	  when the wizard is closed. No dialogs popping out of nowhere when an
+	  error occures.
+	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: As
+	  there is no need to access the types from outside the wizard I
+	  removed the iterators. Added another page to the wizard that monitors
+	  the upload status of the selected types.
+
+2005-05-20  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
 	* gui/gtkmm/TypeTree.cpp: Added an error message dialog when the user
 	  is not logged in yet. This prevents a segfault.
 

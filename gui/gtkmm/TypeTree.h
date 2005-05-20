@@ -7,8 +7,6 @@
 
 #include "OptionBox.h"
 
-#include <Atlas/Objects/RootOperation.h>
-
 class ImportTypesWizard;
 class Server;
 
@@ -54,7 +52,6 @@ class TypeTree : public OptionBox
     void importPressed();
     void importTypesWizardResponse(int iResponse);
     void insertType(Eris::TypeInfo * const, Gtk::TreeRow);
-    void typeInstalled(const Atlas::Objects::Operation::RootOperation & Operation);
 
   public:
     explicit TypeTree(Server &);

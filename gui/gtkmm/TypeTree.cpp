@@ -6,14 +6,7 @@
 
 #include "app/Server.h"
 
-#include <Atlas/Codecs/Bach.h>
-#include <Atlas/Objects/Encoder.h>
-#include <Atlas/Objects/Operation.h>
-#include <Atlas/Objects/RootOperation.h>
-
-#include <Eris/Account.h>
 #include <Eris/Connection.h>
-#include <Eris/Response.h>
 #include <Eris/TypeInfo.h>
 
 #include <gtkmm/action.h>
@@ -118,6 +111,7 @@ void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
 
 void TypeTree::importPressed()
 {
+    assert(m_server.m_connection);
     if(m_server.m_account == 0)
     {
         Gtk::MessageDialog ErrorDialog("Please log in first.", true, Gtk::MESSAGE_ERROR);
@@ -128,7 +122,7 @@ void TypeTree::importPressed()
     }
     if(m_pImportTypesWizard == 0)
     {
-        m_pImportTypesWizard = new ImportTypesWizard();
+        m_pImportTypesWizard = new ImportTypesWizard(m_server);
         m_pImportTypesWizard->signal_response().connect(sigc::mem_fun(this, &TypeTree::importTypesWizardResponse));
     }
     m_pImportTypesWizard->present();
@@ -136,30 +130,6 @@ void TypeTree::importPressed()
 
 void TypeTree::importTypesWizardResponse(int iResponse)
 {
-    if(iResponse == Gtk::RESPONSE_OK)
-    {
-        // do the import
-        ImportTypesWizard::iterator iType(m_pImportTypesWizard->begin());
-        
-        while(iType != m_pImportTypesWizard->end())
-        {
-            Atlas::Objects::Operation::Create Create;
-            Atlas::Message::ListType Arguments;
-            Atlas::Message::MapType Type(*iType);
-            
-            Type["ruleset"] = "mason";
-            Arguments.push_back(Type);
-            Create->setArgsAsList(Arguments);
-            Create->setFrom(m_server.m_account->getId());
-            
-            long lSerialNumber(Eris::getNewSerialno());
-            
-            Create->setSerialno(lSerialNumber);
-            m_server.m_connection->getResponder()->await(lSerialNumber, this, &TypeTree::typeInstalled);
-            m_server.m_connection->send(Create);
-            ++iType;
-        }
-    }
     if((iResponse == Gtk::RESPONSE_OK) || (iResponse == Gtk::RESPONSE_CANCEL))
     {
         // only close the wizard on Cancel or OK
@@ -182,22 +152,4 @@ void TypeTree::populate()
     Gtk::TreeModel::Row row = *(m_treeModel->append());
 
     insertType(ti, row);
-}
-
-void TypeTree::typeInstalled(const Atlas::Objects::Operation::RootOperation & Operation)
-{
-    const std::list< std::string > & Parents(Operation->getParents());
-    
-    if(std::find(Parents.begin(), Parents.end(), "error") != Parents.end())
-    {
-        Atlas::Message::MapType Arg0Map;
-        Atlas::Message::MapType Arg1Map;
-        
-        Operation->getArgs()[0]->addToMessage(Arg0Map);
-        Operation->getArgs()[1]->addToMessage(Arg1Map);
-        
-        Gtk::MessageDialog ErrorDialog(Arg0Map["message"].asString() + "\n\nType id: " + Arg1Map["args"].asList()[0].asMap()["id"].asString(), true, Gtk::MESSAGE_ERROR);
-        
-        ErrorDialog.run();
-    }
 }

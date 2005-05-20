@@ -3,10 +3,14 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/filechooserwidget.h>
+#include <gtkmm/progressbar.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/treeview.h>
 
 #include <Atlas/Message/Element.h>
+#include <Atlas/Objects/RootOperation.h>
+
+#include "../../app/Server.h"
 
 namespace Gtk
 {
@@ -16,39 +20,24 @@ namespace Gtk
 }
 
 class TypeStore;
+class UploadStatusStore;
 class ImportTypesWizard;
-
-class TypeIterator
-{
-    friend class ImportTypesWizard;
-public:
-    TypeIterator(const TypeIterator & TypeIterator);
-    TypeIterator & operator++(void);
-    bool operator!=(const TypeIterator & Other) const;
-    Atlas::Message::MapType operator*(void) const;
-private:
-    TypeIterator(Glib::RefPtr< TypeStore > & Store, const Gtk::TreeIter & TreeIter);
-    Glib::RefPtr< TypeStore > & m_Store;
-    Gtk::TreeIter m_TreeIter;
-};
 
 class ImportTypesWizard : public Gtk::Dialog
 {
 public:
-    typedef TypeIterator iterator;
-    
-    ImportTypesWizard(void);
+    ImportTypesWizard(Server & Server);
     ~ImportTypesWizard(void);
-    
-    iterator begin(void);
-    iterator end(void);
 private:
     virtual void on_response(int iResponse);
+    bool bLoadFile(const Glib::ustring & sFileName);
+    void vImportMessage(const Atlas::Objects::Operation::RootOperation & Operation);
     void buttons(void);
     
     void vActionAdd(void);
     void vActionRemove(void);
     
+    Server & m_Server;
     Glib::RefPtr< Gtk::Action > m_ActionAdd;
     Glib::RefPtr< Gtk::Action > m_ActionRemove;
     Glib::RefPtr< Gtk::ActionGroup > m_Actions;
@@ -58,14 +47,20 @@ private:
     Gtk::FileChooserWidget m_FileChooserWidget;
     Glib::RefPtr< TypeStore > m_TypesStore;
     Glib::RefPtr< TypeStore > m_ImportTypesStore;
+    Glib::RefPtr< UploadStatusStore > m_UploadStatusStore;
     Gtk::TreeView m_Types;
     Gtk::TreeView m_ImportTypes;
-    Glib::ustring m_sFileName;
+    Gtk::TreeView m_UploadStatus;
+    Gtk::ProgressBar m_ProgressBar;
     Gtk::Button * m_pBackButton;
+    Gtk::Button * m_pCancelButton;
     Gtk::Button * m_pForwardButton;
     Gtk::Button * m_pOKButton;
+    Gtk::CellRendererText m_StatusRenderer;
     int m_iPageWithFileChooser;
     int m_iPageWithTypePicker;
+    int m_iPageWithUploadStatus;
+    unsigned int m_uiUploadedTypes;
 };
 
 #endif
