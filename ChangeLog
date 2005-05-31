@@ -1,3 +1,11 @@
+2005-06-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: The
+	  types are now displayed in a tree list view. The way it is done
+	  automatically takes care of dependency problems and better visualizes
+	  the structure of the types tree.
+	* TODO: Please investigate leaks in the ImportTypesWizard.
+
 2005-05-21  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: Added

@@ -27,13 +27,6 @@ namespace Eris
 class TypeStore;
 class UploadStatusStore;
 class ImportTypesWizard;
-    
-enum Status
-{
-    STATUS_IMPORT,
-    STATUS_UPDATE,
-    STATUS_ERROR
-};
 
 class ImportTypesWizard : public Gtk::Dialog
 {
@@ -42,10 +35,11 @@ public:
     ~ImportTypesWizard(void);
 private:
     virtual void on_response(int iResponse);
-    bool bLoadFile(const Glib::ustring & sFileName);
+    void vSelectionChanged(Gtk::TreeView * pTreeView);
     void vImportMessage(const Atlas::Objects::Operation::RootOperation & Operation);
     void vImportType(Eris::TypeInfo * pTypeInfo);
     void vUpdateType(Eris::TypeInfo * pTypeInfo);
+    void vUploadTypesFromTree(Gtk::TreeNodeChildren Childs);
     void buttons(void);
     
     void vActionAdd(void);
@@ -65,18 +59,24 @@ private:
     Gtk::TreeView m_Types;
     Gtk::TreeView m_ImportTypes;
     Gtk::TreeView m_UploadStatus;
-    Gtk::ProgressBar m_ProgressBar;
+    Gtk::ProgressBar m_UploadProgressBar;
+    Gtk::ProgressBar m_LoadProgressBar;
     Gtk::Button * m_pBackButton;
     Gtk::Button * m_pCancelButton;
     Gtk::Button * m_pForwardButton;
     Gtk::Button * m_pOKButton;
     Gtk::CellRendererText m_StatusRenderer;
+    Gtk::CellRendererText m_TypesRenderer;
+    Gtk::CellRendererText m_ImportTypesRenderer;
     int m_iPageWithFileChooser;
     int m_iPageWithTypePicker;
     int m_iPageWithUploadStatus;
-    unsigned int m_uiUploadedTypes;
-    std::map< std::string, Gtk::TreeRowReference > m_QueuedTypes;
-    std::map< std::string, Status > m_TypeOperations;
+    
+    class Picking;
+    class Uploading;
+    
+    Picking * m_pPicking;
+    Uploading * m_pUploading;
 };
 
 #endif

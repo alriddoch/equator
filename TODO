@@ -1,3 +1,6 @@
+There is a good probability that ImportTypesWizard leaks memory as there is
+recurrent RefPtr usage in the TreeStores. Please investigate.
+
 Clean up state handling in Character create/take dialogue. Buttons should
 be made sensitive/insensitive and default more cleanly.
 
