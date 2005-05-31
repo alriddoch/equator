@@ -1,5 +1,14 @@
 2005-06-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
+	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: Fixed
+	  an error with counting the overall count of types to upload. Changed
+	  the text of progress bars to "x of y" instead of "x / y". Added more
+	  commentaries (so I understand it myself :)).
+	* gui/gtkmm/TypeTree.cpp: Correctly act when the dialog was closed with
+	  the "X" button.
+
+2005-06-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
 	* gui/gtkmm/ImportTypesWizard.h, gui/gtkmm/ImportTypesWizard.cpp: The
 	  types are now displayed in a tree list view. The way it is done
 	  automatically takes care of dependency problems and better visualizes

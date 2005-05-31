@@ -356,6 +356,7 @@ class ImportTypesWizard::Uploading
 public:
     Uploading(void);
     unsigned int m_uiUploadedTypes;
+    unsigned int m_uiTypesToUpload;
     std::map< std::string, Gtk::TreeRowReference > m_QueuedTypes;
     std::map< std::string, UploadStatusStore::Status > m_TypeOperations;
 };
@@ -381,7 +382,7 @@ public:
             
             std::stringstream ssText;
             
-            ssText << "Loading types: 0 / " << m_Decoder.size();
+            ssText << "Loading types: 0 of " << m_Decoder.size();
             m_ProgressBar.set_text(ssText.str());
             
             XMLFileDecoder::iterator iType(m_Decoder.begin());
@@ -427,17 +428,16 @@ public:
     
     ~Picking(void)
     {
-        std::cout << "Dangeling parents: " << m_ParentsFromFile.size() << std::endl;
+        std::cout << "Dangeling parents: " << m_ParentsFromFile.size() << "\t(should be zero)" << std::endl;
         for(std::map< std::string, std::string >::iterator iParent(m_ParentsFromFile.begin()); iParent != m_ParentsFromFile.end(); ++iParent)
         {
             std::cout << "\t" << iParent->first << " => " << iParent->second << std::endl;
         }
-        std::cout << "Dangeling childs: " << m_ChildsFromFile.size() << std::endl;
+        std::cout << "Dangeling childs: " << m_ChildsFromFile.size() << "\t(should be zero)" << std::endl;
         for(std::map< std::string, std::string >::iterator iParent(m_ChildsFromFile.begin()); iParent != m_ChildsFromFile.end(); ++iParent)
         {
             std::cout << "\t" << iParent->first << " => " << iParent->second << std::endl;
         }
-        std::cout << "Saved types: " << m_TypesStore->children().size() << std::endl;
     }
     
     bool bLoadingWasSuccessful(void)
@@ -483,7 +483,7 @@ private:
         
         std::stringstream ssText;
         
-        ssText << "Loading types: " << m_iAddedTypes << " / " << m_Decoder.size();
+        ssText << "Loading types: " << m_iAddedTypes << " of " << m_Decoder.size();
         m_ProgressBar.set_text(ssText.str());
     }
     
@@ -747,13 +747,14 @@ void ImportTypesWizard::on_response(int iResponse)
                 delete m_pUploading;
                 m_pUploading = new ImportTypesWizard::Uploading();
                 
-                std::stringstream ssText;
-                
-                ssText << "Imported Types: 0 / " << m_ImportTypesStore->children().size();
-                m_UploadProgressBar.set_text(ssText.str());
                 m_Server.m_connection->getTypeService()->BoundType.connect(sigc::mem_fun(this, &ImportTypesWizard::vUpdateType));
                 m_Server.m_connection->getTypeService()->BadType.connect(sigc::mem_fun(this, &ImportTypesWizard::vImportType));
                 vUploadTypesFromTree(m_ImportTypesStore->children());
+                
+                std::stringstream ssText;
+                
+                ssText << "Imported Types: 0 of " << m_pUploading->m_uiTypesToUpload;
+                m_UploadProgressBar.set_text(ssText.str());
             }
             
             break;
@@ -779,21 +780,23 @@ void ImportTypesWizard::vUploadTypesFromTree(Gtk::TreeNodeChildren Children)
     {
         Atlas::Message::MapType Type((*iType)[m_ImportTypesStore->Columns.Type]);
         
-        // upload the type itself first of all, so we won't have dependency problems
+        // process the type itself first of all, so we won't have dependency problems
         if(Type.empty() == false)
         {
             Glib::ustring sID((*iType)[m_ImportTypesStore->Columns.Name]);
-            
-            Eris::TypeInfoPtr TypeInfo(m_Server.m_connection->getTypeService()->getTypeByName(sID));
-            
-            m_Server.m_connection->getTypeService()->getTypeByName(sID);
-            
+            Eris::TypeInfo * pTypeInfo(m_Server.m_connection->getTypeService()->getTypeByName(sID));
             Gtk::TreeRowReference RowRef(m_ImportTypesStore, Gtk::TreePath(iType));
             
-            m_pUploading->m_QueuedTypes[TypeInfo->getName()] = RowRef;
-            if(TypeInfo->isBound() == true)
+            // three possible things here:
+            // - Eris has to ask the server
+            //   - server does not have the type => vImportType is connected to BadType and will be called
+            //   - server has the type => vUpdateType is connected to BoundType and will be called
+            // - Eris knows the type => we call vUpdateType ourself
+            m_pUploading->m_QueuedTypes[pTypeInfo->getName()] = RowRef;
+            m_pUploading->m_uiTypesToUpload++;
+            if(pTypeInfo->isBound() == true)
             {
-                vUpdateType(TypeInfo);
+                vUpdateType(pTypeInfo);
             }
         }
         vUploadTypesFromTree(iType->children());
@@ -933,9 +936,9 @@ void ImportTypesWizard::vImportMessage(const Atlas::Objects::Operation::RootOper
     
     std::stringstream ssText;
     
-    ssText << "Imported Types: " << m_pUploading->m_uiUploadedTypes << " / " << m_ImportTypesStore->children().size();
+    ssText << "Imported Types: " << m_pUploading->m_uiUploadedTypes << " of " << m_pUploading->m_uiTypesToUpload;
     m_UploadProgressBar.set_text(ssText.str());
-    m_UploadProgressBar.set_fraction(static_cast< double >(m_pUploading->m_uiUploadedTypes) / m_ImportTypesStore->children().size());
+    m_UploadProgressBar.set_fraction(static_cast< double >(m_pUploading->m_uiUploadedTypes) / m_pUploading->m_uiTypesToUpload);
     buttons();
 }
 
@@ -990,6 +993,7 @@ void ImportTypesWizard::vUpdateType(Eris::TypeInfo * pType)
 }
 
 ImportTypesWizard::Uploading::Uploading(void) :
-    m_uiUploadedTypes(0)
+    m_uiUploadedTypes(0),
+    m_uiTypesToUpload(0)
 {
 }

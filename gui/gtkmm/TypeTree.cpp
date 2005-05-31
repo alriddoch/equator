@@ -130,7 +130,7 @@ void TypeTree::importPressed()
 
 void TypeTree::importTypesWizardResponse(int iResponse)
 {
-    if((iResponse == Gtk::RESPONSE_OK) || (iResponse == Gtk::RESPONSE_CANCEL))
+    if((iResponse == Gtk::RESPONSE_OK) || (iResponse == Gtk::RESPONSE_CANCEL) || (iResponse == Gtk::RESPONSE_DELETE_EVENT))
     {
         // only close the wizard on Cancel or OK
         delete m_pImportTypesWizard;
