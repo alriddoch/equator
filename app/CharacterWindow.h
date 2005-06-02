@@ -56,6 +56,7 @@ class CharacterWindow : public Gtk::Dialog
     }
 
     void doshow();
+    bool nameKeyPressed(GdkEventKey * pEvent);
 
     void useServer(Server *);
 

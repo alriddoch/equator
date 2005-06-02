@@ -1,5 +1,13 @@
 2005-06-02  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
+	* configure.ac: Fixed a wrong error message.
+	* app/CharacterWindow.h, app/CharacterWindow.cpp: Added a function to
+	  respond to <return> keys in the combo box. If <return> is pressed we
+	  won't allow the normal signal handler to act and pop the list but
+	  will activate the dialog's default action.
+
+2005-06-02  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
 	* configure.ac: Relax mercator version requirement.
 
 2005-06-01  Hagen Möbius  <hagen.moebius@starschiffchen.de>
