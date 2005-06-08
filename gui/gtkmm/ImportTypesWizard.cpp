@@ -808,7 +808,7 @@ void ImportTypesWizard::buttons(void)
     if((m_Notebook.get_current_page() + 1 == m_Notebook.get_n_pages()) || (m_Notebook.get_n_pages() == 1))
     {
         m_pForwardButton->set_sensitive(false);
-        m_pOKButton->set_sensitive((m_Notebook.get_current_page() != m_iPageWithUploadStatus) || ((m_pUploading != 0) && (m_pUploading->m_uiUploadedTypes == m_ImportTypesStore->children().size())));
+        m_pOKButton->set_sensitive((m_Notebook.get_current_page() != m_iPageWithUploadStatus) || ((m_pUploading != 0) && (m_pUploading->m_uiUploadedTypes == m_pUploading->m_uiTypesToUpload)));
     }
     else
     {

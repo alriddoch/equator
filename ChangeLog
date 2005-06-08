@@ -1,3 +1,8 @@
+2005-06-08  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/ImportTypesWizard.cpp: Fixed a problem where the OK button
+	  would not be made sensitive after all types have been uploaded.
+
 2005-06-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/gtkmm/Makefile.am: Fix suffix of files required for this
