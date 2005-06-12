@@ -1,3 +1,10 @@
+2005-06-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* equator.spec.in, autopackage/default.apspec.in,
+	  configure.ac: Add autopackage and rpm specs.
+
+	* app/Makefile.am: Update the static libs.
+
 2005-06-08  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* gui/gtkmm/ImportTypesWizard.cpp: Fixed a problem where the OK button

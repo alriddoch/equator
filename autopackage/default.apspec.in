@@ -1,0 +1,39 @@
+[Meta]
+RootName: @worldforge.org/equator:$SOFTWAREVERSION
+DisplayName: Equator
+ShortName: equator
+Maintainer: Al Riddoch <alriddoch@zepler.org>
+Packager: Al Riddoch <alriddoch@zepler.org>
+Summary: equator is an MMORPG editing tool
+URL: http://www.worldforge.org/dev/eng/clients/equator
+License: GNU General Public License, Version 2
+SoftwareVersion: @VERSION@
+AutopackageTarget: 1.0
+
+[Description]
+Equator is a world builder client and general purpose editor. The aim is to
+create a single tool that has all the facilities required to build a game
+using WorldForge.
+
+[BuildPrepare]
+prepareBuild --enable-static-link
+
+[BuildUnprepare]
+unprepareBuild
+
+[Imports]
+echo '*' | import
+
+[Prepare]
+# Dependency checking
+# require @whatever.you/need 1.0
+require @gtk.org/gtk 2.4
+# require @opengl.org/opengl Currently broken for some reason I cannot determine
+
+[Install]
+# Put your installation script here
+installExe bin/*
+
+[Uninstall]
+# Usually just the following line is enough to uninstall everything
+uninstallFromLog

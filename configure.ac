@@ -210,11 +210,13 @@ dnl LIBS="$LIBS $WF_SDL_IMAGE_LIBS"
 
 dnl Generate files
 AC_CONFIG_FILES([
+	equator.spec
 	Makefile
 	common/Makefile
 	visual/Makefile
 	app/Makefile
 	gui/Makefile
 	gui/gtkmm/Makefile
+	autopackage/default.apspec
 ])
 AC_OUTPUT

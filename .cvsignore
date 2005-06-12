@@ -10,6 +10,7 @@ config.sub
 configure
 depcomp
 equator.atlas-*log
+equator.spec
 equator-*.tar.gz
 install-sh
 libtool

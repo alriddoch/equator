@@ -31,14 +31,14 @@ EQUATOR_EXT_LIBS = \
         /usr/local/lib/liberis-1.3.a \
         /usr/lib/libsigc-2.0.a \
         /usr/lib/libskstream-0.3.a \
-        /usr/local/lib/libAtlasObjects-0.6.a \
-        /usr/local/lib/libAtlasNet-0.6.a \
-        /usr/local/lib/libAtlasCodecs-0.6.a \
-        /usr/local/lib/libAtlasMessage-0.6.a \
-        /usr/local/lib/libAtlas-0.6.a \
+        /usr/lib/libAtlasObjects-0.6.a \
+        /usr/lib/libAtlasNet-0.6.a \
+        /usr/lib/libAtlasCodecs-0.6.a \
+        /usr/lib/libAtlasMessage-0.6.a \
+        /usr/lib/libAtlas-0.6.a \
         /usr/lib/libwfmath-0.3.a \
         /usr/local/lib/libsage.a \
-        /usr/local/lib/lib3ds.a \
+        /usr/lib/lib3ds.a \
         /usr/local/lib/libcal3d.a \
         /usr/X11R6/lib/libGLU.a \
         $(STATIC_LIBSTDCPP) \

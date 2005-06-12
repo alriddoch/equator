@@ -1,0 +1,41 @@
+%define name @PACKAGE@
+%define version @VERSION@
+%define release 1
+
+Summary: A world builder tool for the WorldForge project
+Name: %{name}
+Version: %{version}
+Release: %{release}
+License: GPL
+Group: Amusements/Games
+URL: http://www.worldforge.org/dev/eng/clients/equator
+Packager: Al Riddoch <alriddoch@zepler.org>
+Vendor: WorldForge
+Distribution: Mason
+Source0: %{name}-%{version}.tar.bz2
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: eris-devel >= 0.4.94 mercator-devel >= 0.2.2 varconf-devel >= 0.6.2
+
+%description
+Equator is a world builder client and general purpose editor. The aim is to
+create a single tool that has all the facilities required to build a game
+using WorldForge.
+
+%prep
+%setup -q
+
+%build
+CXXFLAGS=$RPM_OPT_FLAGS %configure --enable-static-link
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%makeinstall
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%{_bindir}/*
+%doc AUTHORS COPYING NEWS README
