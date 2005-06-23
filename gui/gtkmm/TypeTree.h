@@ -22,6 +22,7 @@ namespace Gtk {
    template <class T> class TreeModelColumn;
    class TreeModelColumnRecord;
    class TreeRow;
+   class TreeRowReference;
    class TreeView;
    class TreeSelection;
    class UIManager;
@@ -51,12 +52,15 @@ class TypeTree : public OptionBox
     bool buttonPressEvent(GdkEventButton * pEvent);
     void importPressed();
     void importTypesWizardResponse(int iResponse);
-    void insertType(Eris::TypeInfo * const, Gtk::TreeRow);
+    void insertType(Eris::TypeInfo * pType);
+    void insertType(Eris::TypeInfo * pType, Eris::TypeInfo * pParent);
 
   public:
     explicit TypeTree(Server &);
 
     void populate();
+private:
+    std::map< Eris::TypeInfo *, Gtk::TreeRowReference > m_Types;
 };
 
 #endif // EQUATOR_GUI_GTKMM_TYPETREE_H

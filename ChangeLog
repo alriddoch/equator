@@ -1,3 +1,8 @@
+2005-06-08  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/TypesTree.h, gui/gtkmm/TypesTree.cpp: Added some logic
+	  to add newly bound types to the tree.
+
 2005-06-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* equator.spec.in, autopackage/default.apspec.in,

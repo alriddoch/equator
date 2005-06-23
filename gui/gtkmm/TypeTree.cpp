@@ -17,6 +17,7 @@
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treemodelcolumn.h>
+#include <gtkmm/treerowreference.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeselection.h>
 #include <gtkmm/treeview.h>
@@ -92,20 +93,44 @@ bool TypeTree::buttonPressEvent(GdkEventButton * pEvent)
     return false;
 }
 
-void TypeTree::insertType(Eris::TypeInfo * const ti, Gtk::TreeModel::Row row)
+void TypeTree::insertType(Eris::TypeInfo * pType, Eris::TypeInfo * pParent)
 {
-    assert(ti != 0);
-
-
-    row[*m_nameColumn] = Glib::ustring(ti->getName());
-    row[*m_ptrColumn] = ti;
-
-    const Eris::TypeInfoSet & children = ti->getChildren();
-    Eris::TypeInfoSet::const_iterator I = children.begin();
-    Eris::TypeInfoSet::const_iterator Iend = children.end();
-    for (; I != Iend; ++I) {
-        Gtk::TreeModel::Row childrow = *(m_treeModel->append(row.children()));
-        insertType(*I, childrow);
+    assert(pType != 0);
+    
+    Gtk::TreeRow Row;
+    
+    if((pParent == 0) && (pType->getParents().size() > 0))
+    {
+        pParent = *(pType->getParents().begin());
+    }
+    if(pParent == 0)
+    {
+        Row = *(m_treeModel->append());
+    }
+    else
+    {
+        std::map< Eris::TypeInfo *, Gtk::TreeRowReference >::iterator iParent(m_Types.find(pParent));
+        
+        if(iParent != m_Types.end())
+        {
+            Row = *(m_treeModel->append((m_treeModel->get_iter(iParent->second.get_path()))->children()));
+        }
+        else
+        {
+            Row = *(m_treeModel->append());
+        }
+    }
+    Row[*m_nameColumn] = Glib::ustring(pType->getName());
+    Row[*m_ptrColumn] = pType;
+    m_Types[pType] = Gtk::TreeRowReference(m_treeModel, m_treeModel->get_path(Row));
+    
+    const Eris::TypeInfoSet & Children(pType->getChildren());
+    Eris::TypeInfoSet::const_iterator I(Children.begin());
+    Eris::TypeInfoSet::const_iterator Iend(Children.end());
+    
+    for (; I != Iend; ++I)
+    {
+        insertType(*I, pType);
     }
 }
 
@@ -148,8 +173,6 @@ void TypeTree::populate()
     if (ti == 0) {
         std::cout << "No types" << std::endl << std::flush;
     }
-
-    Gtk::TreeModel::Row row = *(m_treeModel->append());
-
-    insertType(ti, row);
+    insertType(ti, 0);
+    ts->BoundType.connect(sigc::bind(sigc::mem_fun(this, &TypeTree::insertType), static_cast< Eris::TypeInfo * >(0)));
 }
