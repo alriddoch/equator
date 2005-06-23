@@ -1,4 +1,8 @@
-2005-06-08  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+2005-06-23  Hagen Möbius  <hagen.moebius@starschiffchen.de>
+
+	* gui/gtkmm/TypesTree.h: Silly me. Fixed a small error.
+
+2005-06-23  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* gui/gtkmm/TypesTree.h, gui/gtkmm/TypesTree.cpp: Added some logic
 	  to add newly bound types to the tree.

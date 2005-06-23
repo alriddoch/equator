@@ -52,7 +52,6 @@ class TypeTree : public OptionBox
     bool buttonPressEvent(GdkEventButton * pEvent);
     void importPressed();
     void importTypesWizardResponse(int iResponse);
-    void insertType(Eris::TypeInfo * pType);
     void insertType(Eris::TypeInfo * pType, Eris::TypeInfo * pParent);
 
   public:
