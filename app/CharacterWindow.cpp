@@ -126,7 +126,7 @@ void CharacterWindow::gotCharacterList()
     // std::list<Glib::ustring> listStrings;
     for(; I != chars.end(); ++I) {
         const std::string & id = I->first;
-        const Atlas::Objects::Entity::GameEntity & ge = I->second;
+        const Atlas::Objects::Entity::RootEntity & ge = I->second;
         Gtk::ComboDropDownItem* item = Gtk::manage(new Gtk::ComboDropDownItem);
         Gtk::HBox * hbox = manage(new Gtk::HBox(false, 3));
         Gtk::Label * l = manage(new Gtk::Label());
@@ -155,7 +155,7 @@ void CharacterWindow::select_child(Gtk::Widget & w)
     if (I == chars.end()) {
         return;
     }
-    const Atlas::Objects::Entity::GameEntity & ge = I->second;
+    const Atlas::Objects::Entity::RootEntity & ge = I->second;
     m_selectedCharacter = id;
     m_nameEntry->get_entry()->set_text(ge->getName());
     m_typeEntry->set_text(ge->getParents().front());

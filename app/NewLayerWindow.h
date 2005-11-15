@@ -30,6 +30,7 @@ template <typename T>
 class LayerPlant : public LayerFactory {
   public:
     LayerPlant() { }
+    virtual ~LayerPlant() { }
     Layer * newLayer(Model & m) { return new T(m); }
 };
 

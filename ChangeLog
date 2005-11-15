@@ -1,3 +1,10 @@
+2005-11-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/CharacterWindow.cpp, app/WorldEntity.cpp, app/WorldEntity.h:
+	  Update for changes in the Eris API.
+
+	* app/NewLayerWindow.h: Add a virtual destructor to silence a warning.
+
 2005-06-23  Hagen Möbius  <hagen.moebius@starschiffchen.de>
 
 	* gui/gtkmm/TypesTree.h: Silly me. Fixed a small error.

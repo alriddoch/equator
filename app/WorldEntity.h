@@ -107,8 +107,8 @@ class WEFactory : public Eris::Factory
     explicit WEFactory(Eris::TypeService &, Renderer &);
     virtual ~WEFactory();
     
-    virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *);
-    virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity &, Eris::TypeInfo *, Eris::View *);
+    virtual bool accept(const Atlas::Objects::Entity::RootEntity &, Eris::TypeInfo *);
+    virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::RootEntity &, Eris::TypeInfo *, Eris::View *);
 
 #if defined(SIGC_MAJOR_VERSION) && SIGC_MAJOR_VERSION < 2
     SigC::Signal1<void, AutonomousEntity *> AutonomousEntityCreated;

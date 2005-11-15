@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-using Atlas::Objects::Entity::GameEntity;
+using Atlas::Objects::Entity::RootEntity;
 
 RenderableEntity::RenderableEntity(const std::string & id, Eris::TypeInfo * t,
                              Eris::View * v) : Eris::Entity(id, t, v), m_drawer(0)
@@ -142,12 +142,12 @@ WEFactory::~WEFactory()
 {
 }
 
-bool WEFactory::accept(const GameEntity&, Eris::TypeInfo * w)
+bool WEFactory::accept(const RootEntity&, Eris::TypeInfo * w)
 {
     return true;
 }
 
-Eris::EntityPtr WEFactory::instantiate(const GameEntity & ge,
+Eris::EntityPtr WEFactory::instantiate(const RootEntity & ge,
                                        Eris::TypeInfo * type,
                                        Eris::View * v)
 {
