@@ -214,6 +214,7 @@ AC_CONFIG_FILES([
 	Makefile
 	common/Makefile
 	visual/Makefile
+	sear/Makefile
 	app/Makefile
 	gui/Makefile
 	gui/gtkmm/Makefile
