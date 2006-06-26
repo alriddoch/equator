@@ -13,8 +13,8 @@
 #include <gtkmm/fileselection.h>
 #include <gtkmm/filechooserdialog.h>
 
-#include <sigc++/bind.h>
-#include <sigc++/object_slot.h>
+#include <sigc++/adaptors/bind.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -118,7 +118,7 @@ void Cal3dStore::importFile()
     filter_component.add_pattern("*.cmf");
     fc->add_filter(filter_component);
 
-    fc->signal_response().connect(SigC::bind<Gtk::FileChooserDialog*>(SigC::slot(*this, &Cal3dStore::import_response), fc));
+    fc->signal_response().connect(sigc::bind<Gtk::FileChooserDialog*>(sigc::mem_fun(*this, &Cal3dStore::import_response), fc));
     fc->show_all();
 }
 

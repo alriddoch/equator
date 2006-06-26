@@ -45,7 +45,7 @@ class Palette : public OptionBox
     // Gtk::CList * m_texture_clist;
     Gtk::OptionMenu * m_modelMenu;
     Model * m_currentModel;
-    SigC::Connection m_typeMonitor;
+    sigc::connection m_typeMonitor;
 
     std::map<Model *, std::list<std::string> > m_tiles;
     std::map<Model *, std::list<std::string> > m_entities;

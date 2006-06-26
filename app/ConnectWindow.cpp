@@ -23,9 +23,9 @@
 #include <gtkmm/table.h>
 #include <gtkmm/messagedialog.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
-#include <sigc++/hide.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
+#include <sigc++/adaptors/hide.h>
 
 #include <cassert>
 
@@ -40,7 +40,7 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     m_connectButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
     set_default_response(Gtk::RESPONSE_ACCEPT);
-    signal_response().connect(SigC::slot(*this, &ConnectWindow::response));
+    signal_response().connect(sigc::mem_fun(*this, &ConnectWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -73,9 +73,9 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     m_portChoice = manage( new Gtk::OptionMenu() );
     Gtk::Menu * portMenu = manage( new Gtk::Menu() );
     Gtk::Menu_Helpers::MenuList& portEntries = portMenu->items();
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", SigC::bind<int>(SigC::slot(*this, &ConnectWindow::setPort), 6767)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", SigC::bind<int>(SigC::slot(*this, &ConnectWindow::setPort), 6768)));
-    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", SigC::slot(*this, &ConnectWindow::setCustomPort)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Standard port", sigc::bind<int>(sigc::mem_fun(*this, &ConnectWindow::setPort), 6767)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Admin port", sigc::bind<int>(sigc::mem_fun(*this, &ConnectWindow::setPort), 6768)));
+    portEntries.push_back(Gtk::Menu_Helpers::MenuElem("Custom port", sigc::mem_fun(*this, &ConnectWindow::setCustomPort)));
     m_portChoice->set_menu(*portMenu);
     table->attach(*m_portChoice, 1, 2, 1, 2);
     Gtk::Adjustment * adj = manage( new Gtk::Adjustment (6767.0, 1.0, 32768.0) );
@@ -90,7 +90,7 @@ ConnectWindow::ConnectWindow(MainWindow & mw) :
     m_statusContext = m_status->get_context_id("Connection status");
     // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
-    signal_delete_event().connect(SigC::slot(*this, &ConnectWindow::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &ConnectWindow::deleteEvent));
 }
 
 void ConnectWindow::setPort(int port)
@@ -128,14 +128,14 @@ void ConnectWindow::createConnection()
 
     m_server->setupServerConnection(m_hostEntry->get_text(), m_portNum);
 
-    m_failure = m_server->m_connection->Failure.connect(SigC::slot(*this, &ConnectWindow::failure));
-    m_connected = m_server->m_connection->Connected.connect(SigC::slot(*this, &ConnectWindow::connected));
+    m_failure = m_server->m_connection->Failure.connect(sigc::mem_fun(*this, &ConnectWindow::failure));
+    m_connected = m_server->m_connection->Connected.connect(sigc::mem_fun(*this, &ConnectWindow::connected));
 
     //std::cout << m_hostEntry->get_text() << ": " << m_portNum
               //<< std::endl << std::flush;
     // c.connect(m_hostEntry->get_text(), m_portNum);
 
-    //Gtk::Main::input.connect(SigC::slot(server, &Server::poll), c.getSocket(),
+    //Gtk::Main::input.connect(sigc::mem_fun(server, &Server::poll), c.getSocket(),
                              //GDK_INPUT_READ);
     // m_server->connect("localhost", 6767);
     m_server->connect();
@@ -146,7 +146,7 @@ void ConnectWindow::failure(const std::string & msg)
     assert(m_server != 0);
 
     Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, "Connection Failed", false, Gtk::MESSAGE_ERROR);
-    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->signal_response().connect(sigc::hide(sigc::mem_fun(*md, &Gtk::MessageDialog::hide)));
     md->show();
 
     std::cout << "ConnectWindow::failure" << std::endl << std::flush;

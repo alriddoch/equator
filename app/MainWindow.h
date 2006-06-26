@@ -82,12 +82,12 @@ class MainWindow : public Gtk::Window
   public:
     // THese signals absolutely must be constructed before the other window
     // references, so that the other windows can connect in their constructors
-    SigC::Signal1<void, Model *> modelAdded;
-    SigC::Signal1<void, Model *> currentModelChanged;
-    SigC::Signal1<void, Server *> serverAdded;
-    SigC::Signal0<void> modeChanged;
-    SigC::Signal0<void> toolChanged;
-    SigC::Signal0<void> navChanged;
+    sigc::signal<void, Model *> modelAdded;
+    sigc::signal<void, Model *> currentModelChanged;
+    sigc::signal<void, Server *> serverAdded;
+    sigc::signal<void> modeChanged;
+    sigc::signal<void> toolChanged;
+    sigc::signal<void> navChanged;
 
     LayerWindow & m_layerwindow;
     InheritanceWindow & m_inheritancewindow;

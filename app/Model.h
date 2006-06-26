@@ -9,14 +9,14 @@
 
 #include <string>
 #include <list>
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 #include <sigc++/signal.h>
 
 class Layer;
 class Holo;
 class MainWindow;
 
-class Model : public SigC::Object {
+class Model : public sigc::trackable {
   private:
     static int modelCount;
 
@@ -98,11 +98,11 @@ class Model : public SigC::Object {
 
     void alignSelection(Alignment );
 
-    SigC::Signal0<void> nameChanged;
-    SigC::Signal0<void> updated;
-    SigC::Signal0<void> layersChanged;
-    SigC::Signal0<void> typesAdded;
-    SigC::Signal0<void> cursorMoved;
+    sigc::signal<void> nameChanged;
+    sigc::signal<void> updated;
+    sigc::signal<void> layersChanged;
+    sigc::signal<void> typesAdded;
+    sigc::signal<void> cursorMoved;
 };
 
 #endif // EQUATOR_APP_MODEL_H

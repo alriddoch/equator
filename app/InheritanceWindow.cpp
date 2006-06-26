@@ -23,8 +23,8 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/menuitem.h>
 
-#include <sigc++/bind.h>
-#include <sigc++/object_slot.h>
+#include <sigc++/adaptors/bind.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <sstream>
@@ -114,9 +114,9 @@ InheritanceWindow::InheritanceWindow(MainWindow & mw): OptionBox("Inheritance"),
     // set_title("Inheritance");
     set_sensitive(false);
 
-    mw.serverAdded.connect(SigC::slot(*this, &InheritanceWindow::serverAdded));
+    mw.serverAdded.connect(sigc::mem_fun(*this, &InheritanceWindow::serverAdded));
 
-    signal_delete_event().connect(SigC::slot(*this, &InheritanceWindow::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &InheritanceWindow::deleteEvent));
 }
 
 void InheritanceWindow::descendTypeTree(Eris::TypeInfo * node,
@@ -188,7 +188,7 @@ void InheritanceWindow::serverAdded(Server * s)
     std::stringstream ident;
     ident << s->getName() << "-" << s->getServerNo();
 
-    server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Server*>(SigC::slot(*this, &InheritanceWindow::currentServerChanged), s)));
+    server_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), sigc::bind<Server*>(sigc::mem_fun(*this, &InheritanceWindow::currentServerChanged), s)));
     if (newMenu) {
         m_serverMenu->set_history(0);
         currentServerChanged(s);

@@ -16,8 +16,8 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
 
 #include <iostream>
 #include <sstream>
@@ -46,7 +46,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
     // m_tile_clist = manage( new Gtk::CList(titles) );
     // m_tile_clist->set_column_width(0, 200);
     // m_tile_clist->set_column_width(1, 50);
-    // m_tile_clist->select_row.connect(SigC::slot(*this, &Palette::setCurrentTile));
+    // m_tile_clist->select_row.connect(sigc::mem_fun(*this, &Palette::setCurrentTile));
 
     m_columns = new Gtk::TreeModelColumnRecord();
     m_nameColumn = new Gtk::TreeModelColumn<Glib::ustring>();
@@ -72,7 +72,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_refTileTreeSelection = m_tileTreeView->get_selection();
     m_refTileTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    m_refTileTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentTile) );
+    m_refTileTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &Palette::setCurrentTile) );
 
     m_entityTreeView = manage( new Gtk::TreeView() );
     m_entityTreeView->set_model( m_entityTreeModel );
@@ -81,7 +81,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_refEntityTreeSelection = m_entityTreeView->get_selection();
     m_refEntityTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    m_refEntityTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentEntity) );
+    m_refEntityTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &Palette::setCurrentEntity) );
 
     m_textureTreeView = manage( new Gtk::TreeView() );
     m_textureTreeView->set_model( m_textureTreeModel );
@@ -90,7 +90,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
 
     m_refTextureTreeSelection = m_textureTreeView->get_selection();
     m_refTextureTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    m_refTextureTreeSelection->signal_changed().connect( SigC::slot(*this, &Palette::setCurrentTexture) );
+    m_refTextureTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &Palette::setCurrentTexture) );
 
     Gtk::ScrolledWindow * sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
@@ -102,7 +102,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
     // m_entity_clist = manage( new Gtk::CList(entity_titles) );
     // m_entity_clist->set_column_width(0, 200);
     // m_entity_clist->set_column_width(1, 50);
-    // m_entity_clist->select_row.connect(SigC::slot(*this, &Palette::setCurrentEntity));
+    // m_entity_clist->select_row.connect(sigc::mem_fun(*this, &Palette::setCurrentEntity));
     sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     sw->set_size_request(300,150);
@@ -113,7 +113,7 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
     // m_texture_clist = manage( new Gtk::CList(texture_titles) );
     // m_texture_clist->set_column_width(0, 200);
     // m_texture_clist->set_column_width(1, 50);
-    // m_texture_clist->select_row.connect(SigC::slot(*this, &Palette::setCurrentTexture));
+    // m_texture_clist->select_row.connect(sigc::mem_fun(*this, &Palette::setCurrentTexture));
     sw = manage( new Gtk::ScrolledWindow() );
     sw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     sw->set_size_request(300,200);
@@ -126,9 +126,9 @@ Palette::Palette(MainWindow & mw) : OptionBox("Palette"),
     // set_title("Palette");
     set_sensitive(false);
 
-    mw.modelAdded.connect(SigC::slot(*this, &Palette::addModel));
-    mw.currentModelChanged.connect(SigC::slot(*this, &Palette::setModel));
-    signal_delete_event().connect(SigC::slot(*this, &Palette::deleteEvent));
+    mw.modelAdded.connect(sigc::mem_fun(*this, &Palette::addModel));
+    mw.currentModelChanged.connect(sigc::mem_fun(*this, &Palette::setModel));
+    signal_delete_event().connect(sigc::mem_fun(*this, &Palette::deleteEvent));
 }
 
 void Palette::setCurrentTile()
@@ -179,13 +179,13 @@ void Palette::addModel(Model * model)
         menu = manage( new Gtk::Menu() );
         
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &Palette::setModel),model)));
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), sigc::bind<Model*>(sigc::mem_fun(*this, &Palette::setModel),model)));
         m_modelMenu->set_menu(*menu);
         set_sensitive(true);
         setModel(model);
     } else {
         Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
-        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &Palette::setModel),model)));
+        model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), sigc::bind<Model*>(sigc::mem_fun(*this, &Palette::setModel),model)));
     }
 }
 
@@ -200,7 +200,7 @@ void Palette::setModel(Model * model)
     }
     syncModel(model);
 
-    m_typeMonitor = model->typesAdded.connect(SigC::bind(SigC::slot(*this, &Palette::syncModel), model));
+    m_typeMonitor = model->typesAdded.connect(sigc::bind(sigc::mem_fun(*this, &Palette::syncModel), model));
 }
 
 void Palette::syncModel(Model * model)

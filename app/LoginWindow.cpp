@@ -19,8 +19,8 @@
 #include <gtkmm/table.h>
 #include <gtkmm/messagedialog.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/hide.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/hide.h>
 
 #include <iostream>
 #include <cassert>
@@ -37,7 +37,7 @@ LoginWindow::LoginWindow() :
     m_loginButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
     set_default_response(Gtk::RESPONSE_ACCEPT);
-    signal_response().connect(SigC::slot(*this, &LoginWindow::response));
+    signal_response().connect(sigc::mem_fun(*this, &LoginWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -83,7 +83,7 @@ LoginWindow::LoginWindow() :
     m_statusContext = m_status->get_context_id("Login status");
     // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
-    signal_delete_event().connect(SigC::slot(*this, &LoginWindow::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &LoginWindow::deleteEvent));
 }
 
 void LoginWindow::doshow()
@@ -116,8 +116,8 @@ void LoginWindow::create()
 
     m_server->createAccount(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
 
-    m_failure = m_server->m_account->LoginFailure.connect(SigC::slot(*this, &LoginWindow::failure));
-    m_loggedIn = m_server->m_account->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
+    m_failure = m_server->m_account->LoginFailure.connect(sigc::mem_fun(*this, &LoginWindow::failure));
+    m_loggedIn = m_server->m_account->LoginSuccess.connect(sigc::mem_fun(*this, &LoginWindow::loggedIn));
 }
 
 void LoginWindow::login()
@@ -133,8 +133,8 @@ void LoginWindow::login()
 
     m_server->login(m_userEntry->get_entry()->get_text(), m_passwdEntry->get_text());
 
-    m_failure = m_server->m_account->LoginFailure.connect(SigC::slot(*this, &LoginWindow::failure));
-    m_loggedIn = m_server->m_account->LoginSuccess.connect(SigC::slot(*this, &LoginWindow::loggedIn));
+    m_failure = m_server->m_account->LoginFailure.connect(sigc::mem_fun(*this, &LoginWindow::failure));
+    m_loggedIn = m_server->m_account->LoginSuccess.connect(sigc::mem_fun(*this, &LoginWindow::loggedIn));
 }
 
 void LoginWindow::failure(const std::string & msg)
@@ -142,7 +142,7 @@ void LoginWindow::failure(const std::string & msg)
     assert(m_server != 0);
 
     Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, "Login Failed", false, Gtk::MESSAGE_ERROR);
-    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->signal_response().connect(sigc::hide(sigc::mem_fun(*md, &Gtk::MessageDialog::hide)));
     md->show();
 
     std::cout << "LoginWindow::failure" << std::endl << std::flush;

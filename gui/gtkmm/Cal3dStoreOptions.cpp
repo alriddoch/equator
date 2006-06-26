@@ -18,7 +18,7 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeselection.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <vector>
@@ -50,7 +50,7 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
     m_treeView->append_column("Component", *m_nameColumn);
 
     Gtk::CellRendererToggle * crt = manage( new Gtk::CellRendererToggle() );
-    crt->signal_toggled().connect( SigC::slot(*this, &Cal3dStoreOptions::enableToggled) );
+    crt->signal_toggled().connect( sigc::mem_fun(*this, &Cal3dStoreOptions::enableToggled) );
     int column_no = m_treeView->append_column("View", *crt);
     Gtk::TreeViewColumn * column = m_treeView->get_column(column_no - 1);
     column->add_attribute(crt->property_active(), *m_selectColumn);
@@ -58,7 +58,7 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    // m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &Cal3dStoreOptions::selectionChanged) );
+    // m_refTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &Cal3dStoreOptions::selectionChanged) );
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
@@ -70,7 +70,7 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
     Gtk::HBox * bothbox = manage( new Gtk::HBox );
 
     Gtk::Button * b = manage( new Gtk::Button("Wuh...") );
-    // b->signal_clicked().connect(SigC::slot(*this, &Cal3dStoreOptions::typesPressed));
+    // b->signal_clicked().connect(sigc::mem_fun(*this, &Cal3dStoreOptions::typesPressed));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     vbox->pack_start(*bothbox, Gtk::PACK_SHRINK, 6);
@@ -89,11 +89,11 @@ Cal3dStoreOptions::Cal3dStoreOptions(Cal3dStore & s) :
 
     Cal3dModel & m = s.getModel();
 
-    m.skeletonLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::skeletonLoaded));
-    m.animationLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::animationLoaded));
-    m.actionLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::actionLoaded));
-    m.meshLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::meshLoaded));
-    m.materialLoaded.connect(SigC::slot(*this, &Cal3dStoreOptions::materialLoaded));
+    m.skeletonLoaded.connect(sigc::mem_fun(*this, &Cal3dStoreOptions::skeletonLoaded));
+    m.animationLoaded.connect(sigc::mem_fun(*this, &Cal3dStoreOptions::animationLoaded));
+    m.actionLoaded.connect(sigc::mem_fun(*this, &Cal3dStoreOptions::actionLoaded));
+    m.meshLoaded.connect(sigc::mem_fun(*this, &Cal3dStoreOptions::meshLoaded));
+    m.materialLoaded.connect(sigc::mem_fun(*this, &Cal3dStoreOptions::materialLoaded));
 }
 
 void Cal3dStoreOptions::skeletonLoaded(const std::string & s)

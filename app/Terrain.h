@@ -83,7 +83,7 @@ class Terrain : public Layer {
     virtual void insert(const PosType &);
     virtual void align(Alignment ) { }
 
-    SigC::Signal0<void> TerrainModified;
+    sigc::signal<void> TerrainModified;
 };
 
 #endif // EQUATOR_TERRAIN_H

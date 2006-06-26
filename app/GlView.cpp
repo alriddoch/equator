@@ -26,7 +26,7 @@
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/main.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <sstream>
@@ -89,12 +89,12 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
            m_model(m),
            m_renderer(* new Renderer)
 {
-    m_scaleAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_xAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_yAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_zAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_declAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_rotaAdj.signal_value_changed().connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m_scaleAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_xAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_yAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_zAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_declAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_rotaAdj.signal_value_changed().connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
 
     m_projection = GlView::ORTHO; // KEEPME
     m_renderMode = GlView::SOLID; // KEEPME
@@ -134,23 +134,23 @@ GlView::GlView(MainWindow&mw,ViewWindow&vw, Model&m) :
     }
 #endif
 
-    m.updated.connect(SigC::slot(*this, &GlView::scheduleRedraw));
+    m.updated.connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
 
     set_events(Gdk::POINTER_MOTION_MASK|
                Gdk::EXPOSURE_MASK|
                Gdk::BUTTON_PRESS_MASK|
                Gdk::BUTTON_RELEASE_MASK);
 
-    mw.modeChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    mw.toolChanged.connect(SigC::slot(*this, &GlView::scheduleRedraw));
-    m_model.cursorMoved.connect(SigC::slot(m_viewWindow,
+    mw.modeChanged.connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    mw.toolChanged.connect(sigc::mem_fun(*this, &GlView::scheduleRedraw));
+    m_model.cursorMoved.connect(sigc::mem_fun(m_viewWindow,
                                            &ViewWindow::cursorMoved));
-    signal_realize().connect(SigC::slot(*this, &GlView::realize));
-    // signal_configure_event().connect(SigC::slot(*this, &GlView::configureEvent));
-    signal_expose_event().connect(SigC::slot(*this, &GlView::exposeEvent));
-    signal_button_press_event().connect(SigC::slot(*this, &GlView::buttonPressEvent));
-    signal_button_release_event().connect(SigC::slot(*this, &GlView::buttonReleaseEvent));
-    signal_motion_notify_event().connect(SigC::slot(*this, &GlView::motionNotifyEvent));
+    signal_realize().connect(sigc::mem_fun(*this, &GlView::realize));
+    // signal_configure_event().connect(sigc::mem_fun(*this, &GlView::configureEvent));
+    signal_expose_event().connect(sigc::mem_fun(*this, &GlView::exposeEvent));
+    signal_button_press_event().connect(sigc::mem_fun(*this, &GlView::buttonPressEvent));
+    signal_button_release_event().connect(sigc::mem_fun(*this, &GlView::buttonReleaseEvent));
+    signal_motion_notify_event().connect(sigc::mem_fun(*this, &GlView::motionNotifyEvent));
 
     scheduleRedraw();
     startAnimation();
@@ -788,7 +788,7 @@ void GlView::startAnimation()
 {
     if (!m_animationRequired) {
         m_animationRequired = true;
-        Glib::signal_timeout().connect(SigC::slot(*this, &GlView::animate), 50);
+        Glib::signal_timeout().connect(sigc::mem_fun(*this, &GlView::animate), 50);
     }
 }
 
@@ -834,7 +834,7 @@ void GlView::scheduleRedraw()
 {
     if (!m_redrawRequired) {
         m_redrawRequired = true;
-        Glib::signal_idle().connect(SigC::slot(*this, &GlView::redraw));
+        Glib::signal_idle().connect(sigc::mem_fun(*this, &GlView::redraw));
     }
 }
 

@@ -67,8 +67,8 @@ class ServerEntities : public Layer {
     static EntityImportOptions * m_importOptions;
     static EntityExportOptions * m_exportOptions;
 
-    SigC::Connection m_loadOptionsDone;
-    SigC::Connection m_saveOptionsDone;
+    sigc::connection m_loadOptionsDone;
+    sigc::connection m_saveOptionsDone;
 
     Eris::TypeInfo * m_gameEntityType;
 

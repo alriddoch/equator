@@ -21,8 +21,8 @@
 
 #include <gtkmm/fileselection.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
 
 #include <GL/glu.h>
 
@@ -152,8 +152,8 @@ void Terrain::importFile()
 {
 
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Height Map File");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &Terrain::load),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &Terrain::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &Terrain::load),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &Terrain::cancel),fsel));
     fsel->show();
 
 }

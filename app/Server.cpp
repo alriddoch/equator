@@ -30,8 +30,8 @@
 #include <Atlas/Objects/Entity.h>
 #include <Atlas/Objects/Operation.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
 
 #include <sstream>
 
@@ -84,10 +84,10 @@ void Server::connectWorldSignals()
     if (worldSignalsConnected) {
         return;
     }
-    // m_lobby->Talk.connect(SigC::slot(*this,&Server::lobbyTalk));
-    // m_lobby->Entered.connect(SigC::slot(*this,&Server::roomEnter));
+    // m_lobby->Talk.connect(sigc::mem_fun(*this,&Server::lobbyTalk));
+    // m_lobby->Entered.connect(sigc::mem_fun(*this,&Server::roomEnter));
 
-    m_account->AvatarSuccess.connect(SigC::slot(*this,&Server::gotAvatar));
+    m_account->AvatarSuccess.connect(sigc::mem_fun(*this,&Server::gotAvatar));
 
 
     worldSignalsConnected = true;
@@ -164,7 +164,7 @@ void Server::createTerrainLayer(TerrainEntity * tent)
             Terrain * layer = new Terrain(*m_model, tr->m_terrain);
             // readTerrain(*layer, ent); FIXME Perhaps we should do this here?
             layer->readTerrain(*tent);
-            layer->TerrainModified.connect(SigC::bind<Terrain*, TerrainEntity *>(SigC::slot(*this, &Server::modifyTerrain), layer, tent));
+            layer->TerrainModified.connect(sigc::bind<Terrain*, TerrainEntity *>(sigc::mem_fun(*this, &Server::modifyTerrain), layer, tent));
             m_model->addLayer(layer);
         }
     }
@@ -191,11 +191,11 @@ void Server::setupServerConnection(const std::string & host, int port)
 
     m_connection = new Eris::Connection("equator", host, port, true);
 
-    m_connection->Failure.connect(SigC::slot(*this, &Server::netFailure));
-    m_connection->Connected.connect(SigC::slot(*this, &Server::netConnected));
-    m_connection->Disconnected.connect(SigC::slot(*this, &Server::netDisconnected));
+    m_connection->Failure.connect(sigc::mem_fun(*this, &Server::netFailure));
+    m_connection->Connected.connect(sigc::mem_fun(*this, &Server::netConnected));
+    m_connection->Disconnected.connect(sigc::mem_fun(*this, &Server::netDisconnected));
 
-    Eris::Logged.connect(SigC::slot(*this, &Server::connectionLog));
+    Eris::Logged.connect(sigc::mem_fun(*this, &Server::connectionLog));
     Eris::setLogLevel(Eris::LOG_DEBUG);
 }
 
@@ -203,7 +203,7 @@ void Server::connect()
 {
     m_connection->connect();
 
-    inputHandler = Glib::signal_io().connect(SigC::slot(*this, &Server::poll),
+    inputHandler = Glib::signal_io().connect(sigc::mem_fun(*this, &Server::poll),
                                              m_connection->getFileDescriptor(),
                                              Glib::IO_IN);
 }
@@ -229,14 +229,14 @@ void Server::login(const std::string & name, const std::string & password)
 {
     m_account = new Eris::Account(m_connection);
     m_account->login(name, password);
-    m_account->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
+    m_account->LoginSuccess.connect(sigc::mem_fun(*this, &Server::loginComplete));
 }
 
 void Server::createAccount(const std::string& name, const std::string& password)
 {
     m_account = new Eris::Account(m_connection);
     m_account->createAccount(name, name, password);
-    m_account->LoginSuccess.connect(SigC::slot(*this, &Server::loginComplete));
+    m_account->LoginSuccess.connect(sigc::mem_fun(*this, &Server::loginComplete));
 }
 
 void Server::netDisconnected()
@@ -260,13 +260,13 @@ void Server::gotAvatar(Eris::Avatar * av)
 {
     // FIXME Is it necessary to store the Avatar pointer
     m_avatar = av;
-    m_avatar->GotCharacterEntity.connect(SigC::slot(*this,&Server::worldEnter));
+    m_avatar->GotCharacterEntity.connect(sigc::mem_fun(*this,&Server::worldEnter));
 
     m_view = m_avatar->getView();
-    m_view->EntityCreated.connect(SigC::slot(*this,&Server::worldEntityCreate));
+    m_view->EntityCreated.connect(sigc::mem_fun(*this,&Server::worldEntityCreate));
 
     WEFactory * wef = new WEFactory(*m_connection->getTypeService(), m_renderer);
-    wef->TerrainEntityCreated.connect(SigC::slot(*this, &Server::createTerrainLayer));
+    wef->TerrainEntityCreated.connect(sigc::mem_fun(*this, &Server::createTerrainLayer));
     m_view->registerFactory(wef);
 
     Model & model = m_mainWindow.newModel();
@@ -283,7 +283,7 @@ void Server::worldEnter(Eris::Entity * chr)
 
     createLayers();
 
-    chr->Moved.connect(SigC::slot(*this, &Server::charMoved));
+    chr->Moved.connect(sigc::mem_fun(*this, &Server::charMoved));
 }
 
 void Server::charMoved()

@@ -11,8 +11,8 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/checkbutton.h>
 
-#include <sigc++/bind.h>
-#include <sigc++/object_slot.h>
+#include <sigc++/adaptors/bind.h>
+#include <sigc++/functors/mem_fun.h>
 
 EntityExportOptions::EntityExportOptions() : m_target(EXPORT_ALL),
                                              m_charType(NULL)
@@ -36,17 +36,17 @@ EntityExportOptions::EntityExportOptions() : m_target(EXPORT_ALL),
     hbox->pack_start(*vbox, Gtk::PACK_EXPAND_WIDGET, 6);
 
     Gtk::RadioButton * rb1 = manage( new Gtk::RadioButton("all entities") );
-    rb1->signal_clicked().connect(SigC::bind<ExportTarget>(SigC::slot(*this, &EntityExportOptions::setExportTarget),EXPORT_ALL));
+    rb1->signal_clicked().connect(sigc::bind<ExportTarget>(sigc::mem_fun(*this, &EntityExportOptions::setExportTarget),EXPORT_ALL));
     vbox->pack_start(*rb1, Gtk::PACK_SHRINK, 6);
     Gtk::RadioButton::Group rgp = rb1->get_group();
     Gtk::RadioButton * rb = manage( new Gtk::RadioButton(rgp, "visible entities") );
-    rb->signal_clicked().connect(SigC::bind<ExportTarget>(SigC::slot(*this, &EntityExportOptions::setExportTarget),EXPORT_VISIBLE));
+    rb->signal_clicked().connect(sigc::bind<ExportTarget>(sigc::mem_fun(*this, &EntityExportOptions::setExportTarget),EXPORT_VISIBLE));
     vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
     rb = manage( new Gtk::RadioButton(rgp, "selected entity") );
-    rb->signal_clicked().connect(SigC::bind<ExportTarget>(SigC::slot(*this, &EntityExportOptions::setExportTarget),EXPORT_SELECTION));
+    rb->signal_clicked().connect(sigc::bind<ExportTarget>(sigc::mem_fun(*this, &EntityExportOptions::setExportTarget),EXPORT_SELECTION));
     vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
     rb = manage( new Gtk::RadioButton(rgp, "all selected entities") );
-    rb->signal_clicked().connect(SigC::bind<ExportTarget>(SigC::slot(*this, &EntityExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
+    rb->signal_clicked().connect(sigc::bind<ExportTarget>(sigc::mem_fun(*this, &EntityExportOptions::setExportTarget),EXPORT_ALL_SELECTED));
     vbox->pack_start(*rb, Gtk::PACK_SHRINK, 6);
     m_charCheck = manage( new Gtk::CheckButton("Remove characters") );
     vbox->pack_start(*m_charCheck, Gtk::PACK_SHRINK, 6);
@@ -85,7 +85,7 @@ EntityExportOptions::EntityExportOptions() : m_target(EXPORT_ALL),
     add_button(Gtk::Stock::CANCEL , Gtk::RESPONSE_CANCEL);
     m_ok = add_button(Gtk::Stock::OK , Gtk::RESPONSE_OK);
 
-    signal_response().connect(SigC::slot(*this, &EntityExportOptions::response));
+    signal_response().connect(sigc::mem_fun(*this, &EntityExportOptions::response));
 }
 
 void EntityExportOptions::setExportTarget(ExportTarget et)

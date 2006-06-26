@@ -39,8 +39,8 @@
 
 #include <gtkmm/fileselection.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
 
 #include <fstream>
 
@@ -670,7 +670,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
 void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 {
     m_loadOptionsDone.disconnect();
-    m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::load), fsel));
+    m_loadOptionsDone = m_importOptions->m_ok->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::load), fsel));
     m_importOptions->show_all();
     fsel->hide();
 }
@@ -678,7 +678,7 @@ void ServerEntities::loadOptions(Gtk::FileSelection * fsel)
 void ServerEntities::saveOptions(Gtk::FileSelection * fsel)
 {
     m_saveOptionsDone.disconnect();
-    m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::save), fsel));
+    m_saveOptionsDone = m_exportOptions->m_ok->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::save), fsel));
     m_exportOptions->show_all();
     fsel->hide();
 }
@@ -873,8 +873,8 @@ void ServerEntities::createOptionsWindows()
 
 void ServerEntities::connectEntity(Eris::Entity * ent)
 {
-    ent->Changed.connect(SigC::slot(*this, &ServerEntities::entityChanged));
-    ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
+    ent->Changed.connect(sigc::mem_fun(*this, &ServerEntities::entityChanged));
+    ent->Moved.connect(sigc::mem_fun(*this, &ServerEntities::entityMoved));
 
     int numEnts = ent->numContained();
     for (int i = 0; i < numEnts; i++) {
@@ -891,7 +891,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
 {
     // FIXME This stuff populates palette, but does not belong here.
     // It probably belongs in server.
-    m_serverConnection.m_connection->getTypeService()->BoundType.connect(SigC::slot(*this, &ServerEntities::newType));
+    m_serverConnection.m_connection->getTypeService()->BoundType.connect(sigc::mem_fun(*this, &ServerEntities::newType));
     m_gameEntityType = m_serverConnection.m_connection->getTypeService()->getTypeByName("game_entity");
     assert(m_gameEntityType != 0);
     m_model.m_mainWindow.m_palettewindow.addModel(&m_model);
@@ -911,7 +911,7 @@ ServerEntities::ServerEntities(Model & model, Server & server) :
     // observe the Eris world (in the future, we will need to get World* from
     // the server object, when Eris supports multiple world objects
     m_serverConnection.m_view->EntityCreated.connect(
-        SigC::slot(*this, &ServerEntities::gotNewEntity)
+        sigc::mem_fun(*this, &ServerEntities::gotNewEntity)
     );
 
     if (m_importOptions == 0) {
@@ -926,16 +926,16 @@ void ServerEntities::options()
 void ServerEntities::importFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Load Atlas Map File");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::loadOptions),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::loadOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 
 void ServerEntities::exportFile()
 {
     Gtk::FileSelection * fsel = new Gtk::FileSelection("Save Atlas Map File");
-    fsel->get_ok_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::saveOptions),fsel));
-    fsel->get_cancel_button()->signal_clicked().connect(SigC::bind<Gtk::FileSelection*>(SigC::slot(*this, &ServerEntities::cancel),fsel));
+    fsel->get_ok_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::saveOptions),fsel));
+    fsel->get_cancel_button()->signal_clicked().connect(sigc::bind<Gtk::FileSelection*>(sigc::mem_fun(*this, &ServerEntities::cancel),fsel));
     fsel->show();
 }
 
@@ -1199,8 +1199,8 @@ void ServerEntities::align(Alignment a)
 
 void ServerEntities::gotNewEntity(Eris::Entity *ent)
 {
-    ent->Changed.connect(SigC::slot(*this, &ServerEntities::entityChanged));
-    ent->Moved.connect(SigC::slot(*this, &ServerEntities::entityMoved));
+    ent->Changed.connect(sigc::mem_fun(*this, &ServerEntities::entityChanged));
+    ent->Moved.connect(sigc::mem_fun(*this, &ServerEntities::entityMoved));
     m_model.update(); // cause a re-draw
 }
 

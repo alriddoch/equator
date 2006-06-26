@@ -1,5 +1,24 @@
 2006-06-26  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/Cal3dStore.cpp,
+	  app/CharacterWindow.cpp, app/CharacterWindow.h,
+	  app/ConnectWindow.cpp, app/ConnectWindow.h, app/GlView.cpp,
+	  app/InheritanceWindow.cpp, app/Layer.h, app/LayerWindow.cpp,
+	  app/LayerWindow.h, app/LoginWindow.cpp, app/LoginWindow.h,
+	  app/MainWindow.cpp, app/MainWindow.h, app/Model.h,
+	  app/NewLayerWindow.cpp, app/Palette.cpp, app/Palette.h,
+	  app/Server.cpp, app/Server.h, app/ServerEntities.cpp,
+	  app/ServerEntities.h, app/ServerWindow.cpp, app/Terrain.cpp,
+	  app/Terrain.h, app/ViewWindow.cpp, app/WorldEntity.cpp,
+	  app/WorldEntity.h, gui/gtkmm/Cal3dStoreOptions.cpp,
+	  gui/gtkmm/EntityExportOptions.cpp,
+	  gui/gtkmm/EntityImportOptions.cpp,
+	  gui/gtkmm/EntityTree.cpp, gui/gtkmm/TypeTree.cpp,
+	  visual/Renderer.h: Update usage of sigc++ to the native 2.0 API
+	  rather than the deprecated compatability API.
+
+2006-06-26  Al Riddoch  <alriddoch@zepler.org>
+
 	* configure.ac, Makefile.am, sear/Makefile.am: Add a subdirectory
 	  to experiment with sear support.
 

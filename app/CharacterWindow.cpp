@@ -22,8 +22,8 @@
 #include <gtkmm/table.h>
 #include <gtkmm/messagedialog.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/hide.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/hide.h>
 
 #include <iostream>
 #include <cassert>
@@ -40,7 +40,7 @@ CharacterWindow::CharacterWindow() :
     m_createButton->set_use_underline();
     add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
     set_default_response(Gtk::RESPONSE_YES);
-    signal_response().connect(SigC::slot(*this, &CharacterWindow::response));
+    signal_response().connect(sigc::mem_fun(*this, &CharacterWindow::response));
 
     Gtk::VBox * vbox = get_vbox();
 
@@ -68,9 +68,9 @@ CharacterWindow::CharacterWindow() :
     m_nameEntry->get_entry()->set_max_length(60);
     m_nameEntry->get_entry()->signal_key_press_event().connect(sigc::mem_fun(this, &CharacterWindow::nameKeyPressed), false);
     table->attach(*m_nameEntry, 1, 3, 0, 1);
-    m_nameEntry->get_list()->signal_select_child().connect(SigC::slot(*this, &CharacterWindow::select_child));
-    m_nameEntry->get_list()->signal_selection_changed().connect(SigC::slot(*this, &CharacterWindow::selection_changed));
-    m_nameEntry->get_list()->signal_unselect_child().connect(SigC::slot(*this, &CharacterWindow::unselect_child));
+    m_nameEntry->get_list()->signal_select_child().connect(sigc::mem_fun(*this, &CharacterWindow::select_child));
+    m_nameEntry->get_list()->signal_selection_changed().connect(sigc::mem_fun(*this, &CharacterWindow::selection_changed));
+    m_nameEntry->get_list()->signal_unselect_child().connect(sigc::mem_fun(*this, &CharacterWindow::unselect_child));
 
     a = manage( new Gtk::Alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER, 0, 0) );
     a->add(*(manage( new Gtk::Label("Type:") )));
@@ -88,7 +88,7 @@ CharacterWindow::CharacterWindow() :
     m_statusContext = m_status->get_context_id("Login status");
     // vbox->pack_start(*m_status, Gtk::PACK_SHRINK, 0);
 
-    signal_delete_event().connect(SigC::slot(*this, &CharacterWindow::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &CharacterWindow::deleteEvent));
 }
 
 void CharacterWindow::doshow()
@@ -105,7 +105,7 @@ void CharacterWindow::useServer(Server * s)
 
     m_server = s;
     m_serverLabel->set_text(std::string("Create avatar on ") + m_server->getName() + ":");
-    m_charlist = m_server->m_account->GotAllCharacters.connect(SigC::slot(*this, &CharacterWindow::gotCharacterList));
+    m_charlist = m_server->m_account->GotAllCharacters.connect(sigc::mem_fun(*this, &CharacterWindow::gotCharacterList));
     m_server->m_account->refreshCharacterInfo();
 
     std::list<Glib::ustring> listStrings;
@@ -203,8 +203,8 @@ void CharacterWindow::take()
 
     m_server->takeCharacter(m_selectedCharacter);
 
-    m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
-    m_failure = m_server->m_account->AvatarFailure.connect(SigC::slot(*this, &CharacterWindow::failure));
+    m_success = m_server->m_account->AvatarSuccess.connect(sigc::mem_fun(*this, &CharacterWindow::success));
+    m_failure = m_server->m_account->AvatarFailure.connect(sigc::mem_fun(*this, &CharacterWindow::failure));
 }
 
 void CharacterWindow::create()
@@ -219,8 +219,8 @@ void CharacterWindow::create()
 
     m_server->createCharacter(m_nameEntry->get_entry()->get_text(), m_typeEntry->get_text());
 
-    m_success = m_server->m_account->AvatarSuccess.connect(SigC::slot(*this, &CharacterWindow::success));
-    m_failure = m_server->m_account->AvatarFailure.connect(SigC::slot(*this, &CharacterWindow::failure));
+    m_success = m_server->m_account->AvatarSuccess.connect(sigc::mem_fun(*this, &CharacterWindow::success));
+    m_failure = m_server->m_account->AvatarFailure.connect(sigc::mem_fun(*this, &CharacterWindow::failure));
 }
 
 void CharacterWindow::failure(const std::string & msg)
@@ -228,7 +228,7 @@ void CharacterWindow::failure(const std::string & msg)
     assert(m_server != 0);
 
     Gtk::MessageDialog * md = new Gtk::MessageDialog(*this, msg, false, Gtk::MESSAGE_ERROR);
-    md->signal_response().connect(SigC::hide<int>(SigC::slot(*md, &Gtk::MessageDialog::hide)));
+    md->signal_response().connect(sigc::hide(sigc::mem_fun(*md, &Gtk::MessageDialog::hide)));
     md->show();
 
     std::cout << "CharacterWindow::failure" << std::endl << std::flush;

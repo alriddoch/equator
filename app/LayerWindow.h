@@ -40,7 +40,7 @@ class LayerWindow : public OptionBox
 
     Model * m_currentModel;
     NewLayerWindow * m_newLayerWindow;
-    SigC::Connection m_updateSignal;
+    sigc::connection m_updateSignal;
 
     void visibleToggled(const Glib::ustring& path_string);
     void selectionChanged();

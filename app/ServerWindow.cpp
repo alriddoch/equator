@@ -28,7 +28,7 @@
 #include <gtkmm/treeselection.h>
 #include <gtkmm/uimanager.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <vector>
@@ -79,7 +79,7 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_treeView->set_model( m_treeModel );
 
     m_treeView->append_column("Hostname", *m_hostnameColumn);
-    m_treeView->signal_button_press_event().connect_notify(SigC::slot(*this, &ServerWindow::buttonPressEvent));
+    m_treeView->signal_button_press_event().connect_notify(sigc::mem_fun(*this, &ServerWindow::buttonPressEvent));
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
@@ -111,9 +111,9 @@ ServerWindow::ServerWindow(MainWindow & mw) : OptionBox("Servers"),
     m_UIManager->add_ui_from_string(g_sUI);
     m_popupMenu = dynamic_cast< Gtk::Menu * >(m_UIManager->get_widget("/PopupMenu"));
     vbox->pack_start(*(m_UIManager->get_widget("/ToolBar")), Gtk::PACK_SHRINK, 6);
-    signal_delete_event().connect(SigC::slot(*this, &ServerWindow::deleteEvent));
-    m_connectWindow.serverConnected.connect(SigC::slot(*this, &ServerWindow::newServer));
-    m_loginWindow.loginSuccess.connect(SigC::slot(*this, &ServerWindow::loggedIn));
+    signal_delete_event().connect(sigc::mem_fun(*this, &ServerWindow::deleteEvent));
+    m_connectWindow.serverConnected.connect(sigc::mem_fun(*this, &ServerWindow::newServer));
+    m_loginWindow.loginSuccess.connect(sigc::mem_fun(*this, &ServerWindow::loggedIn));
     // call this so the correct buttons get disabled
     selectionChanged();
 }

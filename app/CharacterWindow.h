@@ -35,9 +35,9 @@ class CharacterWindow : public Gtk::Dialog
     Server * m_server;
     std::string m_selectedCharacter;
 
-    SigC::Connection m_failure;
-    SigC::Connection m_success;
-    SigC::Connection m_charlist;
+    sigc::connection m_failure;
+    sigc::connection m_success;
+    sigc::connection m_charlist;
 
     void gotCharacterList();
     void select_child(Gtk::Widget&);

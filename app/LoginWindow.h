@@ -30,8 +30,8 @@ class LoginWindow : public Gtk::Dialog
     int m_statusContext;
     Server * m_server;
 
-    SigC::Connection m_failure;
-    SigC::Connection m_loggedIn;
+    sigc::connection m_failure;
+    sigc::connection m_loggedIn;
   public:
     LoginWindow();
 
@@ -52,7 +52,7 @@ class LoginWindow : public Gtk::Dialog
 
     void response(int);
 
-    SigC::Signal1<void, Server *> loginSuccess;
+    sigc::signal<void, Server *> loginSuccess;
 };
 
 #endif // EQUATOR_APP_LOGIN_WINDOW_H

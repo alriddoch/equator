@@ -25,8 +25,8 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/menuitem.h>
 
-#include <sigc++/bind.h>
-#include <sigc++/object_slot.h>
+#include <sigc++/adaptors/bind.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <sstream>
@@ -124,9 +124,9 @@ EntityTree::EntityTree(MainWindow & mw): OptionBox("Entity Tree"),
     // set_title("Inheritance");
     set_sensitive(false);
 
-    mw.modelAdded.connect(SigC::slot(*this, &EntityTree::modelAdded));
+    mw.modelAdded.connect(sigc::mem_fun(*this, &EntityTree::modelAdded));
 
-    signal_delete_event().connect(SigC::slot(*this, &EntityTree::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &EntityTree::deleteEvent));
 }
 
 void EntityTree::descendEntityTree(Eris::Entity * node,
@@ -210,7 +210,7 @@ void EntityTree::modelAdded(Model * s)
     std::stringstream ident;
     ident << s->getName() << "-" << s->getModelNo();
 
-    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &EntityTree::currentModelChanged), s)));
+    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), sigc::bind<Model*>(sigc::mem_fun(*this, &EntityTree::currentModelChanged), s)));
     if (newMenu) {
         m_modelMenu->set_history(0);
         currentModelChanged(s);

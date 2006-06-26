@@ -8,14 +8,14 @@
 #include "common/Vector3D.h"
 #include "types.h"
 
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 
 #include <string>
 
 class GlView;
 class Model;
 
-class Layer : public SigC::Object {
+class Layer : public sigc::trackable {
   protected:
     Layer(Model & m, const std::string & n, const std::string & t) :
           m_model(m), m_name(n), m_type(t), m_visible(true),

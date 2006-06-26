@@ -32,8 +32,8 @@ class ConnectWindow : public Gtk::Dialog
     int m_statusContext;
     Server * m_server;
 
-    SigC::Connection m_failure;
-    SigC::Connection m_connected;
+    sigc::connection m_failure;
+    sigc::connection m_connected;
 
     void setPort(int );
     void setCustomPort();
@@ -55,7 +55,7 @@ class ConnectWindow : public Gtk::Dialog
     void failure(const std::string & msg);
     void connected();
 
-    SigC::Signal1<void, Server *> serverConnected;
+    sigc::signal<void, Server *> serverConnected;
 };
 
 #endif // EQUATOR_APP_CONNECT_WINDOW_H

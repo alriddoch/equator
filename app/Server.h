@@ -13,7 +13,7 @@
 
 #include <glibmm/main.h>
 
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 
 namespace Eris {
   class Connection;
@@ -37,7 +37,7 @@ class Renderer;
 class TerrainEntity;
 class Terrain;
 
-class Server : public SigC::Object {
+class Server : public sigc::trackable {
   private:
     static unsigned serverCount;
     const unsigned m_serverNo;
@@ -77,7 +77,7 @@ class Server : public SigC::Object {
     Eris::View * m_view;
     Eris::Entity * m_character;
 
-    SigC::Connection inputHandler;
+    sigc::connection inputHandler;
 
     const unsigned getServerNo() const {
         return m_serverNo;

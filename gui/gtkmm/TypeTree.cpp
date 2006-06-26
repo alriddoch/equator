@@ -23,7 +23,7 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/uimanager.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/functors/mem_fun.h>
 
 #include <iostream>
 #include <vector>
@@ -64,7 +64,7 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s),
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    // m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &TypeTree::selectionChanged) );
+    // m_refTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &TypeTree::selectionChanged) );
 
     Gtk::ScrolledWindow *scrolled_window = manage(new Gtk::ScrolledWindow());
     scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
@@ -80,7 +80,7 @@ TypeTree::TypeTree(Server & s) : OptionBox("Type Tree"), m_server(s),
     m_UIManager->add_ui_from_string(g_sUI);
     m_popupMenu = dynamic_cast< Gtk::Menu * >(m_UIManager->get_widget("/PopupMenu"));
     vbox->pack_start(*(m_UIManager->get_widget("/ToolBar")), Gtk::PACK_SHRINK, 0);
-    signal_delete_event().connect(SigC::slot(*this, &TypeTree::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &TypeTree::deleteEvent));
 }
 
 bool TypeTree::buttonPressEvent(GdkEventButton * pEvent)

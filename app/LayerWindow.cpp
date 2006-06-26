@@ -21,8 +21,8 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/treeselection.h>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
+#include <sigc++/functors/mem_fun.h>
+#include <sigc++/adaptors/bind.h>
 
 #include <iostream>
 #include <vector>
@@ -71,7 +71,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     m_treeView->set_model( m_treeModel );
 
     Gtk::CellRendererToggle * crt = manage( new Gtk::CellRendererToggle() );
-    crt->signal_toggled().connect( SigC::slot(*this, &LayerWindow::visibleToggled) );
+    crt->signal_toggled().connect( sigc::mem_fun(*this, &LayerWindow::visibleToggled) );
     int column_no = m_treeView->append_column("Visible", *crt);
     Gtk::TreeViewColumn * column = m_treeView->get_column(column_no - 1);
     column->add_attribute(crt->property_active(), *m_visColumn);
@@ -82,7 +82,7 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
 
     m_refTreeSelection = m_treeView->get_selection();
     m_refTreeSelection->set_mode(Gtk::SELECTION_SINGLE);
-    m_refTreeSelection->signal_changed().connect( SigC::slot(*this, &LayerWindow::selectionChanged) );
+    m_refTreeSelection->signal_changed().connect( sigc::mem_fun(*this, &LayerWindow::selectionChanged) );
 
     vbox->pack_start(*manage(new Gtk::HSeparator()), Gtk::PACK_SHRINK);
 
@@ -101,19 +101,19 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     Glib::RefPtr<Gdk::Pixmap> p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, newlayer_xpm);
     b->add_pixmap(p, pixmask);
 
-    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::newLayerRequested));
+    b->signal_clicked().connect(sigc::mem_fun(*this, &LayerWindow::newLayerRequested));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, raise_xpm);
     b->add_pixmap(p, pixmask);
-    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::raiseLayer));
+    b->signal_clicked().connect(sigc::mem_fun(*this, &LayerWindow::raiseLayer));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
     p = Gdk::Pixmap::create_from_xpm(get_colormap(), pixmask, lower_xpm);
     b->add_pixmap(p, pixmask);
-    b->signal_clicked().connect(SigC::slot(*this, &LayerWindow::lowerLayer));
+    b->signal_clicked().connect(sigc::mem_fun(*this, &LayerWindow::lowerLayer));
     bothbox->pack_start(*b, Gtk::PACK_EXPAND_PADDING, 6);
 
     b = manage( new Gtk::Button() );
@@ -142,10 +142,10 @@ LayerWindow::LayerWindow(MainWindow & mw) : OptionBox("Layers"),
     m_newLayerWindow = new NewLayerWindow();
     // show_all();
 
-    mw.modelAdded.connect(SigC::slot(*this, &LayerWindow::modelAdded));
-    mw.currentModelChanged.connect(SigC::slot(*this, &LayerWindow::currentModelChanged));
+    mw.modelAdded.connect(sigc::mem_fun(*this, &LayerWindow::modelAdded));
+    mw.currentModelChanged.connect(sigc::mem_fun(*this, &LayerWindow::currentModelChanged));
 
-    signal_delete_event().connect(SigC::slot(*this, &LayerWindow::deleteEvent));
+    signal_delete_event().connect(sigc::mem_fun(*this, &LayerWindow::deleteEvent));
 }
 
 void LayerWindow::currentModelChanged(Model * model)
@@ -166,7 +166,7 @@ void LayerWindow::currentModelChanged(Model * model)
         return;
     }
 
-    m_updateSignal = m_currentModel->layersChanged.connect(SigC::slot(*this, &LayerWindow::layersChanged));
+    m_updateSignal = m_currentModel->layersChanged.connect(sigc::mem_fun(*this, &LayerWindow::layersChanged));
     layersChanged();
 
     set_sensitive(true);
@@ -207,7 +207,7 @@ void LayerWindow::modelAdded(Model * model)
     Gtk::Menu_Helpers::MenuList& model_menu = menu->items();
     std::stringstream ident;
     ident << model->getName() << "-" << model->getModelNo();
-    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), SigC::bind<Model*>(SigC::slot(*this, &LayerWindow::currentModelChanged),model)));
+    model_menu.push_back(Gtk::Menu_Helpers::MenuElem(ident.str(), sigc::bind<Model*>(sigc::mem_fun(*this, &LayerWindow::currentModelChanged),model)));
     if (newMenu) {
         m_modelMenu->set_history(0);
         currentModelChanged(model);
