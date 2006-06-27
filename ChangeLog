@@ -1,5 +1,10 @@
 2006-06-27  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/SearView.h, app/SearView.cpp: Its a crazy idea, but it might
+	  just work?
+
+2006-06-27  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/AtlasMapWidget.cpp, app/AtlasMapWidget.h, app/Cal3dStore.cpp,
 	  app/Cal3dStore.h, app/CharacterWindow.cpp, app/CharacterWindow.h,
 	  app/ConnectWindow.cpp, app/ConnectWindow.h, app/EntityLayer.cpp,
