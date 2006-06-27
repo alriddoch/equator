@@ -1,3 +1,37 @@
+2006-06-27  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/AtlasMapWidget.cpp, app/AtlasMapWidget.h, app/Cal3dStore.cpp,
+	  app/Cal3dStore.h, app/CharacterWindow.cpp, app/CharacterWindow.h,
+	  app/ConnectWindow.cpp, app/ConnectWindow.h, app/EntityLayer.cpp,
+	  app/EntityLayer.h, app/GL.h, app/GameView.cpp, app/GameView.h,
+	  app/GlView.cpp, app/GlView.h, app/Holo.cpp, app/Holo.h,
+	  app/InheritanceWindow.cpp, app/InheritanceWindow.h, app/Layer.cpp,
+	  app/Layer.h, app/LayerWindow.cpp, app/LayerWindow.h,
+	  app/LoginWindow.cpp, app/LoginWindow.h, app/MainWindow.cpp,
+	  app/MainWindow.h, app/Model.cpp, app/Model.h,
+	  app/NewLayerWindow.cpp, app/NewLayerWindow.h, app/Palette.cpp,
+	  app/Palette.h, app/Server.cpp, app/Server.h,
+	  app/ServerEntities.cpp, app/ServerEntities.h,
+	  app/ServerWindow.cpp, app/ServerWindow.h, app/Terrain.cpp,
+	  app/Terrain.h, app/ViewWindow.cpp, app/ViewWindow.h,
+	  app/WorldEntity.cpp, app/WorldEntity.h, app/equator.cpp,
+	  app/equator_plugin.cpp, app/operations.h, app/types.h,
+	  common/Vector3D.h, common/configuration.cpp,
+	  common/configuration.h, common/debug.h, common/system.cpp,
+	  common/system.h, gui/gtkmm/Cal3dStoreOptions.cpp,
+	  gui/gtkmm/Cal3dStoreOptions.h, gui/gtkmm/CameraControl.cpp,
+	  gui/gtkmm/CameraControl.h, gui/gtkmm/DockWindow.cpp,
+	  gui/gtkmm/DockWindow.h, gui/gtkmm/EntityExportOptions.cpp,
+	  gui/gtkmm/EntityExportOptions.h,
+	  gui/gtkmm/EntityImportOptions.cpp,
+	  gui/gtkmm/EntityImportOptions.h, gui/gtkmm/EntityTree.cpp,
+	  gui/gtkmm/EntityTree.h, gui/gtkmm/OptionBox.cpp,
+	  gui/gtkmm/OptionBox.h, gui/gtkmm/Options_template.h,
+	  gui/gtkmm/TypeTree.cpp, gui/gtkmm/TypeTree.h,
+	  visual/Renderer.cpp, visual/Renderer.h, visual/StockTexture.cpp,
+	  visual/StockTexture.h: Replace older brief copyright message
+	  with fuller text as recommended by the GPL.
+
 2006-06-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Cal3dStore.cpp,
@@ -977,7 +1011,7 @@
 2004-01-04  Al Riddoch  <ajr@ecs.soton.ac.uk>
 
 	* app/ServerEntities.cpp, app/ServerEntities.h,
-	  gui/gtkmm/EntityExportOptions.cpp gui/gtkmm/EntityExportOptions.h
+	  gui/gtkmm/EntityExportOptions.cpp gui/gtkmm/EntityExportOptions.h,
 	  gui/gtkmm/EntityImportOptions.cpp gui/gtkmm/EntityImportOptions.h:
 	  Move gui classes into separate files in gui directory.
 
