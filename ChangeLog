@@ -1,3 +1,11 @@
+2006-06-28  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/GlView.cpp: Report OpenGL errors once per frame if they have
+	  occured.
+
+	* visual/Makefile.am: Prevent errors caused by symlink attempts when
+	  file is already there.
+
 2006-06-27  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/SearView.h, app/SearView.cpp: Its a crazy idea, but it might

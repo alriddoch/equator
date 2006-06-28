@@ -370,6 +370,12 @@ void GlView::drawgl()
     }
     glFlush();
 
+    GLenum er;
+    if ((er = glGetError()) != 0) {
+        std::cerr << "Reporting OpenGL rendering error: " << gluErrorString(er)
+                  << std::endl << std::flush;
+    }
+
     mouseEffects();
 }
 
