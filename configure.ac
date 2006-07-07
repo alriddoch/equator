@@ -152,6 +152,15 @@ AM_PATH_LIB3DS(1.2.0, , AC_MSG_ERROR(Couldn't find lib3ds))
 CPPFLAGS="$CPPFLAGS $LIB3DS_CFLAGS"
 EQUATOR_LIBS="$EQUATOR_LIBS $LIB3DS_LIBS"
 
+PKG_CHECK_MODULES(LIBMD3, libmd3-0.2,
+    [
+        CPPFLAGS="$CPPFLAGS $LIBMD3_CFLAGS"
+        EQUATOR_LIBS="$EQUATOR_LIBS $LIBMD3_LIBS"
+    ],
+    [
+        AC_MSG_ERROR(Could not find libmd3 library)
+    ])
+
 PKG_CHECK_MODULES(CAL3D, cal3d >= 0.10.0,
     [
         CPPFLAGS="$CPPFLAGS $CAL3D_CFLAGS"
@@ -214,10 +223,17 @@ AC_CONFIG_FILES([
 	Makefile
 	common/Makefile
 	visual/Makefile
-	sear/Makefile
 	app/Makefile
 	gui/Makefile
 	gui/gtkmm/Makefile
+	sear/Makefile
+	sear/interfaces/Makefile
+	sear/common/Makefile
+	sear/loaders/Makefile
+	sear/loaders/cal3d/Makefile
+	sear/renderers/Makefile
+	sear/environment/Makefile
+	sear/src/Makefile
 	autopackage/default.apspec
 ])
 AC_OUTPUT

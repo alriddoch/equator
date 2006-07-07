@@ -1,3 +1,12 @@
+2006-07-07  Al Riddoch  <alriddoch@zepler.org>
+
+	* common/Makefile.am, environment/Makefile.am, interfaces/Makefile.am,
+	  loaders/Makefile.am, loaders/cal3d/Makefile.am,
+	  renderers/Makefile.am, src/Makefile.am: Add tree structure for
+	  sear rendering engine.
+
+	* configure.ac, sear/Makefile.am: Add sear tree to the build.
+
 2006-06-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GlView.cpp: Report OpenGL errors once per frame if they have
