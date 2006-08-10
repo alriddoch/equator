@@ -1,3 +1,8 @@
+Build an abstract interface for model data, for internal use, facilitating
+manipulation in a generic way, and conversion to other formats. Will have to
+be designed iteratively as I currently have only the vaguest idea of
+how it should work.
+
 There is a good probability that ImportTypesWizard leaks memory as there is
 recurrent RefPtr usage in the TreeStores. Please investigate.
 
