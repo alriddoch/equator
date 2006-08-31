@@ -10,7 +10,7 @@ CoreModelHandler.cpp CoreModelHandler.h:
 Cal3dCoreModel.cpp Cal3dCoreModel.h:
 	$(LN_S) -f $(sear_srcdir)/loaders/cal3d/Cal3dCoreModel.cpp $(sear_srcdir)/loaders/cal3d/Cal3dCoreModel.h .
 
-Cal3dModel.cpp Cal3dModel.h:
+Cal3dModel.cpp Cal3dModel.h: Cal3dCoreModel.h
 	$(LN_S) -f $(sear_srcdir)/loaders/cal3d/Cal3dModel.cpp $(sear_srcdir)/loaders/cal3d/Cal3dModel.h .
 
 Cal3d_Loader.cpp Cal3d_Loader.h:
