@@ -1,3 +1,5 @@
+SUBDIRS = cal3d
+
 noinst_LIBRARIES = libsearloaders.a
 
 INCLUDES = -I$(top_srcdir)/sear

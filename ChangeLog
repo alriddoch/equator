@@ -1,3 +1,10 @@
+2007-01-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* sear/environment/Makefile.am, sear/loaders/Makefile.am,
+	  sear/loaders/cal3d/Makefile.am, sear/renderers/Makefile.am,
+	  sear/src/Makefile.am: Add headers so they get packaged into
+	  the source distribution.
+
 2006-07-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* common/Makefile.am, environment/Makefile.am, interfaces/Makefile.am,

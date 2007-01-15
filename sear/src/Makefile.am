@@ -22,5 +22,5 @@ Calendar.h:
 SrcHeaders.cpp: Console.h System.h WorldEntity.h FileHandler.h Calendar.h
 	touch SrcHeaders.cpp
 
-libsearsrc_a_SOURCES = \
-                       SrcHeaders.cpp
+libsearsrc_a_SOURCES = SrcHeaders.cpp Console.h System.h WorldEntity.h \
+                       FileHandler.h Calendar.h

@@ -27,4 +27,7 @@ libsearenvironment_a_SOURCES = EnvironmentHeaders.cpp \
                                Stars.cpp \
                                TerrainRenderer.cpp \
                                Weather.cpp \
-                               Environment.cpp
+                               Environment.cpp \
+                               Environment.h  TerrainRenderer.h \
+                               SkyDome.h Weather.h Stars.h
+

@@ -26,5 +26,5 @@ RenderersHeaders.cpp: Render.h RenderSystem.h RenderTypes.h Graphics.h \
                       Light.h StateManager.h
 	touch RenderersHeaders.cpp
 
-libsearrenderers_a_SOURCES = \
-                             RenderersHeaders.cpp
+libsearrenderers_a_SOURCES = RenderersHeaders.cpp Render.h RenderSystem.h \
+                             RenderTypes.h Graphics.h Light.h StateManager.h
