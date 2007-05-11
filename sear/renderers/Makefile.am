@@ -22,9 +22,13 @@ Light.h:
 StateManager.h:
 	$(LN_S) -f $(sear_srcdir)/renderers/StateManager.h
 
+TextureManager.h:
+	$(LN_S) -f $(sear_srcdir)/renderers/TextureManager.h
+
 RenderersHeaders.cpp: Render.h RenderSystem.h RenderTypes.h Graphics.h \
-                      Light.h StateManager.h
+                      Light.h StateManager.h TextureManager.h
 	touch RenderersHeaders.cpp
 
 libsearrenderers_a_SOURCES = RenderersHeaders.cpp Render.h RenderSystem.h \
-                             RenderTypes.h Graphics.h Light.h StateManager.h
+                             RenderTypes.h Graphics.h Light.h StateManager.h \
+                             TextureManager.h

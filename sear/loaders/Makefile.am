@@ -27,6 +27,9 @@ BoundBox_Loader.cpp BoundBox_Loader.h:
 DynamicObject.cpp DynamicObject.h:
 	$(LN_S) -f $(sear_srcdir)/loaders/DynamicObject.cpp $(sear_srcdir)/loaders/DynamicObject.h .
 
+EntityMapper.cpp EntityMapper.h:
+	$(LN_S) -f $(sear_srcdir)/loaders/EntityMapper.cpp $(sear_srcdir)/loaders/EntityMapper.h .
+
 LibModelFile.cpp LibModelFile.h:
 	$(LN_S) -f $(sear_srcdir)/loaders/LibModelFile.cpp $(sear_srcdir)/loaders/LibModelFile.h .
 
@@ -66,6 +69,18 @@ ParticleSystemLoader.cpp ParticleSystemLoader.h:
 StaticObject.cpp StaticObject.h:
 	$(LN_S) -f $(sear_srcdir)/loaders/StaticObject.cpp $(sear_srcdir)/loaders/StaticObject.h .
 
+SearObject.cpp SearObject.h:
+	$(LN_S) -f $(sear_srcdir)/loaders/SearObject.cpp $(sear_srcdir)/loaders/SearObject.h .
+
+SearObject_Loader.cpp SearObject_Loader.h:
+	$(LN_S) -f $(sear_srcdir)/loaders/SearObject_Loader.cpp $(sear_srcdir)/loaders/SearObject_Loader.h .
+
+SearObjectTypes.h:
+	$(LN_S) -f $(sear_srcdir)/loaders/SearObjectTypes.h .
+
+StaticObjectFunctions.h:
+	$(LN_S) -f $(sear_srcdir)/loaders/StaticObjectFunctions.h .
+
 WireFrame.cpp WireFrame.h:
 	$(LN_S) -f $(sear_srcdir)/loaders/WireFrame.cpp $(sear_srcdir)/loaders/WireFrame.h .
 
@@ -79,6 +94,7 @@ LoadersHeaders.cpp: 3ds.h \
                     BoundBox.h \
                     BoundBox_Loader.h \
                     DynamicObject.h \
+                    EntityMapper.h \
                     LibModelFile.h \
                     LibModelFile_Loader.h \
                     Model.h \
@@ -93,7 +109,11 @@ LoadersHeaders.cpp: 3ds.h \
                     ObjectRecord.h \
                     ParticleSystem.h \
                     ParticleSystemLoader.h \
+                    SearObject.h \
+                    SearObject_Loader.h \
+                    SearObjectTypes.h \
                     StaticObject.h \
+                    StaticObjectFunctions.h \
                     WireFrame.h \
                     WireFrame_Loader.h
 	touch LoadersHeaders.cpp
@@ -106,6 +126,7 @@ libsearloaders_a_SOURCES = LoadersHeaders.cpp \
                            BoundBox.cpp \
                            BoundBox_Loader.cpp \
                            DynamicObject.cpp \
+                           EntityMapper.cpp \
                            LibModelFile.cpp \
                            LibModelFile_Loader.cpp \
                            ModelHandler.cpp \
@@ -118,6 +139,8 @@ libsearloaders_a_SOURCES = LoadersHeaders.cpp \
                            ObjectRecord.cpp \
                            ParticleSystem.cpp \
                            ParticleSystemLoader.cpp \
+                           SearObject.cpp \
+                           SearObject_Loader.cpp \
                            StaticObject.cpp \
                            WireFrame.cpp \
                            WireFrame_Loader.cpp \
@@ -128,6 +151,7 @@ libsearloaders_a_SOURCES = LoadersHeaders.cpp \
                            BoundBox.h \
                            BoundBox_Loader.h \
                            DynamicObject.h \
+                           EntityMapper.h \
                            LibModelFile.h \
                            LibModelFile_Loader.h \
                            Model.h \
@@ -142,6 +166,10 @@ libsearloaders_a_SOURCES = LoadersHeaders.cpp \
                            ObjectRecord.h \
                            ParticleSystem.h \
                            ParticleSystemLoader.h \
+                           SearObject.h \
+                           SearObject_Loader.h \
+                           SearObjectTypes.h \
                            StaticObject.h \
+                           StaticObjectFunctions.h \
                            WireFrame.h \
                            WireFrame_Loader.h
