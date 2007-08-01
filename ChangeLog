@@ -1,3 +1,10 @@
+2007-08-01  Al Riddoch  <alriddoch@zepler.org>
+
+	* app/Forest.cpp, app/Forest.h: Layer for messing about with forests.
+
+	* app/NewLayerWindow.cpp: Break the build by adding the forest layer
+	  stuff before the code is written.
+
 2007-01-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* sear/loaders/Makefile.am, sear/renderers/Makefile.am:

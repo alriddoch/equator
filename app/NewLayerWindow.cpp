@@ -20,6 +20,7 @@
 #include "Model.h"
 #include "Terrain.h"
 #include "Cal3dStore.h"
+#include "Forest.h"
 
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
@@ -68,6 +69,12 @@ NewLayerWindow::NewLayerWindow()
     m_factories["Cal3d"] = factory;
     row = *(m_treeModel->append());
     row[*m_nameColumn]     = "Cal3d";
+
+    factory = new LayerPlant<Forest>();
+    LayerFactory::factories["Forest"] = factory;
+    m_factories["Forest"] = factory;
+    row = *(m_treeModel->append());
+    row[*m_nameColumn]     = "Forest";
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
     scrolled_window->set_size_request(250,150);

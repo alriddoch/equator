@@ -1,0 +1,4 @@
+.deps
+LoadersHeaders.cpp
+Makefile
+Makefile.in

@@ -1,0 +1,4 @@
+.deps
+EnvironmentHeaders.cpp
+Makefile
+Makefile.in
