@@ -1,5 +1,9 @@
 2007-11-05  Al Riddoch  <alriddoch@zepler.org>
 
+	* configure.ac: Improve error messages when libraries are missing.
+
+2007-11-05  Al Riddoch  <alriddoch@zepler.org>
+
 	* acinclude.m4: Update to latest pkgconfig macros.
 
 	* configure.ac, Makefile.am: Rip out the attempt to bring in sear

@@ -145,7 +145,14 @@ PKG_CHECK_MODULES(WF, eris-1.3 >= 1.3.5 mercator-0.2 >= 0.2.2 varconf-1.0 sage ,
         EQUATOR_LIBS="$EQUATOR_LIBS $WF_LIBS"
     ],
     [
-        AC_MSG_ERROR(Couldn't find WorldForge libs.)
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([
+Cannot find valid versions of required WorldForge libraries:
+$WF_PKG_ERRORS
+Perhaps you should add the directory containing the missing libraries to the
+PKG_CONFIG_PATH environment variable.
+Please see http://worldforge.org/dev/eng/clients/equator for details of the
+libraries required and where to obtain them.])
     ])
 
 AM_PATH_LIB3DS(1.2.0, , AC_MSG_ERROR(Couldn't find lib3ds))
@@ -158,7 +165,14 @@ PKG_CHECK_MODULES(LIBMD3, libmd3-0.2,
         EQUATOR_LIBS="$EQUATOR_LIBS $LIBMD3_LIBS"
     ],
     [
-        AC_MSG_ERROR(Could not find libmd3 library)
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([
+Cannot find valid version of required library, libmodelfile:
+$LIBMD3_PKG_ERRORS
+Perhaps you should add the directory containing the missing libraries to the
+PKG_CONFIG_PATH environment variable.
+Please see http://worldforge.org/dev/eng/clients/equator for details of the
+libraries required and where to obtain them.])
     ])
 
 PKG_CHECK_MODULES(CAL3D, cal3d >= 0.10.0,
@@ -167,7 +181,14 @@ PKG_CHECK_MODULES(CAL3D, cal3d >= 0.10.0,
         EQUATOR_LIBS="$EQUATOR_LIBS $CAL3D_LIBS"
     ],
     [
-        AC_MSG_ERROR(Could not find cal3d library)
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([
+Cannot find valid version of required library, cal3d:
+$CAL3D_PKG_ERRORS
+Perhaps you should add the directory containing the missing libraries to the
+PKG_CONFIG_PATH environment variable.
+Please see http://worldforge.org/dev/eng/clients/equator for details of the
+libraries required and where to obtain them.])
     ])
 
 dnl Versions required
@@ -178,7 +199,14 @@ PKG_CHECK_MODULES(GTK, gtkglextmm-1.2 ,
         EQUATOR_LIBS="$EQUATOR_LIBS $GTK_LIBS"
     ],
     [
-        AC_MSG_ERROR(Couldn't find GTK libs.)
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([
+Cannot find valid version of required library, gtkglextmm:
+$GTK_PKG_ERRORS
+Perhaps you should add the directory containing the missing libraries to the
+PKG_CONFIG_PATH environment variable.
+Please see http://worldforge.org/dev/eng/clients/equator for details of the
+libraries required and where to obtain them.])
     ])
 
 AC_MSG_CHECKING([for round in libm])
