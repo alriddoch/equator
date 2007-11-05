@@ -1,6 +1,6 @@
 dnl Initialise autoconf
 
-AC_INIT(equator, 0.1.1)
+AC_INIT([equator], [0.1.1], [alriddoch@googlemail.com])
 AC_CONFIG_SRCDIR([app/equator_plugin.cpp])
 AC_CONFIG_HEADERS([config.h])
 
@@ -11,16 +11,14 @@ AC_CANONICAL_TARGET
 
 dnl Initialise automake
 
-AM_INIT_AUTOMAKE([dist-bzip2])
-
-dnl Need libtool
-
-AC_PROG_LIBTOOL
-AC_PROG_LN_S
+AM_INIT_AUTOMAKE([dist-bzip2 check-news])
 
 dnl Test for C++ compiler
 
 AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_RANLIB
+AC_PROG_LN_S
 
 AC_ARG_ENABLE(debug,
     [  --enable-debug          enable debug information [default=no]],
@@ -139,6 +137,8 @@ if test $cross_compiling == no; then
 fi
 LIBS="$LIBS $EQUATOR_LIBS"
 
+PKG_PROG_PKG_CONFIG
+
 PKG_CHECK_MODULES(WF, eris-1.3 >= 1.3.5 mercator-0.2 >= 0.2.2 varconf-1.0 sage ,
     [
         CPPFLAGS="$CPPFLAGS $WF_CFLAGS"
@@ -226,14 +226,6 @@ AC_CONFIG_FILES([
 	app/Makefile
 	gui/Makefile
 	gui/gtkmm/Makefile
-	sear/Makefile
-	sear/interfaces/Makefile
-	sear/common/Makefile
-	sear/loaders/Makefile
-	sear/loaders/cal3d/Makefile
-	sear/renderers/Makefile
-	sear/environment/Makefile
-	sear/src/Makefile
 	autopackage/default.apspec
 ])
 AC_OUTPUT

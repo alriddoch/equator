@@ -1,3 +1,14 @@
+2007-11-05  Al Riddoch  <alriddoch@zepler.org>
+
+	* acinclude.m4: Update to latest pkgconfig macros.
+
+	* configure.ac, Makefile.am: Rip out the attempt to bring in sear
+	  code for rendering the world. Use latest pkgconfig macros, and
+	  update autoconf usage.
+
+	* app/NewLayerWindow.cpp: Take out the prematurely added Forest code
+	  for the moment.
+
 2007-08-01  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/Forest.cpp, app/Forest.h: Layer for messing about with forests.

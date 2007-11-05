@@ -70,11 +70,13 @@ NewLayerWindow::NewLayerWindow()
     row = *(m_treeModel->append());
     row[*m_nameColumn]     = "Cal3d";
 
+#if 0
     factory = new LayerPlant<Forest>();
     LayerFactory::factories["Forest"] = factory;
     m_factories["Forest"] = factory;
     row = *(m_treeModel->append());
     row[*m_nameColumn]     = "Forest";
+#endif
 
     Gtk::ScrolledWindow * scrolled_window = manage( new Gtk::ScrolledWindow() );
     scrolled_window->set_size_request(250,150);
