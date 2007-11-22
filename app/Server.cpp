@@ -156,8 +156,8 @@ void Server::createLayers()
     Layer * layer = new ServerEntities(*m_model, *this);
     m_model->addLayer(layer);
 
-    layer = new GameView(*m_model, *this);
-    m_model->addLayer(layer);
+    // layer = new GameView(*m_model, *this);
+    // m_model->addLayer(layer);
 
     Eris::Entity * worldRoot = m_view->getTopLevel();
 

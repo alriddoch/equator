@@ -1,3 +1,9 @@
+2007-11-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* common/configuration.cpp, app/Server.cpp: Remove a bunch of
+	  code used to support using the apogee renderer to get a game
+	  like view.
+
 2007-11-05  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Improve error messages when libraries are missing.
