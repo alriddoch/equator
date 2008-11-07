@@ -17,7 +17,7 @@
 
 #include "configuration.h"
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 varconf::Config * global_conf;
 

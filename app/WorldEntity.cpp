@@ -30,7 +30,7 @@
 
 #include <Atlas/Objects/Entity.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <sigc++/adaptors/bind.h>
 #include <sigc++/functors/mem_fun.h>
