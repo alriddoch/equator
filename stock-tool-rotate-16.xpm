@@ -1,5 +1,5 @@
 /* XPM */
-static char * stock_tool_rotate_16_xpm[] = {
+static const char * stock_tool_rotate_16_xpm[] = {
 "16 16 77 1",
 " 	c None",
 ".	c #000000",

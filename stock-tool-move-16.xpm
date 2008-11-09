@@ -1,5 +1,5 @@
 /* XPM */
-static char * stock_tool_move_16_xpm[] = {
+static const char * stock_tool_move_16_xpm[] = {
 "16 16 17 1",
 " 	c None",
 ".	c #000000",

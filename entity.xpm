@@ -1,5 +1,5 @@
 /* XPM */
-static char * entity_xpm[] = {
+static const char * entity_xpm[] = {
 "20 20 5 1",
 " 	c None",
 ".	c #000000",

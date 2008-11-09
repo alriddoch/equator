@@ -1,5 +1,5 @@
 /* XPM */
-static char * eye_xpm[] = {
+static const char * eye_xpm[] = {
 "21 21 2 1",
 " 	c None",
 ".	c #000000",

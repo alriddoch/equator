@@ -1,5 +1,5 @@
 /* XPM */
-static char * vertex_xpm[] = {
+static const char * vertex_xpm[] = {
 "20 20 4 1",
 " 	c None",
 ".	c #000000",

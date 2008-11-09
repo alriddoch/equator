@@ -1,3 +1,12 @@
+2008-11-09  Al Riddoch  <alriddoch@googlemail.com>
+
+	* arrow.xpm, delete.xpm, draw.xpm, duplicate.xpm, entity.xpm, eye.xpm,
+	  info.xpm, lower.xpm, move.xpm, newlayer.xpm, null.xpm, raise.xpm,
+	  rotate.xpm, scale.xpm, select.xpm, stock-tool-move-16.xpm,
+	  stock-tool-rotate-16.xpm, stock-tool-zoom-16.xpm, tile.xpm,
+	  vertex.xpm: Hack all the inlined xpms so they are const to prevent
+	  warnings.
+
 2008-11-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* app/GameView.h: Fix the constructor argument name.
