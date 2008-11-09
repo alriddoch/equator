@@ -1,5 +1,9 @@
 2008-11-07  Al Riddoch  <alriddoch@zepler.org>
 
+	* app/GameView.h: Fix the constructor argument name.
+
+2008-11-07  Al Riddoch  <alriddoch@zepler.org>
+
 	* app/WorldEntity.cpp, common/configuration.cpp:
 	  Switch varconf/Config.h to the lower case name.
 

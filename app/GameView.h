@@ -41,7 +41,7 @@ class GameView : public Layer {
                     const PosType &);
     void drawWorld(GlView & view, Eris::Entity * wrld);
   public:
-    GameView(Model & m, Server & m);
+    GameView(Model & m, Server & s);
 
     virtual void options();
     virtual void importFile();
