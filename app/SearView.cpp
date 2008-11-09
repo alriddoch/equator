@@ -54,6 +54,7 @@ void SearView::draw(GlView & view)
 
 bool SearView::animate(GlView & view)
 {
+    return false;
 }
 
 void SearView::select(GlView & view, int x, int y)

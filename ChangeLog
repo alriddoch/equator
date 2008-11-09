@@ -1,5 +1,16 @@
 2008-11-09  Al Riddoch  <alriddoch@googlemail.com>
 
+	* app/SearView.cpp: Fix a warning about a missing return value in
+	  a stub class.
+
+	* app/ServerWindow.cpp: Remove an unused variable and add a FIXME
+	  about completing the implementation.
+
+	* app/Palette.cpp, app/ServerEntities.cpp, app/AtlasMapWidget.cpp:
+	  Convert some #warnings into FIXMEs.
+
+2008-11-09  Al Riddoch  <alriddoch@googlemail.com>
+
 	* arrow.xpm, delete.xpm, draw.xpm, duplicate.xpm, entity.xpm, eye.xpm,
 	  info.xpm, lower.xpm, move.xpm, newlayer.xpm, null.xpm, raise.xpm,
 	  rotate.xpm, scale.xpm, select.xpm, stock-tool-move-16.xpm,

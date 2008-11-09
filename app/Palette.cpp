@@ -225,7 +225,7 @@ void Palette::syncModel(Model * model)
     if (I != m_tiles.end()) {
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
-#warning Clear the paletter windows
+        // FIXME Clear the paletter windows
         m_tileTreeModel->clear();
         for (; J != entries.end(); J++) {
             Gtk::TreeModel::Row row = *(m_tileTreeModel->append());
@@ -241,7 +241,7 @@ void Palette::syncModel(Model * model)
     if (I != m_entities.end()) {
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
-#warning Clear the paletter windows
+        // FIXME Clear the paletter windows
         m_entityTreeModel->clear();
         for (; J != entries.end(); J++) {
             Gtk::TreeModel::Row row = *(m_entityTreeModel->append());
@@ -255,7 +255,7 @@ void Palette::syncModel(Model * model)
     if (I != m_textures.end()) {
         const std::list<std::string> & entries = I->second;
         std::list<std::string>::const_iterator J = entries.begin();
-#warning Clear the paletter windows
+        // FIXME Clear the paletter windows
         m_textureTreeModel->clear();
         for (; J != entries.end(); J++) {
             Gtk::TreeModel::Row row = *(m_textureTreeModel->append());

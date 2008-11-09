@@ -223,12 +223,13 @@ void ServerWindow::chatPressed()
 
 void ServerWindow::statusPressed()
 {
-    Gtk::TreeModel::Row row = *(m_refTreeSelection->get_selected());
-    Server * selServer = row[*m_ptrColumn];
-
-    assert(selServer != 0);
-
     // FIXME Query status
+
+    // Gtk::TreeModel::Row row = *(m_refTreeSelection->get_selected());
+    // Server * selected_erver = row[*m_ptrColumn];
+
+    // assert(selected_erver != 0);
+
 }
 
 void ServerWindow::typesPressed()

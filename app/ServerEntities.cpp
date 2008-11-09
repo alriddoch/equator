@@ -666,7 +666,7 @@ void ServerEntities::alignEntityParent(Eris::Entity * ent)
                                         ent->getLocation()->getId(),
                                         pos, VelType(0,0,0));
         }
-#warning FIXME - get the server object to handle the adjustment.
+        // FIXME - get the server object to handle the adjustment.
         // The server object knows about what data we have available.
         // We should probably support alignments like "other layer", "parent"
     }

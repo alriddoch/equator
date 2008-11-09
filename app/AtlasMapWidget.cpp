@@ -46,7 +46,7 @@ void AtlasMapWidget::add(/* Gtk::CTree_Helpers::RowList rowList, */
                          const std::string & name,
                          const Element & o)
 {
-#warning Fix the AtlasMapWidget class FIXME
+    // FIXME Fix the AtlasMapWidget class
 #if 0
     std::vector<const char*> item(2);
     item[0] = name.c_str();
