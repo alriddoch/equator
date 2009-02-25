@@ -1,3 +1,8 @@
+2009-02-25  Al Riddoch  <alriddoch@googlemail.com>
+
+	* app/ConnectWindow.cpp, app/GlView.cpp, app/Terrain.cpp:
+	  Add includes required by recent library versions.
+
 2008-11-09  Al Riddoch  <alriddoch@googlemail.com>
 
 	* app/SearView.cpp: Fix a warning about a missing return value in

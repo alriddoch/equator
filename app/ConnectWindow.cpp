@@ -40,6 +40,8 @@
 #include <sigc++/adaptors/bind.h>
 #include <sigc++/adaptors/hide.h>
 
+#include <iostream>
+
 #include <cassert>
 
 ConnectWindow::ConnectWindow(MainWindow & mw) :

@@ -30,6 +30,8 @@
 #include <Mercator/Terrain.h>
 #include <Mercator/Segment.h>
 
+#include <Atlas/Message/Element.h>
+
 #include <wfmath/point.h>
 
 #include <gtkmm/fileselection.h>

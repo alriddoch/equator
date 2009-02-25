@@ -31,6 +31,7 @@
 #include "gui/gtkmm/DockWindow.h"
 
 #include <wfmath/point.h>
+#include <wfmath/vector.h>
 
 #include <GL/glu.h>
 
